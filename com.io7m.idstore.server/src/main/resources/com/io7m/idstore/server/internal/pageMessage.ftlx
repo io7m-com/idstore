@@ -1,0 +1,50 @@
+[#ftl output_format="XHTML"]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="/resource/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="/resource/style.css"/>
+  <title>${pageTitle}</title>
+</head>
+<body>
+
+<div id="ids_main">
+  <div id="ids_header">
+    <span class="ids_logo">
+      <img src="/resource/idstore.svg" width="16" height="16" class="ids_header_logo ids_logo"/> idstore
+    </span>
+    <span class="ids_empty">&#x000A;</span>
+    <span class="ids_profile_links">
+      <a href="/logout">Log out</a>
+    </span>
+  </div>
+
+  <div id="ids_content">
+    <div class="ids_message_container">
+      [#if messageIsError]
+      <div class="ids_message_error">
+        <h3>${messageTitle}</h3>
+        <p>${message}</p>
+        [#if messageIsServerError]
+        <p>The administrators have been notified of this error.</p>
+        <p>Request ID: ${requestId}</p>
+        [/#if]
+
+        <div><a href="${returnTo}" class="ids_xbutton">Return</a></div>
+      </div>
+      [#else]
+      <div class="ids_message">
+        <h3>${messageTitle}</h3>
+        <p>${message}</p>
+
+        <div><a href="${returnTo}" class="ids_xbutton">Return</a></div>
+      </div>
+      [/#if]
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

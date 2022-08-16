@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE suppressions PUBLIC
+  "-//Checkstyle//DTD SuppressionFilter Configuration 1.0//EN"
+  "https://checkstyle.org/dtds/suppressions_1_0.dtd">
+
+<suppressions>
+  <!-- Secondary record constructors require parameter name shadowing. -->
+  <suppress files="IdStorageName\.java"
+            checks="HiddenField"/>
+
+  <suppress files="IdLoggingHTTPRequestLayout\.java"
+            checks="JavadocVariable"/>
+
+  <!-- Secondary record constructors require parameter name shadowing. -->
+  <suppress files="IdAuditEvent\.java"
+            checks="HiddenField"/>
+  <suppress files="IdUserOrdering\.java"
+            checks="HiddenField"/>
+  <suppress files="IdNonEmptyList\.java"
+            checks="HiddenField"/>
+
+  <suppress files="IdSCommandVersion\.java"
+            checks="IllegalInstantiation"/>
+  <suppress files="IdPSCommandVersion\.java"
+            checks="IllegalInstantiation"/>
+
+  <!-- Without pattern matching... -->
+  <suppress files="IdACommandExecutor\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACommandExecutor\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdPCommandExecutor\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdPCommandExecutor\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdSecPolicyDefault\.java"
+            checks="NPathComplexity"/>
+
+  <!-- MXBeans have specific name conventions. -->
+  <suppress files="IdDatabaseMetricsMXBean\.java"
+            checks="TypeName"/>
+</suppressions>

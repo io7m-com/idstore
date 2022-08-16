@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+  <entry key="httpError">HTTP server returned an error: {0}</entry>
+  <entry key="noSupportedVersions">This client does not support any protocols the server presented.</entry>
+  <entry key="serverSupports">Server supports:</entry>
+  <entry key="clientSupports">Client supports:</entry>
+  <entry key="notLoggedIn">Error: Not logged in!</entry>
+
+  <entry key="errorContentType"><![CDATA[The server sent an unexpected content type.
+  Command:  {0}
+  Expected: {1}
+  Received: {2}
+]]></entry>
+
+  <entry key="errorResponseType"><![CDATA[The server sent an unexpected message response type.
+  Request ID: {0}
+  Command:    {1}
+  Expected:   {2}
+  Received:   {3}
+]]></entry>
+
+  <entry key="errorResponse"><![CDATA[The server sent an error response.
+  Request ID:    {0}
+  Command:       {1}
+  Status:        {2}
+  Error Code:    {3}
+  Error Message: {4}
+]]></entry>
+
+  <entry key="errorMalformedParameter">Malformed parameter: {0}</entry>
+
+</properties>

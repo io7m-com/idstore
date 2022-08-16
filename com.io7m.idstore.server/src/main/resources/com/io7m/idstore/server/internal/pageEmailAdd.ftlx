@@ -1,0 +1,46 @@
+[#ftl output_format="XHTML"]
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="/resource/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="/resource/style.css"/>
+  <title>${pageTitle}</title>
+</head>
+<body>
+
+<div id="ids_main">
+  <div id="ids_header">
+    <span class="ids_logo">
+      <img src="/resource/idstore.svg" width="16" height="16" class="ids_header_logo ids_logo"/> idstore
+    </span>
+    <span class="ids_empty">&#x000A;</span>
+    <span class="ids_profile_links">
+      <a href="/logout">Log out</a>
+    </span>
+  </div>
+
+  <div id="ids_content">
+    <div class="ids_emailAddForm_container">
+      [#if errorMessage??]
+      <div class="ids_error_message">
+        <h3>Error</h3>
+        <p>${errorMessage}</p>
+        <p>The administrators have been notified of this error.</p>
+        <p>Request ID: ${requestId}</p>
+      </div>
+      [/#if]
+
+      <p>Please enter the email address to add to this account.</p>
+      <form action="/email-add-run" method="post" class="ids_emailAddForm">
+        <label class="ids_emailAddForm_emailLabel" for="email">Email</label>
+        <input class="ids_emailAddForm_emailField" type="text" id="email" name="email"/>
+        <input class="ids_emailAddForm_submit ids_xbutton" type="submit" value="Add"/>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

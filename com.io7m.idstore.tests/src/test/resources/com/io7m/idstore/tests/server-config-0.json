@@ -1,0 +1,51 @@
+{
+  "%Schema": "https://www.io7m.com/idstore/server-configuration-1.json",
+
+  "Mail": {
+    "Transport": {
+      "Type": "SMTP",
+      "Host": "mail.example.com",
+      "Port": 25
+    },
+    "Sender": "no-reply@example.com",
+    "VerificationExpiration": "PT24H"
+  },
+
+  "HTTP": {
+    "AdminAPIService": {
+      "SessionDirectory": "/tmp/idstore-session-admin-api",
+      "ListenAddress": "localhost",
+      "ListenPort": 51000,
+      "ExternalAddress": "http://localhost:51000/"
+    },
+    "AdminViewService": {
+      "SessionDirectory": "/tmp/idstore-session-admin-view",
+      "ListenAddress": "localhost",
+      "ListenPort": 51001,
+      "ExternalAddress": "http://localhost:51001/"
+    },
+    "UserAPIService": {
+      "SessionDirectory": "/tmp/idstore-session-user-api",
+      "ListenAddress": "localhost",
+      "ListenPort": 50000,
+      "ExternalAddress": "http://localhost:50000/"
+    },
+    "UserViewService": {
+      "SessionDirectory": "/tmp/idstore-session-user-view",
+      "ListenAddress": "localhost",
+      "ListenPort": 50001,
+      "ExternalAddress": "http://localhost:50001/"
+    }
+  },
+
+  "Database": {
+    "Kind": "POSTGRESQL",
+    "User": "postgres",
+    "Password": "12345678",
+    "Host": "localhost",
+    "Port": 54322,
+    "Name": "postgres",
+    "Create": true,
+    "Upgrade": true
+  }
+}

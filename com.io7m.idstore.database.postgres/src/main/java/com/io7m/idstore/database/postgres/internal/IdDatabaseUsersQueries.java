@@ -1,0 +1,730 @@
+/*
+ * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+ * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+
+package com.io7m.idstore.database.postgres.internal;
+
+import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
+import com.io7m.idstore.database.postgres.internal.tables.records.EmailsRecord;
+import com.io7m.idstore.database.postgres.internal.tables.records.LoginHistoryRecord;
+import com.io7m.idstore.database.postgres.internal.tables.records.UsersRecord;
+import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdLogin;
+import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdNonEmptyList;
+import com.io7m.idstore.model.IdPassword;
+import com.io7m.idstore.model.IdPasswordAlgorithms;
+import com.io7m.idstore.model.IdPasswordException;
+import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.model.IdTimeRange;
+import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdUserOrdering;
+import com.io7m.idstore.model.IdUserSummary;
+import org.jooq.OrderField;
+import org.jooq.Result;
+import org.jooq.SelectForUpdateStep;
+import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
+
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Supplier;
+
+import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
+import static com.io7m.idstore.database.postgres.internal.Tables.AUDIT;
+import static com.io7m.idstore.database.postgres.internal.Tables.EMAILS;
+import static com.io7m.idstore.database.postgres.internal.Tables.LOGIN_HISTORY;
+import static com.io7m.idstore.database.postgres.internal.Tables.USERS;
+import static com.io7m.idstore.database.postgres.internal.Tables.USER_IDS;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_EMAIL;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID_NAME;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+
+final class IdDatabaseUsersQueries
+  extends IdBaseQueries
+  implements IdDatabaseUsersQueriesType
+{
+  static final Supplier<IdDatabaseException> USER_DOES_NOT_EXIST = () -> {
+    return new IdDatabaseException(
+      "User does not exist",
+      USER_NONEXISTENT
+    );
+  };
+
+  IdDatabaseUsersQueries(
+    final IdDatabaseTransaction inTransaction)
+  {
+    super(inTransaction);
+  }
+
+  private static IdUser userMap(
+    final UsersRecord userRecord,
+    final Result<EmailsRecord> emails)
+    throws IdPasswordException
+  {
+    return new IdUser(
+      userRecord.getId(),
+      new IdName(userRecord.getIdName()),
+      new IdRealName(userRecord.getRealName()),
+      IdNonEmptyList.ofList(
+        emails.stream()
+          .map(e -> new IdEmail(e.getEmailAddress()))
+          .toList()
+      ),
+      userRecord.getTimeCreated(),
+      userRecord.getTimeUpdated(),
+      new IdPassword(
+        IdPasswordAlgorithms.parse(userRecord.getPasswordAlgo()),
+        userRecord.getPasswordHash().toUpperCase(Locale.ROOT),
+        userRecord.getPasswordSalt().toUpperCase(Locale.ROOT)
+      )
+    );
+  }
+
+  private static IdDatabaseException handlePasswordException(
+    final IdPasswordException exception)
+  {
+    return new IdDatabaseException(
+      exception.getMessage(),
+      exception,
+      PASSWORD_ERROR
+    );
+  }
+
+  private static Collection<? extends OrderField<?>> orderFields(
+    final IdUserOrdering ordering)
+  {
+    final var columns = ordering.ordering();
+    final var fields = new ArrayList<OrderField<?>>(columns.size());
+    for (final var columnOrder : columns) {
+      fields.add(
+        switch (columnOrder.column()) {
+          case BY_ID -> {
+            if (columnOrder.ascending()) {
+              yield USERS.ID.asc();
+            }
+            yield USERS.ID.desc();
+          }
+
+          case BY_IDNAME -> {
+            if (columnOrder.ascending()) {
+              yield USERS.ID_NAME.asc();
+            }
+            yield USERS.ID_NAME.desc();
+          }
+
+          case BY_REALNAME -> {
+            if (columnOrder.ascending()) {
+              yield USERS.REAL_NAME.asc();
+            }
+            yield USERS.REAL_NAME.desc();
+          }
+
+          case BY_TIME_CREATED -> {
+            if (columnOrder.ascending()) {
+              yield USERS.TIME_CREATED.asc();
+            }
+            yield USERS.TIME_CREATED.desc();
+          }
+
+          case BY_TIME_UPDATED -> {
+            if (columnOrder.ascending()) {
+              yield USERS.TIME_UPDATED.asc();
+            }
+            yield USERS.TIME_UPDATED.desc();
+          }
+        });
+    }
+    return List.copyOf(fields);
+  }
+
+  @Override
+  public IdUser userCreate(
+    final UUID id,
+    final IdName idName,
+    final IdRealName realName,
+    final IdEmail email,
+    final OffsetDateTime created,
+    final IdPassword password)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+    Objects.requireNonNull(idName, "idName");
+    Objects.requireNonNull(realName, "userName");
+    Objects.requireNonNull(email, "email");
+    Objects.requireNonNull(password, "password");
+    Objects.requireNonNull(created, "created");
+    Objects.requireNonNull(password, "password");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var adminId = transaction.adminId();
+
+    try {
+      {
+        final var existing =
+          context.fetchOptional(USERS, USERS.ID.eq(id));
+        if (existing.isPresent()) {
+          throw new IdDatabaseException(
+            "User ID already exists",
+            USER_DUPLICATE_ID
+          );
+        }
+      }
+
+      {
+        final var existing =
+          context.fetchOptional(USERS, USERS.ID_NAME.eq(idName.value()));
+        if (existing.isPresent()) {
+          throw new IdDatabaseException(
+            "User ID name already exists",
+            USER_DUPLICATE_ID_NAME
+          );
+        }
+      }
+
+      {
+        final var existing =
+          context.fetchOptional(
+            EMAILS,
+            EMAILS.EMAIL_ADDRESS.eq(email.value())
+              .and(EMAILS.USER_ID.isNotNull())
+          );
+
+        if (existing.isPresent()) {
+          throw new IdDatabaseException(
+            "Email already exists",
+            USER_DUPLICATE_EMAIL
+          );
+        }
+      }
+
+      final var idCreate =
+        context.insertInto(USER_IDS)
+          .set(USER_IDS.ID, id);
+
+      idCreate.execute();
+
+      final var userCreate =
+        context.insertInto(USERS)
+          .set(USERS.ID, id)
+          .set(USERS.ID_NAME, idName.value())
+          .set(USERS.REAL_NAME, realName.value())
+          .set(USERS.TIME_CREATED, created)
+          .set(USERS.TIME_UPDATED, created)
+          .set(USERS.PASSWORD_ALGO, password.algorithm().identifier())
+          .set(USERS.PASSWORD_HASH, password.hash())
+          .set(USERS.PASSWORD_SALT, password.salt());
+
+      userCreate.execute();
+
+      context.insertInto(EMAILS)
+        .set(EMAILS.EMAIL_ADDRESS, email.value())
+        .set(EMAILS.USER_ID, id)
+        .execute();
+
+      final var audit =
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "USER_CREATED")
+          .set(AUDIT.USER_ID, adminId)
+          .set(AUDIT.MESSAGE, id.toString());
+
+      audit.execute();
+      return this.userGet(id).orElseThrow();
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(transaction, e);
+    }
+  }
+
+  @Override
+  public Optional<IdUser> userGet(
+    final UUID id)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+
+    final var context = this.transaction().createContext();
+    try {
+      final var userRecordOpt =
+        context.selectFrom(USERS)
+          .where(USERS.ID.eq(id))
+          .fetchOptional();
+
+      if (userRecordOpt.isEmpty()) {
+        return Optional.empty();
+      }
+
+      final var userRecord =
+        userRecordOpt.get();
+
+      final var emails =
+        context.selectFrom(EMAILS)
+          .where(EMAILS.USER_ID.eq(userRecord.getId()))
+          .fetch();
+
+      return Optional.of(userMap(userRecord, emails));
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    } catch (final IdPasswordException e) {
+      throw handlePasswordException(e);
+    }
+  }
+
+  @Override
+  public IdUser userGetRequire(
+    final UUID id)
+    throws IdDatabaseException
+  {
+    return this.userGet(id).orElseThrow(USER_DOES_NOT_EXIST);
+  }
+
+  @Override
+  public Optional<IdUser> userGetForName(
+    final IdName name)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(name, "name");
+
+    final var context = this.transaction().createContext();
+    try {
+      final var userRecordOpt =
+        context.selectFrom(USERS)
+          .where(USERS.ID_NAME.eq(name.value()))
+          .fetchOptional();
+
+      if (userRecordOpt.isEmpty()) {
+        return Optional.empty();
+      }
+
+      final var userRecord =
+        userRecordOpt.get();
+
+      final var emails =
+        context.selectFrom(EMAILS)
+          .where(EMAILS.USER_ID.eq(userRecord.getId()))
+          .fetch();
+
+      return Optional.of(userMap(userRecord, emails));
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    } catch (final IdPasswordException e) {
+      throw handlePasswordException(e);
+    }
+  }
+
+  @Override
+  public IdUser userGetForNameRequire(
+    final IdName name)
+    throws IdDatabaseException
+  {
+    return this.userGetForName(name).orElseThrow(USER_DOES_NOT_EXIST);
+  }
+
+  @Override
+  public Optional<IdUser> userGetForEmail(
+    final IdEmail email)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(email, "email");
+
+    final var context = this.transaction().createContext();
+    try {
+      final var emailOpt =
+        context.selectFrom(EMAILS)
+          .where(EMAILS.EMAIL_ADDRESS.eq(email.value()))
+          .fetchOptional();
+
+      if (emailOpt.isEmpty()) {
+        return Optional.empty();
+      }
+
+      final var emailRecord = emailOpt.get();
+      if (emailRecord.getUserId() == null) {
+        return Optional.empty();
+      }
+
+      return this.userGet(emailRecord.getUserId());
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public IdUser userGetForEmailRequire(
+    final IdEmail email)
+    throws IdDatabaseException
+  {
+    return this.userGetForEmail(email).orElseThrow(USER_DOES_NOT_EXIST);
+  }
+
+  @Override
+  public void userLogin(
+    final UUID id,
+    final String userAgent,
+    final String host)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+    Objects.requireNonNull(userAgent, "userAgent");
+    Objects.requireNonNull(host, "host");
+
+    final var context =
+      this.transaction().createContext();
+
+    try {
+      final var time = this.currentTime();
+
+      context.fetchOptional(USERS, USERS.ID.eq(id))
+        .orElseThrow(USER_DOES_NOT_EXIST);
+
+      /*
+       * Record the login.
+       */
+
+      context.insertInto(LOGIN_HISTORY)
+        .set(LOGIN_HISTORY.USER_ID, id)
+        .set(LOGIN_HISTORY.TIME, this.currentTime())
+        .set(LOGIN_HISTORY.AGENT, userAgent)
+        .set(LOGIN_HISTORY.HOST, host)
+        .execute();
+
+      /*
+       * The audit event is considered confidential because IP addresses
+       * are tentatively considered confidential.
+       */
+
+      final var audit =
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, time)
+          .set(AUDIT.TYPE, "USER_LOGGED_IN")
+          .set(AUDIT.USER_ID, id)
+          .set(AUDIT.MESSAGE, host);
+
+      audit.execute();
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public List<IdUserSummary> userSearch(
+    final String query)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(query, "query");
+
+    final var context =
+      this.transaction().createContext();
+
+    try {
+      final var wildcardQuery =
+        "%%%s%%".formatted(query);
+
+      final var records =
+        context.selectFrom(USERS)
+          .where(USERS.ID_NAME.likeIgnoreCase(wildcardQuery))
+          .or(USERS.REAL_NAME.likeIgnoreCase(wildcardQuery))
+          .or(USERS.ID.likeIgnoreCase(wildcardQuery))
+          .orderBy(USERS.REAL_NAME)
+          .fetch();
+
+      final var summaries = new ArrayList<IdUserSummary>(records.size());
+      for (final var record : records) {
+        summaries.add(
+          new IdUserSummary(
+            record.get(USERS.ID),
+            new IdName(record.get(USERS.ID_NAME)),
+            new IdRealName(record.get(USERS.REAL_NAME)),
+            record.getTimeCreated(),
+            record.getTimeUpdated()
+          )
+        );
+      }
+      return List.copyOf(summaries);
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public void userUpdate(
+    final UUID id,
+    final Optional<IdName> withIdName,
+    final Optional<IdRealName> withRealName,
+    final Optional<IdPassword> withPassword)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+    Objects.requireNonNull(withIdName, "withIdName");
+    Objects.requireNonNull(withRealName, "withRealName");
+    Objects.requireNonNull(withPassword, "withPassword");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var owner = transaction.userId();
+
+    try {
+      final var record = context.fetchOne(USERS, USERS.ID.eq(id));
+      if (record == null) {
+        throw USER_DOES_NOT_EXIST.get();
+      }
+
+      if (withIdName.isPresent()) {
+        final var name = withIdName.get();
+        record.setIdName(name.value());
+
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "USER_CHANGED_ID_NAME")
+          .set(AUDIT.USER_ID, owner)
+          .set(AUDIT.MESSAGE, "%s|%s".formatted(id.toString(), name.value()))
+          .execute();
+      }
+
+      if (withRealName.isPresent()) {
+        final var name = withRealName.get();
+        record.setRealName(name.value());
+
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "USER_CHANGED_REAL_NAME")
+          .set(AUDIT.USER_ID, owner)
+          .set(AUDIT.MESSAGE, "%s|%s".formatted(id.toString(), name.value()))
+          .execute();
+      }
+
+      if (withPassword.isPresent()) {
+        final var pass = withPassword.get();
+        record.setPasswordAlgo(pass.algorithm().identifier());
+        record.setPasswordHash(pass.hash());
+        record.setPasswordSalt(pass.salt());
+
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "USER_CHANGED_PASSWORD")
+          .set(AUDIT.USER_ID, owner)
+          .set(AUDIT.MESSAGE, id.toString())
+          .execute();
+      }
+
+      record.store();
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public List<IdUserSummary> userList(
+    final IdTimeRange timeCreatedRange,
+    final IdTimeRange timeUpdatedRange,
+    final IdUserOrdering ordering,
+    final int limit,
+    final Optional<List<Object>> seek)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(timeCreatedRange, "timeCreatedRange");
+    Objects.requireNonNull(timeUpdatedRange, "timeUpdatedRange");
+    Objects.requireNonNull(ordering, "ordering");
+    Objects.requireNonNull(seek, "seek");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+      final var baseSelection =
+        context.selectFrom(USERS);
+
+      /*
+       * The tickets must lie within the given time ranges.
+       */
+
+      final var timeCreatedCondition =
+        DSL.condition(
+          USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedCondition =
+        DSL.condition(
+          USERS.TIME_UPDATED.ge(timeCreatedRange.timeLower())
+            .and(USERS.TIME_UPDATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition);
+
+      final var baseOrdering =
+        baseSelection.where(allConditions)
+          .orderBy(orderFields(ordering));
+
+      /*
+       * If a seek is specified, then seek!
+       */
+
+      final SelectForUpdateStep<?> next;
+      if (seek.isPresent()) {
+        final var page = seek.get();
+        final var fields = page.toArray();
+        next = baseOrdering.seek(fields).limit(Integer.valueOf(limit));
+      } else {
+        next = baseOrdering.limit(Integer.valueOf(limit));
+      }
+
+      return next.fetch()
+        .map(record -> {
+          return new IdUserSummary(
+            record.get(USERS.ID),
+            new IdName(record.get(USERS.ID_NAME)),
+            new IdRealName(record.get(USERS.REAL_NAME)),
+            record.get(USERS.TIME_CREATED),
+            record.get(USERS.TIME_UPDATED)
+          );
+        });
+
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public void userEmailAdd(
+    final UUID id,
+    final IdEmail email)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+    Objects.requireNonNull(email, "email");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+      context.fetchOptional(USERS, USERS.ID.eq(id))
+        .orElseThrow(USER_DOES_NOT_EXIST);
+
+      context.insertInto(EMAILS)
+        .set(EMAILS.USER_ID, id)
+        .set(EMAILS.EMAIL_ADDRESS, email.value())
+        .execute();
+
+      context.insertInto(AUDIT)
+        .set(AUDIT.TIME, this.currentTime())
+        .set(AUDIT.TYPE, "USER_EMAIL_ADDED")
+        .set(AUDIT.USER_ID, id)
+        .set(AUDIT.MESSAGE, email.value())
+        .execute();
+
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public void userEmailRemove(
+    final UUID id,
+    final IdEmail email)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+    Objects.requireNonNull(email, "email");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+      context.fetchOptional(USERS, USERS.ID.eq(id))
+        .orElseThrow(USER_DOES_NOT_EXIST);
+
+      final var existing =
+        context.fetchOptional(
+          EMAILS,
+          EMAILS.USER_ID.eq(id).and(EMAILS.EMAIL_ADDRESS.eq(email.value()))
+        );
+
+      if (existing.isEmpty()) {
+        return;
+      }
+
+      /*
+       * There is a database trigger that prevents the last email address
+       * being removed from the account, so we don't perform any check here.
+       */
+
+      context.deleteFrom(EMAILS)
+        .where(EMAILS.USER_ID.eq(id).and(EMAILS.EMAIL_ADDRESS.eq(email.value())))
+        .execute();
+
+      context.insertInto(AUDIT)
+        .set(AUDIT.TIME, this.currentTime())
+        .set(AUDIT.TYPE, "USER_EMAIL_REMOVED")
+        .set(AUDIT.USER_ID, id)
+        .set(AUDIT.MESSAGE, email.value())
+        .execute();
+
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public List<IdLogin> userLoginHistory(
+    final UUID id,
+    final int limit)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+      context.fetchOptional(USERS, USERS.ID.eq(id))
+        .orElseThrow(USER_DOES_NOT_EXIST);
+
+      return context.selectFrom(LOGIN_HISTORY)
+        .where(LOGIN_HISTORY.USER_ID.eq(id))
+        .limit(Integer.valueOf(limit))
+        .stream()
+        .map(IdDatabaseUsersQueries::mapLogin)
+        .toList();
+
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  private static IdLogin mapLogin(
+    final LoginHistoryRecord r)
+  {
+    return new IdLogin(
+      r.getUserId(),
+      r.getTime(),
+      r.getHost(),
+      r.getAgent()
+    );
+  }
+}

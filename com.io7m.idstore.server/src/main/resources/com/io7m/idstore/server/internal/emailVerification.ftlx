@@ -1,0 +1,26 @@
+[#ftl output_format="plainText"]
+
+[#if verification.operation() == "EMAIL_ADD"]
+A request has been made to add the email address ${verification.email()} to your account.
+[#elseif verification.operation() == "EMAIL_REMOVE"]
+A request has been made to remove the email address ${verification.email()} from your account.
+[/#if]
+
+The request was made from:
+
+  Address:    ${host}
+  User Agent: ${userAgent}
+
+If this looks suspicious to you, or you don't know why you are receiving this
+message, then please click the following link to deny the request:
+
+  ${linkDeny}
+
+Otherwise, if you are happy to allow this operation to proceed, then please
+click the following link:
+
+  ${linkAllow}
+
+If you do nothing, this request will expire at: ${verification.expires()}
+
+Please note: It is not possible to reply to this email.
