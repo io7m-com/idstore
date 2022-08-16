@@ -45,7 +45,7 @@
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
-    <com.io7m.trasco.version>0.0.4-SNAPSHOT</com.io7m.trasco.version>
+    <com.io7m.trasco.version>0.0.4</com.io7m.trasco.version>
     <io7m.api.previousVersion>0.0.1-SNAPSHOT</io7m.api.previousVersion>
     <jackson.version>2.13.3</jackson.version>
     <jetty.version>11.0.11</jetty.version>
@@ -383,7 +383,7 @@
       <dependency>
         <groupId>com.io7m.genevan</groupId>
         <artifactId>com.io7m.genevan.core</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
       </dependency>
       <dependency>
         <groupId>com.sanctionco.jmail</groupId>
