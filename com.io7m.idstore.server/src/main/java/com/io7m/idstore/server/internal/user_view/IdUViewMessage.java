@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.internal.user_view;
 
+import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerUserControllersService;
 import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
@@ -44,6 +45,7 @@ public final class IdUViewMessage extends IdUViewAuthenticatedServlet
     LoggerFactory.getLogger(IdUViewMessage.class);
 
   private final IdFMTemplateType<IdFMMessageData> template;
+  private final IdServerBrandingService branding;
 
   /**
    * The generic message page.
@@ -56,6 +58,8 @@ public final class IdUViewMessage extends IdUViewAuthenticatedServlet
   {
     super(inServices);
 
+    this.branding =
+      inServices.requireService(IdServerBrandingService.class);
     this.template =
       inServices.requireService(IdFMTemplateService.class)
         .pageMessage();
@@ -102,6 +106,7 @@ public final class IdUViewMessage extends IdUViewAuthenticatedServlet
 
       this.template.process(
         new IdFMMessageData(
+          this.branding.htmlTitle(message.messageTitle()),
           message.messageTitle(),
           requestIdFor(request),
           message.isError(),

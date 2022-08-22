@@ -26,6 +26,7 @@ import java.util.Objects;
 /**
  * Data for email verification templates.
  *
+ * @param productTitle The product title
  * @param verification The verification
  * @param host         The host
  * @param userAgent    The user agent
@@ -34,6 +35,7 @@ import java.util.Objects;
  */
 
 public record IdFMEmailVerificationData(
+  String productTitle,
   IdEmailVerification verification,
   String host,
   String userAgent,
@@ -44,6 +46,7 @@ public record IdFMEmailVerificationData(
   /**
    * Data for email verification templates.
    *
+   * @param productTitle The product title
    * @param verification The verification
    * @param host         The host
    * @param userAgent    The user agent
@@ -53,6 +56,7 @@ public record IdFMEmailVerificationData(
 
   public IdFMEmailVerificationData
   {
+    Objects.requireNonNull(productTitle, "productTitle");
     Objects.requireNonNull(verification, "verification");
     Objects.requireNonNull(host, "host");
     Objects.requireNonNull(userAgent, "userAgent");
@@ -64,6 +68,7 @@ public record IdFMEmailVerificationData(
   public Map<String, Object> toTemplateHash()
   {
     final var m = new HashMap<String, Object>();
+    m.put("productTitle", this.productTitle());
     m.put("verification", this.verification());
     m.put("host", this.host());
     m.put("userAgent", this.userAgent());

@@ -1,34 +1,40 @@
 [#ftl output_format="XHTML"]
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
   <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8"/>
-  <link rel="stylesheet" type="text/css" href="/resource/reset.css"/>
-  <link rel="stylesheet" type="text/css" href="/resource/style.css"/>
-  <title>${pageTitle}</title>
+  <link rel="stylesheet" type="text/css" href="/css/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+  <title>${htmlTitle}</title>
 </head>
 <body>
 
 <div id="ids_main">
   <div id="ids_header">
     <span class="ids_logo">
-      <img src="/resource/idstore.svg" width="16" height="16" class="ids_header_logo ids_logo"/> idstore
+      <img src="/logo" width="16" height="16" class="ids_header_logo ids_logo"/> ${pageHeaderTitle}
     </span>
   </div>
 
   <div id="ids_content">
-    <div class="ids_login_form">
-      [#if errorMessage??]<p class="ids_login_error_message">${errorMessage}</p>[/#if]
-      <div>
-        <form class="ids_login" action="/login" method="post">
-          <label for="user" class="ids_login_username_label">Username</label>
-          <input type="text" name="username" class="ids_login_username"/>
-          <label for="password" class="ids_login_password_label">Password</label>
-          <input type="password" name="password" class="ids_login_password"/>
-          <input type="submit" value="Log In" class="ids_login_submit"/>
-        </form>
+    <div class="ids_loginForm_container">
+      <div class="ids_loginForm_logo">
+        <img src="/logo"/>
       </div>
+
+      <form class="ids_loginForm" action="/login" method="post">
+        <label class="ids_loginForm_usernameLabel"      for="user">Username</label>
+        <input class="ids_loginForm_username"           type="text" name="username"/>
+        <label class="ids_loginForm_passwordLabel"      for="password">Password</label>
+        <input class="ids_loginForm_password"           type="password" name="password"/>
+        <input class="ids_loginForm_submit ids_xbutton" type="submit" value="Log In" />
+      </form>
+
+      [#if errorMessage??]
+      <div class="ids_loginForm_error">
+        <p class="ids_message_error">${errorMessage}</p>
+      </div>
+      [/#if]
     </div>
   </div>
 </div>

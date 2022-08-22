@@ -137,6 +137,17 @@ public final class IdFMTemplateService implements IdServiceType
     );
   }
 
+  /**
+   * @return The main CSS template
+   */
+
+  public IdFMTemplateType<IdFMCSSData> cssTemplate()
+  {
+    return new IdGenericTemplate<>(
+      this.findTemplate("mainCss")
+    );
+  }
+
   private static final class IdGenericTemplate<T extends IdFMDataModelType>
     implements IdFMTemplateType<T>
   {

@@ -29,6 +29,7 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.server.IdServers;
+import com.io7m.idstore.server.api.IdServerBrandingConfiguration;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerException;
 import com.io7m.idstore.server.api.IdServerHTTPServiceConfiguration;
@@ -267,6 +268,13 @@ public abstract class IdWithServerContract
         URI.create("http://localhost:51001/")
       );
 
+    final var branding =
+      new IdServerBrandingConfiguration(
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
+      );
+
     return this.servers.createServer(
       new IdServerConfiguration(
         Locale.getDefault(),
@@ -277,7 +285,8 @@ public abstract class IdWithServerContract
         userApiService,
         userViewService,
         adminApiService,
-        adminViewService
+        adminViewService,
+        branding
       )
     );
   }

@@ -27,15 +27,15 @@ import java.util.Objects;
 /**
  * Data for the "self" user profile screen template.
  *
- * @param pageTitle    The page title
- * @param title        The login form title
- * @param user         The user
- * @param loginHistory The user's login history
+ * @param htmlTitle       The page title
+ * @param pageHeaderTitle The page header title
+ * @param user            The user
+ * @param loginHistory    The user's login history
  */
 
 public record IdFMUserSelfData(
-  String pageTitle,
-  String title,
+  String htmlTitle,
+  String pageHeaderTitle,
   IdUser user,
   List<IdLogin> loginHistory)
   implements IdFMDataModelType
@@ -43,16 +43,16 @@ public record IdFMUserSelfData(
   /**
    * Data for the "self" user profile screen template.
    *
-   * @param pageTitle    The page title
-   * @param title        The login form title
-   * @param user         The user
-   * @param loginHistory The user's login history
+   * @param htmlTitle       The page title
+   * @param pageHeaderTitle The page header title
+   * @param user            The user
+   * @param loginHistory    The user's login history
    */
 
   public IdFMUserSelfData
   {
-    Objects.requireNonNull(pageTitle, "pageTitle");
-    Objects.requireNonNull(title, "title");
+    Objects.requireNonNull(htmlTitle, "htmlTitle");
+    Objects.requireNonNull(pageHeaderTitle, "pageHeaderTitle");
     Objects.requireNonNull(user, "user");
     Objects.requireNonNull(loginHistory, "loginHistory");
   }
@@ -61,8 +61,8 @@ public record IdFMUserSelfData(
   public Map<String, Object> toTemplateHash()
   {
     final var m = new HashMap<String, Object>();
-    m.put("pageTitle", this.pageTitle());
-    m.put("title", this.title());
+    m.put("htmlTitle", this.htmlTitle());
+    m.put("pageHeaderTitle", this.pageHeaderTitle());
     m.put("user", this.user());
     m.put("loginHistory", this.loginHistory());
     return m;

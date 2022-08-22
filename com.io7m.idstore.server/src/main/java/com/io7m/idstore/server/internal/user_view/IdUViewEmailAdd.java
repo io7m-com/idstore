@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.internal.user_view;
 
+import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.freemarker.IdFMEmailAddData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
@@ -42,6 +43,7 @@ public final class IdUViewEmailAdd extends IdUViewAuthenticatedServlet
     LoggerFactory.getLogger(IdUViewEmailAdd.class);
 
   private final IdFMTemplateType<IdFMEmailAddData> template;
+  private final IdServerBrandingService branding;
 
   /**
    * The login form.
@@ -54,6 +56,8 @@ public final class IdUViewEmailAdd extends IdUViewAuthenticatedServlet
   {
     super(inServices);
 
+    this.branding =
+      inServices.requireService(IdServerBrandingService.class);
     this.template =
       inServices.requireService(IdFMTemplateService.class)
         .pageEmailAddTemplate();
@@ -77,7 +81,8 @@ public final class IdUViewEmailAdd extends IdUViewAuthenticatedServlet
     try (var writer = servletResponse.getWriter()) {
       this.template.process(
         new IdFMEmailAddData(
-          "Add an email address.",
+          this.branding.htmlTitle("Add an email address."),
+          this.branding.title(),
           requestIdFor(request)
         ),
         writer

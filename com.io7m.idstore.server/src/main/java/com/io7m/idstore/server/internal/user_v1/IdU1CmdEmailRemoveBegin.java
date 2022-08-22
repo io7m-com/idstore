@@ -28,6 +28,7 @@ import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailRemoveBegin;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
+import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerConfigurationService;
 import com.io7m.idstore.server.internal.IdServerMailService;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
@@ -86,6 +87,8 @@ public final class IdU1CmdEmailRemoveBegin
         services.requireService(IdServerConfigurationService.class);
       final var mailService =
         services.requireService(IdServerMailService.class);
+      final var brandingService =
+        services.requireService(IdServerBrandingService.class);
 
       final var configuration =
         configurationService.configuration();
@@ -120,6 +123,7 @@ public final class IdU1CmdEmailRemoveBegin
         templateService,
         configuration,
         mailService,
+        brandingService,
         email,
         verification
       );
@@ -137,6 +141,7 @@ public final class IdU1CmdEmailRemoveBegin
     final IdFMTemplateService templateService,
     final IdServerConfiguration configuration,
     final IdServerMailService mailService,
+    final IdServerBrandingService brandingService,
     final IdEmail email,
     final IdEmailVerification verification)
     throws
@@ -162,6 +167,7 @@ public final class IdU1CmdEmailRemoveBegin
     try {
       template.process(
         new IdFMEmailVerificationData(
+          brandingService.title(),
           verification,
           context.remoteHost(),
           context.remoteUserAgent(),

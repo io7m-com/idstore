@@ -2,35 +2,7 @@
   "%Schema": "https://www.io7m.com/idstore/server-configuration-1.json",
 
   "Branding": {
-    "ColorScheme": {
-      "ButtonBodyColor": "#1a4f73",
-      "ButtonBorderColor": "#000000",
-      "ButtonEmbossEColor": "#2d87c4",
-      "ButtonEmbossNColor": "#2d87c4",
-      "ButtonEmbossSColor": "#123751",
-      "ButtonEmbossWColor": "#123751",
-      "ButtonHoverBodyColor": "#205f8a",
-      "ButtonHoverBorderColor": "#000000",
-      "ButtonHoverEmbossEColor": "#2d87c4",
-      "ButtonHoverEmbossNColor": "#2d87c4",
-      "ButtonHoverEmbossSColor": "#123751",
-      "ButtonHoverEmbossWColor": "#123751",
-      "ButtonPressedBodyColor": "#184768",
-      "ButtonPressedBorderColor": "#000000",
-      "ButtonPressedEmbossEColor": "#123751",
-      "ButtonPressedEmbossNColor": "#123751",
-      "ButtonPressedEmbossSColor": "#205f8a",
-      "ButtonPressedEmbossWColor": "#205f8a",
-      "ErrorBorderColor": "#ff0000",
-      "HeaderBackgroundColor": "#2f2f2f",
-      "HeaderLinkColor": "#ffffff",
-      "HeaderTextColor": "#ffffff",
-      "MainBackgroundColor": "#1a4f73",
-      "MainLinkColor": "#ffffff",
-      "MainMessageBorderColor": "#308fd0",
-      "MainTableBorderColor": "#308fd0",
-      "MainTextColor": "#ffffff"
-    }
+
   },
 
   "Mail": {
@@ -53,7 +25,7 @@
     "AdminViewService": {
       "SessionDirectory": "/tmp/idstore-session-admin-view",
       "ListenAddress": "localhost",
-      "ListenPort": 51001,
+      "ListenPort": 51000,
       "ExternalAddress": "http://localhost:51001/"
     },
     "UserAPIService": {

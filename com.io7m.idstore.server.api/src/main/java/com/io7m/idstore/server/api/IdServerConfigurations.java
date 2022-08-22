@@ -125,7 +125,8 @@ public final class IdServerConfigurations
       file.httpConfiguration().userAPIService(),
       file.httpConfiguration().userViewService(),
       file.httpConfiguration().adminAPIService(),
-      file.httpConfiguration().adminViewService()
+      file.httpConfiguration().adminViewService(),
+      file.brandingConfiguration()
     );
   }
 

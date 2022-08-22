@@ -24,6 +24,7 @@ import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddDeny;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveDeny;
+import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
@@ -58,6 +59,7 @@ public final class IdUViewEmailVerificationDeny extends HttpServlet
   private final IdFMTemplateType<IdFMMessageData> template;
   private final IdServiceDirectoryType services;
   private final IdServerClock clock;
+  private final IdServerBrandingService branding;
 
   /**
    * The endpoint that allows for completing email verification challenges.
@@ -78,6 +80,8 @@ public final class IdUViewEmailVerificationDeny extends HttpServlet
       inServices.requireService(IdServerStrings.class);
     this.clock =
       inServices.requireService(IdServerClock.class);
+    this.branding =
+      inServices.requireService(IdServerBrandingService.class);
     this.template =
       inServices.requireService(IdFMTemplateService.class)
         .pageMessage();
@@ -196,7 +200,8 @@ public final class IdUViewEmailVerificationDeny extends HttpServlet
     try (var writer = servletResponse.getWriter()) {
       this.template.process(
         new IdFMMessageData(
-          this.strings.format("emailVerificationSuccessTitle"),
+          this.branding.htmlTitle(this.strings.format("emailVerificationSuccessTitle")),
+          this.branding.title(),
           requestIdFor(request),
           false,
           false,
@@ -227,7 +232,8 @@ public final class IdUViewEmailVerificationDeny extends HttpServlet
 
       this.template.process(
         new IdFMMessageData(
-          this.strings.format("error"),
+          this.branding.htmlTitle(this.strings.format("error")),
+          this.branding.title(),
           requestIdFor(request),
           true,
           isServerError,

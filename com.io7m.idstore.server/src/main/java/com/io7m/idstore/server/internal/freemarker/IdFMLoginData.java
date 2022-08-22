@@ -24,29 +24,29 @@ import java.util.Optional;
 /**
  * Data for the login screen template.
  *
- * @param pageTitle    The page title
- * @param title        The login form title
- * @param errorMessage The error message, if any
+ * @param htmlTitle       The HTML title
+ * @param pageHeaderTitle The page header title
+ * @param errorMessage    The error message, if any
  */
 
 public record IdFMLoginData(
-  String pageTitle,
-  String title,
+  String htmlTitle,
+  String pageHeaderTitle,
   Optional<String> errorMessage)
   implements IdFMDataModelType
 {
   /**
    * Data for the login screen template.
    *
-   * @param pageTitle    The page title
-   * @param title        The login form title
-   * @param errorMessage The error message, if any
+   * @param htmlTitle       The HTML title
+   * @param pageHeaderTitle The page header title
+   * @param errorMessage    The error message, if any
    */
 
   public IdFMLoginData
   {
-    Objects.requireNonNull(pageTitle, "pageTitle");
-    Objects.requireNonNull(title, "title");
+    Objects.requireNonNull(htmlTitle, "htmlTitle");
+    Objects.requireNonNull(pageHeaderTitle, "pageHeaderTitle");
     Objects.requireNonNull(errorMessage, "errorMessage");
   }
 
@@ -54,8 +54,8 @@ public record IdFMLoginData(
   public Map<String, Object> toTemplateHash()
   {
     final var m = new HashMap<String, Object>();
-    m.put("pageTitle", this.pageTitle);
-    m.put("title", this.title);
+    m.put("htmlTitle", this.htmlTitle);
+    m.put("pageHeaderTitle", this.pageHeaderTitle);
     this.errorMessage().ifPresent(error -> m.put("errorMessage", error));
     return m;
   }

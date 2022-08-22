@@ -20,20 +20,34 @@ package com.io7m.idstore.tests;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdEmailVerificationOperation;
+import com.io7m.idstore.model.IdLogin;
+import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdNonEmptyList;
+import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
+import com.io7m.idstore.model.IdPasswordException;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
+import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.server.internal.freemarker.IdFMCSSData;
 import com.io7m.idstore.server.internal.freemarker.IdFMEmailVerificationData;
 import com.io7m.idstore.server.internal.freemarker.IdFMLoginData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
+import com.io7m.idstore.server.internal.freemarker.IdFMUserSelfData;
 import freemarker.template.TemplateException;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -54,7 +68,7 @@ public final class IdFMTemplateServiceTest
 
     template.process(new IdFMLoginData(
       "idstore: Login",
-      "Login",
+      "idstore",
       Optional.of("Error!")
     ), writer);
 
@@ -88,6 +102,7 @@ public final class IdFMTemplateServiceTest
 
     template.process(
       new IdFMEmailVerificationData(
+        "idstore",
         verification,
         "[2610:1c1:1:606c::50:15]",
         "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0",
@@ -98,5 +113,136 @@ public final class IdFMTemplateServiceTest
     );
 
     writer.flush();
+  }
+
+  @Test
+  public void testUser()
+    throws IOException, TemplateException, IdPasswordException
+  {
+    final var service =
+      IdFMTemplateService.create();
+
+    final var template =
+      service.pageUserSelfTemplate();
+
+    final var writer =
+      new BufferedWriter(new OutputStreamWriter(System.out, UTF_8));
+
+    final var id = UUID.randomUUID();
+
+    final var user = new IdUser(
+      id,
+      new IdName("someone"),
+      new IdRealName("Someone X. Incognito"),
+      new IdNonEmptyList<>(
+        new IdEmail("someone@example.com"),
+        List.of(
+          new IdEmail("someone2@example.com"),
+          new IdEmail("someone3@example.com"),
+          new IdEmail("someone4@example.com")
+        )
+      ),
+      OffsetDateTime.now(),
+      OffsetDateTime.now(),
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+        .createHashed("12345678")
+    );
+
+    final var loginHistory =
+      List.of(
+      new IdLogin(
+        id,
+        OffsetDateTime.now(),
+        "localhost",
+        "Test"
+      ),
+      new IdLogin(
+        id,
+        OffsetDateTime.now(),
+        "localhost",
+        "Test"
+      ), new IdLogin(
+        id,
+        OffsetDateTime.now(),
+        "localhost",
+        "Test"
+      )
+    );
+
+    final var userData =
+      new IdFMUserSelfData(
+      "idstore: User",
+      "idstore",
+      user,
+      loginHistory
+    );
+
+    template.process(userData, writer);
+    writer.flush();
+
+    dump("user.xhtml", w -> {
+      try {
+        template.process(userData, w);
+      } catch (final Exception e) {
+        // Don't care
+      }
+    });
+  }
+
+  private static void dump(
+    final String name,
+    final Consumer<Writer> consumer)
+  {
+    try {
+      final var path = Paths.get("/shared-tmp/" + name);
+      try (var writer = Files.newBufferedWriter(path)) {
+        consumer.accept(writer);
+      }
+    } catch (final Exception e) {
+      // Don't care
+    }
+  }
+
+  @Test
+  public void testCSS()
+    throws IOException, TemplateException
+  {
+    final var service =
+      IdFMTemplateService.create();
+
+    final var template =
+      service.cssTemplate();
+
+    final var writer =
+      new BufferedWriter(new OutputStreamWriter(System.out, UTF_8));
+
+    template.process(
+      IdFMCSSData.defaults(),
+      writer
+    );
+
+    writer.flush();
+
+    dump("style.css", w -> {
+      try {
+        template.process(IdFMCSSData.ocean(), w);
+      } catch (final Exception e) {
+        // Don't care
+      }
+    });
+  }
+
+  @Test
+  public void testOcean()
+  {
+    for (final var entry : IdFMCSSData.ocean().toTemplateHash().entrySet()) {
+      System.out.printf(
+        "\"%s\": \"%s\",%n",
+        entry.getKey().transform(s -> {
+          return Character.toUpperCase(s.charAt(0)) + s.substring(1);
+        }),
+        entry.getValue()
+      );
+    }
   }
 }

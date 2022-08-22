@@ -24,18 +24,20 @@ import java.util.UUID;
 /**
  * Data for the generic message screen template.
  *
- * @param pageTitle     The page title
- * @param requestId     The request ID
- * @param isError       {@code true} if the message is an error
- * @param isServerError {@code true} if the error is a server-side error and not
- *                      the fault of the user
- * @param message       The message
- * @param messageTitle  The message title
- * @param returnTo      The path to which to return
+ * @param htmlTitle       The page title
+ * @param pageHeaderTitle The page header title
+ * @param requestId       The request ID
+ * @param isError         {@code true} if the message is an error
+ * @param isServerError   {@code true} if the error is a server-side error and
+ *                        not the fault of the user
+ * @param message         The message
+ * @param messageTitle    The message title
+ * @param returnTo        The path to which to return
  */
 
 public record IdFMMessageData(
-  String pageTitle,
+  String htmlTitle,
+  String pageHeaderTitle,
   UUID requestId,
   boolean isError,
   boolean isServerError,
@@ -47,19 +49,21 @@ public record IdFMMessageData(
   /**
    * Data for the generic message screen template.
    *
-   * @param pageTitle     The page title
-   * @param requestId     The request ID
-   * @param isError       {@code true} if the message is an error
-   * @param isServerError {@code true} if the error is a server-side error and
-   *                      not the fault of the user
-   * @param message       The message
-   * @param messageTitle  The message title
-   * @param returnTo      The path to which to return
+   * @param htmlTitle       The page title
+   * @param pageHeaderTitle The page header title
+   * @param requestId       The request ID
+   * @param isError         {@code true} if the message is an error
+   * @param isServerError   {@code true} if the error is a server-side error and
+   *                        not the fault of the user
+   * @param message         The message
+   * @param messageTitle    The message title
+   * @param returnTo        The path to which to return
    */
 
   public IdFMMessageData
   {
-    Objects.requireNonNull(pageTitle, "pageTitle");
+    Objects.requireNonNull(htmlTitle, "htmlTitle");
+    Objects.requireNonNull(pageHeaderTitle, "pageHeaderTitle");
     Objects.requireNonNull(requestId, "requestId");
     Objects.requireNonNull(messageTitle, "messageTitle");
     Objects.requireNonNull(message, "message");
@@ -70,7 +74,8 @@ public record IdFMMessageData(
   public Map<String, Object> toTemplateHash()
   {
     final var m = new HashMap<String, Object>();
-    m.put("pageTitle", this.pageTitle);
+    m.put("htmlTitle", this.htmlTitle);
+    m.put("pageHeaderTitle", this.pageHeaderTitle);
     m.put("requestId", this.requestId);
     m.put("messageIsError", this.isError);
     m.put("messageIsServerError", this.isServerError);

@@ -70,6 +70,15 @@ public final class IdServerConfigurationFiles
         .build();
 
     final var simpleModule = new SimpleModule();
+    simpleModule.addDeserializer(
+      IdServerColor.class,
+      new IdServerColorDeserializer()
+    );
+    simpleModule.addSerializer(
+      IdServerColor.class,
+      new IdServerColorSerializer()
+    );
+
     this.mapper.registerModule(simpleModule);
     this.mapper.registerModule(new JavaTimeModule());
     this.mapper.registerModule(new Jdk8Module());

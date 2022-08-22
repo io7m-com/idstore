@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.tests;
 
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.server.api.IdServerConfigurationFiles;
 import com.io7m.idstore.server.api.IdServerConfigurations;
@@ -28,6 +29,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.util.Locale;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdServerConfigurationsTest
 {
@@ -66,5 +70,28 @@ public final class IdServerConfigurationsTest
         Clock.systemUTC(),
         file
       );
+  }
+
+  @Test
+  public void testPortOverlap()
+    throws IOException, IdProtocolException
+  {
+    final var file =
+      IdTestDirectories.resourceOf(
+        IdServerConfigurationsTest.class,
+        this.directory,
+        "server-config-1.json"
+      );
+
+    final var ex =
+      assertThrows(ValueInstantiationException.class, () -> {
+        IdServerConfigurations.ofFile(
+          Locale.getDefault(),
+          Clock.systemUTC(),
+          file
+        );
+      });
+
+    assertTrue(ex.getMessage().contains("51000"));
   }
 }

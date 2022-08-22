@@ -1,0 +1,422 @@
+[#ftl output_format="plainText"]
+
+/*
+ * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+ * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+a {
+  color: ${mainLinkColor};
+}
+
+body
+{
+  background-color: ${mainBackgroundColor};
+  color:            ${mainTextColor};
+  font-family:      monospace;
+}
+
+#ids_main
+{
+  background-color: ${mainBackgroundColor};
+  color:            ${mainTextColor};
+  font-family:      monospace;
+}
+
+#ids_header
+{
+  height:           2em;
+  background-color: ${headerBackgroundColor};
+  color:            ${headerTextColor};
+
+  display:        flex;
+  flex-direction: row;
+  align-items:    center;
+
+  padding-left:  0.25em;
+  padding-right: 0.25em;
+}
+
+#ids_content
+{
+  flex:    1;
+  margin:  1em;
+  display: flex;
+}
+
+img.ids_header_logo
+{
+  filter:       invert(100%);
+  margin-right: 0.5em;
+}
+
+span.ids_logo
+{
+  display:     flex;
+  align-items: center;
+}
+span.ids_empty
+{
+  flex: 1;
+}
+span.ids_profile_links > a
+{
+  color: ${headerLinkColor};
+}
+
+.ids_error_message h3
+{
+  margin-top: 0em;
+}
+.ids_error_message
+{
+  border:        1px ${errorBorderColor} solid;
+  padding:       2em;
+  margin-bottom: 3em;
+}
+
+/*
+ * Login form.
+ */
+
+div.ids_loginForm_container
+{
+  margin:         8em;
+  width:          100%;
+
+  display:        flex;
+  align-items:    center;
+  flex-direction: column;
+}
+
+div.ids_loginForm_error
+{
+
+}
+
+div.ids_loginForm_logo
+{
+  margin-bottom: 3em;
+}
+
+.ids_loginForm
+{
+  display:               grid;
+  grid-template-columns: 8em 24em;
+  grid-template-rows:    2em;
+  grid-gap:              16px;
+
+  margin-left:   -9.5em;
+  margin-bottom: 2em;
+}
+
+.ids_loginForm_usernameLabel { grid-column: 1; grid-row: 1; }
+.ids_loginForm_username      { grid-column: 2; grid-row: 1; }
+.ids_loginForm_passwordLabel { grid-column: 1; grid-row: 2; }
+.ids_loginForm_password      { grid-column: 2; grid-row: 2; }
+.ids_loginForm_submit        { grid-column: 2; grid-row: 3; }
+
+form.ids_loginForm
+{
+
+}
+.ids_loginForm_username
+{
+  height: 2em;
+}
+.ids_loginForm_password
+{
+  height: 2em;
+}
+.ids_loginForm_usernameLabel
+{
+  display:     flex;
+  align-items: center;
+}
+.ids_loginForm_passwordLabel
+{
+  display:     flex;
+  align-items: center;
+}
+
+.ids_loginForm_submit
+{
+  height:      3em;
+  margin:      2px;
+  padding:     0em;
+  display:     table-cell;
+  align-items: center;
+}
+
+/*
+ * User profile.
+ */
+
+div.ids_userProfile_container
+{
+  margin:    2em;
+  width:     100%;
+  max-width: 80em;
+}
+
+table.ids_userProfile
+{
+  width:           100%;
+  border-collapse: collapse;
+}
+table.ids_userProfile th
+{
+  border: 1px ${mainTableBorderColor} solid;
+}
+table.ids_userProfile td
+{
+  border:        1px ${mainTableBorderColor} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_userProfile thead
+{
+
+}
+
+table.ids_userProfile > tr > td:first-child
+{
+  width: 16em;
+}
+
+table.ids_userProfile > tr > td:last-child
+{
+  width:   8em;
+  margin:  0;
+  padding: 1px;
+}
+
+table.ids_userProfile > tr > td:last-child .ids_xbutton
+{
+  margin: 0px;
+  width:  8em;
+  height: 1em;
+}
+
+/*
+ * User profile: Emails
+ */
+
+table.ids_userProfile_emails
+{
+  width: 100%;
+  border-collapse: collapse;
+}
+table.ids_userProfile_emails th
+{
+  border: 1px ${mainTableBorderColor} solid;
+  height: 2em;
+}
+table.ids_userProfile_emails td
+{
+  border:        1px ${mainTableBorderColor} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_userProfile_emails thead
+{
+
+}
+
+table.ids_userProfile_emails > tr > td:last-child
+{
+  width:   8em;
+  margin:  0;
+  padding: 1px;
+}
+
+table.ids_userProfile_emails > tr > td:last-child .ids_xbutton
+{
+  margin: 0px;
+  width:  8em;
+  height: 1em;
+}
+
+/*
+ * User profile: Login history
+ */
+
+table.ids_userProfile_loginHistory
+{
+  width:           100%;
+  border-collapse: collapse;
+}
+table.ids_userProfile_loginHistory th
+{
+  border: 1px ${mainTableBorderColor} solid;
+}
+table.ids_userProfile_loginHistory td
+{
+  border:        1px ${mainTableBorderColor} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_userProfile_loginHistory > thead > tr
+{
+  height: 2.5em;
+}
+table.ids_userProfile_loginHistory > thead > tr > th
+{
+  padding-left: 1em;
+  text-align:   left;
+}
+
+table.ids_userProfile_loginHistory > tr > td:first-child
+{
+  width: 16em;
+}
+
+/*
+ * Generic buttons.
+ */
+
+.ids_xbutton
+{
+  text-align:     center;
+  vertical-align: middle;
+  display:        table-cell;
+  padding-left:   1.5em;
+  padding-right:  1.5em;
+  padding-top:    0.5em;
+  padding-bottom: 0.5em;
+
+  background-color: ${buttonBodyColor};
+
+  border-bottom: 2px solid ${buttonEmbossSColor};
+  border-left:   2px solid ${buttonEmbossWColor};
+  border-top:    2px solid ${buttonEmbossNColor};
+  border-right:  2px solid ${buttonEmbossEColor};
+
+  box-shadow:  0px 0px 0px 2px ${buttonBorderColor};
+  user-select: none;
+}
+
+.ids_xbutton:hover
+{
+  background-color: ${buttonHoverBodyColor};
+
+  border-bottom: 2px solid ${buttonHoverEmbossSColor};
+  border-left:   2px solid ${buttonHoverEmbossWColor};
+  border-top:    2px solid ${buttonHoverEmbossNColor};
+  border-right:  2px solid ${buttonHoverEmbossEColor};
+
+  box-shadow:  0px 0px 0px 2px ${buttonHoverBorderColor};
+  user-select: none;
+}
+
+.ids_xbutton:active
+{
+  background-color: ${buttonPressedBodyColor};
+
+  border-bottom: 2px solid ${buttonPressedEmbossSColor};
+  border-left:   2px solid ${buttonPressedEmbossWColor};
+  border-top:    2px solid ${buttonPressedEmbossNColor};
+  border-right:  2px solid ${buttonPressedEmbossEColor};
+
+  box-shadow:  0px 0px 0px 2px ${buttonPressedBorderColor};
+  user-select: none;
+}
+
+.ids_xbutton a, a.ids_xbutton
+{
+  color: ${mainTextColor};
+}
+
+/*
+ * Email addition form.
+ */
+
+div.ids_emailAddForm_container
+{
+  margin:    2em;
+  width:     100%;
+  max-width: 80em;
+}
+
+.ids_emailAddForm
+{
+  display: grid;
+  grid-template-columns: 8em 24em;
+  grid-template-rows:    2em;
+  grid-gap:              16px;
+}
+.ids_emailAddForm_emailLabel { grid-column: 1; grid-row: 1; }
+.ids_emailAddForm_emailField { grid-column: 2; grid-row: 1; }
+.ids_emailAddForm_submit     { grid-column: 2; grid-row: 2; }
+
+form.ids_emailAddForm
+{
+  margin-top: 4em;
+}
+
+.ids_emailAddForm_emailLabel
+{
+  display:     flex;
+  align-items: center;
+}
+
+.ids_emailAddForm_submit
+{
+  height:  3em;
+  margin:  2px;
+  padding: 0em;
+}
+
+/*
+ * Generic message page.
+ */
+
+.ids_message_container
+{
+  margin:      2em;
+  width:       100%;
+  max-width:   80em;
+}
+.ids_message_error h3
+{
+  margin-top: 0em;
+}
+.ids_message_error
+{
+  border:        1px red solid;
+  padding:       2em;
+  margin-bottom: 3em;
+}
+div.ids_message_error > p:last-of-type
+{
+  margin-bottom: 4em;
+}
+
+.ids_message h3
+{
+  margin-top: 0em;
+}
+.ids_message
+{
+  border:        1px ${mainMessageBorderColor} solid;
+  padding:       2em;
+  margin-bottom: 3em;
+}
+div.ids_message > p:last-of-type
+{
+  margin-bottom: 4em;
+}

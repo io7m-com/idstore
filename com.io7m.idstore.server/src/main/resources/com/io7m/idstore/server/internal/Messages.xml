@@ -3,6 +3,7 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 
 <properties>
+  <entry key="productTitle">idstore</entry>
   <entry key="error">Error</entry>
   <entry key="errorInvalidUsernamePassword">Invalid username or password.</entry>
   <entry key="operationNotPermitted">Operation not permitted.</entry>

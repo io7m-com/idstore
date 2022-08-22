@@ -24,25 +24,29 @@ import java.util.UUID;
 /**
  * Data for the email addition screen template.
  *
- * @param pageTitle The page title
- * @param requestId The request ID
+ * @param htmlTitle       The HTML title
+ * @param pageHeaderTitle The page header title
+ * @param requestId       The request ID
  */
 
 public record IdFMEmailAddData(
-  String pageTitle,
+  String htmlTitle,
+  String pageHeaderTitle,
   UUID requestId)
   implements IdFMDataModelType
 {
   /**
    * Data for the email addition  screen template.
    *
-   * @param pageTitle The page title
-   * @param requestId The request ID
+   * @param htmlTitle       The HTML title
+   * @param pageHeaderTitle The page header title
+   * @param requestId       The request ID
    */
 
   public IdFMEmailAddData
   {
-    Objects.requireNonNull(pageTitle, "pageTitle");
+    Objects.requireNonNull(htmlTitle, "htmlTitle");
+    Objects.requireNonNull(pageHeaderTitle, "pageHeaderTitle");
     Objects.requireNonNull(requestId, "requestId");
   }
 
@@ -50,7 +54,8 @@ public record IdFMEmailAddData(
   public Map<String, Object> toTemplateHash()
   {
     final var m = new HashMap<String, Object>();
-    m.put("pageTitle", this.pageTitle);
+    m.put("htmlTitle", this.htmlTitle);
+    m.put("pageHeaderTitle", this.pageHeaderTitle);
     m.put("requestId", this.requestId);
     return m;
   }

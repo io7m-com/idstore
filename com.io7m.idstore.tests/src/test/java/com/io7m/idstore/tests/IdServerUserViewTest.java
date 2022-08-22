@@ -94,7 +94,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
           "Content-Type",
           "application/x-www-form-urlencoded"),
       200,
-      "Login");
+      "idstore: Login");
   }
 
   /**
@@ -120,7 +120,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
           "Content-Type",
           "application/x-www-form-urlencoded"),
       200,
-      "Login");
+      "idstore: Login");
   }
 
   /**
@@ -146,7 +146,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
           "Content-Type",
           "application/x-www-form-urlencoded"),
       401,
-      "Login");
+      "idstore: Login");
   }
 
   /**
@@ -172,7 +172,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
           "Content-Type",
           "application/x-www-form-urlencoded"),
       401,
-      "Login");
+      "idstore: Login");
   }
 
   /**
@@ -192,8 +192,8 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
-    this.openPage("/email-add", "Add an email address.");
-    this.openPage("/email-add-run?email=extras@example.com", "Verification");
+    this.openPage("/email-add", "idstore: Add an email address.");
+    this.openPage("/email-add-run?email=extras@example.com", "idstore: Verification");
 
     this.permitEmailChallenge("/email-verification-permit/?token=%s");
   }
@@ -215,8 +215,8 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
-    this.openPage("/email-add", "Add an email address.");
-    this.openPage("/email-add-run?email=extras@example.com", "Verification");
+    this.openPage("/email-add", "idstore: Add an email address.");
+    this.openPage("/email-add-run?email=extras@example.com", "idstore: Verification");
 
     this.permitEmailChallenge("/email-verification-deny/?token=%s");
   }
@@ -238,14 +238,14 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
-    this.openPage("/email-add", "Add an email address.");
+    this.openPage("/email-add", "idstore: Add an email address.");
 
     this.expectError(
       HttpRequest.newBuilder(
         this.viewURL(
           "/email-verification-deny/?token=C0DE290A52CE988DAD77E16F60671830")),
       400,
-      "Error");
+      "idstore: Error");
   }
 
   /**
@@ -265,14 +265,14 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
-    this.openPage("/email-add", "Add an email address.");
+    this.openPage("/email-add", "idstore: Add an email address.");
 
     this.expectError(
       HttpRequest.newBuilder(
         this.viewURL(
           "/email-verification-permit/?token=C0DE290A52CE988DAD77E16F60671830")),
       400,
-      "Error");
+      "idstore: Error");
   }
 
   /**
@@ -292,12 +292,12 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
-    this.openPage("/email-add", "Add an email address.");
+    this.openPage("/email-add", "idstore: Add an email address.");
 
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/email-verification-permit/?token=what")),
       400,
-      "Error");
+      "idstore: Error");
   }
 
   /**
@@ -317,12 +317,12 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
-    this.openPage("/email-add", "Add an email address.");
+    this.openPage("/email-add", "idstore: Add an email address.");
 
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/email-verification-deny/?token=what")),
       400,
-      "Error");
+      "idstore: Error");
   }
 
 
@@ -343,12 +343,12 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
-    this.openPage("/email-add", "Add an email address.");
+    this.openPage("/email-add", "idstore: Add an email address.");
 
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/email-verification-permit/")),
       400,
-      "Error");
+      "idstore: Error");
   }
 
   /**
@@ -368,10 +368,10 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
-    this.openPage("/email-add", "Add an email address.");
+    this.openPage("/email-add", "idstore: Add an email address.");
 
     this.expectError(HttpRequest.newBuilder(
-      this.viewURL("/email-verification-deny/")), 400, "Error");
+      this.viewURL("/email-verification-deny/")), 400, "idstore: Error");
   }
 
   /**
@@ -393,7 +393,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.login();
 
     this.expectError(HttpRequest.newBuilder(
-      this.viewURL("/email-add-run")), 400, "Error");
+      this.viewURL("/email-add-run")), 400, "idstore: Error");
   }
 
   /**
@@ -415,7 +415,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.login();
 
     this.expectError(HttpRequest.newBuilder(
-      this.viewURL("/email-add-run/?email=*@*")), 500, "Error");
+      this.viewURL("/email-add-run/?email=*@*")), 500, "idstore: Error");
   }
 
   /**
@@ -435,10 +435,10 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
-    this.openPage("/email-add", "Add an email address.");
-    this.openPage("/email-add-run?email=extras@example.com", "Verification");
+    this.openPage("/email-add", "idstore: Add an email address.");
+    this.openPage("/email-add-run?email=extras@example.com", "idstore: Verification");
     this.permitEmailChallenge("/email-verification-permit/?token=%s");
-    this.openPage("/email-remove-run?email=extras@example.com", "Verification");
+    this.openPage("/email-remove-run?email=extras@example.com", "idstore: Verification");
     this.permitEmailChallenge("/email-verification-permit/?token=%s");
   }
 
@@ -459,10 +459,10 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
-    this.openPage("/email-add", "Add an email address.");
-    this.openPage("/email-add-run?email=extras@example.com", "Verification");
+    this.openPage("/email-add", "idstore: Add an email address.");
+    this.openPage("/email-add-run?email=extras@example.com", "idstore: Verification");
     this.permitEmailChallenge("/email-verification-permit/?token=%s");
-    this.openPage("/email-remove-run?email=extras@example.com", "Verification");
+    this.openPage("/email-remove-run?email=extras@example.com", "idstore: Verification");
     this.permitEmailChallenge("/email-verification-deny/?token=%s");
   }
 
@@ -487,7 +487,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/email-remove-run")),
       400,
-      "Error");
+      "idstore: Error");
   }
 
   /**
@@ -511,7 +511,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/email-remove-run/?email=*@*")),
       500,
-      "Error");
+      "idstore: Error");
   }
 
   /**
@@ -533,7 +533,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/email-add")),
       401,
-      "Login");
+      "idstore: Login");
   }
 
   /**
@@ -555,7 +555,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/email-remove")),
       401,
-      "Login");
+      "idstore: Login");
   }
 
   /**
@@ -577,7 +577,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/email-add-run")),
       401,
-      "Login");
+      "idstore: Login");
   }
 
   /**
@@ -599,7 +599,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/email-remove-run")),
       401,
-      "Login");
+      "idstore: Login");
   }
 
   private void expectError(
@@ -640,7 +640,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
 
     final var titles =
       IdDocuments.elementsWithName(res.body(), "title");
-    assertEquals("Verified", titles.get(0).getTextContent());
+    assertEquals("idstore: Verified", titles.get(0).getTextContent());
   }
 
 
@@ -678,6 +678,6 @@ public final class IdServerUserViewTest extends IdWithServerContract
       assertEquals(200, res.statusCode());
     }
 
-    this.openPage("/", "User Profile");
+    this.openPage("/", "idstore: User Profile");
   }
 }

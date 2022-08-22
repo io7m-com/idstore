@@ -14,8 +14,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.internal.user_view;
+package com.io7m.idstore.server.internal.common;
 
+import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -23,38 +24,29 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Pattern;
-
-import static java.util.Map.entry;
 
 /**
- * The static resource servlet.
+ * The logo servlet.
  */
 
-public final class IdUViewResource extends HttpServlet
+public final class IdCommonLogoServlet extends HttpServlet
 {
-  private static final Pattern LEADING_SLASHES =
-    Pattern.compile("^/+");
-
-  private static final Map<String, String> RESOURCES =
-    Map.ofEntries(
-      entry("style.css", "text/css"),
-      entry("reset.css", "text/css"),
-      entry("idstore.svg", "image/svg+xml")
-    );
+  private final IdServerBrandingService branding;
 
   /**
-   * The static resource servlet.
+   * The logo servlet.
    *
    * @param inServices The service directory
    */
 
-  public IdUViewResource(
+  public IdCommonLogoServlet(
     final IdServiceDirectoryType inServices)
   {
     Objects.requireNonNull(inServices, "inServices");
+
+    this.branding =
+      inServices.requireService(IdServerBrandingService.class);
   }
 
   @Override
@@ -63,28 +55,11 @@ public final class IdUViewResource extends HttpServlet
     final HttpServletResponse servletResponse)
     throws ServletException, IOException
   {
-    final var path =
-      request.getPathInfo();
-    final var stripped =
-      LEADING_SLASHES.matcher(path)
-        .replaceFirst("");
-
-    final var contentType = RESOURCES.get(stripped);
-    if (contentType != null) {
-      final var resourcePath =
-        "/com/io7m/idstore/server/internal/%s".formatted(stripped);
-
-      servletResponse.setStatus(200);
-      servletResponse.setContentType(contentType);
-      try (var stream = IdUViewResource.class.getResourceAsStream(resourcePath)) {
-        try (var output = servletResponse.getOutputStream()) {
-          stream.transferTo(output);
-          output.flush();
-        }
-      }
-      return;
+    servletResponse.setStatus(200);
+    servletResponse.setContentType("image/svg+xml; charset=utf-8");
+    try (var output = servletResponse.getOutputStream()) {
+      output.write(this.branding.logoImage());
+      output.flush();
     }
-
-    servletResponse.setStatus(404);
   }
 }

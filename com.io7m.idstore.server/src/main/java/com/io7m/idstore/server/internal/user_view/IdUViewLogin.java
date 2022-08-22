@@ -25,6 +25,7 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.server.internal.IdRequests;
+import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.freemarker.IdFMLoginData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
@@ -58,6 +59,7 @@ public final class IdUViewLogin extends HttpServlet
   private final IdFMTemplateType<IdFMLoginData> template;
   private final IdDatabaseType database;
   private final IdServerStrings strings;
+  private final IdServerBrandingService branding;
 
   /**
    * The login form.
@@ -74,6 +76,8 @@ public final class IdUViewLogin extends HttpServlet
       inServices.requireService(IdDatabaseType.class);
     this.strings =
       inServices.requireService(IdServerStrings.class);
+    this.branding =
+      inServices.requireService(IdServerBrandingService.class);
 
     this.template =
       inServices.requireService(IdFMTemplateService.class)
@@ -127,10 +131,11 @@ public final class IdUViewLogin extends HttpServlet
     servletResponse.setContentType("application/xhtml+xml");
 
     try (var writer = servletResponse.getWriter()) {
+
       this.template.process(
         new IdFMLoginData(
-          "Login",
-          "Login",
+          this.branding.htmlTitle("Login"),
+          this.branding.title(),
           Optional.ofNullable((String) session.getAttribute("ErrorMessage"))
         ),
         writer

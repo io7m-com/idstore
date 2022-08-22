@@ -28,6 +28,8 @@ import com.io7m.idstore.server.internal.admin_v1.IdA1CommandServlet;
 import com.io7m.idstore.server.internal.admin_v1.IdA1Login;
 import com.io7m.idstore.server.internal.admin_v1.IdA1Sends;
 import com.io7m.idstore.server.internal.admin_v1.IdA1Versions;
+import com.io7m.idstore.server.internal.common.IdCommonCSSServlet;
+import com.io7m.idstore.server.internal.common.IdCommonLogoServlet;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.user_v1.IdU1CommandServlet;
 import com.io7m.idstore.server.internal.user_v1.IdU1Login;
@@ -41,7 +43,6 @@ import com.io7m.idstore.server.internal.user_view.IdUViewEmailVerificationPermit
 import com.io7m.idstore.server.internal.user_view.IdUViewLogin;
 import com.io7m.idstore.server.internal.user_view.IdUViewLogout;
 import com.io7m.idstore.server.internal.user_view.IdUViewMain;
-import com.io7m.idstore.server.internal.user_view.IdUViewResource;
 import com.io7m.idstore.server.logging.IdServerRequestLog;
 import com.io7m.idstore.services.api.IdServiceDirectory;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
@@ -161,6 +162,9 @@ public final class IdServer implements IdServerType
     final var services = new IdServiceDirectory();
     services.register(IdDatabaseType.class, inDatabase);
 
+    final var strings = new IdServerStrings(this.configuration.locale());
+    services.register(IdServerStrings.class, strings);
+
     services.register(
       IdServerMailService.class,
       IdServerMailService.create(this.configuration.mailConfiguration())
@@ -169,6 +173,15 @@ public final class IdServer implements IdServerType
     services.register(
       IdServerUserControllersService.class,
       new IdServerUserControllersService()
+    );
+
+    final var templates = IdFMTemplateService.create();
+    services.register(IdFMTemplateService.class, templates);
+
+    services.register(
+      IdServerBrandingService.class,
+      IdServerBrandingService.create(
+        strings, templates, this.configuration.branding())
     );
 
     final var versionMessages = new IdVMessages();
@@ -187,12 +200,6 @@ public final class IdServer implements IdServerType
 
     final var config = new IdServerConfigurationService(this.configuration);
     services.register(IdServerConfigurationService.class, config);
-
-    final var strings = new IdServerStrings(this.configuration.locale());
-    services.register(IdServerStrings.class, strings);
-
-    final var templates = IdFMTemplateService.create();
-    services.register(IdFMTemplateService.class, templates);
 
     services.register(IdRequestLimits.class, new IdRequestLimits(strings));
     return services;
@@ -241,8 +248,20 @@ public final class IdServer implements IdServerType
     );
 
     servlets.addServlet(
-      servletHolders.create(IdUViewResource.class, IdUViewResource::new),
-      "/resource/*"
+      servletHolders.create(IdCommonCSSServlet.class, IdCommonCSSServlet::new),
+      "/css/*"
+    );
+    servlets.addServlet(
+      servletHolders.create(IdCommonCSSServlet.class, IdCommonCSSServlet::new),
+      "/css"
+    );
+    servlets.addServlet(
+      servletHolders.create(IdCommonLogoServlet.class, IdCommonLogoServlet::new),
+      "/logo/*"
+    );
+    servlets.addServlet(
+      servletHolders.create(IdCommonLogoServlet.class, IdCommonLogoServlet::new),
+      "/logo"
     );
 
     servlets.addServlet(

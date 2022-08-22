@@ -30,6 +30,8 @@ open module com.io7m.idstore.tests
   requires transitive com.io7m.idstore.user_client.api;
   requires transitive com.io7m.idstore.user_client;
 
+  requires com.fasterxml.jackson.core;
+  requires com.fasterxml.jackson.databind;
   requires com.io7m.jmulticlose.core;
   requires java.net.http;
   requires java.sql;

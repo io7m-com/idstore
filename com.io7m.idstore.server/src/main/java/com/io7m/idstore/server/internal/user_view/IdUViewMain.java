@@ -19,6 +19,7 @@ package com.io7m.idstore.server.internal.user_view;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdLogin;
+import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
 import com.io7m.idstore.server.internal.freemarker.IdFMUserSelfData;
@@ -45,6 +46,7 @@ public final class IdUViewMain extends IdUViewAuthenticatedServlet
     LoggerFactory.getLogger(IdUViewMain.class);
 
   private final IdFMTemplateType<IdFMUserSelfData> template;
+  private final IdServerBrandingService branding;
 
   /**
    * The main view.
@@ -57,6 +59,8 @@ public final class IdUViewMain extends IdUViewAuthenticatedServlet
   {
     super(inServices);
 
+    this.branding =
+      inServices.requireService(IdServerBrandingService.class);
     this.template =
       inServices.requireService(IdFMTemplateService.class)
         .pageUserSelfTemplate();
@@ -80,8 +84,8 @@ public final class IdUViewMain extends IdUViewAuthenticatedServlet
     try (var writer = servletResponse.getWriter()) {
       this.template.process(
         new IdFMUserSelfData(
-          "User Profile",
-          "User Profile",
+          this.branding.htmlTitle("User Profile"),
+          this.branding.title(),
           this.user(),
           this.loginHistory()
         ),

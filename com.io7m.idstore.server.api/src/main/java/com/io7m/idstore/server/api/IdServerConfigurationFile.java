@@ -25,6 +25,7 @@ import java.util.Objects;
 /**
  * The server configuration file.
  *
+ * @param brandingConfiguration The branding configuration
  * @param mailConfiguration     The mail configuration
  * @param httpConfiguration     The HTTP configuration
  * @param databaseConfiguration The database configuration
@@ -33,6 +34,8 @@ import java.util.Objects;
 @JsonDeserialize
 @JsonSerialize
 public record IdServerConfigurationFile(
+  @JsonProperty(value = "Branding", required = true)
+  IdServerBrandingConfiguration brandingConfiguration,
   @JsonProperty(value = "Mail", required = true)
   IdServerMailConfiguration mailConfiguration,
   @JsonProperty(value = "HTTP", required = true)
@@ -44,6 +47,7 @@ public record IdServerConfigurationFile(
   /**
    * The server configuration file.
    *
+   * @param brandingConfiguration The branding configuration
    * @param mailConfiguration     The mail configuration
    * @param httpConfiguration     The HTTP configuration
    * @param databaseConfiguration The database configuration
@@ -51,6 +55,7 @@ public record IdServerConfigurationFile(
 
   public IdServerConfigurationFile
   {
+    Objects.requireNonNull(brandingConfiguration, "brandingConfiguration");
     Objects.requireNonNull(mailConfiguration, "mailConfiguration");
     Objects.requireNonNull(httpConfiguration, "httpConfiguration");
     Objects.requireNonNull(databaseConfiguration, "databaseConfiguration");

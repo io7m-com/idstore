@@ -1,5 +1,7 @@
 [#ftl output_format="plainText"]
 
+Hello! This is an automated message from the ${productTitle} identity server.
+
 [#if verification.operation() == "EMAIL_ADD"]
 A request has been made to add the email address ${verification.email()} to your account.
 [#elseif verification.operation() == "EMAIL_REMOVE"]

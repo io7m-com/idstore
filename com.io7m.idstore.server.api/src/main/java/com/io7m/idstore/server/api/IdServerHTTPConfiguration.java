@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Configuration for the parts of the server that serve over HTTP.
@@ -59,5 +60,20 @@ public record IdServerHTTPConfiguration(
     Objects.requireNonNull(adminViewService, "adminViewService");
     Objects.requireNonNull(userAPIService, "userAPIService");
     Objects.requireNonNull(userViewService, "userViewService");
+
+    try {
+      Set.of(
+        Integer.valueOf(adminAPIService.listenPort()),
+        Integer.valueOf(adminViewService.listenPort()),
+        Integer.valueOf(userAPIService.listenPort()),
+        Integer.valueOf(userViewService.listenPort())
+      );
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(
+        "All HTTP services must be configured to listen on different ports: %s"
+          .formatted(e.getMessage()),
+        e
+      );
+    }
   }
 }

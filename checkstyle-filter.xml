@@ -19,6 +19,8 @@
             checks="HiddenField"/>
   <suppress files="IdNonEmptyList\.java"
             checks="HiddenField"/>
+  <suppress files="IdServerColor\.java"
+            checks="HiddenField"/>
 
   <suppress files="IdSCommandVersion\.java"
             checks="IllegalInstantiation"/>
@@ -40,4 +42,5 @@
   <!-- MXBeans have specific name conventions. -->
   <suppress files="IdDatabaseMetricsMXBean\.java"
             checks="TypeName"/>
+
 </suppressions>

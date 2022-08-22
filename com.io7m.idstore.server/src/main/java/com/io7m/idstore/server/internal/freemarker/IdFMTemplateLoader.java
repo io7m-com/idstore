@@ -42,6 +42,24 @@ public final class IdFMTemplateLoader implements TemplateLoader
 
   }
 
+  private static Reader load(
+    final String name)
+    throws IOException
+  {
+    final var path =
+      "/com/io7m/idstore/server/internal/%s.ftlx".formatted(name);
+
+    final var url =
+      IdFMTemplateLoader.class.getResource(path);
+
+    if (url == null) {
+      throw new NoSuchFileException(path);
+    }
+
+    final var stream = url.openStream();
+    return new BufferedReader(new InputStreamReader(stream, UTF_8));
+  }
+
   @Override
   public Object findTemplateSource(
     final String name)
@@ -78,29 +96,14 @@ public final class IdFMTemplateLoader implements TemplateLoader
       if (name.startsWith("emailVerification")) {
         return load("emailVerification");
       }
+      if (name.startsWith("mainCss")) {
+        return load("mainCss");
+      }
     }
 
     throw new IOException(
       "No such template: %s".formatted(templateSource)
     );
-  }
-
-  private static Reader load(
-    final String name)
-    throws IOException
-  {
-    final var path =
-      "/com/io7m/idstore/server/internal/%s.ftlx".formatted(name);
-
-    final var url =
-      IdFMTemplateLoader.class.getResource(path);
-
-    if (url == null) {
-      throw new NoSuchFileException(path);
-    }
-
-    final var stream = url.openStream();
-    return new BufferedReader(new InputStreamReader(stream, UTF_8));
   }
 
   @Override

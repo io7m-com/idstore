@@ -29,6 +29,7 @@ import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.server.IdServers;
+import com.io7m.idstore.server.api.IdServerBrandingConfiguration;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerHTTPServiceConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
@@ -114,6 +115,13 @@ public final class IdServerDemo
         URI.create("http://localhost:51001/")
       );
 
+    final var branding =
+      new IdServerBrandingConfiguration(
+        Optional.of("Lemon"),
+        Optional.empty(),
+        Optional.empty()
+      );
+
     final var serverConfiguration =
       new IdServerConfiguration(
         Locale.getDefault(),
@@ -124,7 +132,8 @@ public final class IdServerDemo
         userApiService,
         userViewService,
         adminApiService,
-        adminViewService
+        adminViewService,
+        branding
       );
 
     final var servers = new IdServers();
