@@ -18,24 +18,26 @@ package com.io7m.idstore.server.security;
 
 import com.io7m.idstore.model.IdUser;
 
+import java.util.Objects;
+
 /**
- * A view of an action within the security policy. An <i>action</i> may (or may
- * not) be performed by a  <i>user</i> according to the security policy.
+ * A request to update a user's realname.
+ *
+ * @param user The user
  */
 
-public sealed interface IdSecUserActionType
-  extends IdSecActionType
-  permits IdSecUserActionEmailAddBegin,
-  IdSecUserActionEmailAddDeny,
-  IdSecUserActionEmailAddPermit,
-  IdSecUserActionEmailRemoveBegin,
-  IdSecUserActionEmailRemoveDeny,
-  IdSecUserActionEmailRemovePermit,
-  IdSecUserActionRealnameUpdate
+public record IdSecUserActionRealnameUpdate(
+  IdUser user)
+  implements IdSecUserActionType
 {
   /**
-   * @return The user performing the action
+   * A request to update a user's realname.
+   *
+   * @param user The user
    */
 
-  IdUser user();
+  public IdSecUserActionRealnameUpdate
+  {
+    Objects.requireNonNull(user, "user");
+  }
 }

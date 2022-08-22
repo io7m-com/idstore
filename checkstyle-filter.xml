@@ -30,6 +30,8 @@
   <!-- Without pattern matching... -->
   <suppress files="IdACommandExecutor\.java"
             checks="NPathComplexity"/>
+  <suppress files="IdU1CommandExecutor\.java"
+            checks="NPathComplexity"/>
   <suppress files="IdACommandExecutor\.java"
             checks="CyclomaticComplexity"/>
   <suppress files="IdPCommandExecutor\.java"

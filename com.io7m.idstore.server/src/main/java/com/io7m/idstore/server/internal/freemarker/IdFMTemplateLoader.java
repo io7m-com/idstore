@@ -99,6 +99,9 @@ public final class IdFMTemplateLoader implements TemplateLoader
       if (name.startsWith("mainCss")) {
         return load("mainCss");
       }
+      if (name.startsWith("pageRealNameUpdate")) {
+        return load("pageRealNameUpdate");
+      }
     }
 
     throw new IOException(

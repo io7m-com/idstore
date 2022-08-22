@@ -17,6 +17,7 @@
 package com.io7m.idstore.user_client.internal;
 
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.user_client.api.IdUClientException;
@@ -124,6 +125,14 @@ public final class IdUClientProtocolHandlerDisconnected
   @Override
   public void userEmailRemoveDeny(
     final IdToken token)
+    throws IdUClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public void userRealNameUpdate(
+    final IdRealName realName)
     throws IdUClientException
   {
     throw this.notLoggedIn();

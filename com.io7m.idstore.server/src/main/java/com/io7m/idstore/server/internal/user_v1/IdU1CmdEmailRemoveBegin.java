@@ -23,6 +23,7 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailRemoveBegin;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
@@ -129,6 +130,8 @@ public final class IdU1CmdEmailRemoveBegin
       );
 
       return new IdU1ResponseEmailRemoveBegin(context.requestId());
+    } catch (final IdValidityException e) {
+      throw context.failValidity(e);
     } catch (final IdSecurityException e) {
       throw context.failSecurity(e);
     } catch (final IdDatabaseException e) {

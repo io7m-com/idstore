@@ -18,7 +18,7 @@
 package com.io7m.idstore.server.internal.user_view;
 
 import com.io7m.idstore.server.internal.IdServerBrandingService;
-import com.io7m.idstore.server.internal.freemarker.IdFMEmailAddData;
+import com.io7m.idstore.server.internal.freemarker.IdFMRealNameUpdateData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
@@ -34,24 +34,24 @@ import java.io.IOException;
 import static com.io7m.idstore.server.internal.IdServerRequestDecoration.requestIdFor;
 
 /**
- * The email addition form.
+ * The realname update form.
  */
 
-public final class IdUViewEmailAdd extends IdUViewAuthenticatedServlet
+public final class IdUViewRealnameUpdate extends IdUViewAuthenticatedServlet
 {
   private static final Logger LOG =
-    LoggerFactory.getLogger(IdUViewEmailAdd.class);
+    LoggerFactory.getLogger(IdUViewRealnameUpdate.class);
 
-  private final IdFMTemplateType<IdFMEmailAddData> template;
+  private final IdFMTemplateType<IdFMRealNameUpdateData> template;
   private final IdServerBrandingService branding;
 
   /**
-   * The email addition form.
+   * The realname update form.
    *
    * @param inServices The service directory
    */
 
-  public IdUViewEmailAdd(
+  public IdUViewRealnameUpdate(
     final IdServiceDirectoryType inServices)
   {
     super(inServices);
@@ -60,7 +60,7 @@ public final class IdUViewEmailAdd extends IdUViewAuthenticatedServlet
       inServices.requireService(IdServerBrandingService.class);
     this.template =
       inServices.requireService(IdFMTemplateService.class)
-        .pageEmailAddTemplate();
+        .pageRealnameUpdateTemplate();
   }
 
   @Override
@@ -80,9 +80,10 @@ public final class IdUViewEmailAdd extends IdUViewAuthenticatedServlet
 
     try (var writer = servletResponse.getWriter()) {
       this.template.process(
-        new IdFMEmailAddData(
-          this.branding.htmlTitle("Add an email address."),
+        new IdFMRealNameUpdateData(
+          this.branding.htmlTitle("Update your real name."),
           this.branding.title(),
+          this.user().realName(),
           requestIdFor(request)
         ),
         writer

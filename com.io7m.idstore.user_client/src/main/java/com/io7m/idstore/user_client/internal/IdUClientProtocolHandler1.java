@@ -19,6 +19,7 @@ package com.io7m.idstore.user_client.internal;
 
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdPasswordException;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.protocol.api.IdProtocolException;
@@ -29,6 +30,7 @@ import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveDeny;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemovePermit;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandLogin;
+import com.io7m.idstore.protocol.user_v1.IdU1CommandRealnameUpdate;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandType;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandUserSelf;
 import com.io7m.idstore.protocol.user_v1.IdU1Messages;
@@ -40,6 +42,7 @@ import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailRemoveDeny;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailRemovePermit;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseError;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseLogin;
+import com.io7m.idstore.protocol.user_v1.IdU1ResponseRealnameUpdate;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseUserSelf;
 import com.io7m.idstore.user_client.api.IdUClientException;
@@ -320,6 +323,17 @@ public final class IdUClientProtocolHandler1
     this.sendCommand(
       IdU1ResponseEmailRemoveDeny.class,
       new IdU1CommandEmailRemoveDeny(token.value())
+    );
+  }
+
+  @Override
+  public void userRealNameUpdate(
+    final IdRealName realName)
+    throws IdUClientException, InterruptedException
+  {
+    this.sendCommand(
+      IdU1ResponseRealnameUpdate.class,
+      new IdU1CommandRealnameUpdate(realName.value())
     );
   }
 

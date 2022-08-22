@@ -16,44 +16,39 @@
 
 package com.io7m.idstore.server.internal.user_v1;
 
-import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
-import com.io7m.idstore.model.IdEmailVerification;
-import com.io7m.idstore.model.IdToken;
-import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdValidityException;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddDeny;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailAddDeny;
+import com.io7m.idstore.protocol.user_v1.IdU1CommandRealnameUpdate;
+import com.io7m.idstore.protocol.user_v1.IdU1ResponseRealnameUpdate;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
-import com.io7m.idstore.server.security.IdSecUserActionEmailAddDeny;
+import com.io7m.idstore.server.security.IdSecUserActionRealnameUpdate;
 import com.io7m.idstore.server.security.IdSecurity;
 import com.io7m.idstore.server.security.IdSecurityException;
 
 import java.util.Objects;
+import java.util.Optional;
 
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
-import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_ADD;
-import static com.io7m.idstore.model.IdEmailVerificationResolution.DENIED;
 import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
- * IdU1CmdEmailAddDeny
+ * IdU1CmdRealNameUpdate
  */
 
-public final class IdU1CmdEmailAddDeny
+public final class IdU1CmdRealNameUpdate
   implements IdCommandExecutorType<
-  IdU1CommandContext, IdU1CommandEmailAddDeny, IdU1ResponseType>
+  IdU1CommandContext, IdU1CommandRealnameUpdate, IdU1ResponseType>
 {
   /**
-   * IdU1CmdEmailAddDeny
+   * IdU1CmdRealNameUpdate
    */
 
-  public IdU1CmdEmailAddDeny()
+  public IdU1CmdRealNameUpdate()
   {
 
   }
@@ -61,18 +56,15 @@ public final class IdU1CmdEmailAddDeny
   @Override
   public IdU1ResponseType execute(
     final IdU1CommandContext context,
-    final IdU1CommandEmailAddDeny command)
+    final IdU1CommandRealnameUpdate command)
     throws IdCommandExecutionFailure
   {
     Objects.requireNonNull(context, "context");
     Objects.requireNonNull(command, "command");
 
     try {
-      final var token =
-        new IdToken(command.token());
-
       final var user = context.user();
-      if (IdSecurity.check(new IdSecUserActionEmailAddDeny(user))
+      if (IdSecurity.check(new IdSecUserActionRealnameUpdate(user))
         instanceof IdSecPolicyResultDenied denied) {
         throw context.fail(
           FORBIDDEN_403,
@@ -83,33 +75,19 @@ public final class IdU1CmdEmailAddDeny
 
       final var transaction =
         context.transaction();
-      final var emails =
-        transaction.queries(IdDatabaseEmailsQueriesType.class);
 
-      final var verificationOpt =
-        emails.emailVerificationGet(token);
-
-      if (verificationOpt.isEmpty()) {
-        throw context.failFormatted(
-          404,
-          EMAIL_VERIFICATION_NONEXISTENT,
-          "notFound"
-        );
-      }
-
-      final var verification = verificationOpt.get();
-      if (!checkVerification(context, verification, user)) {
-        throw context.failFormatted(
-          400,
-          EMAIL_VERIFICATION_FAILED,
-          "operationNotPermitted"
-        );
-      }
+      final var users =
+        transaction.queries(IdDatabaseUsersQueriesType.class);
 
       transaction.userIdSet(user.id());
-      emails.emailVerificationDelete(token, DENIED);
+      users.userUpdate(
+        user.id(),
+        Optional.empty(),
+        Optional.of(new IdRealName(command.realname())),
+        Optional.empty()
+      );
 
-      return new IdU1ResponseEmailAddDeny(context.requestId());
+      return new IdU1ResponseRealnameUpdate(context.requestId());
     } catch (final IdValidityException e) {
       throw context.failValidity(e);
     } catch (final IdSecurityException e) {
@@ -117,28 +95,5 @@ public final class IdU1CmdEmailAddDeny
     } catch (final IdDatabaseException e) {
       throw context.failDatabase(e);
     }
-  }
-
-  private static boolean checkVerification(
-    final IdU1CommandContext context,
-    final IdEmailVerification verification,
-    final IdUser user)
-  {
-    final var verificationUser = verification.user();
-    if (!Objects.equals(verificationUser, user.id())) {
-      return false;
-    }
-
-    final var expires = verification.expires();
-    if (context.now().isAfter(expires)) {
-      return false;
-    }
-
-    final var operation = verification.operation();
-    if (operation != EMAIL_ADD) {
-      return false;
-    }
-
-    return true;
   }
 }

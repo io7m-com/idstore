@@ -114,7 +114,7 @@ div.ids_loginForm_logo
 {
   display:               grid;
   grid-template-columns: 8em 24em;
-  grid-template-rows:    2em;
+  grid-template-rows:    3em;
   grid-gap:              16px;
 
   margin-left:   -9.5em;
@@ -131,24 +131,26 @@ form.ids_loginForm
 {
 
 }
-.ids_loginForm_username
-{
-  height: 2em;
-}
+
+.ids_loginForm_username,
 .ids_loginForm_password
 {
-  height: 2em;
+  display:      flex;
+  align-items:  center;
+  height:       3em;
+  padding:      0;
+  padding-left: 1em;
 }
-.ids_loginForm_usernameLabel
-{
-  display:     flex;
-  align-items: center;
-}
+
+.ids_loginForm_usernameLabel,
 .ids_loginForm_passwordLabel
 {
   display:     flex;
   align-items: center;
+  height:      3em;
+  padding:     0;
 }
+
 
 .ids_loginForm_submit
 {
@@ -355,30 +357,86 @@ div.ids_emailAddForm_container
 .ids_emailAddForm
 {
   display: grid;
-  grid-template-columns: 8em 24em;
-  grid-template-rows:    2em;
+  grid-template-columns: 8em 32em;
+  grid-template-rows:    3em;
   grid-gap:              16px;
+  margin-top:            4em;
 }
 .ids_emailAddForm_emailLabel { grid-column: 1; grid-row: 1; }
 .ids_emailAddForm_emailField { grid-column: 2; grid-row: 1; }
 .ids_emailAddForm_submit     { grid-column: 2; grid-row: 2; }
 
-form.ids_emailAddForm
-{
-  margin-top: 4em;
-}
-
 .ids_emailAddForm_emailLabel
 {
   display:     flex;
   align-items: center;
+  height:      3em;
+}
+
+.ids_emailAddForm_emailField
+{
+  display:      flex;
+  align-items:  center;
+  padding:      0;
+  padding-left: 1em;
+  height:       3em;
 }
 
 .ids_emailAddForm_submit
 {
-  height:  3em;
   margin:  2px;
   padding: 0em;
+  height:  3em;
+}
+
+/*
+ * Realname update form.
+ */
+
+div.ids_realnameUpdateForm_container
+{
+  margin:    2em;
+  width:     100%;
+  max-width: 80em;
+}
+
+.ids_realnameUpdateForm
+{
+  display: grid;
+  grid-template-columns: 8em 32em;
+  grid-template-rows:    3em;
+  grid-gap:              16px;
+  margin-top:            4em;
+}
+.ids_realnameUpdateForm_existingLabel { grid-column: 1; grid-row: 1; }
+.ids_realnameUpdateForm_existingField { grid-column: 2; grid-row: 1; }
+.ids_realnameUpdateForm_realnameLabel { grid-column: 1; grid-row: 2; }
+.ids_realnameUpdateForm_realnameField { grid-column: 2; grid-row: 2; }
+.ids_realnameUpdateForm_submit        { grid-column: 2; grid-row: 3; }
+
+.ids_realnameUpdateForm_realnameLabel,
+.ids_realnameUpdateForm_existingLabel
+{
+  display: flex;
+  align-items: center;
+  height: 3em;
+}
+
+.ids_realnameUpdateForm_realnameField,
+.ids_realnameUpdateForm_existingField
+{
+  display: flex;
+  align-items: center;
+  padding: 0;
+  padding-left: 1em;
+  height: 3em;
+}
+
+.ids_realnameUpdateForm_submit
+{
+  margin:  2px;
+  padding: 0em;
+  height: 3em;
 }
 
 /*

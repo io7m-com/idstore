@@ -23,6 +23,7 @@ import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddPermit;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailAddPermit;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
@@ -114,6 +115,8 @@ public final class IdU1CmdEmailAddPermit
       emails.emailVerificationDelete(token, PERMITTED);
 
       return new IdU1ResponseEmailAddPermit(context.requestId());
+    } catch (final IdValidityException e) {
+      throw context.failValidity(e);
     } catch (final IdSecurityException e) {
       throw context.failSecurity(e);
     } catch (final IdDatabaseException e) {

@@ -22,10 +22,10 @@ import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
 import com.io7m.idstore.protocol.user_v1.IdU1Messages;
 import com.io7m.idstore.protocol.versions.IdVMessages;
 import com.io7m.idstore.server.api.IdServerConfiguration;
-import com.io7m.idstore.server.api.events.IdServerEventReady;
-import com.io7m.idstore.server.api.events.IdServerEventType;
 import com.io7m.idstore.server.api.IdServerException;
 import com.io7m.idstore.server.api.IdServerType;
+import com.io7m.idstore.server.api.events.IdServerEventReady;
+import com.io7m.idstore.server.api.events.IdServerEventType;
 import com.io7m.idstore.server.internal.admin_v1.IdA1CommandServlet;
 import com.io7m.idstore.server.internal.admin_v1.IdA1Login;
 import com.io7m.idstore.server.internal.admin_v1.IdA1Sends;
@@ -45,6 +45,8 @@ import com.io7m.idstore.server.internal.user_view.IdUViewEmailVerificationPermit
 import com.io7m.idstore.server.internal.user_view.IdUViewLogin;
 import com.io7m.idstore.server.internal.user_view.IdUViewLogout;
 import com.io7m.idstore.server.internal.user_view.IdUViewMain;
+import com.io7m.idstore.server.internal.user_view.IdUViewRealnameUpdate;
+import com.io7m.idstore.server.internal.user_view.IdUViewRealnameUpdateRun;
 import com.io7m.idstore.server.logging.IdServerRequestLog;
 import com.io7m.idstore.services.api.IdServiceDirectory;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
@@ -339,6 +341,32 @@ public final class IdServer implements IdServerType
         IdUViewEmailVerificationDeny.class,
         IdUViewEmailVerificationDeny::new),
       "/email-verification-deny/*"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewRealnameUpdate.class,
+        IdUViewRealnameUpdate::new),
+      "/realname-update"
+    );
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewRealnameUpdate.class,
+        IdUViewRealnameUpdate::new),
+      "/realname-update/*"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewRealnameUpdateRun.class,
+        IdUViewRealnameUpdateRun::new),
+      "/realname-update-run"
+    );
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewRealnameUpdateRun.class,
+        IdUViewRealnameUpdateRun::new),
+      "/realname-update-run/*"
     );
 
     /*

@@ -14,28 +14,37 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.security;
+package com.io7m.idstore.protocol.user_v1;
 
-import com.io7m.idstore.model.IdUser;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.util.Objects;
 
 /**
- * A view of an action within the security policy. An <i>action</i> may (or may
- * not) be performed by a  <i>user</i> according to the security policy.
+ * A request to update the realname.
+ *
+ * @param realname The realname
  */
 
-public sealed interface IdSecUserActionType
-  extends IdSecActionType
-  permits IdSecUserActionEmailAddBegin,
-  IdSecUserActionEmailAddDeny,
-  IdSecUserActionEmailAddPermit,
-  IdSecUserActionEmailRemoveBegin,
-  IdSecUserActionEmailRemoveDeny,
-  IdSecUserActionEmailRemovePermit,
-  IdSecUserActionRealnameUpdate
+@JsonDeserialize
+@JsonSerialize
+public record IdU1CommandRealnameUpdate(
+  @JsonProperty(value = "RealName", required = true)
+  String realname)
+  implements IdU1CommandType<IdU1ResponseRealnameUpdate>
 {
   /**
-   * @return The user performing the action
+   * A request to update the realname.
+   *
+   * @param realname The realname
    */
 
-  IdUser user();
+  @JsonCreator
+  public IdU1CommandRealnameUpdate
+  {
+    Objects.requireNonNull(realname, "realname");
+  }
 }

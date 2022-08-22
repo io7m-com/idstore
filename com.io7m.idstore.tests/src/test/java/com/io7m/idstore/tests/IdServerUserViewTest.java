@@ -473,7 +473,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.login();
 
     this.expectError(HttpRequest.newBuilder(
-      this.viewURL("/email-add-run/?email=*@*")), 500, "idstore: Error");
+      this.viewURL("/email-add-run/?email=*@*")), 400, "idstore: Error");
   }
 
   /**
@@ -568,7 +568,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
 
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/email-remove-run/?email=*@*")),
-      500,
+      400,
       "idstore: Error");
   }
 
@@ -658,6 +658,127 @@ public final class IdServerUserViewTest extends IdWithServerContract
       HttpRequest.newBuilder(this.viewURL("/email-remove-run")),
       401,
       "idstore: Login");
+  }
+
+  /**
+   * Authentication is required.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUnauthUpdateRealnameRun()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    this.serverCreateUser(admin, "someone");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL("/realname-update-run")),
+      401,
+      "idstore: Login");
+  }
+
+  /**
+   * Authentication is required.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUnauthUpdateRealname()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    this.serverCreateUser(admin, "someone");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL("/realname-update")),
+      401,
+      "idstore: Login");
+  }
+
+  /**
+   * Updating a realname works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUpdateRealname()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/realname-update", "idstore: Update your real name.");
+    this.openPage("/realname-update-run?realname=Someone%20Else", "idstore: User Profile");
+
+    final var user = this.userGet(userId);
+    assertEquals("Someone Else", user.realName().value());
+  }
+
+  /**
+   * Updating a realname fails for invalid names.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUpdateRealnameInvalid()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/realname-update", "idstore: Update your real name.");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL("/realname-update-run?realname=")),
+      400,
+      "idstore: Error");
+  }
+
+  /**
+   * Updating a realname fails for missing names.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUpdateRealnameMissing()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/realname-update", "idstore: Update your real name.");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL("/realname-update-run")),
+      400,
+      "idstore: Error");
   }
 
   private void expectError(

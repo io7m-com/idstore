@@ -21,12 +21,14 @@
   </div>
 
   <div id="ids_content">
-    <div class="ids_emailAddForm_container">
-      <p>Please enter the email address to add to this account.</p>
-      <form action="/email-add-run" method="post" class="ids_emailAddForm">
-        <label class="ids_emailAddForm_emailLabel" for="email">Email</label>
-        <input class="ids_emailAddForm_emailField" type="text" id="email" name="email"/>
-        <input class="ids_emailAddForm_submit ids_xbutton" type="submit" value="Add"/>
+    <div class="ids_realnameUpdateForm_container">
+      <p>Please enter your new name.</p>
+      <form action="/realname-update-run" method="post" class="ids_realnameUpdateForm">
+        <label class="ids_realnameUpdateForm_existingLabel" for="existing">Existing</label>
+        <input class="ids_realnameUpdateForm_existingField" type="text" id="existing" name="existing" readonly="true" value="${existingName}"/>
+        <label class="ids_realnameUpdateForm_realnameLabel" for="realname">New Name</label>
+        <input class="ids_realnameUpdateForm_realnameField" type="text" id="realname" name="realname"/>
+        <input class="ids_realnameUpdateForm_submit ids_xbutton" type="submit" value="Update"/>
       </form>
     </div>
   </div>

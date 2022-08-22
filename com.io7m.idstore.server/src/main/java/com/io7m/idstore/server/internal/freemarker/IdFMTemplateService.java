@@ -148,6 +148,17 @@ public final class IdFMTemplateService implements IdServiceType
     );
   }
 
+  /**
+   * @return The realname update page template
+   */
+
+  public IdFMTemplateType<IdFMRealNameUpdateData> pageRealnameUpdateTemplate()
+  {
+    return new IdGenericTemplate<>(
+      this.findTemplate("pageRealNameUpdate")
+    );
+  }
+
   private static final class IdGenericTemplate<T extends IdFMDataModelType>
     implements IdFMTemplateType<T>
   {

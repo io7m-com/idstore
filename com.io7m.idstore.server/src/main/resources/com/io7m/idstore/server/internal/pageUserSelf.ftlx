@@ -40,7 +40,7 @@
           <td>${user.realName()}</td>
           <td>
             <div class="ids_xbutton">
-              <a href="/real-name-change">Update</a>
+              <a href="/realname-update">Update</a>
             </div>
           </td>
         </tr>

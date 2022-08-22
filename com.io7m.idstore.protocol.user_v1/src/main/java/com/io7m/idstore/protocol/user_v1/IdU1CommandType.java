@@ -31,6 +31,7 @@ public sealed interface IdU1CommandType<R extends IdU1ResponseType>
   IdU1CommandEmailRemoveDeny,
   IdU1CommandEmailRemovePermit,
   IdU1CommandLogin,
+  IdU1CommandRealnameUpdate,
   IdU1CommandUserSelf
 {
 

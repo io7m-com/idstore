@@ -21,6 +21,7 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
@@ -31,6 +32,7 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_PARAMETER_INVALID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.MAIL_SYSTEM_FAILURE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 
@@ -259,6 +261,26 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
       this.requestId,
       500,
       MAIL_SYSTEM_FAILURE
+    );
+  }
+
+  /**
+   * Produce an exception indicating a validation error.
+   *
+   * @param e The exception
+   *
+   * @return An execution failure
+   */
+
+  public IdCommandExecutionFailure failValidity(
+    final IdValidityException e)
+  {
+    return new IdCommandExecutionFailure(
+      e.getMessage(),
+      e,
+      this.requestId,
+      400,
+      HTTP_PARAMETER_INVALID
     );
   }
 }

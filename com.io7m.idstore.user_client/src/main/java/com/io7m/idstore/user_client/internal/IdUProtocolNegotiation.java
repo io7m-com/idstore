@@ -17,11 +17,11 @@
 
 package com.io7m.idstore.user_client.internal;
 
-import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.versions.IdVMessageType;
 import com.io7m.idstore.protocol.versions.IdVMessages;
 import com.io7m.idstore.protocol.versions.IdVProtocols;
+import com.io7m.idstore.user_client.api.IdUClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

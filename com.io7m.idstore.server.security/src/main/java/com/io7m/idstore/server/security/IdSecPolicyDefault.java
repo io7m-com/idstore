@@ -62,8 +62,17 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     if (action instanceof IdSecUserActionEmailRemoveDeny e) {
       return checkUserActionEmailRemoveDeny(e);
     }
+    if (action instanceof IdSecUserActionRealnameUpdate e) {
+      return checkUserActionRealnameUpdate(e);
+    }
 
     return new IdSecPolicyResultDenied("Operation not permitted.");
+  }
+
+  private static IdSecPolicyResultType checkUserActionRealnameUpdate(
+    final IdSecUserActionRealnameUpdate e)
+  {
+    return new IdSecPolicyResultPermitted();
   }
 
   private static IdSecPolicyResultType checkUserActionEmailAddBegin(

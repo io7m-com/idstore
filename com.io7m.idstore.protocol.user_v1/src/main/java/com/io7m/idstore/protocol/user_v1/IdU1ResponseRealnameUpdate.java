@@ -14,28 +14,38 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.security;
+package com.io7m.idstore.protocol.user_v1;
 
-import com.io7m.idstore.model.IdUser;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.util.Objects;
+import java.util.UUID;
 
 /**
- * A view of an action within the security policy. An <i>action</i> may (or may
- * not) be performed by a  <i>user</i> according to the security policy.
+ * A response to {@link IdU1CommandRealnameUpdate}.
+ *
+ * @param requestId The request ID
  */
 
-public sealed interface IdSecUserActionType
-  extends IdSecActionType
-  permits IdSecUserActionEmailAddBegin,
-  IdSecUserActionEmailAddDeny,
-  IdSecUserActionEmailAddPermit,
-  IdSecUserActionEmailRemoveBegin,
-  IdSecUserActionEmailRemoveDeny,
-  IdSecUserActionEmailRemovePermit,
-  IdSecUserActionRealnameUpdate
+@JsonDeserialize
+@JsonSerialize
+public record IdU1ResponseRealnameUpdate(
+  @JsonProperty(value = "RequestID", required = true)
+  UUID requestId)
+  implements IdU1ResponseType
 {
   /**
-   * @return The user performing the action
+   * A response to {@link IdU1CommandRealnameUpdate}.
+   *
+   * @param requestId The request ID
    */
 
-  IdUser user();
+  @JsonCreator
+  public IdU1ResponseRealnameUpdate
+  {
+    Objects.requireNonNull(requestId, "requestId");
+  }
 }

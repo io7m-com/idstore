@@ -17,6 +17,7 @@
 package com.io7m.idstore.user_client.internal;
 
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.user_client.api.IdUClientException;
@@ -137,5 +138,13 @@ public final class IdUClient implements IdUClientType
     throws IdUClientException, InterruptedException
   {
     this.handler.userEmailRemoveDeny(token);
+  }
+
+  @Override
+  public void userRealNameUpdate(
+    final IdRealName realName)
+    throws IdUClientException, InterruptedException
+  {
+    this.handler.userRealNameUpdate(realName);
   }
 }

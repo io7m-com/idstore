@@ -33,6 +33,7 @@ public sealed interface IdU1ResponseType
   IdU1ResponseEmailRemovePermit,
   IdU1ResponseError,
   IdU1ResponseLogin,
+  IdU1ResponseRealnameUpdate,
   IdU1ResponseUserSelf
 {
   /**

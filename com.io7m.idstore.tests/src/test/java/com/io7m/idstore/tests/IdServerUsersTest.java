@@ -17,6 +17,7 @@
 package com.io7m.idstore.tests;
 
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.user_client.IdUClients;
 import com.io7m.idstore.user_client.api.IdUClientException;
@@ -677,5 +678,28 @@ public final class IdServerUsersTest extends IdWithServerContract
         .toList()
         .stream().anyMatch(e -> Objects.equals(e, newMail))
     );
+  }
+
+  /**
+   * Updating a user realname works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testRealNameUpdate()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    this.serverCreateUser(admin, "someone");
+
+    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.userRealNameUpdate(new IdRealName("A New Name"));
+
+    final var userNow = this.client.userSelf();
+    assertEquals("A New Name", userNow.realName().value());
   }
 }

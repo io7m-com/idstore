@@ -18,6 +18,7 @@
 package com.io7m.idstore.user_client.api;
 
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
 
@@ -109,5 +110,17 @@ public interface IdUClientUsersType
    */
 
   void userEmailRemoveDeny(IdToken token)
+    throws IdUClientException, InterruptedException;
+
+  /**
+   * Update the user's realname.
+   *
+   * @param realName The new realname
+   *
+   * @throws IdUClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  void userRealNameUpdate(IdRealName realName)
     throws IdUClientException, InterruptedException;
 }

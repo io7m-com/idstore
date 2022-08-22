@@ -22,6 +22,7 @@ import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddPermit;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveDeny;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemovePermit;
+import com.io7m.idstore.protocol.user_v1.IdU1CommandRealnameUpdate;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandType;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandUserSelf;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
@@ -75,6 +76,9 @@ public final class IdU1CommandExecutor
     }
     if (command instanceof IdU1CommandEmailRemoveBegin c) {
       return new IdU1CmdEmailRemoveBegin().execute(context, c);
+    }
+    if (command instanceof IdU1CommandRealnameUpdate c) {
+      return new IdU1CmdRealNameUpdate().execute(context, c);
     }
 
     throw new IllegalStateException();

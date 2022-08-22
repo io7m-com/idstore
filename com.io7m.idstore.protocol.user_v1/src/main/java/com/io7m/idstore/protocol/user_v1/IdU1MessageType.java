@@ -58,6 +58,8 @@ public sealed interface IdU1MessageType
       com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveDeny.class,
       com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemovePermit.class,
       com.io7m.idstore.protocol.user_v1.IdU1CommandLogin.class,
+      com.io7m.idstore.protocol.user_v1.IdU1CommandRealnameUpdate.class,
+      com.io7m.idstore.protocol.user_v1.IdU1CommandUserSelf.class,
       com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailAddBegin.class,
       com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailAddDeny.class,
       com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailAddPermit.class,
@@ -66,7 +68,7 @@ public sealed interface IdU1MessageType
       com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailRemovePermit.class,
       com.io7m.idstore.protocol.user_v1.IdU1ResponseError.class,
       com.io7m.idstore.protocol.user_v1.IdU1ResponseLogin.class,
-      com.io7m.idstore.protocol.user_v1.IdU1CommandUserSelf.class,
+      com.io7m.idstore.protocol.user_v1.IdU1ResponseRealnameUpdate.class,
       com.io7m.idstore.protocol.user_v1.IdU1ResponseUserSelf.class
     ).collect(toUnmodifiableMap(identity(), IdU1MessageType::typeIdOf));
 
