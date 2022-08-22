@@ -26,10 +26,12 @@ import java.net.CookieManager;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 import static java.net.http.HttpClient.Redirect.ALWAYS;
 import static java.net.http.HttpRequest.BodyPublishers.ofString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdServerUserViewTest extends IdWithServerContract
 {
@@ -50,6 +52,62 @@ public final class IdServerUserViewTest extends IdWithServerContract
         .followRedirects(ALWAYS)
         .cookieHandler(this.cookies)
         .build();
+  }
+
+  /**
+   * Fetching CSS works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testCSS()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    {
+      final var req =
+        HttpRequest.newBuilder(this.viewURL("/css/reset.css"))
+          .build();
+      final var res =
+        this.httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+
+      assertTrue(res.body().startsWith("/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */"));
+    }
+
+    {
+      final var req =
+        HttpRequest.newBuilder(this.viewURL("/css/style.css"))
+          .build();
+      final var res =
+        this.httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+
+      assertTrue(res.body().contains("font-family:"));
+    }
+  }
+
+  /**
+   * Fetching the logo works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testLogo()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    {
+      final var req =
+        HttpRequest.newBuilder(this.viewURL("/logo"))
+          .build();
+      final var res =
+        this.httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+
+      assertTrue(res.body().contains("<svg width=\"64\""));
+    }
   }
 
   /**
@@ -642,7 +700,6 @@ public final class IdServerUserViewTest extends IdWithServerContract
       IdDocuments.elementsWithName(res.body(), "title");
     assertEquals("idstore: Verified", titles.get(0).getTextContent());
   }
-
 
   private void openPage(
     final String endpoint,
