@@ -31,12 +31,17 @@ import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.server.IdServers;
 import com.io7m.idstore.server.api.IdServerBrandingConfiguration;
 import com.io7m.idstore.server.api.IdServerConfiguration;
+import com.io7m.idstore.server.api.events.IdServerEventReady;
+import com.io7m.idstore.server.api.events.IdServerEventType;
 import com.io7m.idstore.server.api.IdServerHTTPServiceConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.subethamail.smtp.server.SMTPServer;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -46,11 +51,16 @@ import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Flow;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 
 public final class IdServerDemo
 {
+  private static final Logger LOG =
+    LoggerFactory.getLogger(IdServerDemo.class);
+
   private IdServerDemo()
   {
 
@@ -136,24 +146,47 @@ public final class IdServerDemo
         branding
       );
 
-    final var servers = new IdServers();
+    final var smtp =
+      SMTPServer.port(25000)
+        .executorService(Executors.newSingleThreadExecutor(r -> {
+          final var thread = new Thread(r);
+          thread.setName("mail");
+          thread.setDaemon(true);
+          return thread;
+        }))
+        .messageHandler((messageContext, source, destination, data) -> {
 
-    try (var server = servers.createServer(serverConfiguration)) {
-      final var smtp =
-        SMTPServer.port(25000)
-          .messageHandler((messageContext, source, destination, data) -> {
+        })
+        .build();
 
-          })
-          .build();
+    try {
+      final var servers = new IdServers();
+      try (var server = servers.createServer(serverConfiguration)) {
+        final var watchdog = new Watchdog();
+        server.events().subscribe(watchdog);
 
-      smtp.start();
-      server.start();
-      createInitialAdmin(server);
-      createUser(server);
+        smtp.start();
+        server.start();
 
-      while (true) {
-        Thread.sleep(1_000L);
+        for (int second = 1; second <= 10; ++second) {
+          if (watchdog.isStarted()) {
+            break;
+          }
+          if (second == 10) {
+            throw new IOException("Server startup failed!");
+          }
+          Thread.sleep(1_000L);
+        }
+
+        createInitialAdmin(server);
+        createUser(server);
+
+        while (true) {
+          Thread.sleep(1_000L);
+        }
       }
+    } finally {
+      smtp.stop();
     }
   }
 
@@ -231,6 +264,57 @@ public final class IdServerDemo
       }
     } catch (final IdDatabaseException | IdPasswordException e) {
       e.getMessage();
+    }
+  }
+
+  private static final class Watchdog
+    implements Flow.Subscriber<IdServerEventType>
+  {
+    private Flow.Subscription subscription;
+    private boolean isStarted;
+
+    Watchdog()
+    {
+
+    }
+
+    public boolean isStarted()
+    {
+      return this.isStarted;
+    }
+
+    @Override
+    public void onSubscribe(
+      final Flow.Subscription newSubscription)
+    {
+      this.subscription = newSubscription;
+      newSubscription.request(1L);
+    }
+
+    @Override
+    public void onNext(
+      final IdServerEventType item)
+    {
+      if (item instanceof IdServerEventReady) {
+        LOG.debug("server is ready");
+        this.isStarted = true;
+        this.subscription.cancel();
+      } else {
+        this.subscription.request(1L);
+      }
+    }
+
+    @Override
+    public void onError(
+      final Throwable throwable)
+    {
+
+    }
+
+    @Override
+    public void onComplete()
+    {
+
     }
   }
 }

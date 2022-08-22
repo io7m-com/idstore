@@ -198,6 +198,7 @@ public final class IdU1CmdEmailRemoveBegin
 
     try {
       mailService.sendMail(
+        context.requestId(),
         email,
         mailHeaders,
         "[idstore] Email verification request",

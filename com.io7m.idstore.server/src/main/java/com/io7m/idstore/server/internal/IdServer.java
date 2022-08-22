@@ -22,6 +22,8 @@ import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
 import com.io7m.idstore.protocol.user_v1.IdU1Messages;
 import com.io7m.idstore.protocol.versions.IdVMessages;
 import com.io7m.idstore.server.api.IdServerConfiguration;
+import com.io7m.idstore.server.api.events.IdServerEventReady;
+import com.io7m.idstore.server.api.events.IdServerEventType;
 import com.io7m.idstore.server.api.IdServerException;
 import com.io7m.idstore.server.api.IdServerType;
 import com.io7m.idstore.server.internal.admin_v1.IdA1CommandServlet;
@@ -65,6 +67,8 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Flow;
+import java.util.concurrent.SubmissionPublisher;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -80,6 +84,7 @@ public final class IdServer implements IdServerType
   private final CloseableCollectionType<IdServerException> resources;
   private final AtomicBoolean closed;
   private IdDatabaseType database;
+  private final SubmissionPublisher<IdServerEventType> events;
 
   /**
    * The main server implementation.
@@ -102,6 +107,8 @@ public final class IdServer implements IdServerType
         }
       );
 
+    this.events =
+      new SubmissionPublisher<>();
     this.closed =
       new AtomicBoolean(false);
   }
@@ -129,6 +136,7 @@ public final class IdServer implements IdServerType
       final var adminAPIServer = this.createAdminAPIServer(services);
       this.resources.add(adminAPIServer::stop);
 
+      this.events.submit(new IdServerEventReady(this.configuration.now()));
     } catch (final IdDatabaseException e) {
       try {
         this.close();
@@ -155,6 +163,12 @@ public final class IdServer implements IdServerType
       });
   }
 
+  @Override
+  public Flow.Publisher<IdServerEventType> events()
+  {
+    return this.events;
+  }
+
   private IdServiceDirectory createServiceDirectory(
     final IdDatabaseType inDatabase)
     throws IOException
@@ -162,12 +176,18 @@ public final class IdServer implements IdServerType
     final var services = new IdServiceDirectory();
     services.register(IdDatabaseType.class, inDatabase);
 
+    final var eventBus = new IdServerEventBusService(this.events);
+    services.register(IdServerEventBusService.class, eventBus);
+
     final var strings = new IdServerStrings(this.configuration.locale());
     services.register(IdServerStrings.class, strings);
 
     services.register(
       IdServerMailService.class,
-      IdServerMailService.create(this.configuration.mailConfiguration())
+      IdServerMailService.create(
+        this.configuration.clock(),
+        eventBus,
+        this.configuration.mailConfiguration())
     );
 
     services.register(
@@ -564,7 +584,6 @@ public final class IdServer implements IdServerType
 
         });
   }
-
 
   @Override
   public void close()

@@ -17,6 +17,9 @@
 package com.io7m.idstore.server.api;
 
 import com.io7m.idstore.database.api.IdDatabaseType;
+import com.io7m.idstore.server.api.events.IdServerEventType;
+
+import java.util.concurrent.Flow;
 
 /**
  * A server instance.
@@ -39,6 +42,11 @@ public interface IdServerType extends AutoCloseable
 
   IdDatabaseType database();
 
+  /**
+   * @return An observable stream of server events
+   */
+
+  Flow.Publisher<IdServerEventType> events();
 
   @Override
   void close()

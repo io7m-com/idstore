@@ -22,6 +22,7 @@ import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTPS;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP_TLS;
+import com.io7m.idstore.server.api.events.IdServerEventMailServiceFailure;
 import com.io7m.idstore.services.api.IdServiceType;
 import com.io7m.junreachable.UnreachableCodeException;
 import org.simplejavamail.api.mailer.Mailer;
@@ -29,8 +30,11 @@ import org.simplejavamail.email.EmailBuilder;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.simplejavamail.mailer.internal.MailerRegularBuilderImpl;
 
+import java.time.Clock;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static org.simplejavamail.api.mailer.config.TransportStrategy.SMTP;
@@ -43,15 +47,23 @@ import static org.simplejavamail.api.mailer.config.TransportStrategy.SMTP_TLS;
 
 public final class IdServerMailService implements IdServiceType
 {
+  private final Clock clock;
   private final IdServerMailConfiguration configuration;
+  private final IdServerEventBusService events;
   private final Mailer mailer;
 
   private IdServerMailService(
+    final Clock inClock,
     final IdServerMailConfiguration inConfiguration,
+    final IdServerEventBusService inEvents,
     final Mailer inMailer)
   {
+    this.clock =
+      Objects.requireNonNull(inClock, "clock");
     this.configuration =
       Objects.requireNonNull(inConfiguration, "configuration");
+    this.events =
+      Objects.requireNonNull(inEvents, "events");
     this.mailer =
       Objects.requireNonNull(inMailer, "mailer");
   }
@@ -59,14 +71,22 @@ public final class IdServerMailService implements IdServiceType
   /**
    * Create a new mail service.
    *
+   * @param clock         The clock
+   * @param events        The event bus service
    * @param configuration The mail configuration
    *
    * @return The service
    */
 
   public static IdServerMailService create(
+    final Clock clock,
+    final IdServerEventBusService events,
     final IdServerMailConfiguration configuration)
   {
+    Objects.requireNonNull(clock, "clock");
+    Objects.requireNonNull(events, "events");
+    Objects.requireNonNull(configuration, "configuration");
+
     MailerRegularBuilderImpl mailerBuilder;
 
     final var authOpt =
@@ -99,7 +119,9 @@ public final class IdServerMailService implements IdServiceType
     }
 
     return new IdServerMailService(
+      clock,
       configuration,
+      events,
       mailerBuilder.buildMailer()
     );
   }
@@ -107,41 +129,55 @@ public final class IdServerMailService implements IdServiceType
   /**
    * Send a message to the given target address.
    *
-   * @param to      The target address
-   * @param subject The message subject
-   * @param text    The message text
-   * @param headers Extra message headers
+   * @param requestId The request ID
+   * @param to        The target address
+   * @param subject   The message subject
+   * @param text      The message text
+   * @param headers   Extra message headers
    *
    * @return The send in progress
    */
 
   public CompletableFuture<Void> sendMail(
+    final UUID requestId,
     final IdEmail to,
     final Map<String, String> headers,
     final String subject,
     final String text)
   {
-    Objects.requireNonNull(to, "to");
-    Objects.requireNonNull(subject, "subject");
-    Objects.requireNonNull(headers, "headers");
-    Objects.requireNonNull(text, "text");
+    try {
+      Objects.requireNonNull(requestId, "requestId");
+      Objects.requireNonNull(to, "to");
+      Objects.requireNonNull(subject, "subject");
+      Objects.requireNonNull(headers, "headers");
+      Objects.requireNonNull(text, "text");
 
-    final var emailBuilder =
-      EmailBuilder.startingBlank();
+      final var emailBuilder =
+        EmailBuilder.startingBlank();
 
-    for (final var entry : headers.entrySet()) {
-      emailBuilder.withHeader(entry.getKey(), entry.getValue());
+      for (final var entry : headers.entrySet()) {
+        emailBuilder.withHeader(entry.getKey(), entry.getValue());
+      }
+
+      final var email =
+        emailBuilder
+          .to(to.value())
+          .from(this.configuration.senderAddress())
+          .withSubject(subject)
+          .appendText(text)
+          .buildEmail();
+
+      return this.mailer.sendMail(email);
+    } catch (final Exception e) {
+      this.events.publish(
+        new IdServerEventMailServiceFailure(
+          OffsetDateTime.now(this.clock),
+          requestId,
+          e.getMessage()
+        )
+      );
+      throw e;
     }
-
-    final var email =
-      emailBuilder
-        .to(to.value())
-        .from(this.configuration.senderAddress())
-        .withSubject(subject)
-        .appendText(text)
-        .buildEmail();
-
-    return this.mailer.sendMail(email);
   }
 
   @Override

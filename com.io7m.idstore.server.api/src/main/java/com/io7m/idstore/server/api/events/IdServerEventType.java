@@ -14,23 +14,35 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
+package com.io7m.idstore.server.api.events;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import java.time.OffsetDateTime;
+
 /**
- * The server API.
+ * The type of events published by the server.
  */
 
-module com.io7m.idstore.server.api
+@JsonTypeInfo(
+  use = JsonTypeInfo.Id.NAME,
+  include = JsonTypeInfo.As.PROPERTY,
+  property = "%Type"
+)
+@JsonSubTypes({
+  @JsonSubTypes.Type(value = IdServerEventReady.class)
+})
+
+public sealed interface IdServerEventType
+  permits IdServerEventMailServiceFailure, IdServerEventReady
 {
-  requires static org.osgi.annotation.bundle;
-  requires static org.osgi.annotation.versioning;
+  /**
+   * @return The event timestamp
+   */
 
-  requires transitive com.io7m.idstore.database.api;
-
-  requires com.fasterxml.jackson.databind;
-  requires com.fasterxml.jackson.datatype.jsr310;
-  requires com.fasterxml.jackson.datatype.jdk8;
-
-  uses com.io7m.idstore.database.api.IdDatabaseFactoryType;
-
-  exports com.io7m.idstore.server.api;
-  exports com.io7m.idstore.server.api.events;
+  @JsonProperty(value = "Time", required = true)
+  OffsetDateTime time();
 }

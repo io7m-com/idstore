@@ -201,6 +201,7 @@ public final class IdU1CmdEmailAddBegin
 
     try {
       mailService.sendMail(
+        context.requestId(),
         email,
         mailHeaders,
         "[idstore] Email verification request",

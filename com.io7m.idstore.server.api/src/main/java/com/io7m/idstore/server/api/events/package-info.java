@@ -15,22 +15,12 @@
  */
 
 /**
- * The server API.
+ * The server API (Events).
  */
 
-module com.io7m.idstore.server.api
-{
-  requires static org.osgi.annotation.bundle;
-  requires static org.osgi.annotation.versioning;
+@Export
+@Version("1.0.0")
+package com.io7m.idstore.server.api.events;
 
-  requires transitive com.io7m.idstore.database.api;
-
-  requires com.fasterxml.jackson.databind;
-  requires com.fasterxml.jackson.datatype.jsr310;
-  requires com.fasterxml.jackson.datatype.jdk8;
-
-  uses com.io7m.idstore.database.api.IdDatabaseFactoryType;
-
-  exports com.io7m.idstore.server.api;
-  exports com.io7m.idstore.server.api.events;
-}
+import org.osgi.annotation.bundle.Export;
+import org.osgi.annotation.versioning.Version;
