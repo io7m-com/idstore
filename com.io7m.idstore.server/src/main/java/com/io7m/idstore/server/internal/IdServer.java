@@ -30,6 +30,11 @@ import com.io7m.idstore.server.internal.admin_v1.IdA1CommandServlet;
 import com.io7m.idstore.server.internal.admin_v1.IdA1Login;
 import com.io7m.idstore.server.internal.admin_v1.IdA1Sends;
 import com.io7m.idstore.server.internal.admin_v1.IdA1Versions;
+import com.io7m.idstore.server.internal.admin_view.IdAViewLogin;
+import com.io7m.idstore.server.internal.admin_view.IdAViewLogout;
+import com.io7m.idstore.server.internal.admin_view.IdAViewMain;
+import com.io7m.idstore.server.internal.admin_view.IdAViewUser;
+import com.io7m.idstore.server.internal.admin_view.IdAViewUsers;
 import com.io7m.idstore.server.internal.common.IdCommonCSSServlet;
 import com.io7m.idstore.server.internal.common.IdCommonLogoServlet;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
@@ -137,6 +142,9 @@ public final class IdServer implements IdServerType
 
       final var adminAPIServer = this.createAdminAPIServer(services);
       this.resources.add(adminAPIServer::stop);
+
+      final var adminViewServer = this.createAdminViewServer(services);
+      this.resources.add(adminViewServer::stop);
 
       this.events.submit(new IdServerEventReady(this.configuration.now()));
     } catch (final IdDatabaseException e) {
@@ -278,11 +286,15 @@ public final class IdServer implements IdServerType
       "/css"
     );
     servlets.addServlet(
-      servletHolders.create(IdCommonLogoServlet.class, IdCommonLogoServlet::new),
+      servletHolders.create(
+        IdCommonLogoServlet.class,
+        IdCommonLogoServlet::new),
       "/logo/*"
     );
     servlets.addServlet(
-      servletHolders.create(IdCommonLogoServlet.class, IdCommonLogoServlet::new),
+      servletHolders.create(
+        IdCommonLogoServlet.class,
+        IdCommonLogoServlet::new),
       "/logo"
     );
 
@@ -421,6 +433,141 @@ public final class IdServer implements IdServerType
     LOG.info("[{}] User view server started", address);
     return server;
   }
+
+  private Server createAdminViewServer(
+    final IdServiceDirectoryType services)
+    throws Exception
+  {
+    final var httpConfig =
+      this.configuration.adminViewAddress();
+    final var address =
+      InetSocketAddress.createUnresolved(
+        httpConfig.listenAddress(),
+        httpConfig.listenPort()
+      );
+
+    final var server =
+      new Server(address);
+
+    /*
+     * Configure all the servlets.
+     */
+
+    final var servletHolders =
+      new IdServletHolders(services);
+    final var servlets =
+      new ServletContextHandler();
+
+    servlets.addServlet(
+      servletHolders.create(IdAViewMain.class, IdAViewMain::new),
+      "/"
+    );
+    servlets.addServlet(
+      servletHolders.create(IdAViewLogout.class, IdAViewLogout::new),
+      "/logout"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(IdAViewLogin.class, IdAViewLogin::new),
+      "/login"
+    );
+    servlets.addServlet(
+      servletHolders.create(IdAViewLogin.class, IdAViewLogin::new),
+      "/login/*"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(IdCommonCSSServlet.class, IdCommonCSSServlet::new),
+      "/css/*"
+    );
+    servlets.addServlet(
+      servletHolders.create(IdCommonCSSServlet.class, IdCommonCSSServlet::new),
+      "/css"
+    );
+    servlets.addServlet(
+      servletHolders.create(
+        IdCommonLogoServlet.class,
+        IdCommonLogoServlet::new),
+      "/logo/*"
+    );
+    servlets.addServlet(
+      servletHolders.create(
+        IdCommonLogoServlet.class,
+        IdCommonLogoServlet::new),
+      "/logo"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(IdAViewUsers.class, IdAViewUsers::new),
+      "/users"
+    );
+    servlets.addServlet(
+      servletHolders.create(IdAViewUsers.class, IdAViewUsers::new),
+      "/users/*"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(IdAViewUser.class, IdAViewUser::new),
+      "/user"
+    );
+    servlets.addServlet(
+      servletHolders.create(IdAViewUser.class, IdAViewUser::new),
+      "/user/*"
+    );
+
+    /*
+     * Set up a session handler that allows for Servlets to have sessions
+     * that can survive server restarts.
+     */
+
+    final var sessionIds = new DefaultSessionIdManager(server);
+    server.setSessionIdManager(sessionIds);
+
+    final var sessionHandler = new SessionHandler();
+    sessionHandler.setSessionCookie("IDSTORE_ADMIN_VIEW_SESSION");
+
+    final var sessionStore = new FileSessionDataStore();
+    sessionStore.setStoreDir(httpConfig.sessionDirectory().toFile());
+
+    final var sessionCache = new DefaultSessionCache(sessionHandler);
+    sessionCache.setSessionDataStore(sessionStore);
+
+    sessionHandler.setSessionCache(sessionCache);
+    sessionHandler.setSessionIdManager(sessionIds);
+    sessionHandler.setHandler(servlets);
+
+    /*
+     * Set up an MBean container so that the statistics handler can export
+     * statistics to JMX.
+     */
+
+    final var mbeanContainer =
+      new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
+    server.addBean(mbeanContainer);
+
+    /*
+     * Set up a statistics handler that wraps everything.
+     */
+
+    final var statsHandler = new StatisticsHandler();
+    statsHandler.setHandler(sessionHandler);
+
+    /*
+     * Add a connector listener that adds unique identifiers to all requests.
+     */
+
+    Arrays.stream(server.getConnectors()).forEach(
+      connector -> connector.addBean(new IdServerRequestDecoration(services))
+    );
+
+    server.setErrorHandler(new IdErrorHandler());
+    server.setRequestLog(new IdServerRequestLog(services, "admin_view"));
+    server.setHandler(statsHandler);
+    server.start();
+    LOG.info("[{}] Admin view server started", address);
+    return server;
+  }
+
 
   private Server createUserAPIServer(
     final IdServiceDirectoryType services)

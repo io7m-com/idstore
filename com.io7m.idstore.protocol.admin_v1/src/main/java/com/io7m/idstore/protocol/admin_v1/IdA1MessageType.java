@@ -53,9 +53,11 @@ public sealed interface IdA1MessageType
     Stream.of(
       IdA1CommandLogin.class,
       IdA1CommandAdminSelf.class,
+      IdA1CommandUserListParametersSet.class,
       IdA1ResponseError.class,
       IdA1ResponseLogin.class,
-      IdA1ResponseAdminSelf.class
+      IdA1ResponseAdminSelf.class,
+      IdA1ResponseUserListParametersSet.class
     ).collect(toUnmodifiableMap(identity(), IdA1MessageType::typeIdOf));
 
   /**

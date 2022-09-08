@@ -87,6 +87,16 @@ public final class IdCommonCSSServlet extends HttpServlet
       return;
     }
 
+    if (Objects.equals(stripped, "xbutton.css")) {
+      servletResponse.setStatus(200);
+      servletResponse.setContentType("text/css; charset=utf-8");
+      try (var output = servletResponse.getOutputStream()) {
+        output.print(this.branding.xButtonCSS());
+        output.flush();
+      }
+      return;
+    }
+
     servletResponse.setStatus(404);
   }
 }

@@ -37,6 +37,7 @@ public final class IdDatabaseUserListPaging
   private final IdUserListParameters parameters;
   private volatile int currentPage;
   private final ConcurrentHashMap<Integer, Page> pages;
+  private long pagesCountApproximate;
 
   private IdDatabaseUserListPaging(
     final IdUserListParameters inParameters)
@@ -86,6 +87,12 @@ public final class IdDatabaseUserListPaging
   }
 
   @Override
+  public long pageCount()
+  {
+    return this.pagesCountApproximate;
+  }
+
+  @Override
   public boolean pageNextAvailable()
   {
     return this.pages.containsKey(Integer.valueOf(this.currentPage + 1));
@@ -122,14 +129,21 @@ public final class IdDatabaseUserListPaging
     final var page =
       this.pages.get(Integer.valueOf(this.currentPage));
 
+    this.pagesCountApproximate =
+      queries.userCount(
+        this.parameters.timeCreatedRange(),
+        this.parameters.timeUpdatedRange(),
+        this.parameters.search()
+      ) / (long) this.parameters.limit();
+
     final var results =
       queries.userList(
         this.parameters.timeCreatedRange(),
         this.parameters.timeUpdatedRange(),
+        this.parameters.search(),
         this.parameters.ordering(),
         this.parameters.limit(),
-        page.seek
-      );
+        page.seek);
 
     if (results.size() == this.parameters.limit()) {
       final var nextPage =

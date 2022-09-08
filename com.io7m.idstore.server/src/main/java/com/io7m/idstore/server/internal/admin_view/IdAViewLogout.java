@@ -15,55 +15,49 @@
  */
 
 
-package com.io7m.idstore.server.api;
+package com.io7m.idstore.server.internal.admin_view;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
 /**
- * A serializer for color values.
+ * Log out.
  */
 
-public final class IdServerColorSerializer
-  extends StdSerializer<IdServerColor>
+public final class IdAViewLogout extends HttpServlet
 {
   /**
-   * A serializer for color values.
+   * Log out.
    *
-   * @inheritDoc
+   * @param inServices The service directory
    */
 
-  public IdServerColorSerializer()
+  public IdAViewLogout(
+    final IdServiceDirectoryType inServices)
   {
-    this(null);
-  }
 
-
-  /**
-   * A serializer for color values.
-   *
-   * @inheritDoc
-   *
-   * @param t The serialized class
-   */
-
-  public IdServerColorSerializer(
-    final Class<IdServerColor> t)
-  {
-    super(t);
   }
 
   @Override
-  public void serialize(
-    final IdServerColor value,
-    final JsonGenerator jgen,
-    final SerializerProvider provider)
-    throws IOException, JsonProcessingException
+  protected void service(
+    final HttpServletRequest request,
+    final HttpServletResponse servletResponse)
+    throws ServletException, IOException
   {
-    jgen.writeString(value.toString());
+    final var session = request.getSession(false);
+    if (session != null) {
+      try {
+        session.invalidate();
+      } catch (final Exception e) {
+        // Don't care
+      }
+    }
+
+    servletResponse.sendRedirect("/");
   }
 }

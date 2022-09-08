@@ -159,6 +159,39 @@ public final class IdFMTemplateService implements IdServiceType
     );
   }
 
+  /**
+   * @return The admin main template
+   */
+
+  public IdFMTemplateType<IdFMAdminMainData> pageAdminMainTemplate()
+  {
+    return new IdGenericTemplate<>(
+      this.findTemplate("pageAdminMain")
+    );
+  }
+
+  /**
+   * @return The admin user list template
+   */
+
+  public IdFMTemplateType<IdFMAdminUsersData> pageAdminUsersTemplate()
+  {
+    return new IdGenericTemplate<>(
+      this.findTemplate("pageAdminUsers")
+    );
+  }
+
+  /**
+   * @return The admin user page template
+   */
+
+  public IdFMTemplateType<IdFMAdminUserData> pageAdminUserTemplate()
+  {
+    return new IdGenericTemplate<>(
+      this.findTemplate("pageAdminUser")
+    );
+  }
+
   private static final class IdGenericTemplate<T extends IdFMDataModelType>
     implements IdFMTemplateType<T>
   {

@@ -17,28 +17,28 @@
  */
 
 a {
-  color: ${mainLinkColor};
+  color: ${colors.mainLinkColor()};
 }
 
 body
 {
-  background-color: ${mainBackgroundColor};
-  color:            ${mainTextColor};
+  background-color: ${colors.mainBackgroundColor()};
+  color:            ${colors.mainTextColor()};
   font-family:      monospace;
 }
 
 #ids_main
 {
-  background-color: ${mainBackgroundColor};
-  color:            ${mainTextColor};
+  background-color: ${colors.mainBackgroundColor()};
+  color:            ${colors.mainTextColor()};
   font-family:      monospace;
 }
 
 #ids_header
 {
   height:           2em;
-  background-color: ${headerBackgroundColor};
-  color:            ${headerTextColor};
+  background-color: ${colors.headerBackgroundColor()};
+  color:            ${colors.headerTextColor()};
 
   display:        flex;
   flex-direction: row;
@@ -72,8 +72,12 @@ span.ids_empty
 }
 span.ids_profile_links > a
 {
-  color: ${headerLinkColor};
+  color: ${colors.headerLinkColor()};
 }
+
+/*
+ * Error messages.
+ */
 
 .ids_error_message h3
 {
@@ -81,9 +85,36 @@ span.ids_profile_links > a
 }
 .ids_error_message
 {
-  border:        1px ${errorBorderColor} solid;
+  border:        1px ${colors.errorBorderColor()} solid;
   padding:       2em;
   margin-bottom: 3em;
+}
+
+/*
+ * Standard form elements.
+ */
+
+.ids_formItem
+{
+  display:      flex;
+  align-items:  center;
+  padding:      0;
+  height:       3em;
+}
+input.ids_formItem
+{
+  padding-left: 1em;
+}
+
+/*
+ * Standard page container.
+ */
+
+div.ids_standardPage_container
+{
+  margin:    2em;
+  width:     100%;
+  max-width: 80em;
 }
 
 /*
@@ -151,7 +182,6 @@ form.ids_loginForm
   padding:     0;
 }
 
-
 .ids_loginForm_submit
 {
   height:      3em;
@@ -161,16 +191,14 @@ form.ids_loginForm
   align-items: center;
 }
 
+.ids_loginForm_loginTitle
+{
+  margin-bottom: 2em;
+}
+
 /*
  * User profile.
  */
-
-div.ids_userProfile_container
-{
-  margin:    2em;
-  width:     100%;
-  max-width: 80em;
-}
 
 table.ids_userProfile
 {
@@ -179,11 +207,11 @@ table.ids_userProfile
 }
 table.ids_userProfile th
 {
-  border: 1px ${mainTableBorderColor} solid;
+  border: 1px ${colors.mainTableBorderColor()} solid;
 }
 table.ids_userProfile td
 {
-  border:        1px ${mainTableBorderColor} solid;
+  border:        1px ${colors.mainTableBorderColor()} solid;
   height:        2.5em;
   padding-left:  1em;
   padding-right: 1em;
@@ -223,12 +251,12 @@ table.ids_userProfile_emails
 }
 table.ids_userProfile_emails th
 {
-  border: 1px ${mainTableBorderColor} solid;
+  border: 1px ${colors.mainTableBorderColor()} solid;
   height: 2em;
 }
 table.ids_userProfile_emails td
 {
-  border:        1px ${mainTableBorderColor} solid;
+  border:        1px ${colors.mainTableBorderColor()} solid;
   height:        2.5em;
   padding-left:  1em;
   padding-right: 1em;
@@ -263,11 +291,11 @@ table.ids_userProfile_loginHistory
 }
 table.ids_userProfile_loginHistory th
 {
-  border: 1px ${mainTableBorderColor} solid;
+  border: 1px ${colors.mainTableBorderColor()} solid;
 }
 table.ids_userProfile_loginHistory td
 {
-  border:        1px ${mainTableBorderColor} solid;
+  border:        1px ${colors.mainTableBorderColor()} solid;
   height:        2.5em;
   padding-left:  1em;
   padding-right: 1em;
@@ -288,71 +316,8 @@ table.ids_userProfile_loginHistory > tr > td:first-child
 }
 
 /*
- * Generic buttons.
- */
-
-.ids_xbutton
-{
-  text-align:     center;
-  vertical-align: middle;
-  display:        table-cell;
-  padding-left:   1.5em;
-  padding-right:  1.5em;
-  padding-top:    0.5em;
-  padding-bottom: 0.5em;
-
-  background-color: ${buttonBodyColor};
-
-  border-bottom: 2px solid ${buttonEmbossSColor};
-  border-left:   2px solid ${buttonEmbossWColor};
-  border-top:    2px solid ${buttonEmbossNColor};
-  border-right:  2px solid ${buttonEmbossEColor};
-
-  box-shadow:  0px 0px 0px 2px ${buttonBorderColor};
-  user-select: none;
-}
-
-.ids_xbutton:hover
-{
-  background-color: ${buttonHoverBodyColor};
-
-  border-bottom: 2px solid ${buttonHoverEmbossSColor};
-  border-left:   2px solid ${buttonHoverEmbossWColor};
-  border-top:    2px solid ${buttonHoverEmbossNColor};
-  border-right:  2px solid ${buttonHoverEmbossEColor};
-
-  box-shadow:  0px 0px 0px 2px ${buttonHoverBorderColor};
-  user-select: none;
-}
-
-.ids_xbutton:active
-{
-  background-color: ${buttonPressedBodyColor};
-
-  border-bottom: 2px solid ${buttonPressedEmbossSColor};
-  border-left:   2px solid ${buttonPressedEmbossWColor};
-  border-top:    2px solid ${buttonPressedEmbossNColor};
-  border-right:  2px solid ${buttonPressedEmbossEColor};
-
-  box-shadow:  0px 0px 0px 2px ${buttonPressedBorderColor};
-  user-select: none;
-}
-
-.ids_xbutton a, a.ids_xbutton
-{
-  color: ${mainTextColor};
-}
-
-/*
  * Email addition form.
  */
-
-div.ids_emailAddForm_container
-{
-  margin:    2em;
-  width:     100%;
-  max-width: 80em;
-}
 
 .ids_emailAddForm
 {
@@ -392,13 +357,6 @@ div.ids_emailAddForm_container
 /*
  * Realname update form.
  */
-
-div.ids_realnameUpdateForm_container
-{
-  margin:    2em;
-  width:     100%;
-  max-width: 80em;
-}
 
 .ids_realnameUpdateForm
 {
@@ -470,11 +428,217 @@ div.ids_message_error > p:last-of-type
 }
 .ids_message
 {
-  border:        1px ${mainMessageBorderColor} solid;
+  border:        1px ${colors.mainMessageBorderColor()} solid;
   padding:       2em;
   margin-bottom: 3em;
 }
 div.ids_message > p:last-of-type
 {
   margin-bottom: 4em;
+}
+
+/*
+ * Admin main page.
+ */
+
+div.ids_standardPage_container > ul > li
+{
+  margin-bottom: 1em;
+}
+
+/*
+ * Admin users page.
+ */
+
+table.ids_adminUsers
+{
+  width:           100%;
+  border-collapse: collapse;
+}
+table.ids_adminUsers th
+{
+  border: 1px ${colors.mainTableBorderColor()} solid;
+}
+table.ids_adminUsers td
+{
+  border:        1px ${colors.mainTableBorderColor()} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_adminUsers > thead > tr
+{
+  height: 2.5em;
+}
+table.ids_adminUsers > thead > tr > th
+{
+  padding-left: 1em;
+  text-align:   left;
+}
+table.ids_adminUsers > tbody > tr > td:first-child
+{
+  width: 24em;
+}
+
+div.ids_adminUsers_prevNext
+{
+  display:        flex;
+  flex-direction: row;
+  align-items:    center;
+  margin-top:     2em;
+  margin-right:   2px;
+  margin-left:    2px;
+}
+
+span.ids_adminUsers_prev > a
+{
+  width: 8em;
+}
+span.ids_adminUsers_prevEmpty
+{
+  width: 8em;
+}
+
+div.ids_adminUsers_prevNext > span:nth-child(2)
+{
+  flex: 1;
+  text-align: center;
+}
+
+span.ids_adminUsers_next > a
+{
+  width: 8em;
+}
+span.ids_adminUsers_nextEmpty
+{
+  width: 8em;
+}
+
+form.ids_adminUsers_search
+{
+  display:        flex;
+  flex-direction: row;
+  align-items:    center;
+  margin-bottom:  2em;
+}
+form.ids_adminUsers_search > .ids_adminUsers_searchLabel
+{
+  margin-right: 2em;
+}
+form.ids_adminUsers_search > .ids_adminUsers_searchField
+{
+  flex:           1;
+  margin-right:   2em;
+  height:         2em;
+  padding-top:    2px;
+  padding-bottom: 2px;
+  padding-left:   1em;
+}
+form.ids_adminUsers_search > .ids_adminUsers_searchButton
+{
+  width: 8em;
+}
+
+ /*
+  * Admin user profile.
+  */
+
+form.ids_adminUserProfile_details
+{
+  display:               grid;
+  grid-template-columns: 8em;
+  grid-template-rows:    3em;
+  grid-gap:              16px;
+  margin-top:            4em;
+  margin-bottom:         4em;
+}
+.ids_adminUserProfile_idLabel       { grid-column: 1; grid-row: 1; }
+.ids_adminUserProfile_idField       { grid-column: 2; grid-row: 1; }
+.ids_adminUserProfile_idNameLabel   { grid-column: 1; grid-row: 2; }
+.ids_adminUserProfile_idNameField   { grid-column: 2; grid-row: 2; }
+.ids_adminUserProfile_realNameLabel { grid-column: 1; grid-row: 3; }
+.ids_adminUserProfile_realNameField { grid-column: 2; grid-row: 3; }
+.ids_adminUserProfile_update        { grid-column: 2; grid-row: 4; }
+
+form.ids_adminUserProfile_emailAdd
+{
+  display: flex;
+}
+.ids_adminUserProfile_emailAddLabel  { }
+.ids_adminUserProfile_emailAddField  { flex: 1; }
+.ids_adminUserProfile_emailAddSubmit { }
+
+/*
+ * User profile: Emails
+ */
+
+table.ids_adminUserProfile_emails
+{
+  width: 100%;
+  border-collapse: collapse;
+}
+table.ids_adminUserProfile_emails th
+{
+  border: 1px ${colors.mainTableBorderColor()} solid;
+  height: 2em;
+}
+table.ids_adminUserProfile_emails td
+{
+  border:        1px ${colors.mainTableBorderColor()} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_adminUserProfile_emails thead
+{
+
+}
+
+table.ids_adminUserProfile_emails > tr > td:last-child
+{
+  width:   8em;
+  margin:  0;
+  padding: 1px;
+}
+
+table.ids_adminUserProfile_emails > tr > td:last-child .ids_xbutton
+{
+  margin: 0px;
+  width:  8em;
+  height: 1em;
+}
+
+/*
+ * User profile: Login history
+ */
+
+table.ids_adminUserProfile_loginHistory
+{
+  width:           100%;
+  border-collapse: collapse;
+}
+table.ids_adminUserProfile_loginHistory th
+{
+  border: 1px ${colors.mainTableBorderColor()} solid;
+}
+table.ids_adminUserProfile_loginHistory td
+{
+  border:        1px ${colors.mainTableBorderColor()} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_adminUserProfile_loginHistory > thead > tr
+{
+  height: 2.5em;
+}
+table.ids_adminUserProfile_loginHistory > thead > tr > th
+{
+  padding-left: 1em;
+  text-align:   left;
+}
+
+table.ids_adminUserProfile_loginHistory > tr > td:first-child
+{
+  width: 16em;
 }

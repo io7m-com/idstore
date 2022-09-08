@@ -23,6 +23,7 @@
   <modules>
     <module>com.io7m.idstore.admin_client.api</module>
     <module>com.io7m.idstore.admin_client</module>
+    <module>com.io7m.idstore.colors</module>
     <module>com.io7m.idstore.database.api</module>
     <module>com.io7m.idstore.database.postgres</module>
     <module>com.io7m.idstore.error_codes</module>
@@ -39,6 +40,7 @@
     <module>com.io7m.idstore.tests</module>
     <module>com.io7m.idstore.user_client.api</module>
     <module>com.io7m.idstore.user_client</module>
+    <module>com.io7m.idstore.xbutton</module>
   </modules>
 
   <properties>

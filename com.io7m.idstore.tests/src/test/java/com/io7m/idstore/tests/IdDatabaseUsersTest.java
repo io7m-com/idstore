@@ -32,9 +32,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIRED;
@@ -444,12 +447,12 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
         users.userList(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          Optional.empty(),
           new IdUserOrdering(List.of(new IdUserColumnOrdering(
             BY_IDNAME,
             true))),
           600,
-          Optional.empty()
-        );
+          Optional.empty());
 
       assertEquals(500, usersListed.size());
 
@@ -472,12 +475,12 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
         users.userList(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          Optional.empty(),
           new IdUserOrdering(List.of(new IdUserColumnOrdering(
             BY_IDNAME,
             false))),
           600,
-          Optional.empty()
-        );
+          Optional.empty());
 
       assertEquals(500, usersListed.size());
 
@@ -548,6 +551,7 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
         new IdUserListParameters(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          Optional.empty(),
           new IdUserOrdering(List.of(
             new IdUserColumnOrdering(BY_IDNAME, true),
             new IdUserColumnOrdering(BY_REALNAME, true),
@@ -599,6 +603,121 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     assertEquals(0, paging.pageNumber());
     checkPage(0, 150, items);
     assertTrue(paging.pageNextAvailable());
+  }
+
+  /**
+   * Users can be listed/searched and paging works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserListSearchPaging()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    final var now =
+      now();
+    final var password =
+      databaseGenerateBadPassword();
+    final var userSet =
+      IdTestUserSet.users();
+
+    for (final var u : userSet) {
+      users.userCreate(
+        u.id(),
+        u.idName(),
+        u.realName(),
+        new IdEmail(u.idName() + "@example.com"),
+        now,
+        password
+      );
+    }
+
+    final var paging =
+      IdDatabaseUserListPaging.create(
+        new IdUserListParameters(
+          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          Optional.of("od"),
+          new IdUserOrdering(List.of(
+            new IdUserColumnOrdering(BY_IDNAME, true),
+            new IdUserColumnOrdering(BY_REALNAME, true),
+            new IdUserColumnOrdering(BY_TIME_UPDATED, true),
+            new IdUserColumnOrdering(BY_TIME_CREATED, true)
+          )),
+          150
+        ));
+
+    final List<IdUserSummary> items;
+    assertEquals(0, paging.pageNumber());
+    items = paging.pageCurrent(users);
+    assertEquals(39, items.size());
+    assertFalse(paging.pageNextAvailable());
+
+    final var expected = Set.of(
+      "Gabfests Godlessness",
+      "Neurotics Odorous",
+      "Herniates Monodies",
+      "Leaks Floodwater",
+      "Remarriage Orthodox",
+      "Moodiest Desiccants",
+      "Tipples Iodising",
+      "Modifiable Fortieths",
+      "Angola Bodging",
+      "Sorts Produces",
+      "Doodlebugs Jibbed",
+      "Widely Warmblooded",
+      "Proposes Eurodollar",
+      "Boyhood Wheeziness",
+      "Ploughs Modules",
+      "Desertification Oddments",
+      "Egotist Bloodsucker",
+      "Litmus Sod",
+      "Stranding Methodicalness",
+      "Booing Nickelodeons",
+      "Roomers Antipodean",
+      "Cruets Biodiversity",
+      "Personage Bloodthirstier",
+      "Wormwood Soundproofs",
+      "Embodies Incinerator",
+      "Unicode Mahatmas",
+      "Shoddiness Bestride",
+      "Ghettoises Geodesy",
+      "Voodooing Calculating",
+      "Podiatrist Brexit",
+      "Hodges Sloucher",
+      "Powhatan Disembodied",
+      "Productive Matriarchy",
+      "Cantor Bloodline",
+      "Goldenrod Treacherous",
+      "Lunchroom Nodes",
+      "Flammability Modernly",
+      "Strip Nobody",
+      "Spume Podding"
+      );
+
+    for (final var e : expected) {
+      assertTrue(
+        items.stream().anyMatch(u -> Objects.equals(u.realName().value(), e)),
+        "Must contain " + e
+      );
+    }
   }
 
   /**
@@ -743,7 +862,6 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
 
     assertEquals(USER_NONEXISTENT, ex.errorCode());
   }
-
 
   /**
    * Adding and removing email addresses works.

@@ -1,0 +1,36 @@
+[#ftl output_format="XHTML"]
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="/css/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/xbutton.css"/>
+  <title>${htmlTitle}</title>
+</head>
+<body>
+
+<div id="ids_main">
+  <div id="ids_header">
+    <span class="ids_logo">
+      <img src="/logo" width="16" height="16" class="ids_header_logo ids_logo"/> ${pageHeaderTitle}
+    </span>
+    <span class="ids_empty">&#x000A;</span>
+    <span class="ids_profile_links">
+      <a href="/logout">Log out</a>
+    </span>
+  </div>
+
+  <div id="ids_content">
+    <div class="ids_standardPage_container">
+      <ul>
+        <li><a href="/users">Users</a></li>
+        <li><a href="/self">Profile</a></li>
+        <li><a href="/audit">Audit</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

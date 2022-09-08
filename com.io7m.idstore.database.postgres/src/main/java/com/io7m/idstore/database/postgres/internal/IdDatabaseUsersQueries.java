@@ -34,6 +34,7 @@ import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserOrdering;
 import com.io7m.idstore.model.IdUserSummary;
+import org.jooq.Condition;
 import org.jooq.OrderField;
 import org.jooq.Result;
 import org.jooq.SelectForUpdateStep;
@@ -540,6 +541,7 @@ final class IdDatabaseUsersQueries
   public List<IdUserSummary> userList(
     final IdTimeRange timeCreatedRange,
     final IdTimeRange timeUpdatedRange,
+    final Optional<String> search,
     final IdUserOrdering ordering,
     final int limit,
     final Optional<List<Object>> seek)
@@ -547,6 +549,7 @@ final class IdDatabaseUsersQueries
   {
     Objects.requireNonNull(timeCreatedRange, "timeCreatedRange");
     Objects.requireNonNull(timeUpdatedRange, "timeUpdatedRange");
+    Objects.requireNonNull(search, "search");
     Objects.requireNonNull(ordering, "ordering");
     Objects.requireNonNull(seek, "seek");
 
@@ -558,7 +561,7 @@ final class IdDatabaseUsersQueries
         context.selectFrom(USERS);
 
       /*
-       * The tickets must lie within the given time ranges.
+       * The users must lie within the given time ranges.
        */
 
       final var timeCreatedCondition =
@@ -573,9 +576,25 @@ final class IdDatabaseUsersQueries
             .and(USERS.TIME_UPDATED.le(timeCreatedRange.timeUpper()))
         );
 
+      /*
+       * A search query might be present.
+       */
+
+      final Condition searchCondition;
+      if (search.isPresent()) {
+        final var searchText = "%%%s%%".formatted(search.get());
+        searchCondition =
+          DSL.condition(USERS.ID_NAME.likeIgnoreCase(searchText))
+            .or(DSL.condition(USERS.REAL_NAME.likeIgnoreCase(searchText)))
+            .or(DSL.condition(USERS.ID.likeIgnoreCase(searchText)));
+      } else {
+        searchCondition = DSL.trueCondition();
+      }
+
       final var allConditions =
         timeCreatedCondition
-          .and(timeUpdatedCondition);
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
 
       final var baseOrdering =
         baseSelection.where(allConditions)
@@ -605,6 +624,68 @@ final class IdDatabaseUsersQueries
           );
         });
 
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public long userCount(
+    final IdTimeRange timeCreatedRange,
+    final IdTimeRange timeUpdatedRange,
+    final Optional<String> search)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(timeCreatedRange, "timeCreatedRange");
+    Objects.requireNonNull(timeUpdatedRange, "timeUpdatedRange");
+    Objects.requireNonNull(search, "search");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+      /*
+       * The users must lie within the given time ranges.
+       */
+
+      final var timeCreatedCondition =
+        DSL.condition(
+          USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedCondition =
+        DSL.condition(
+          USERS.TIME_UPDATED.ge(timeCreatedRange.timeLower())
+            .and(USERS.TIME_UPDATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      /*
+       * A search query might be present.
+       */
+
+      final Condition searchCondition;
+      if (search.isPresent()) {
+        final var searchText = "%%%s%%".formatted(search.get());
+        searchCondition =
+          DSL.condition(USERS.ID_NAME.likeIgnoreCase(searchText))
+            .or(DSL.condition(USERS.REAL_NAME.likeIgnoreCase(searchText)))
+            .or(DSL.condition(USERS.ID.likeIgnoreCase(searchText)));
+      } else {
+        searchCondition = DSL.trueCondition();
+      }
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
+
+      return ((Integer) context.selectCount()
+        .from(USERS)
+        .where(allConditions)
+        .fetchOne()
+        .getValue(0))
+        .longValue();
     } catch (final DataAccessException e) {
       throw handleDatabaseException(this.transaction(), e);
     }

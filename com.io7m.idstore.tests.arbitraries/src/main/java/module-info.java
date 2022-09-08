@@ -15,8 +15,14 @@
  */
 
 import com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1UserColumnOrderingProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1UserOrderingProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbAdminProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAuditEventProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbHashProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbIdA1AdminProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbIdA1TimeRangeProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbIdA1UserListParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbIdU1PasswordProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbIdU1UserProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbIdA1PasswordProvider;
@@ -55,12 +61,15 @@ module com.io7m.idstore.tests.arbitraries
 
   provides ArbitraryProvider
     with
-      IdArbU1MessageProvider,
       IdArbA1MessageProvider,
+      IdArbAdminProvider,
       IdArbAuditEventProvider,
       IdArbEmailProvider,
       IdArbHashProvider,
+      IdArbIdA1AdminProvider,
       IdArbIdA1PasswordProvider,
+      IdArbIdA1TimeRangeProvider,
+      IdArbIdA1UserListParametersProvider,
       IdArbIdA1UserProvider,
       IdArbIdNameProvider,
       IdArbIdU1PasswordProvider,
@@ -72,12 +81,13 @@ module com.io7m.idstore.tests.arbitraries
       IdArbRealNameProvider,
       IdArbSubsetMatchProvider,
       IdArbTokenProvider,
+      IdArbU1MessageProvider,
       IdArbURIProvider,
       IdArbUUIDProvider,
       IdArbUserProvider,
       IdArbUserSummaryProvider,
-      com.io7m.idstore.tests.arbitraries.IdArbAdminProvider,
-      com.io7m.idstore.tests.arbitraries.IdArbIdA1AdminProvider
+      IdArbA1UserOrderingProvider,
+      IdArbA1UserColumnOrderingProvider
     ;
 
   exports com.io7m.idstore.tests.arbitraries;

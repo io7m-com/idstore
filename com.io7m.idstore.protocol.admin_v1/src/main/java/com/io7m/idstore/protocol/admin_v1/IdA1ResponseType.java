@@ -25,7 +25,10 @@ import java.util.UUID;
 
 public sealed interface IdA1ResponseType
   extends IdA1MessageType
-  permits IdA1ResponseError, IdA1ResponseLogin, IdA1ResponseAdminSelf
+  permits IdA1ResponseAdminSelf,
+  IdA1ResponseError,
+  IdA1ResponseLogin,
+  IdA1ResponseUserListParametersSet
 {
   /**
    * @return The server-assigned request ID

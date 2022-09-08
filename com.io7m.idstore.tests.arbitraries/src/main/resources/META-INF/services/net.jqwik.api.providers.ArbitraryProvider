@@ -5,6 +5,7 @@ com.io7m.idstore.tests.arbitraries.IdArbEmailProvider
 com.io7m.idstore.tests.arbitraries.IdArbHashProvider
 com.io7m.idstore.tests.arbitraries.IdArbIdA1AdminProvider
 com.io7m.idstore.tests.arbitraries.IdArbIdA1PasswordProvider
+com.io7m.idstore.tests.arbitraries.IdArbIdA1UserListParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbIdA1UserProvider
 com.io7m.idstore.tests.arbitraries.IdArbIdNameProvider
 com.io7m.idstore.tests.arbitraries.IdArbIdU1PasswordProvider
@@ -21,3 +22,6 @@ com.io7m.idstore.tests.arbitraries.IdArbURIProvider
 com.io7m.idstore.tests.arbitraries.IdArbUUIDProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserSummaryProvider
+com.io7m.idstore.tests.arbitraries.IdArbIdA1TimeRangeProvider
+com.io7m.idstore.tests.arbitraries.IdArbA1UserOrderingProvider
+com.io7m.idstore.tests.arbitraries.IdArbA1UserColumnOrderingProvider

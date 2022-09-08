@@ -15,7 +15,7 @@
  */
 
 
-package com.io7m.idstore.server.api;
+package com.io7m.idstore.colors;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -29,8 +29,8 @@ import java.util.regex.Pattern;
  * A deserializer for color values.
  */
 
-public final class IdServerColorDeserializer
-  extends StdDeserializer<IdServerColor>
+public final class IdColorDeserializer
+  extends StdDeserializer<IdColor>
 {
   private static final Pattern COLOR_PATTERN =
     Pattern.compile("#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})");
@@ -41,7 +41,7 @@ public final class IdServerColorDeserializer
    * @inheritDoc
    */
 
-  public IdServerColorDeserializer()
+  public IdColorDeserializer()
   {
     this(null);
   }
@@ -54,14 +54,14 @@ public final class IdServerColorDeserializer
    * @param t The deserialized class
    */
 
-  public IdServerColorDeserializer(
-    final Class<IdServerColor> t)
+  public IdColorDeserializer(
+    final Class<IdColor> t)
   {
     super(t);
   }
 
   @Override
-  public IdServerColor deserialize(
+  public IdColor deserialize(
     final JsonParser p,
     final DeserializationContext ctxt)
     throws IOException
@@ -73,7 +73,7 @@ public final class IdServerColorDeserializer
       final var r = matcher.group(1);
       final var g = matcher.group(2);
       final var b = matcher.group(3);
-      return new IdServerColor(
+      return new IdColor(
         (double) Integer.parseUnsignedInt(r, 16) / 255.0,
         (double) Integer.parseUnsignedInt(g, 16) / 255.0,
         (double) Integer.parseUnsignedInt(b, 16) / 255.0

@@ -14,51 +14,43 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.server.internal.freemarker;
 
-package com.io7m.idstore.server.api;
-
-import static java.lang.Double.max;
-import static java.lang.Double.min;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
- * A color.
+ * Data for the main admin screen template.
  *
- * @param red   The red channel
- * @param green The green channel
- * @param blue  The blue channel
+ * @param htmlTitle       The page title
+ * @param pageHeaderTitle The page header title
  */
 
-public record IdServerColor(
-  double red,
-  double green,
-  double blue)
+public record IdFMAdminMainData(
+  String htmlTitle,
+  String pageHeaderTitle)
+  implements IdFMDataModelType
 {
   /**
-   * A color.
+   * Data for the main admin screen template.
    *
-   * @param red   The red channel
-   * @param green The green channel
-   * @param blue  The blue channel
+   * @param htmlTitle       The page title
+   * @param pageHeaderTitle The page header title
    */
 
-  public IdServerColor(
-    final double red,
-    final double green,
-    final double blue)
+  public IdFMAdminMainData
   {
-    this.red = min(1.0, max(0.0, red));
-    this.green = min(1.0, max(0.0, green));
-    this.blue = min(1.0, max(0.0, blue));
+    Objects.requireNonNull(htmlTitle, "htmlTitle");
+    Objects.requireNonNull(pageHeaderTitle, "pageHeaderTitle");
   }
 
   @Override
-  public String toString()
+  public Map<String, Object> toTemplateHash()
   {
-    return String.format(
-      "#%02x%02x%02x",
-      Integer.valueOf((int) this.red * 255),
-      Integer.valueOf((int) this.green * 255),
-      Integer.valueOf((int) this.blue * 255)
-    );
+    final var m = new HashMap<String, Object>();
+    m.put("htmlTitle", this.htmlTitle());
+    m.put("pageHeaderTitle", this.pageHeaderTitle());
+    return m;
   }
 }

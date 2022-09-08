@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.model.IdUserColumn.BY_ID;
 import static java.time.ZoneOffset.UTC;
@@ -32,6 +33,7 @@ import static java.time.ZoneOffset.UTC;
  *                         returned
  * @param timeUpdatedRange Only users updated within this time range are
  *                         returned
+ * @param search The search query
  * @param ordering         The ordering specification
  * @param limit            The limit on the number of returned users
  */
@@ -39,6 +41,7 @@ import static java.time.ZoneOffset.UTC;
 public record IdUserListParameters(
   IdTimeRange timeCreatedRange,
   IdTimeRange timeUpdatedRange,
+  Optional<String> search,
   IdUserOrdering ordering,
   int limit)
 {
@@ -49,6 +52,7 @@ public record IdUserListParameters(
    *                         returned
    * @param timeUpdatedRange Only users updated within this time range are
    *                         returned
+   *                         @param search The search query
    * @param ordering         The ordering specification
    * @param limit            The limit on the number of returned users
    */
@@ -57,7 +61,18 @@ public record IdUserListParameters(
   {
     Objects.requireNonNull(timeCreatedRange, "timeCreatedRange");
     Objects.requireNonNull(timeUpdatedRange, "timeUpdatedRange");
+    Objects.requireNonNull(search, "search");
     Objects.requireNonNull(ordering, "ordering");
+  }
+
+  /**
+   * @return The limit on the number of returned users
+   */
+
+  @Override
+  public int limit()
+  {
+    return Math.max(1, this.limit);
   }
 
   private static final OffsetDateTime DEFAULT_TIME_LOW =
@@ -73,8 +88,9 @@ public record IdUserListParameters(
     return new IdUserListParameters(
       new IdTimeRange(DEFAULT_TIME_LOW, now.plusDays(1L)),
       new IdTimeRange(DEFAULT_TIME_LOW, now.plusDays(1L)),
+      Optional.empty(),
       new IdUserOrdering(List.of(new IdUserColumnOrdering(BY_ID, false))),
-      20
+      10
     );
   }
 }

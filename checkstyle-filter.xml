@@ -19,7 +19,9 @@
             checks="HiddenField"/>
   <suppress files="IdNonEmptyList\.java"
             checks="HiddenField"/>
-  <suppress files="IdServerColor\.java"
+  <suppress files="IdColor\.java"
+            checks="HiddenField"/>
+  <suppress files="IdA1UserOrdering\.java"
             checks="HiddenField"/>
 
   <suppress files="IdSCommandVersion\.java"

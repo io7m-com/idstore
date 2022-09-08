@@ -379,6 +379,15 @@ final class IdDatabaseAdminsQueries
   }
 
   @Override
+  public IdAdmin adminGetForNameRequire(
+    final IdName name)
+    throws IdDatabaseException
+  {
+    return this.adminGetForName(name)
+      .orElseThrow(ADMIN_DOES_NOT_EXIST);
+  }
+
+  @Override
   public Optional<IdAdmin> adminGetForEmail(
     final IdEmail email)
     throws IdDatabaseException

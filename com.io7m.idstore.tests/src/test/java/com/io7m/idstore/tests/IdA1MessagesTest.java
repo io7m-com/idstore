@@ -23,6 +23,7 @@ import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.CannotFindArbitraryException;
 import net.jqwik.engine.properties.arbitraries.DefaultTypeArbitrary;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,8 @@ import org.junit.jupiter.api.TestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -45,6 +48,7 @@ public final class IdA1MessagesTest
     LoggerFactory.getLogger(IdA1MessagesTest.class);
 
   private IdA1Messages messages;
+  private Path directory;
 
   private static <T> Set<Class<? extends T>> enumerateSubclasses(
     final Class<? extends T> clazz)
@@ -101,8 +105,17 @@ public final class IdA1MessagesTest
 
   @BeforeEach
   public void setup()
+    throws IOException
   {
     this.messages = new IdA1Messages();
+    this.directory = IdTestDirectories.createTempDirectory();
+  }
+
+  @AfterEach
+  public void tearDown()
+    throws IOException
+  {
+    IdTestDirectories.deleteDirectory(this.directory);
   }
 
   /**
@@ -148,5 +161,20 @@ public final class IdA1MessagesTest
     assertThrows(IdProtocolException.class, () -> {
       this.messages.parse("{}".getBytes(UTF_8));
     });
+  }
+
+  /**
+   * Test a specific problematic case.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testCase0()
+    throws Exception
+  {
+    this.messages.parse(
+      IdTestDirectories.resourceBytesOf(IdA1MessagesTest.class, this.directory, "case-0.json")
+    );
   }
 }

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.NoSuchFileException;
+import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -74,6 +75,19 @@ public final class IdFMTemplateLoader implements TemplateLoader
     return 0L;
   }
 
+  private static final Set<String> TEMPLATES = Set.of(
+    "emailVerification",
+    "mainCss",
+    "pageAdminMain",
+    "pageAdminUser",
+    "pageAdminUsers",
+    "pageEmailAdd",
+    "pageLogin",
+    "pageMessage",
+    "pageRealNameUpdate",
+    "pageUserSelf"
+  );
+
   @Override
   public Reader getReader(
     final Object templateSource,
@@ -81,26 +95,10 @@ public final class IdFMTemplateLoader implements TemplateLoader
     throws IOException
   {
     if (templateSource instanceof String name) {
-      if (name.startsWith("pageLogin")) {
-        return load("pageLogin");
-      }
-      if (name.startsWith("pageUserSelf")) {
-        return load("pageUserSelf");
-      }
-      if (name.startsWith("pageEmailAdd")) {
-        return load("pageEmailAdd");
-      }
-      if (name.startsWith("pageMessage")) {
-        return load("pageMessage");
-      }
-      if (name.startsWith("emailVerification")) {
-        return load("emailVerification");
-      }
-      if (name.startsWith("mainCss")) {
-        return load("mainCss");
-      }
-      if (name.startsWith("pageRealNameUpdate")) {
-        return load("pageRealNameUpdate");
+      for (final var known : TEMPLATES) {
+        if (name.startsWith("%s_".formatted(known))) {
+          return load(known);
+        }
       }
     }
 

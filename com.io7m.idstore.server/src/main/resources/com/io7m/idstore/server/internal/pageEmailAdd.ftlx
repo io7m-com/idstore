@@ -5,6 +5,7 @@
   <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8"/>
   <link rel="stylesheet" type="text/css" href="/css/reset.css"/>
   <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/xbutton.css"/>
   <title>${htmlTitle}</title>
 </head>
 <body>
@@ -21,7 +22,7 @@
   </div>
 
   <div id="ids_content">
-    <div class="ids_emailAddForm_container">
+    <div class="ids_standardPage_container">
       <p>Please enter the email address to add to this account.</p>
       <form action="/email-add-run" method="post" class="ids_emailAddForm">
         <label class="ids_emailAddForm_emailLabel" for="email">Email</label>

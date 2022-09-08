@@ -213,15 +213,16 @@ public non-sealed interface IdDatabaseUsersQueriesType
   /**
    * List users.
    *
-   * @param timeCreatedRange Only tickets created within this time range will be
+   * @param timeCreatedRange Only users created within this time range will be
    *                         included
-   * @param timeUpdatedRange Only tickets updated within this time range will be
+   * @param timeUpdatedRange Only users updated within this time range will be
    *                         included
+   * @param search           The search query
    * @param ordering         The fields by which to order the list of tickets
    * @param limit            The limit on the number of items returned
    * @param seek             The record to which to seek, if any
    *
-   * @return The tickets
+   * @return The users
    *
    * @throws IdDatabaseException On errors
    */
@@ -229,9 +230,30 @@ public non-sealed interface IdDatabaseUsersQueriesType
   List<IdUserSummary> userList(
     IdTimeRange timeCreatedRange,
     IdTimeRange timeUpdatedRange,
+    Optional<String> search,
     IdUserOrdering ordering,
     int limit,
     Optional<List<Object>> seek)
+    throws IdDatabaseException;
+
+  /**
+   * Count users.
+   *
+   * @param timeCreatedRange Only users created within this time range will be
+   *                         included
+   * @param timeUpdatedRange Only users updated within this time range will be
+   *                         included
+   * @param search           The search query
+   *
+   * @return The users
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  long userCount(
+    IdTimeRange timeCreatedRange,
+    IdTimeRange timeUpdatedRange,
+    Optional<String> search)
     throws IdDatabaseException;
 
   /**

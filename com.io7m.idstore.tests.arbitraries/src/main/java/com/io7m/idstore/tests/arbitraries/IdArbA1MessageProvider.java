@@ -19,10 +19,12 @@ package com.io7m.idstore.tests.arbitraries;
 import com.io7m.idstore.protocol.admin_v1.IdA1Admin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserListParametersSet;
 import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSelf;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseLogin;
+import com.io7m.idstore.protocol.admin_v1.IdA1UserListParameters;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Combinators;
@@ -62,6 +64,7 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
     return Set.of(
       commandLogin(),
       commandAdminSelf(),
+      commandUserListParametersSet(),
       responseLogin(),
       responseError(),
       responseAdminSelf()
@@ -113,5 +116,11 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       Arbitraries.strings();
 
     return Combinators.combine(s0, s1).as(IdA1CommandLogin::new);
+  }
+
+  private static Arbitrary<IdA1CommandUserListParametersSet> commandUserListParametersSet()
+  {
+    return Arbitraries.defaultFor(IdA1UserListParameters.class)
+      .map(IdA1CommandUserListParametersSet::new);
   }
 }
