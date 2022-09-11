@@ -50,6 +50,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Flow;
@@ -179,7 +180,7 @@ public final class IdServerDemo
         }
 
         createInitialAdmin(server);
-        createUser(server);
+        createUsers(server);
 
         while (true) {
           Thread.sleep(1_000L);
@@ -204,14 +205,29 @@ public final class IdServerDemo
           final var password =
             algo.createHashed("12345678");
 
+          final var adminId = UUID.randomUUID();
           admins.adminCreateInitial(
-            UUID.randomUUID(),
+            adminId,
             new IdName("someone"),
             new IdRealName("Someone R. Incogito"),
             new IdEmail("admin@example.com"),
             OffsetDateTime.now(),
             password
           );
+
+          t.commit();
+          t.adminIdSet(adminId);
+
+          admins.adminCreate(
+            UUID.randomUUID(),
+            new IdName("someone-u"),
+            new IdRealName("Someone R. Incogito"),
+            new IdEmail("admin-u@example.com"),
+            OffsetDateTime.now(),
+            password,
+            Set.of()
+          );
+
           t.commit();
         }
       }
@@ -220,7 +236,7 @@ public final class IdServerDemo
     }
   }
 
-  private static void createUser(
+  private static void createUsers(
     final IdServerType server)
   {
     try {
@@ -237,32 +253,47 @@ public final class IdServerDemo
           final var users =
             t.queries(IdDatabaseUsersQueriesType.class);
 
-          t.adminIdSet(admin.id());
+          if (users.userGetForName(new IdName("someone-0")).isPresent()) {
+            return;
+          }
 
           final var algo =
             IdPasswordAlgorithmPBKDF2HmacSHA256.create();
           final var password =
             algo.createHashed("12345678");
 
-          final var id = UUID.randomUUID();
-          users.userCreate(
-            id,
-            new IdName("someone"),
-            new IdRealName("Someone R. Incogito"),
-            new IdEmail("someone@example.com"),
-            OffsetDateTime.now(),
-            password
-          );
+          final var userSet =
+            IdTestUserSet.users();
 
-          t.userIdSet(id);
-          users.userEmailAdd(id, new IdEmail("someone-alt0@example.com"));
-          users.userEmailAdd(id, new IdEmail("someone-alt1@example.com"));
-          users.userEmailAdd(id, new IdEmail("someone-alt2@example.com"));
+          for (final var u : userSet) {
+            final var id = u.id();
+
+            t.adminIdSet(admin.id());
+            users.userCreate(
+              id,
+              u.idName(),
+              u.realName(),
+              new IdEmail("%s@example.com".formatted(u.idName())),
+              OffsetDateTime.now(),
+              password
+            );
+
+            t.userIdSet(id);
+            users.userEmailAdd(
+              id,
+              new IdEmail("%s-alt0@example.com".formatted(u.idName())));
+            users.userEmailAdd(
+              id,
+              new IdEmail("%s-alt1@example.com".formatted(u.idName())));
+            users.userEmailAdd(
+              id,
+              new IdEmail("%s-alt2@example.com".formatted(u.idName())));
+          }
 
           t.commit();
         }
       }
-    } catch (final IdDatabaseException | IdPasswordException e) {
+    } catch (final IdDatabaseException | IdPasswordException | IOException e) {
       e.getMessage();
     }
   }

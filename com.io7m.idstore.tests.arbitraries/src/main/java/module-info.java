@@ -14,16 +14,26 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+import com.io7m.idstore.tests.arbitraries.IdArbA1AuditEventProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1AuditListParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1UserColumnOrderingProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1UserOrderingProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchByEmailParametersProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbAdminProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAuditEventProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbHashProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbIdU1PasswordProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbIdU1UserProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbIdA1PasswordProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbIdA1UserProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1AdminProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1TimeRangeProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchParametersProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1UserSummaryProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbU1PasswordProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbU1UserProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1PasswordProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1UserProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbIdNameProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbIdVMessagesProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbIdVProtocolSupportedProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbVMessagesProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbVProtocolSupportedProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbOffsetDateTimeProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbPasswordProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbSubsetMatchProvider;
@@ -55,29 +65,37 @@ module com.io7m.idstore.tests.arbitraries
 
   provides ArbitraryProvider
     with
-      IdArbU1MessageProvider,
+      IdArbA1AdminProvider,
+      IdArbA1AuditEventProvider,
+      IdArbA1AuditListParametersProvider,
       IdArbA1MessageProvider,
+      IdArbA1PasswordProvider,
+      IdArbA1TimeRangeProvider,
+      IdArbA1UserColumnOrderingProvider,
+      IdArbA1UserOrderingProvider,
+      IdArbA1UserProvider,
+      IdArbA1UserSearchByEmailParametersProvider,
+      IdArbA1UserSearchParametersProvider,
+      IdArbA1UserSummaryProvider,
+      IdArbAdminProvider,
       IdArbAuditEventProvider,
       IdArbEmailProvider,
       IdArbHashProvider,
-      IdArbIdA1PasswordProvider,
-      IdArbIdA1UserProvider,
       IdArbIdNameProvider,
-      IdArbIdU1PasswordProvider,
-      IdArbIdU1UserProvider,
-      IdArbIdVMessagesProvider,
-      IdArbIdVProtocolSupportedProvider,
       IdArbOffsetDateTimeProvider,
       IdArbPasswordProvider,
       IdArbRealNameProvider,
       IdArbSubsetMatchProvider,
       IdArbTokenProvider,
+      IdArbU1MessageProvider,
+      IdArbU1PasswordProvider,
+      IdArbU1UserProvider,
       IdArbURIProvider,
       IdArbUUIDProvider,
       IdArbUserProvider,
       IdArbUserSummaryProvider,
-      com.io7m.idstore.tests.arbitraries.IdArbAdminProvider,
-      com.io7m.idstore.tests.arbitraries.IdArbIdA1AdminProvider
+      IdArbVMessagesProvider,
+      IdArbVProtocolSupportedProvider
     ;
 
   exports com.io7m.idstore.tests.arbitraries;

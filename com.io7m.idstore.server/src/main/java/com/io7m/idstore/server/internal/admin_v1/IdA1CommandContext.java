@@ -24,6 +24,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.IdUserSession;
 import com.io7m.idstore.server.internal.command_exec.IdCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 
@@ -56,6 +57,7 @@ public final class IdA1CommandContext extends IdCommandContext<IdA1ResponseType>
    * @param inRequestId     The request ID
    * @param inTransaction   The transaction
    * @param inClock         The clock
+   * @param inSession The user session
    * @param inAdmin         The admin executing the command
    * @param remoteHost      The remote host
    * @param remoteUserAgent The remote user agent
@@ -68,6 +70,7 @@ public final class IdA1CommandContext extends IdCommandContext<IdA1ResponseType>
     final IdDatabaseTransactionType inTransaction,
     final IdServerClock inClock,
     final IdAdmin inAdmin,
+    final IdUserSession inSession,
     final String remoteHost,
     final String remoteUserAgent)
   {
@@ -77,10 +80,13 @@ public final class IdA1CommandContext extends IdCommandContext<IdA1ResponseType>
       inRequestId,
       inTransaction,
       inClock,
+      inSession,
       remoteHost,
       remoteUserAgent
     );
-    this.admin = Objects.requireNonNull(inAdmin, "inAdmin");
+
+    this.admin =
+      Objects.requireNonNull(inAdmin, "inAdmin");
   }
 
   @Override

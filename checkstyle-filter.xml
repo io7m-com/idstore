@@ -19,7 +19,13 @@
             checks="HiddenField"/>
   <suppress files="IdNonEmptyList\.java"
             checks="HiddenField"/>
-  <suppress files="IdServerColor\.java"
+  <suppress files="IdColor\.java"
+            checks="HiddenField"/>
+  <suppress files="IdA1UserOrdering\.java"
+            checks="HiddenField"/>
+  <suppress files="IdUserSearchByEmailParameters\.java"
+            checks="HiddenField"/>
+  <suppress files="IdEmail\.java"
             checks="HiddenField"/>
 
   <suppress files="IdSCommandVersion\.java"
@@ -37,6 +43,10 @@
   <suppress files="IdPCommandExecutor\.java"
             checks="NPathComplexity"/>
   <suppress files="IdPCommandExecutor\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdA1CommandExecutor\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdA1CommandExecutor\.java"
             checks="CyclomaticComplexity"/>
   <suppress files="IdSecPolicyDefault\.java"
             checks="NPathComplexity"/>

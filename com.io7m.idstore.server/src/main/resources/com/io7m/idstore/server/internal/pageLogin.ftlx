@@ -5,6 +5,7 @@
   <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8"/>
   <link rel="stylesheet" type="text/css" href="/css/reset.css"/>
   <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/xbutton.css"/>
   <title>${htmlTitle}</title>
 </head>
 <body>
@@ -18,9 +19,15 @@
 
   <div id="ids_content">
     <div class="ids_loginForm_container">
+      [#if logo]
       <div class="ids_loginForm_logo">
         <img src="/logo"/>
       </div>
+      [/#if]
+
+      [#if loginTitle??]
+      <p class="ids_loginForm_loginTitle">${loginTitle}</p>
+      [/#if]
 
       <form class="ids_loginForm" action="/login" method="post">
         <label class="ids_loginForm_usernameLabel"      for="user">Username</label>

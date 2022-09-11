@@ -28,6 +28,7 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.server.api.IdServerColorScheme;
 import com.io7m.idstore.server.internal.freemarker.IdFMCSSData;
 import com.io7m.idstore.server.internal.freemarker.IdFMEmailVerificationData;
 import com.io7m.idstore.server.internal.freemarker.IdFMLoginData;
@@ -69,6 +70,8 @@ public final class IdFMTemplateServiceTest
     template.process(new IdFMLoginData(
       "idstore: Login",
       "idstore",
+      true,
+      Optional.empty(),
       Optional.of("Error!")
     ), writer);
 
@@ -217,32 +220,10 @@ public final class IdFMTemplateServiceTest
       new BufferedWriter(new OutputStreamWriter(System.out, UTF_8));
 
     template.process(
-      IdFMCSSData.defaults(),
+      new IdFMCSSData(IdServerColorScheme.defaults()),
       writer
     );
 
     writer.flush();
-
-    dump("style.css", w -> {
-      try {
-        template.process(IdFMCSSData.ocean(), w);
-      } catch (final Exception e) {
-        // Don't care
-      }
-    });
-  }
-
-  @Test
-  public void testOcean()
-  {
-    for (final var entry : IdFMCSSData.ocean().toTemplateHash().entrySet()) {
-      System.out.printf(
-        "\"%s\": \"%s\",%n",
-        entry.getKey().transform(s -> {
-          return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-        }),
-        entry.getValue()
-      );
-    }
   }
 }

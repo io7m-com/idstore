@@ -24,7 +24,7 @@ import java.net.URI;
  */
 
 public interface IdAClientType
-  extends Closeable, IdAClientUsersType, IdAClientAdminsType
+  extends Closeable, IdAClientUsersType, IdAClientAdminsType, IdAClientAuditType
 {
   /**
    * Log in.
@@ -33,7 +33,7 @@ public interface IdAClientType
    * @param password The password
    * @param base     The base URI
    *
-   * @throws IdAClientException    On errors
+   * @throws IdAClientException   On errors
    * @throws InterruptedException On interruption
    */
 

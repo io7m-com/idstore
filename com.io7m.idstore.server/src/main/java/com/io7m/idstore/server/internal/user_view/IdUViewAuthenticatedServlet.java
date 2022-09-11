@@ -25,8 +25,8 @@ import com.io7m.idstore.protocol.user_v1.IdU1Messages;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
-import com.io7m.idstore.server.internal.IdServerUserController;
-import com.io7m.idstore.server.internal.IdServerUserControllersService;
+import com.io7m.idstore.server.internal.IdUserSession;
+import com.io7m.idstore.server.internal.IdUserSessionService;
 import com.io7m.idstore.server.internal.user_v1.IdU1Sends;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.ServletException;
@@ -62,9 +62,9 @@ public abstract class IdUViewAuthenticatedServlet extends HttpServlet
   private final IdU1Messages messages;
   private final IdDatabaseType database;
   private final IdServiceDirectoryType services;
-  private final IdServerUserControllersService userControllers;
+  private final IdUserSessionService userControllers;
   private IdUser user;
-  private IdServerUserController userController;
+  private IdUserSession userController;
 
   /**
    * A servlet that checks that a user is authenticated before delegating
@@ -90,10 +90,10 @@ public abstract class IdUViewAuthenticatedServlet extends HttpServlet
     this.database =
       inServices.requireService(IdDatabaseType.class);
     this.userControllers =
-      inServices.requireService(IdServerUserControllersService.class);
+      inServices.requireService(IdUserSessionService.class);
   }
 
-  protected final IdServerUserController userController()
+  protected final IdUserSession userController()
   {
     return this.userController;
   }

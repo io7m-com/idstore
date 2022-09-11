@@ -18,7 +18,7 @@
 package com.io7m.idstore.server.internal.user_view;
 
 import com.io7m.idstore.server.internal.IdServerBrandingService;
-import com.io7m.idstore.server.internal.IdServerUserControllersService;
+import com.io7m.idstore.server.internal.IdUserSessionService;
 import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
@@ -80,7 +80,7 @@ public final class IdUViewMessage extends IdUViewAuthenticatedServlet
   {
     final var userController =
       this.services()
-        .requireService(IdServerUserControllersService.class)
+        .requireService(IdUserSessionService.class)
         .createOrGet((UUID) session.getAttribute("UserID"), session.getId());
 
     servletResponse.setContentType("application/xhtml+xml");

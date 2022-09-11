@@ -148,6 +148,17 @@ public non-sealed interface IdDatabaseAdminsQueriesType
     throws IdDatabaseException;
 
   /**
+   * @param name The admin name
+   *
+   * @return A admin with the given name
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  IdAdmin adminGetForNameRequire(IdName name)
+    throws IdDatabaseException;
+
+  /**
    * @param email The admin email
    *
    * @return A admin with the given email

@@ -19,12 +19,25 @@ package com.io7m.idstore.admin_client.internal;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAuditEvent;
+import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdPage;
+import com.io7m.idstore.model.IdPassword;
+import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.model.IdTimeRange;
+import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdUserSearchByEmailParameters;
+import com.io7m.idstore.model.IdUserSearchParameters;
+import com.io7m.idstore.model.IdUserSummary;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * The default client implementation.
@@ -40,7 +53,7 @@ public final class IdAClient implements IdAClientType
   /**
    * The default client implementation.
    *
-   * @param inLocale       The locale
+   * @param inLocale     The locale
    * @param inStrings    The string resources
    * @param inHttpClient The HTTP client
    * @param inHandler    The versioned handler
@@ -94,5 +107,125 @@ public final class IdAClient implements IdAClientType
     throws IdAClientException, InterruptedException
   {
     return this.handler.adminSelf();
+  }
+
+  @Override
+  public String toString()
+  {
+    return String.format(
+      "[IdAClient 0x%s",
+      Integer.toUnsignedString(this.hashCode())
+    );
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchBegin(
+    final IdUserSearchParameters parameters)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userSearchBegin(parameters);
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchNext()
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userSearchNext();
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchPrevious()
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userSearchPrevious();
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchByEmailBegin(
+    final IdUserSearchByEmailParameters parameters)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userSearchByEmailBegin(parameters);
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchByEmailNext()
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userSearchByEmailNext();
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchByEmailPrevious()
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userSearchByEmailPrevious();
+  }
+
+  @Override
+  public Optional<IdUser> userGet(
+    final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userGet(id);
+  }
+
+  @Override
+  public Optional<IdUser> userGetByEmail(
+    final IdEmail email)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userGetByEmail(email);
+  }
+
+  @Override
+  public IdUser userUpdate(final IdUser user)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userUpdate(user);
+  }
+
+  @Override
+  public IdUser userCreate(
+    final Optional<UUID> id,
+    final IdName idName,
+    final IdRealName realName,
+    final IdEmail email,
+    final IdPassword password)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userCreate(id, idName, realName, email, password);
+  }
+
+  @Override
+  public IdPage<IdAuditEvent> auditSearchBegin(
+    final IdTimeRange timeRange,
+    final Optional<String> owner,
+    final Optional<String> type,
+    final Optional<String> message,
+    final int pageSize)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.auditSearchBegin(
+      timeRange,
+      owner,
+      type,
+      message,
+      pageSize
+    );
+  }
+
+  @Override
+  public IdPage<IdAuditEvent> auditSearchNext()
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.auditSearchNext();
+  }
+
+  @Override
+  public IdPage<IdAuditEvent> auditSearchPrevious()
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.auditSearchPrevious();
   }
 }

@@ -22,9 +22,9 @@ import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdRealName;
-import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.model.IdUserOrdering;
+import com.io7m.idstore.model.IdUserSearchByEmailParameters;
+import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
 
 import java.time.OffsetDateTime;
@@ -178,20 +178,6 @@ public non-sealed interface IdDatabaseUsersQueriesType
     throws IdDatabaseException;
 
   /**
-   * Search for users that have an ID, email, or name that contains the given
-   * string, case-insensitive.
-   *
-   * @param query The user query
-   *
-   * @return A list of matching users
-   *
-   * @throws IdDatabaseException On errors
-   */
-
-  List<IdUserSummary> userSearch(String query)
-    throws IdDatabaseException;
-
-  /**
    * Update the given user.
    *
    * @param id           The user ID
@@ -211,27 +197,82 @@ public non-sealed interface IdDatabaseUsersQueriesType
     throws IdDatabaseException;
 
   /**
-   * List users.
+   * Update the given user as an admin.
    *
-   * @param timeCreatedRange Only tickets created within this time range will be
-   *                         included
-   * @param timeUpdatedRange Only tickets updated within this time range will be
-   *                         included
-   * @param ordering         The fields by which to order the list of tickets
-   * @param limit            The limit on the number of items returned
-   * @param seek             The record to which to seek, if any
-   *
-   * @return The tickets
+   * @param id           The user ID
+   * @param withIdName   The new ID name, if desired
+   * @param withRealName The new real name, if desired
+   * @param withPassword The new password, if desired
    *
    * @throws IdDatabaseException On errors
    */
 
-  List<IdUserSummary> userList(
-    IdTimeRange timeCreatedRange,
-    IdTimeRange timeUpdatedRange,
-    IdUserOrdering ordering,
-    int limit,
+  @IdDatabaseRequiresAdmin
+  void userUpdateAsAdmin(
+    UUID id,
+    Optional<IdName> withIdName,
+    Optional<IdRealName> withRealName,
+    Optional<IdPassword> withPassword)
+    throws IdDatabaseException;
+
+  /**
+   * List users.
+   *
+   * @param parameters The search parameters
+   * @param seek       The record to which to seek, if any
+   *
+   * @return The users
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  List<IdUserSummary> userSearch(
+    IdUserSearchParameters parameters,
     Optional<List<Object>> seek)
+    throws IdDatabaseException;
+
+  /**
+   * Determine approximate number of results that would be returned in total by
+   * a given search.
+   *
+   * @param parameters The search parameters
+   * @return The users
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  long userSearchCount(
+    IdUserSearchParameters parameters)
+    throws IdDatabaseException;
+
+  /**
+   * List users.
+   *
+   * @param parameters The search parameters
+   * @param seek       The record to which to seek, if any
+   *
+   * @return The users
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  List<IdUserSummary> userSearchByEmail(
+    IdUserSearchByEmailParameters parameters,
+    Optional<List<Object>> seek)
+    throws IdDatabaseException;
+
+  /**
+   * Determine approximate number of results that would be returned in total by
+   * a given search.
+   *
+   * @param parameters The search parameters
+   * @return The users
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  long userSearchByEmailCount(
+    IdUserSearchByEmailParameters parameters)
     throws IdDatabaseException;
 
   /**

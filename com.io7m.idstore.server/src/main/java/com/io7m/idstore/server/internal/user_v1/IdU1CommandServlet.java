@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
@@ -102,7 +100,7 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
       final var data = input.readAllBytes();
       final var message = this.messages.parse(data);
       if (message instanceof IdU1CommandType command) {
-        this.executeCommand(request, servletResponse, requestId, command);
+        this.executeCommand(request, servletResponse, session, command);
         return;
       }
     } catch (final IdProtocolException e) {
@@ -124,7 +122,7 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
   private void executeCommand(
     final HttpServletRequest request,
     final HttpServletResponse servletResponse,
-    final UUID requestId,
+    final HttpSession session,
     final IdU1CommandType<?> command)
     throws IdDatabaseException, IOException, InterruptedException
   {
@@ -133,7 +131,7 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
         this.executeCommandInTransaction(
           request,
           servletResponse,
-          requestId,
+          session,
           command,
           transaction
         );
@@ -144,29 +142,29 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
   private void executeCommandInTransaction(
     final HttpServletRequest request,
     final HttpServletResponse servletResponse,
-    final UUID requestId,
+    final HttpSession session,
     final IdU1CommandType<?> command,
     final IdDatabaseTransactionType transaction)
     throws IOException, IdDatabaseException, InterruptedException
   {
     final var context =
-      new IdU1CommandContext(
+      IdU1CommandContext.create(
         this.services,
-        this.strings(),
-        requestId,
         transaction,
-        this.clock(),
-        this.user(),
-        request.getRemoteHost(),
-        Optional.ofNullable(request.getHeader("User-Agent"))
-          .orElse("<unavailable>")
+        request,
+        session,
+        this.user()
       );
 
-    final var sends = this.sends();
+    final var sends =
+      this.sends();
 
     try {
       final IdU1ResponseType result = this.executor.execute(context, command);
       sends.send(servletResponse, 200, result);
+      if (!(result instanceof IdU1ResponseError)) {
+        transaction.commit();
+      }
     } catch (final IdCommandExecutionFailure e) {
       sends.send(
         servletResponse,
@@ -177,7 +175,5 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
           e.getMessage()
         ));
     }
-
-    transaction.commit();
   }
 }

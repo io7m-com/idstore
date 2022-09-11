@@ -5,6 +5,7 @@
   <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8"/>
   <link rel="stylesheet" type="text/css" href="/css/reset.css"/>
   <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/xbutton.css"/>
   <title>${htmlTitle}</title>
 </head>
 <body>
@@ -21,7 +22,7 @@
   </div>
 
   <div id="ids_content">
-    <div class="ids_realnameUpdateForm_container">
+    <div class="ids_standardPage_container">
       <p>Please enter your new name.</p>
       <form action="/realname-update-run" method="post" class="ids_realnameUpdateForm">
         <label class="ids_realnameUpdateForm_existingLabel" for="existing">Existing</label>

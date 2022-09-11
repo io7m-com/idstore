@@ -26,12 +26,16 @@ import java.util.Optional;
  *
  * @param htmlTitle       The HTML title
  * @param pageHeaderTitle The page header title
+ * @param logo            {@code true} if the logo should be displayed
+ * @param loginTitle The login title, if any
  * @param errorMessage    The error message, if any
  */
 
 public record IdFMLoginData(
   String htmlTitle,
   String pageHeaderTitle,
+  boolean logo,
+  Optional<String> loginTitle,
   Optional<String> errorMessage)
   implements IdFMDataModelType
 {
@@ -40,6 +44,8 @@ public record IdFMLoginData(
    *
    * @param htmlTitle       The HTML title
    * @param pageHeaderTitle The page header title
+   * @param logo            {@code true} if the logo should be displayed
+   * @param loginTitle The login title, if any
    * @param errorMessage    The error message, if any
    */
 
@@ -47,6 +53,7 @@ public record IdFMLoginData(
   {
     Objects.requireNonNull(htmlTitle, "htmlTitle");
     Objects.requireNonNull(pageHeaderTitle, "pageHeaderTitle");
+    Objects.requireNonNull(loginTitle, "loginTitle");
     Objects.requireNonNull(errorMessage, "errorMessage");
   }
 
@@ -56,6 +63,8 @@ public record IdFMLoginData(
     final var m = new HashMap<String, Object>();
     m.put("htmlTitle", this.htmlTitle);
     m.put("pageHeaderTitle", this.pageHeaderTitle);
+    m.put("logo", Boolean.valueOf(this.logo));
+    this.loginTitle.ifPresent(title -> m.put("loginTitle", title));
     this.errorMessage().ifPresent(error -> m.put("errorMessage", error));
     return m;
   }

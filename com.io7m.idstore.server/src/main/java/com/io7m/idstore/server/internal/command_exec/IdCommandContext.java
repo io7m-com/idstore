@@ -21,10 +21,12 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.IdUserSession;
 import com.io7m.idstore.server.security.IdSecurityException;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 
@@ -50,6 +52,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
   private final IdDatabaseTransactionType transaction;
   private final IdServerClock clock;
   private final IdServerStrings strings;
+  private final IdUserSession userSession;
   private final String remoteHost;
   private final String remoteUserAgent;
 
@@ -60,8 +63,9 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
    * @param inServices        The service directory
    * @param inStrings         The string resources
    * @param inRequestId       The request ID
-   * @param inClock           The clock
    * @param inTransaction     The transaction
+   * @param inClock           The clock
+   * @param inSession         The user session
    * @param inRemoteHost      The remote host
    * @param inRemoteUserAgent The remote user agent
    */
@@ -72,6 +76,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
     final UUID inRequestId,
     final IdDatabaseTransactionType inTransaction,
     final IdServerClock inClock,
+    final IdUserSession inSession,
     final String inRemoteHost,
     final String inRemoteUserAgent)
   {
@@ -85,10 +90,21 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
       Objects.requireNonNull(inClock, "clock");
     this.strings =
       Objects.requireNonNull(inStrings, "strings");
+    this.userSession =
+      Objects.requireNonNull(inSession, "inSession");
     this.remoteHost =
       Objects.requireNonNull(inRemoteHost, "remoteHost");
     this.remoteUserAgent =
       Objects.requireNonNull(inRemoteUserAgent, "remoteUserAgent");
+  }
+
+  /**
+   * @return The user session
+   */
+
+  public final IdUserSession userSession()
+  {
+    return this.userSession;
   }
 
   /**
@@ -274,6 +290,26 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
 
   public IdCommandExecutionFailure failValidity(
     final IdValidityException e)
+  {
+    return new IdCommandExecutionFailure(
+      e.getMessage(),
+      e,
+      this.requestId,
+      400,
+      HTTP_PARAMETER_INVALID
+    );
+  }
+
+  /**
+   * Produce an exception indicating a password format error.
+   *
+   * @param e The exception
+   *
+   * @return An execution failure
+   */
+
+  public IdCommandExecutionFailure failPassword(
+    final IdPasswordException e)
   {
     return new IdCommandExecutionFailure(
       e.getMessage(),

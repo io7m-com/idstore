@@ -51,11 +51,36 @@ public sealed interface IdA1MessageType
 
   Map<Class<?>, String> TYPE_ID_FOR_CLASS =
     Stream.of(
-      IdA1CommandLogin.class,
       IdA1CommandAdminSelf.class,
+      IdA1CommandAuditSearchBegin.class,
+      IdA1CommandAuditSearchNext.class,
+      IdA1CommandAuditSearchPrevious.class,
+      IdA1CommandLogin.class,
+      IdA1CommandUserCreate.class,
+      IdA1CommandUserGet.class,
+      IdA1CommandUserGetByEmail.class,
+      IdA1CommandUserSearchBegin.class,
+      IdA1CommandUserSearchByEmailBegin.class,
+      IdA1CommandUserSearchByEmailNext.class,
+      IdA1CommandUserSearchByEmailPrevious.class,
+      IdA1CommandUserSearchNext.class,
+      IdA1CommandUserSearchPrevious.class,
+      IdA1CommandUserUpdate.class,
+      IdA1ResponseAdminSelf.class,
+      IdA1ResponseAuditSearchBegin.class,
+      IdA1ResponseAuditSearchNext.class,
+      IdA1ResponseAuditSearchPrevious.class,
       IdA1ResponseError.class,
       IdA1ResponseLogin.class,
-      IdA1ResponseAdminSelf.class
+      IdA1ResponseUserCreate.class,
+      IdA1ResponseUserGet.class,
+      IdA1ResponseUserSearchBegin.class,
+      IdA1ResponseUserSearchByEmailBegin.class,
+      IdA1ResponseUserSearchByEmailNext.class,
+      IdA1ResponseUserSearchByEmailPrevious.class,
+      IdA1ResponseUserSearchNext.class,
+      IdA1ResponseUserSearchPrevious.class,
+      IdA1ResponseUserUpdate.class
     ).collect(toUnmodifiableMap(identity(), IdA1MessageType::typeIdOf));
 
   /**

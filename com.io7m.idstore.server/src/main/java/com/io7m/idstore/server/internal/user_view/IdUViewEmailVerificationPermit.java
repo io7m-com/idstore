@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
-import static com.io7m.idstore.server.internal.IdRequests.requestUserAgent;
 import static com.io7m.idstore.server.internal.IdServerRequestDecoration.requestIdFor;
 
 /**
@@ -144,17 +143,13 @@ public final class IdUViewEmailVerificationPermit extends HttpServlet
           verificationOpt.get();
         final var user =
           users.userGetRequire(verification.user());
-
         final var commandContext =
-          new IdU1CommandContext(
+          IdU1CommandContext.create(
             this.services,
-            this.strings,
-            requestIdFor(request),
             transaction,
-            this.clock,
-            user,
-            request.getRemoteHost(),
-            requestUserAgent(request)
+            request,
+            request.getSession(),
+            user
           );
 
         switch (verification.operation()) {
@@ -200,7 +195,8 @@ public final class IdUViewEmailVerificationPermit extends HttpServlet
     try (var writer = servletResponse.getWriter()) {
       this.template.process(
         new IdFMMessageData(
-          this.branding.htmlTitle(this.strings.format("emailVerificationSuccessTitle")),
+          this.branding.htmlTitle(this.strings.format(
+            "emailVerificationSuccessTitle")),
           this.branding.title(),
           requestIdFor(request),
           false,

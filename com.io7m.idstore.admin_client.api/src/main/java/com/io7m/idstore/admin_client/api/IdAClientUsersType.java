@@ -17,11 +17,171 @@
 
 package com.io7m.idstore.admin_client.api;
 
+import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdPage;
+import com.io7m.idstore.model.IdPassword;
+import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdUserSearchByEmailParameters;
+import com.io7m.idstore.model.IdUserSearchParameters;
+import com.io7m.idstore.model.IdUserSummary;
+
+import java.util.Optional;
+import java.util.UUID;
+
 /**
  * Commands related to users.
  */
 
 public interface IdAClientUsersType
 {
+  /**
+   * Start searching/listing users. Calling this method will set the search
+   * parameters and effectively reset searching back to page 1 of any results.
+   *
+   * @param parameters The search parameters
+   *
+   * @return The first page of results
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
 
+  IdPage<IdUserSummary> userSearchBegin(
+    IdUserSearchParameters parameters)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Continue searching/listing users. This will return the next page of
+   * results.
+   *
+   * @return The next page of results
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdPage<IdUserSummary> userSearchNext()
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Continue searching/listing users. This will return the previous page of
+   * results.
+   *
+   * @return The previous page of results
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdPage<IdUserSummary> userSearchPrevious()
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Start searching/listing users. Calling this method will set the search
+   * parameters and effectively reset searching back to page 1 of any results.
+   *
+   * @param parameters The search parameters
+   *
+   * @return The first page of results
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdPage<IdUserSummary> userSearchByEmailBegin(
+    IdUserSearchByEmailParameters parameters)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Continue searching/listing users. This will return the next page of
+   * results.
+   *
+   * @return The next page of results
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdPage<IdUserSummary> userSearchByEmailNext()
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Continue searching/listing users. This will return the previous page of
+   * results.
+   *
+   * @return The previous page of results
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdPage<IdUserSummary> userSearchByEmailPrevious()
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Fetch the given user.
+   *
+   * @param id The user ID
+   *
+   * @return The user, if one exists
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  Optional<IdUser> userGet(UUID id)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Fetch the given user.
+   *
+   * @param email The user email
+   *
+   * @return The user, if one exists
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  Optional<IdUser> userGetByEmail(IdEmail email)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Update the given user.
+   *
+   * @param user The user
+   *
+   * @return The updated user
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdUser userUpdate(IdUser user)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Create a user.
+   *
+   * @param id       The ID
+   * @param password The password
+   * @param realName The real name
+   * @param email    The email
+   * @param idName   The ID name
+   *
+   * @return The created user
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdUser userCreate(
+    Optional<UUID> id,
+    IdName idName,
+    IdRealName realName,
+    IdEmail email,
+    IdPassword password)
+    throws IdAClientException, InterruptedException;
 }

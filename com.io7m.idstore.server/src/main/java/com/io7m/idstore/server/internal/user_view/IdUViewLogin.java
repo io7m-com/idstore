@@ -131,11 +131,12 @@ public final class IdUViewLogin extends HttpServlet
     servletResponse.setContentType("application/xhtml+xml");
 
     try (var writer = servletResponse.getWriter()) {
-
       this.template.process(
         new IdFMLoginData(
           this.branding.htmlTitle("Login"),
           this.branding.title(),
+          true,
+          Optional.empty(),
           Optional.ofNullable((String) session.getAttribute("ErrorMessage"))
         ),
         writer

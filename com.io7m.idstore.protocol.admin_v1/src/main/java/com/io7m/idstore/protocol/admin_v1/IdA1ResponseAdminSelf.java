@@ -28,7 +28,7 @@ import java.util.UUID;
  * A response to {@link IdA1CommandAdminSelf}.
  *
  * @param requestId The request ID
- * @param admin      The admin
+ * @param admin     The admin
  */
 
 @JsonDeserialize
@@ -44,7 +44,7 @@ public record IdA1ResponseAdminSelf(
    * A response to {@link IdA1CommandAdminSelf}.
    *
    * @param requestId The request ID
-   * @param admin      The admin
+   * @param admin     The admin
    */
 
   @JsonCreator

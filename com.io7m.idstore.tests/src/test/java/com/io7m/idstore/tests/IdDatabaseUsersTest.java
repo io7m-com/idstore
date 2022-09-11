@@ -17,14 +17,16 @@
 package com.io7m.idstore.tests;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
-import com.io7m.idstore.database.api.IdDatabaseUserListPaging;
+import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPaging;
+import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUserColumnOrdering;
-import com.io7m.idstore.model.IdUserListParameters;
+import com.io7m.idstore.model.IdUserSearchByEmailParameters;
+import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserOrdering;
 import com.io7m.idstore.model.IdUserSummary;
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIRED;
@@ -440,16 +444,19 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     }
 
     {
-      final var usersListed =
-        users.userList(
+      final var parameters =
+        new IdUserSearchParameters(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          Optional.empty(),
           new IdUserOrdering(List.of(new IdUserColumnOrdering(
             BY_IDNAME,
             true))),
-          600,
-          Optional.empty()
+          600
         );
+
+      final var usersListed =
+        users.userSearch(parameters, Optional.empty());
 
       assertEquals(500, usersListed.size());
 
@@ -468,16 +475,19 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     }
 
     {
-      final var usersListed =
-        users.userList(
+      final var parameters =
+        new IdUserSearchParameters(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          Optional.empty(),
           new IdUserOrdering(List.of(new IdUserColumnOrdering(
             BY_IDNAME,
             false))),
-          600,
-          Optional.empty()
+          600
         );
+
+      final var usersListed =
+        users.userSearch(parameters, Optional.empty());
 
       assertEquals(500, usersListed.size());
 
@@ -505,7 +515,7 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testUserListPaging()
+  public void testUserSearchPaging()
     throws Exception
   {
     assertTrue(this.containerIsRunning());
@@ -544,10 +554,11 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     }
 
     final var paging =
-      IdDatabaseUserListPaging.create(
-        new IdUserListParameters(
+      IdDatabaseUserSearchPaging.create(
+        new IdUserSearchParameters(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          Optional.empty(),
           new IdUserOrdering(List.of(
             new IdUserColumnOrdering(BY_IDNAME, true),
             new IdUserColumnOrdering(BY_REALNAME, true),
@@ -599,6 +610,192 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     assertEquals(0, paging.pageNumber());
     checkPage(0, 150, items);
     assertTrue(paging.pageNextAvailable());
+  }
+
+  /**
+   * Users can be listed and paging works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserSearchByEmailPaging()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    final var now =
+      now();
+    final var password =
+      databaseGenerateBadPassword();
+
+    final var userList = new ArrayList<>();
+    for (int index = 0; index < 500; ++index) {
+      userList.add(
+        users.userCreate(
+          randomUUID(),
+          new IdName("someone_%03d".formatted(index)),
+          new IdRealName("someone %03d".formatted(index)),
+          new IdEmail("someone_%03d@example.com".formatted(index)),
+          now,
+          password
+        )
+      );
+    }
+
+    final var paging =
+      IdDatabaseUserSearchByEmailPaging.create(
+        new IdUserSearchByEmailParameters(
+          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          "0@example.com",
+          new IdUserOrdering(List.of(
+            new IdUserColumnOrdering(BY_IDNAME, true),
+            new IdUserColumnOrdering(BY_REALNAME, true),
+            new IdUserColumnOrdering(BY_TIME_UPDATED, true),
+            new IdUserColumnOrdering(BY_TIME_CREATED, true)
+          )),
+          150
+        ));
+
+    final List<IdUserSummary>  items = paging.pageCurrent(users);
+    assertEquals(0, paging.pageNumber());
+    assertEquals(1, paging.pageCount());
+    assertEquals(50, items.size());
+
+    for (final var item : items) {
+      assertTrue(item.idName().value().endsWith("0"));
+    }
+  }
+
+
+  /**
+   * Users can be listed/searched and paging works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserListSearchPaging()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    final var now =
+      now();
+    final var password =
+      databaseGenerateBadPassword();
+    final var userSet =
+      IdTestUserSet.users();
+
+    for (final var u : userSet) {
+      users.userCreate(
+        u.id(),
+        u.idName(),
+        u.realName(),
+        new IdEmail(u.idName() + "@example.com"),
+        now,
+        password
+      );
+    }
+
+    final var paging =
+      IdDatabaseUserSearchPaging.create(
+        new IdUserSearchParameters(
+          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          Optional.of("od"),
+          new IdUserOrdering(List.of(
+            new IdUserColumnOrdering(BY_IDNAME, true),
+            new IdUserColumnOrdering(BY_REALNAME, true),
+            new IdUserColumnOrdering(BY_TIME_UPDATED, true),
+            new IdUserColumnOrdering(BY_TIME_CREATED, true)
+          )),
+          150
+        ));
+
+    final List<IdUserSummary> items;
+    assertEquals(0, paging.pageNumber());
+    items = paging.pageCurrent(users);
+    assertEquals(39, items.size());
+    assertFalse(paging.pageNextAvailable());
+
+    final var expected = Set.of(
+      "Gabfests Godlessness",
+      "Neurotics Odorous",
+      "Herniates Monodies",
+      "Leaks Floodwater",
+      "Remarriage Orthodox",
+      "Moodiest Desiccants",
+      "Tipples Iodising",
+      "Modifiable Fortieths",
+      "Angola Bodging",
+      "Sorts Produces",
+      "Doodlebugs Jibbed",
+      "Widely Warmblooded",
+      "Proposes Eurodollar",
+      "Boyhood Wheeziness",
+      "Ploughs Modules",
+      "Desertification Oddments",
+      "Egotist Bloodsucker",
+      "Litmus Sod",
+      "Stranding Methodicalness",
+      "Booing Nickelodeons",
+      "Roomers Antipodean",
+      "Cruets Biodiversity",
+      "Personage Bloodthirstier",
+      "Wormwood Soundproofs",
+      "Embodies Incinerator",
+      "Unicode Mahatmas",
+      "Shoddiness Bestride",
+      "Ghettoises Geodesy",
+      "Voodooing Calculating",
+      "Podiatrist Brexit",
+      "Hodges Sloucher",
+      "Powhatan Disembodied",
+      "Productive Matriarchy",
+      "Cantor Bloodline",
+      "Goldenrod Treacherous",
+      "Lunchroom Nodes",
+      "Flammability Modernly",
+      "Strip Nobody",
+      "Spume Podding"
+    );
+
+    for (final var e : expected) {
+      assertTrue(
+        items.stream().anyMatch(u -> Objects.equals(u.realName().value(), e)),
+        "Must contain " + e
+      );
+    }
   }
 
   /**
@@ -744,7 +941,6 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     assertEquals(USER_NONEXISTENT, ex.errorCode());
   }
 
-
   /**
    * Adding and removing email addresses works.
    *
@@ -807,7 +1003,6 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       });
     assertEquals(EMAIL_ONE_REQUIRED, ex.errorCode());
   }
-
 
   private static void checkPage(
     final int indexLow,

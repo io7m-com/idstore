@@ -19,18 +19,47 @@ package com.io7m.idstore.tests;
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
+import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdNonEmptyList;
+import com.io7m.idstore.model.IdPage;
+import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
+import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.model.IdTimeRange;
+import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdUserColumnOrdering;
+import com.io7m.idstore.model.IdUserOrdering;
+import com.io7m.idstore.model.IdUserSearchByEmailParameters;
+import com.io7m.idstore.model.IdUserSearchParameters;
+import com.io7m.idstore.model.IdUserSummary;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
 
+import static com.io7m.idstore.model.IdUserColumn.BY_IDNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdServerAdminUsersTest extends IdWithServerContract
 {
+  private static final IdTimeRange TIME_LARGE_RANGE =
+    new IdTimeRange(
+      OffsetDateTime.now().minusDays(30L),
+      OffsetDateTime.now().plusDays(30L)
+    );
+
+  private static final IdUserOrdering ORDER_BY_IDNAME =
+    new IdUserOrdering(
+      List.of(new IdUserColumnOrdering(BY_IDNAME, true))
+    );
+
   private IdAClients clients;
   private IdAClientType client;
 
@@ -123,5 +152,282 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
     assertTrue(
       ex.getMessage().contains("error-authentication"),
       ex.getMessage());
+  }
+
+  /**
+   * Searching users works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserSearch()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    for (int index = 0; index < 1033; ++index) {
+      this.serverCreateUser(admin, "user-%04d".formatted(index));
+    }
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    {
+      final var p =
+        this.client.userSearchBegin(
+          new IdUserSearchParameters(
+            TIME_LARGE_RANGE,
+            TIME_LARGE_RANGE,
+            Optional.empty(),
+            ORDER_BY_IDNAME,
+            100
+          )
+        );
+
+      assertEquals(0, p.pageIndex());
+      assertEquals(0, p.pageFirstOffset());
+      assertEquals(10, p.pageCount());
+      checkItems(p, 0, 100);
+    }
+
+    for (int page = 1; page < 10; ++page) {
+      final var p = this.client.userSearchNext();
+      assertEquals(page, p.pageIndex());
+      assertEquals(page * 100, p.pageFirstOffset());
+      assertEquals(10, p.pageCount());
+      checkItems(p, page * 100, 100);
+    }
+
+    {
+      final var p = this.client.userSearchNext();
+      assertEquals(10, p.pageIndex());
+      assertEquals(1000, p.pageFirstOffset());
+      assertEquals(10, p.pageCount());
+      checkItems(p, 1000, 33);
+    }
+
+    for (int page = 9; page >= 0; --page) {
+      final var p = this.client.userSearchPrevious();
+      assertEquals(page, p.pageIndex());
+      assertEquals(page * 100, p.pageFirstOffset());
+      assertEquals(10, p.pageCount());
+      checkItems(p, page * 100, 100);
+    }
+  }
+
+  /**
+   * Searching users works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserSearchByEmail()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    for (int index = 0; index < 50; ++index) {
+      this.serverCreateUser(admin, "user-%04d".formatted(index));
+    }
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    {
+      final var p =
+        this.client.userSearchByEmailBegin(
+          new IdUserSearchByEmailParameters(
+            TIME_LARGE_RANGE,
+            TIME_LARGE_RANGE,
+            "@example.com",
+            ORDER_BY_IDNAME,
+            10
+          )
+        );
+
+      assertEquals(0, p.pageIndex());
+      assertEquals(0, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 0, 10);
+    }
+
+    {
+      final var p = this.client.userSearchByEmailNext();
+      assertEquals(1, p.pageIndex());
+      assertEquals(10, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 10, 10);
+    }
+
+    {
+      final var p = this.client.userSearchByEmailNext();
+      assertEquals(2, p.pageIndex());
+      assertEquals(20, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 20, 10);
+    }
+
+    {
+      final var p = this.client.userSearchByEmailNext();
+      assertEquals(3, p.pageIndex());
+      assertEquals(30, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 30, 10);
+    }
+
+    {
+      final var p = this.client.userSearchByEmailNext();
+      assertEquals(4, p.pageIndex());
+      assertEquals(40, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 40, 10);
+    }
+
+    {
+      final var p = this.client.userSearchByEmailNext();
+      assertEquals(5, p.pageIndex());
+      assertEquals(50, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(0, p.items().size());
+    }
+
+    {
+      final var p = this.client.userSearchByEmailPrevious();
+      assertEquals(4, p.pageIndex());
+      assertEquals(40, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 40, 10);
+    }
+
+    {
+      final var p = this.client.userSearchByEmailPrevious();
+      assertEquals(3, p.pageIndex());
+      assertEquals(30, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 30, 10);
+    }
+
+    {
+      final var p = this.client.userSearchByEmailPrevious();
+      assertEquals(2, p.pageIndex());
+      assertEquals(20, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 20, 10);
+    }
+
+    {
+      final var p = this.client.userSearchByEmailPrevious();
+      assertEquals(1, p.pageIndex());
+      assertEquals(10, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 10, 10);
+    }
+
+    {
+      final var p = this.client.userSearchByEmailPrevious();
+      assertEquals(0, p.pageIndex());
+      assertEquals(0, p.pageFirstOffset());
+      assertEquals(5, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 0, 10);
+    }
+  }
+
+
+  /**
+   * Creating, updating, and retrieving users works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserUpdate()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    final var id =
+      UUID.randomUUID();
+    final var password0 =
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+        .createHashed("12345678");
+    final var password1 =
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+        .createHashed("abcdefgh");
+
+    final var user0 =
+      this.client.userCreate(
+        Optional.of(id),
+        new IdName("someone-0"),
+        new IdRealName("Someone R. Incognito"),
+        new IdEmail("someone-0@example.com"),
+        password0
+      );
+
+    final var user0r =
+      new IdUser(
+        id,
+        new IdName("someone-1"),
+        new IdRealName("Someone R. Else"),
+        IdNonEmptyList.single(new IdEmail("someone-1@example.com")),
+        OffsetDateTime.now(this.clock()),
+        OffsetDateTime.now(this.clock()),
+        password1
+      );
+
+    final var user1 =
+      this.client.userUpdate(user0r);
+
+    assertEquals(user0r.id(), user1.id());
+    assertEquals(user0r.emails(), user1.emails());
+    assertEquals(user0r.idName(), user1.idName());
+    assertEquals(user0r.realName(), user1.realName());
+    assertEquals(user0r.password(), user1.password());
+  }
+
+  private static void checkItems(
+    final IdPage<IdUserSummary> p,
+    final int start,
+    final int count)
+  {
+    final var u = p.items();
+    for (int index = 0; index < count; ++index) {
+      assertEquals(
+        "user-%04d".formatted(Integer.valueOf(start + index)),
+        u.get(index).idName().value()
+      );
+    }
   }
 }

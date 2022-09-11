@@ -69,6 +69,11 @@
       <artifactId>com.io7m.idstore.server.security</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.xbutton</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -143,8 +148,8 @@
       <artifactId>com.io7m.junreachable.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.io7m.jtensors</groupId>
-      <artifactId>com.io7m.jtensors.core</artifactId>
+      <groupId>com.io7m.jaffirm</groupId>
+      <artifactId>com.io7m.jaffirm.core</artifactId>
     </dependency>
 
     <dependency>

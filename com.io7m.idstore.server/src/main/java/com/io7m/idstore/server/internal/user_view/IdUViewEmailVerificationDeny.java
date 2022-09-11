@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.util.Objects;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
-import static com.io7m.idstore.server.internal.IdRequests.requestUserAgent;
 import static com.io7m.idstore.server.internal.IdServerRequestDecoration.requestIdFor;
 
 /**
@@ -146,15 +145,12 @@ public final class IdUViewEmailVerificationDeny extends HttpServlet
           users.userGetRequire(verification.user());
 
         final var commandContext =
-          new IdU1CommandContext(
+          IdU1CommandContext.create(
             this.services,
-            this.strings,
-            requestIdFor(request),
             transaction,
-            this.clock,
-            user,
-            request.getRemoteHost(),
-            requestUserAgent(request)
+            request,
+            request.getSession(),
+            user
           );
 
         switch (verification.operation()) {

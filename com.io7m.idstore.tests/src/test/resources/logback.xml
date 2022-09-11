@@ -56,26 +56,10 @@
     </rollingPolicy>
   </appender>
 
-  <appender name="ADMIN_VIEW_REQUEST_LOG"
-            class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-      <layout class="com.io7m.idstore.server.logging.IdLoggingHTTPRequestLayout"/>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${IDSTORE_LOG_DIRECTORY}/admin_view_%d.log</fileNamePattern>
-    </rollingPolicy>
-  </appender>
-
   <logger name="com.io7m.idstore.server.requestLog.admin_api"
           level="TRACE"
           additivity="false">
     <appender-ref ref="ADMIN_API_REQUEST_LOG"/>
-  </logger>
-
-  <logger name="com.io7m.idstore.server.requestLog.admin_view"
-          level="TRACE"
-          additivity="false">
-    <appender-ref ref="ADMIN_VIEW_REQUEST_LOG"/>
   </logger>
 
   <logger name="org.eclipse.jetty.server.Server"

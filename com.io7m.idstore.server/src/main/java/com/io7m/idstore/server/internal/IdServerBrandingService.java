@@ -23,6 +23,7 @@ import com.io7m.idstore.server.internal.freemarker.IdFMCSSData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.idstore.xbutton.IdXButtonCSS;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -39,18 +40,22 @@ import java.util.Optional;
 public final class IdServerBrandingService implements IdServiceType
 {
   private final byte[] logo;
-  private final String css;
+  private final String mainCss;
+  private final String xButtonCSS;
   private final String title;
 
   private IdServerBrandingService(
     final byte[] inLogo,
-    final String inCss,
+    final String inMainCss,
+    final String inXButtonCss,
     final String inTitle)
   {
     this.logo =
       Objects.requireNonNull(inLogo, "logo");
-    this.css =
-      Objects.requireNonNull(inCss, "css");
+    this.mainCss =
+      Objects.requireNonNull(inMainCss, "css");
+    this.xButtonCSS =
+      Objects.requireNonNull(inXButtonCss, "xButtonCss");
     this.title =
       Objects.requireNonNull(inTitle, "title");
   }
@@ -78,27 +83,43 @@ public final class IdServerBrandingService implements IdServiceType
 
     final var logo =
       loadLogo(configuration.logo());
-    final var css =
-      loadCSS(templates.cssTemplate(), configuration.scheme());
+    final var xbuttonCss =
+      loadXButtonCSS(configuration.scheme());
+    final var mainCss =
+      loadMainCSS(templates.cssTemplate(), configuration.scheme());
     final var title =
       configuration.productTitle()
         .orElse(strings.format("productTitle"));
 
     return new IdServerBrandingService(
       logo,
-      css,
+      mainCss,
+      xbuttonCss,
       title
     );
   }
 
-  private static String loadCSS(
+  private static String loadXButtonCSS(
+    final Optional<IdServerColorScheme> scheme)
+    throws IOException
+  {
+    final IdServerColorScheme schemeParams =
+      scheme.orElseGet(IdServerColorScheme::defaults);
+
+    return IdXButtonCSS.create()
+      .cssOf(schemeParams.buttonColors());
+  }
+
+  private static String loadMainCSS(
     final IdFMTemplateType<IdFMCSSData> template,
     final Optional<IdServerColorScheme> scheme)
     throws IOException
   {
     final IdFMCSSData templateParameters =
-      scheme.map(IdFMCSSData::from)
-        .orElseGet(IdFMCSSData::defaults);
+      scheme.map(IdFMCSSData::new)
+        .orElseGet(() -> {
+          return new IdFMCSSData(IdServerColorScheme.defaults());
+        });
 
     try (var writer = new StringWriter(8192)) {
       template.process(templateParameters, writer);
@@ -142,12 +163,21 @@ public final class IdServerBrandingService implements IdServiceType
   }
 
   /**
+   * @return The xButton CSS
+   */
+
+  public String xButtonCSS()
+  {
+    return this.xButtonCSS;
+  }
+
+  /**
    * @return The CSS text
    */
 
   public String css()
   {
-    return this.css;
+    return this.mainCss;
   }
 
   @Override

@@ -27,13 +27,14 @@ import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.database.postgres.IdDatabases;
+import com.io7m.idstore.model.IdAuditListParameters;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
-import com.io7m.idstore.model.IdSubsetMatch;
+import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.jmulticlose.core.ClosingResourceFailedException;
@@ -46,11 +47,14 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.time.Clock;
 import java.time.OffsetDateTime;
+import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseCreate.CREATE_DATABASE;
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.database.api.IdDatabaseUpgrade.UPGRADE_DATABASE;
+import static java.lang.Integer.MAX_VALUE;
 import static java.time.OffsetDateTime.now;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -92,11 +96,14 @@ public abstract class IdWithDatabaseContract
       transaction.queries(IdDatabaseAuditQueriesType.class);
     final var events =
       audit.auditEvents(
-        timeNow().minusYears(1L),
-        timeNow().plusYears(1L),
-        new IdSubsetMatch<>("", ""),
-        new IdSubsetMatch<>("", ""),
-        new IdSubsetMatch<>("", "")
+        new IdAuditListParameters(
+          new IdTimeRange(timeNow().minusYears(1L), timeNow().plusYears(1L)),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          MAX_VALUE
+        ),
+        OptionalLong.empty()
       );
 
     for (var index = 0; index < expectedEvents.length; ++index) {

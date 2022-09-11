@@ -28,8 +28,6 @@ import java.util.UUID;
  * @param time         The event time
  * @param message      The event message
  * @param type         The event type
- * @param confidential {@code true} if the message contains confidential
- *                     information
  */
 
 public record IdAuditEvent(
@@ -37,8 +35,7 @@ public record IdAuditEvent(
   UUID owner,
   OffsetDateTime time,
   String type,
-  String message,
-  boolean confidential)
+  String message)
 {
   /**
    * An audit event.
@@ -48,8 +45,6 @@ public record IdAuditEvent(
    * @param time         The event time
    * @param message      The event message
    * @param type         The event type
-   * @param confidential {@code true} if the message contains confidential
-   *                     information
    */
 
   public IdAuditEvent
@@ -58,25 +53,5 @@ public record IdAuditEvent(
     Objects.requireNonNull(time, "time");
     Objects.requireNonNull(type, "type");
     Objects.requireNonNull(message, "message");
-  }
-
-  /**
-   * An audit event without confidential information.
-   *
-   * @param id      The unique event ID
-   * @param owner   The event owner
-   * @param time    The event time
-   * @param message The event message
-   * @param type    The event type
-   */
-
-  public IdAuditEvent(
-    final long id,
-    final UUID owner,
-    final OffsetDateTime time,
-    final String type,
-    final String message)
-  {
-    this(id, owner, time, type, message, false);
   }
 }

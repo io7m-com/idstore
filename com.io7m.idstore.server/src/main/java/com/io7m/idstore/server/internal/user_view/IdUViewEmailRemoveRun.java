@@ -101,6 +101,7 @@ public final class IdUViewEmailRemoveRun extends IdUViewAuthenticatedServlet
               this.services(),
               transaction,
               request,
+              session,
               this.user()
             );
 

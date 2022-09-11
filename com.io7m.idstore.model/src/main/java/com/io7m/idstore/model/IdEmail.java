@@ -40,13 +40,15 @@ public record IdEmail(String value)
    * @param value The email value
    */
 
-  public IdEmail
+  public IdEmail(final String value)
   {
     Objects.requireNonNull(value, "value");
 
     if (!VALIDATOR.isValid(value)) {
       throw new IdValidityException("Invalid email address.");
     }
+
+    this.value = value.toLowerCase();
   }
 
   @Override

@@ -19,175 +19,69 @@ package com.io7m.idstore.server.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.io7m.idstore.colors.IdColor;
+import com.io7m.idstore.xbutton.IdXButtonColors;
+import com.io7m.idstore.xbutton.IdXButtonStateColors;
 
 import java.util.Objects;
 
 /**
  * A server color scheme.
  *
- * @param buttonBodyColor           The body color of buttons
- * @param buttonBorderColor         The border color of buttons
- * @param buttonEmbossEColor        The east emboss color of buttons
- * @param buttonEmbossNColor        The north emboss color of buttons
- * @param buttonEmbossSColor        The south emboss color of buttons
- * @param buttonEmbossWColor        The west emboss color of buttons
- * @param buttonHoverBodyColor      The body color of buttons (hover)
- * @param buttonHoverBorderColor    The border color of buttons (hover)
- * @param buttonHoverEmbossEColor   The east emboss color of buttons (hover)
- * @param buttonHoverEmbossNColor   The north emboss color of buttons (hover)
- * @param buttonHoverEmbossSColor   The south emboss color of buttons (hover)
- * @param buttonHoverEmbossWColor   The west emboss color of buttons (hover)
- * @param buttonPressedBodyColor    The body color of buttons (pressed)
- * @param buttonPressedBorderColor  The border color of buttons (pressed)
- * @param buttonPressedEmbossEColor The east emboss color of buttons (pressed)
- * @param buttonPressedEmbossNColor The north emboss color of buttons (pressed)
- * @param buttonPressedEmbossSColor The south emboss color of buttons (pressed)
- * @param buttonPressedEmbossWColor The west emboss color of buttons (pressed)
- * @param errorBorderColor          The border color for error messages
- * @param headerBackgroundColor     The background color of the page header
- * @param headerLinkColor           The color of links in the page header
- * @param headerTextColor           The color of text in the page header
- * @param mainBackgroundColor       The background color of the main page
- * @param mainLinkColor             The color of links on the main page
- * @param mainMessageBorderColor    The border color of page messages
- * @param mainTableBorderColor      The border color of tables
- * @param mainTextColor             The main text color
+ * @param buttonColors           The color of buttons
+ * @param errorBorderColor       The border color for error messages
+ * @param headerBackgroundColor  The background color of the page header
+ * @param headerLinkColor        The color of links in the page header
+ * @param headerTextColor        The color of text in the page header
+ * @param mainBackgroundColor    The background color of the main page
+ * @param mainLinkColor          The color of links on the main page
+ * @param mainMessageBorderColor The border color of page messages
+ * @param mainTableBorderColor   The border color of tables
+ * @param mainTextColor          The main text color
  */
 
 @JsonSerialize
 @JsonDeserialize
 public record IdServerColorScheme(
-  @JsonProperty(value = "ButtonBodyColor", required = true)
-  IdServerColor buttonBodyColor,
-  @JsonProperty(value = "ButtonBorderColor", required = true)
-  IdServerColor buttonBorderColor,
-  @JsonProperty(value = "ButtonEmbossEColor", required = true)
-  IdServerColor buttonEmbossEColor,
-  @JsonProperty(value = "ButtonEmbossNColor", required = true)
-  IdServerColor buttonEmbossNColor,
-  @JsonProperty(value = "ButtonEmbossSColor", required = true)
-  IdServerColor buttonEmbossSColor,
-  @JsonProperty(value = "ButtonEmbossWColor", required = true)
-  IdServerColor buttonEmbossWColor,
-  @JsonProperty(value = "ButtonHoverBodyColor", required = true)
-  IdServerColor buttonHoverBodyColor,
-  @JsonProperty(value = "ButtonHoverBorderColor", required = true)
-  IdServerColor buttonHoverBorderColor,
-  @JsonProperty(value = "ButtonHoverEmbossEColor", required = true)
-  IdServerColor buttonHoverEmbossEColor,
-  @JsonProperty(value = "ButtonHoverEmbossNColor", required = true)
-  IdServerColor buttonHoverEmbossNColor,
-  @JsonProperty(value = "ButtonHoverEmbossSColor", required = true)
-  IdServerColor buttonHoverEmbossSColor,
-  @JsonProperty(value = "ButtonHoverEmbossWColor", required = true)
-  IdServerColor buttonHoverEmbossWColor,
-  @JsonProperty(value = "ButtonPressedBodyColor", required = true)
-  IdServerColor buttonPressedBodyColor,
-  @JsonProperty(value = "ButtonPressedBorderColor", required = true)
-  IdServerColor buttonPressedBorderColor,
-  @JsonProperty(value = "ButtonPressedEmbossEColor", required = true)
-  IdServerColor buttonPressedEmbossEColor,
-  @JsonProperty(value = "ButtonPressedEmbossNColor", required = true)
-  IdServerColor buttonPressedEmbossNColor,
-  @JsonProperty(value = "ButtonPressedEmbossSColor", required = true)
-  IdServerColor buttonPressedEmbossSColor,
-  @JsonProperty(value = "ButtonPressedEmbossWColor", required = true)
-  IdServerColor buttonPressedEmbossWColor,
+  @JsonProperty(value = "ButtonColors", required = true)
+  IdXButtonColors buttonColors,
   @JsonProperty(value = "ErrorBorderColor", required = true)
-  IdServerColor errorBorderColor,
+  IdColor errorBorderColor,
   @JsonProperty(value = "HeaderBackgroundColor", required = true)
-  IdServerColor headerBackgroundColor,
+  IdColor headerBackgroundColor,
   @JsonProperty(value = "HeaderLinkColor", required = true)
-  IdServerColor headerLinkColor,
+  IdColor headerLinkColor,
   @JsonProperty(value = "HeaderTextColor", required = true)
-  IdServerColor headerTextColor,
+  IdColor headerTextColor,
   @JsonProperty(value = "MainBackgroundColor", required = true)
-  IdServerColor mainBackgroundColor,
+  IdColor mainBackgroundColor,
   @JsonProperty(value = "MainLinkColor", required = true)
-  IdServerColor mainLinkColor,
+  IdColor mainLinkColor,
   @JsonProperty(value = "MainMessageBorderColor", required = true)
-  IdServerColor mainMessageBorderColor,
+  IdColor mainMessageBorderColor,
   @JsonProperty(value = "MainTableBorderColor", required = true)
-  IdServerColor mainTableBorderColor,
+  IdColor mainTableBorderColor,
   @JsonProperty(value = "MainTextColor", required = true)
-  IdServerColor mainTextColor
+  IdColor mainTextColor
 )
 {
   /**
    * A server color scheme.
    *
-   * @param buttonBodyColor           The body color of buttons
-   * @param buttonBorderColor         The border color of buttons
-   * @param buttonEmbossEColor        The east emboss color of buttons
-   * @param buttonEmbossNColor        The north emboss color of buttons
-   * @param buttonEmbossSColor        The south emboss color of buttons
-   * @param buttonEmbossWColor        The west emboss color of buttons
-   * @param buttonHoverBodyColor      The body color of buttons (hover)
-   * @param buttonHoverBorderColor    The border color of buttons (hover)
-   * @param buttonHoverEmbossEColor   The east emboss color of buttons (hover)
-   * @param buttonHoverEmbossNColor   The north emboss color of buttons (hover)
-   * @param buttonHoverEmbossSColor   The south emboss color of buttons (hover)
-   * @param buttonHoverEmbossWColor   The west emboss color of buttons (hover)
-   * @param buttonPressedBodyColor    The body color of buttons (pressed)
-   * @param buttonPressedBorderColor  The border color of buttons (pressed)
-   * @param buttonPressedEmbossEColor The east emboss color of buttons (pressed)
-   * @param buttonPressedEmbossNColor The north emboss color of buttons (pressed)
-   * @param buttonPressedEmbossSColor The south emboss color of buttons (pressed)
-   * @param buttonPressedEmbossWColor The west emboss color of buttons (pressed)
-   * @param errorBorderColor          The border color for error messages
-   * @param headerBackgroundColor     The background color of the page header
-   * @param headerLinkColor           The color of links in the page header
-   * @param headerTextColor           The color of text in the page header
-   * @param mainBackgroundColor       The background color of the main page
-   * @param mainLinkColor             The color of links on the main page
-   * @param mainMessageBorderColor    The border color of page messages
-   * @param mainTableBorderColor      The border color of tables
-   * @param mainTextColor             The main text color
+   * @param buttonColors           The color of buttons
+   * @param errorBorderColor       The border color for error messages
+   * @param headerBackgroundColor  The background color of the page header
+   * @param headerLinkColor        The color of links in the page header
+   * @param headerTextColor        The color of text in the page header
+   * @param mainBackgroundColor    The background color of the main page
+   * @param mainLinkColor          The color of links on the main page
+   * @param mainMessageBorderColor The border color of page messages
+   * @param mainTableBorderColor   The border color of tables
+   * @param mainTextColor          The main text color
    */
 
   public IdServerColorScheme
   {
-    Objects.requireNonNull(
-      buttonBodyColor, "buttonBodyColor");
-    Objects.requireNonNull(
-      buttonBorderColor, "buttonBorderColor");
-    Objects.requireNonNull(
-      buttonEmbossEColor, "buttonEmbossEColor");
-    Objects.requireNonNull(
-      buttonEmbossNColor, "buttonEmbossNColor");
-    Objects.requireNonNull(
-      buttonEmbossSColor, "buttonEmbossSColor");
-    Objects.requireNonNull(
-      buttonEmbossWColor, "buttonEmbossWColor");
-    Objects.requireNonNull(
-      buttonHoverBodyColor, "buttonHoverBodyColor");
-    Objects.requireNonNull(
-      buttonHoverBorderColor, "buttonHoverBorderColor");
-    Objects.requireNonNull(
-      buttonHoverEmbossEColor, "buttonHoverEmbossEColor");
-    Objects.requireNonNull(
-      buttonHoverEmbossNColor, "buttonHoverEmbossNColor");
-    Objects.requireNonNull(
-      buttonHoverEmbossSColor, "buttonHoverEmbossSColor");
-    Objects.requireNonNull(
-      buttonHoverEmbossWColor, "buttonHoverEmbossWColor");
-    Objects.requireNonNull(
-      buttonPressedBodyColor, "buttonPressedBodyColor");
-    Objects.requireNonNull(
-      buttonPressedBorderColor,
-      "buttonPressedBorderColor");
-    Objects.requireNonNull(
-      buttonPressedEmbossEColor,
-      "buttonPressedEmbossEColor");
-    Objects.requireNonNull(
-      buttonPressedEmbossNColor,
-      "buttonPressedEmbossNColor");
-    Objects.requireNonNull(
-      buttonPressedEmbossSColor,
-      "buttonPressedEmbossSColor");
-    Objects.requireNonNull(
-      buttonPressedEmbossWColor,
-      "buttonPressedEmbossWColor");
     Objects.requireNonNull(
       errorBorderColor, "errorBorderColor");
     Objects.requireNonNull(
@@ -206,5 +100,131 @@ public record IdServerColorScheme(
       mainTableBorderColor, "mainTableBorderColor");
     Objects.requireNonNull(
       mainTextColor, "mainTextColor");
+  }
+
+  /**
+   * An ocean blue colour.
+   */
+
+  public static final IdColor OCEAN_BLUE =
+    new IdColor(0.105, 0.313, 0.454);
+
+  /**
+   * @return The default color scheme
+   */
+
+  public static IdServerColorScheme defaults()
+  {
+    final var buttonEnabledTextColor =
+      new IdColor(0.0, 0.0, 0.0);
+    final var buttonEnabledBorderColor =
+      new IdColor(0.0, 0.0, 0.0);
+    final var buttonEnabledBodyColor =
+      new IdColor(0.86, 0.86, 0.86);
+    final var buttonEnabledEmbossNColor =
+      new IdColor(1.0, 1.0, 1.0);
+    final var buttonEnabledEmbossEColor =
+      new IdColor(1.0, 1.0, 1.0);
+    final var buttonEnabledEmbossSColor =
+      new IdColor(0.66, 0.66, 0.66);
+    final var buttonEnabledEmbossWColor =
+      new IdColor(0.66, 0.66, 0.66);
+
+    final var buttonHoverTextColor =
+      new IdColor(0.0, 0.0, 0.0);
+    final var buttonHoverBorderColor =
+      new IdColor(0.0, 0.0, 0.0);
+    final var buttonHoverBodyColor =
+      new IdColor(0.93, 0.93, 0.93);
+    final var buttonHoverEmbossNColor =
+      new IdColor(1.0, 1.0, 1.0);
+    final var buttonHoverEmbossEColor =
+      new IdColor(1.0, 1.0, 1.0);
+    final var buttonHoverEmbossSColor =
+      new IdColor(0.66, 0.66, 0.66);
+    final var buttonHoverEmbossWColor =
+      new IdColor(0.66, 0.66, 0.66);
+
+    final var buttonPressedTextColor =
+      new IdColor(0.0, 0.0, 0.0);
+    final var buttonPressedBorderColor =
+      new IdColor(0.0, 0.0, 0.0);
+    final var buttonPressedBodyColor =
+      new IdColor(0.86, 0.86, 0.86);
+    final var buttonPressedEmbossNColor =
+      new IdColor(0.66, 0.66, 0.66);
+    final var buttonPressedEmbossEColor =
+      new IdColor(0.66, 0.66, 0.66);
+    final var buttonPressedEmbossSColor =
+      new IdColor(0.8, 0.8, 0.8);
+    final var buttonPressedEmbossWColor =
+      new IdColor(0.8, 0.8, 0.8);
+
+    final var buttonDisabledBorderColor =
+      new IdColor(0.0, 0.0, 0.0);
+    final var buttonDisabledBodyColor =
+      new IdColor(0.86, 0.86, 0.86);
+    final var buttonDisabledTextColor =
+      buttonDisabledBodyColor.darker(0.2);
+    final var buttonDisabledEmbossNColor =
+      buttonDisabledBodyColor;
+    final var buttonDisabledEmbossEColor =
+      buttonDisabledBodyColor;
+    final var buttonDisabledEmbossSColor =
+      buttonDisabledBodyColor;
+    final var buttonDisabledEmbossWColor =
+      buttonDisabledBodyColor;
+
+    final var buttonColors = new IdXButtonColors(
+      new IdXButtonStateColors(
+        buttonEnabledTextColor,
+        buttonEnabledBodyColor,
+        buttonEnabledBorderColor,
+        buttonEnabledEmbossEColor,
+        buttonEnabledEmbossNColor,
+        buttonEnabledEmbossSColor,
+        buttonEnabledEmbossWColor
+      ),
+      new IdXButtonStateColors(
+        buttonDisabledTextColor,
+        buttonDisabledBodyColor,
+        buttonDisabledBorderColor,
+        buttonDisabledEmbossEColor,
+        buttonDisabledEmbossNColor,
+        buttonDisabledEmbossSColor,
+        buttonDisabledEmbossWColor
+      ),
+      new IdXButtonStateColors(
+        buttonPressedTextColor,
+        buttonPressedBodyColor,
+        buttonPressedBorderColor,
+        buttonPressedEmbossEColor,
+        buttonPressedEmbossNColor,
+        buttonPressedEmbossSColor,
+        buttonPressedEmbossWColor
+      ),
+      new IdXButtonStateColors(
+        buttonHoverTextColor,
+        buttonHoverBodyColor,
+        buttonHoverBorderColor,
+        buttonHoverEmbossEColor,
+        buttonHoverEmbossNColor,
+        buttonHoverEmbossSColor,
+        buttonHoverEmbossWColor
+      )
+    );
+
+    return new IdServerColorScheme(
+      buttonColors,
+      new IdColor(1.0, 0.0, 0.0),
+      new IdColor(0.2, 0.2, 0.2),
+      new IdColor(1.0, 0.596, 0.2),
+      new IdColor(1.0, 1.0, 1.0),
+      new IdColor(1.0, 1.0, 1.0),
+      new IdColor(0.0, 0.0, 1.0),
+      new IdColor(0.8, 0.8, 0.8),
+      new IdColor(0.5, 0.5, 0.5),
+      new IdColor(0.0, 0.0, 0.0)
+    );
   }
 }

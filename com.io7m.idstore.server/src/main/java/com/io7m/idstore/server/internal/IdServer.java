@@ -193,8 +193,8 @@ public final class IdServer implements IdServerType
     );
 
     services.register(
-      IdServerUserControllersService.class,
-      new IdServerUserControllersService()
+      IdUserSessionService.class,
+      new IdUserSessionService()
     );
 
     final var templates = IdFMTemplateService.create();
@@ -278,11 +278,15 @@ public final class IdServer implements IdServerType
       "/css"
     );
     servlets.addServlet(
-      servletHolders.create(IdCommonLogoServlet.class, IdCommonLogoServlet::new),
+      servletHolders.create(
+        IdCommonLogoServlet.class,
+        IdCommonLogoServlet::new),
       "/logo/*"
     );
     servlets.addServlet(
-      servletHolders.create(IdCommonLogoServlet.class, IdCommonLogoServlet::new),
+      servletHolders.create(
+        IdCommonLogoServlet.class,
+        IdCommonLogoServlet::new),
       "/logo"
     );
 

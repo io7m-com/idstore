@@ -24,9 +24,12 @@ import com.io7m.idstore.protocol.user_v1.IdU1ResponseError;
 import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.IdUserSession;
+import com.io7m.idstore.server.internal.IdUserSessionService;
 import com.io7m.idstore.server.internal.command_exec.IdCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -61,6 +64,7 @@ public final class IdU1CommandContext extends IdCommandContext<IdU1ResponseType>
    * @param inTransaction   The transaction
    * @param inClock         The clock
    * @param inUser          The user executing the command
+   * @param inSession       The user session
    * @param remoteHost      The remote host
    * @param remoteUserAgent The remote user agent
    */
@@ -72,6 +76,7 @@ public final class IdU1CommandContext extends IdCommandContext<IdU1ResponseType>
     final IdDatabaseTransactionType inTransaction,
     final IdServerClock inClock,
     final IdUser inUser,
+    final IdUserSession inSession,
     final String remoteHost,
     final String remoteUserAgent)
   {
@@ -81,6 +86,7 @@ public final class IdU1CommandContext extends IdCommandContext<IdU1ResponseType>
       inRequestId,
       inTransaction,
       inClock,
+      inSession,
       remoteHost,
       remoteUserAgent
     );
@@ -93,6 +99,7 @@ public final class IdU1CommandContext extends IdCommandContext<IdU1ResponseType>
    * @param services    The service directory
    * @param transaction The database transaction
    * @param request     The request
+   * @param session     The HTTP session
    * @param user        The current user
    *
    * @return A context
@@ -102,6 +109,7 @@ public final class IdU1CommandContext extends IdCommandContext<IdU1ResponseType>
     final IdServiceDirectoryType services,
     final IdDatabaseTransactionType transaction,
     final HttpServletRequest request,
+    final HttpSession session,
     final IdUser user)
   {
     return new IdU1CommandContext(
@@ -111,6 +119,8 @@ public final class IdU1CommandContext extends IdCommandContext<IdU1ResponseType>
       transaction,
       services.requireService(IdServerClock.class),
       user,
+      services.requireService(IdUserSessionService.class)
+        .createOrGet(user.id(), session.getId()),
       request.getRemoteHost(),
       requestUserAgent(request)
     );

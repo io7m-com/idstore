@@ -1,0 +1,61 @@
+/*
+ * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+ * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+package com.io7m.idstore.admin_gui.internal.users;
+
+import com.io7m.idstore.admin_gui.internal.IdAGStrings;
+import javafx.util.StringConverter;
+
+import java.util.Objects;
+
+/**
+ * A search kind string converter.
+ */
+
+public final class IdAGUserSearchKindStringConverter
+  extends StringConverter<IdAGUserSearchKind>
+{
+  private final IdAGStrings strings;
+
+  /**
+   * A search kind string converter.
+   *
+   * @param inStrings The string resources
+   */
+
+  public IdAGUserSearchKindStringConverter(
+    final IdAGStrings inStrings)
+  {
+    this.strings = Objects.requireNonNull(inStrings, "strings");
+  }
+
+  @Override
+  public String toString(
+    final IdAGUserSearchKind kind)
+  {
+    return switch (kind) {
+      case BY_DETAILS -> this.strings.format("users.search.searchDetails");
+      case BY_EMAIL -> this.strings.format("users.search.searchEmail");
+    };
+  }
+
+  @Override
+  public IdAGUserSearchKind fromString(
+    final String s)
+  {
+    return null;
+  }
+}

@@ -17,6 +17,7 @@
 package com.io7m.idstore.admin_client.internal;
 
 import com.io7m.idstore.admin_client.api.IdAClientAdminsType;
+import com.io7m.idstore.admin_client.api.IdAClientAuditType;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientUsersType;
 
@@ -27,7 +28,7 @@ import java.net.URI;
  */
 
 public interface IdAClientProtocolHandlerType
-  extends IdAClientUsersType, IdAClientAdminsType
+  extends IdAClientUsersType, IdAClientAdminsType, IdAClientAuditType
 {
   /**
    * Attempt to log in.
