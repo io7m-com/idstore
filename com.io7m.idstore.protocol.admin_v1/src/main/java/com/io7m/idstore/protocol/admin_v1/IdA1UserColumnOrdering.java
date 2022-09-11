@@ -52,6 +52,23 @@ public record IdA1UserColumnOrdering(
     Objects.requireNonNull(column, "column");
   }
 
+  /**
+   * Convert the given value.
+   *
+   * @param i The value
+   *
+   * @return The converted value
+   */
+
+  public static IdA1UserColumnOrdering of(
+    final IdUserColumnOrdering i)
+  {
+    return new IdA1UserColumnOrdering(
+      IdA1UserColumn.of(i.column()),
+      i.ascending()
+    );
+  }
+
   @Override
   public IdUserColumnOrdering toModel()
   {

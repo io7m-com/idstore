@@ -1,5 +1,5 @@
 {
-  "%Type": "CommandUserListParametersSet",
+  "%Type": "CommandUserSearchBegin",
   "%Schema": "https://www.io7m.com/idstore/admin-api-1.json",
   "Parameters": {
     "Limit": -4094669,

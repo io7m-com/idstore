@@ -35,6 +35,7 @@ module com.io7m.idstore.server
   requires ch.qos.logback.classic;
   requires ch.qos.logback.core;
   requires com.fasterxml.jackson.databind;
+  requires com.io7m.jaffirm.core;
   requires com.io7m.jmulticlose.core;
   requires com.io7m.junreachable.core;
   requires com.io7m.jxtrand.vanilla;

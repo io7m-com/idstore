@@ -55,6 +55,20 @@ public record IdA1TimeRange(
     }
   }
 
+  /**
+   * Convert the given value.
+   *
+   * @param r The value
+   *
+   * @return The converted value
+   */
+
+  public static IdA1TimeRange of(
+    final IdTimeRange r)
+  {
+    return new IdA1TimeRange(r.timeLower(), r.timeUpper());
+  }
+
   @Override
   public IdTimeRange toModel()
   {

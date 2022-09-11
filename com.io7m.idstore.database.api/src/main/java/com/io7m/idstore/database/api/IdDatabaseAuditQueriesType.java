@@ -17,10 +17,11 @@
 package com.io7m.idstore.database.api;
 
 import com.io7m.idstore.model.IdAuditEvent;
-import com.io7m.idstore.model.IdSubsetMatch;
+import com.io7m.idstore.model.IdAuditListParameters;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.OptionalLong;
 import java.util.UUID;
 
 /**
@@ -31,14 +32,10 @@ public non-sealed interface IdDatabaseAuditQueriesType
   extends IdDatabaseQueriesType
 {
   /**
-   * Retrieve all audit events from the database between the given (inclusive)
-   * times.
+   * Retrieve all audit events from the database matching the given parameters.
    *
-   * @param fromInclusive The inclusive lower bound on the event times
-   * @param toInclusive   The inclusive upper bound on the event times
-   * @param message       The subset of messages to include
-   * @param type          The subset of types to include
-   * @param owner         The subset of owners to include
+   * @param parameters The search parameters
+   * @param seek       The record to which to seek, if any
    *
    * @return A series of audit events, sorted by time
    *
@@ -46,20 +43,17 @@ public non-sealed interface IdDatabaseAuditQueriesType
    */
 
   List<IdAuditEvent> auditEvents(
-    OffsetDateTime fromInclusive,
-    OffsetDateTime toInclusive,
-    IdSubsetMatch<String> owner,
-    IdSubsetMatch<String> type,
-    IdSubsetMatch<String> message)
+    IdAuditListParameters parameters,
+    OptionalLong seek)
     throws IdDatabaseException;
 
   /**
    * Create an audit event.
    *
-   * @param userId       The user ID of the event
-   * @param time         The event time
-   * @param type         The event type
-   * @param message      The event message
+   * @param userId  The user ID of the event
+   * @param time    The event time
+   * @param type    The event type
+   * @param message The event message
    *
    * @throws IdDatabaseException On errors
    */
@@ -70,4 +64,14 @@ public non-sealed interface IdDatabaseAuditQueriesType
     String type,
     String message)
     throws IdDatabaseException;
+
+  /**
+   * @param parameters The parameters
+   *
+   * @return The number of events matching the given parameter
+   */
+
+  long auditCount(IdAuditListParameters parameters)
+    throws IdDatabaseException;
+
 }

@@ -18,8 +18,10 @@ package com.io7m.idstore.tests;
 
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import net.jqwik.api.Arbitraries;
 import org.junit.jupiter.api.BeforeEach;
@@ -145,7 +147,8 @@ public final class IdServerAdminErrorsTest extends IdWithServerContract
     this.doLogin(client);
 
     final var arb =
-      Arbitraries.defaultFor(IdA1MessageType.class);
+      Arbitraries.defaultFor(IdA1MessageType.class)
+        .filter(c -> c instanceof IdA1ResponseType);
 
     final var succeeded = new ArrayList<IdA1MessageType>();
     for (int index = 0; index < 1000; ++index) {
@@ -167,7 +170,6 @@ public final class IdServerAdminErrorsTest extends IdWithServerContract
       }
     }
 
-    succeeded.removeIf(m -> m instanceof IdA1CommandAdminSelf);
     assertTrue(succeeded.isEmpty());
   }
 

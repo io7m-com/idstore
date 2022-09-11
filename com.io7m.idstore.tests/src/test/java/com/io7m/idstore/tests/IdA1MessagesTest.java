@@ -16,9 +16,40 @@
 
 package com.io7m.idstore.tests;
 
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSelf;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseLogin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserUpdate;
 import com.io7m.idstore.protocol.api.IdProtocolException;
+import com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.CannotFindArbitraryException;
@@ -33,11 +64,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,12 +87,50 @@ public final class IdA1MessagesTest
   private IdA1Messages messages;
   private Path directory;
 
-  private static <T> Set<Class<? extends T>> enumerateSubclasses(
+  private static final Map<
+    Class<? extends IdA1MessageType>,
+    Arbitrary<? extends IdA1MessageType>> MESSAGE_ARBITRARIES =
+    Map.ofEntries(
+      entry(IdA1CommandAuditSearchBegin.class, commandAuditSearchBegin()),
+      entry(IdA1CommandAuditSearchNext.class, commandAuditSearchNext()),
+      entry(IdA1CommandAuditSearchPrevious.class, commandAuditSearchPrevious()),
+      entry(IdA1CommandAdminSelf.class, commandAdminSelf()),
+      entry(IdA1CommandLogin.class, commandLogin()),
+      entry(IdA1CommandUserSearchBegin.class, commandUserSearchBegin()),
+      entry(IdA1CommandUserSearchNext.class, commandUserSearchNext()),
+      entry(IdA1CommandUserSearchPrevious.class, commandUserSearchPrevious()),
+      entry(IdA1CommandUserSearchByEmailBegin.class, commandUserSearchByEmailBegin()),
+      entry(IdA1CommandUserSearchByEmailNext.class, commandUserSearchByEmailNext()),
+      entry(IdA1CommandUserSearchByEmailPrevious.class, commandUserSearchByEmailPrevious()),
+      entry(IdA1CommandUserGet.class, commandUserGet()),
+      entry(IdA1CommandUserGetByEmail.class, commandUserGetByEmail()),
+      entry(IdA1CommandUserUpdate.class, commandUserUpdate()),
+      entry(IdA1CommandUserCreate.class, commandUserCreate()),
+      entry(IdA1ResponseAdminSelf.class, responseAdminSelf()),
+      entry(IdA1ResponseError.class, responseError()),
+      entry(IdA1ResponseLogin.class, responseLogin()),
+      entry(IdA1ResponseUserSearchBegin.class, responseUserSearchBegin()),
+      entry(IdA1ResponseUserSearchNext.class, responseUserSearchNext()),
+      entry(IdA1ResponseUserSearchPrevious.class, responseUserSearchPrevious()),
+      entry(IdA1ResponseUserSearchByEmailBegin.class, responseUserSearchByEmailBegin()),
+      entry(IdA1ResponseUserSearchByEmailNext.class, responseUserSearchByEmailNext()),
+      entry(IdA1ResponseUserSearchByEmailPrevious.class, responseUserSearchByEmailPrevious()),
+      entry(IdA1ResponseUserGet.class, responseUserGet()),
+      entry(IdA1ResponseUserUpdate.class, responseUserUpdate()),
+      entry(IdA1ResponseUserCreate.class, responseUserCreate()),
+      entry(IdA1ResponseAuditSearchBegin.class, responseAuditSearchBegin()),
+      entry(IdA1ResponseAuditSearchNext.class, responseAuditSearchNext()),
+      entry(IdA1ResponseAuditSearchPrevious.class, responseAuditSearchPrevious())
+    );
+
+  private static <T> List<Class<? extends T>> enumerateSubclasses(
     final Class<? extends T> clazz)
   {
     final var classes = new HashSet<Class<? extends T>>();
     enumerateSubclassesStep(clazz, classes);
-    return classes;
+    return classes.stream()
+      .sorted(Comparator.comparing(Class::getCanonicalName))
+      .toList();
   }
 
   private static <T> void enumerateSubclassesStep(
@@ -77,25 +152,11 @@ public final class IdA1MessagesTest
   private static IdA1MessageType arbitraryOf(
     final Class<? extends IdA1MessageType> c)
   {
-    Arbitrary<? extends IdA1MessageType> arbitrary = null;
-
-    try {
-      arbitrary = Arbitraries.defaultFor(c);
-    } catch (final CannotFindArbitraryException e) {
-      // OK
-    }
-
-    try {
-      if (arbitrary == null) {
-        arbitrary = Arbitraries.forType(c);
-      }
-    } catch (final CannotFindArbitraryException e) {
-      // OK
-    }
-
-    if (arbitrary == null) {
-      arbitrary = new DefaultTypeArbitrary<>(c);
-    }
+    final var arbitrary =
+      Optional.ofNullable(MESSAGE_ARBITRARIES.get(c))
+          .orElseThrow(() -> {
+            return new NoSuchElementException(c.getCanonicalName());
+          });
 
     LOG.debug("arbitrary: {}", arbitrary);
     final var v = arbitrary.sample();
@@ -174,7 +235,10 @@ public final class IdA1MessagesTest
     throws Exception
   {
     this.messages.parse(
-      IdTestDirectories.resourceBytesOf(IdA1MessagesTest.class, this.directory, "case-0.json")
+      IdTestDirectories.resourceBytesOf(
+        IdA1MessagesTest.class,
+        this.directory,
+        "case-0.json")
     );
   }
 }

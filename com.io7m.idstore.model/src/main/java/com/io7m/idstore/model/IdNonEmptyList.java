@@ -52,6 +52,21 @@ public record IdNonEmptyList<T>(
   }
 
   /**
+   * Create a one-element list.
+   *
+   * @param x   The element
+   * @param <T> The type of elements
+   *
+   * @return The result list
+   */
+
+  public static <T> IdNonEmptyList<T> single(
+    final T x)
+  {
+    return new IdNonEmptyList<>(x, List.of());
+  }
+
+  /**
    * @return This list as a plain immutable list
    */
 

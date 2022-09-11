@@ -23,8 +23,10 @@ import com.io7m.idstore.model.IdNonEmptyList;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolFromModel;
 import com.io7m.idstore.protocol.api.IdProtocolToModel;
+import com.io7m.idstore.protocol.api.IdProtocolToModelType;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -58,6 +60,7 @@ public record IdA1User(
   OffsetDateTime timeUpdated,
   @JsonProperty(value = "Password", required = true)
   IdA1Password password)
+  implements IdProtocolToModelType<IdUser>
 {
   /**
    * Information for a single user.
@@ -138,5 +141,16 @@ public record IdA1User(
       this.timeUpdated,
       this.password.toPassword()
     );
+  }
+
+  @Override
+  public IdUser toModel()
+    throws IdProtocolException
+  {
+    try {
+      return this.toUser();
+    } catch (final IdPasswordException e) {
+      throw new IdProtocolException(e.getMessage(), e);
+    }
   }
 }

@@ -51,8 +51,7 @@ public record IdA1UserOrdering(
 
   @JsonCreator
   public IdA1UserOrdering(
-    @JsonProperty(value = "Columns", required = true)
-    final List<IdA1UserColumnOrdering> columns)
+    @JsonProperty(value = "Columns", required = true) final List<IdA1UserColumnOrdering> columns)
   {
     Objects.requireNonNull(columns, "columns");
 
@@ -78,6 +77,25 @@ public record IdA1UserOrdering(
   public static IdA1UserOrdering noOrdering()
   {
     return NO_ORDERING;
+  }
+
+  /**
+   * Convert the given value.
+   *
+   * @param ordering The value
+   *
+   * @return The converted value
+   */
+
+  public static IdA1UserOrdering of(
+    final IdUserOrdering ordering)
+  {
+    return new IdA1UserOrdering(
+      ordering.ordering()
+        .stream()
+        .map(IdA1UserColumnOrdering::of)
+        .toList()
+    );
   }
 
   @Override

@@ -18,6 +18,10 @@ package com.io7m.idstore.server.security;
 
 import java.util.Objects;
 
+import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
+import static com.io7m.idstore.model.IdAdminPermission.USER_READ;
+import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
+
 /**
  * The default security policy.
  */
@@ -114,7 +118,72 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   private static IdSecPolicyResultType checkAdminAction(
     final IdSecAdminActionType action)
   {
+    if (action instanceof IdSecAdminActionUserRead e) {
+      return checkAdminActionUserRead(e);
+    }
+    if (action instanceof IdSecAdminActionUserCreate e) {
+      return checkAdminActionUserCreate(e);
+    }
+    if (action instanceof IdSecAdminActionUserUpdate e) {
+      return checkAdminActionUserUpdate(e);
+    }
+    if (action instanceof IdSecAdminActionAuditRead e) {
+      return checkAdminActionAuditRead(e);
+    }
+
     return new IdSecPolicyResultDenied("Operation not permitted.");
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAuditRead(
+    final IdSecAdminActionAuditRead e)
+  {
+    final var permissions = e.admin().permissions();
+    if (permissions.contains(AUDIT_READ)) {
+      return new IdSecPolicyResultPermitted();
+    }
+
+    return new IdSecPolicyResultDenied(
+      "Reading audit records requires the %s permission.".formatted(AUDIT_READ)
+    );
+  }
+
+  private static IdSecPolicyResultType checkAdminActionUserRead(
+    final IdSecAdminActionUserRead e)
+  {
+    final var permissions = e.admin().permissions();
+    if (permissions.contains(USER_READ)) {
+      return new IdSecPolicyResultPermitted();
+    }
+
+    return new IdSecPolicyResultDenied(
+      "Reading users requires the %s permission.".formatted(USER_READ)
+    );
+  }
+
+  private static IdSecPolicyResultType checkAdminActionUserCreate(
+    final IdSecAdminActionUserCreate e)
+  {
+    final var permissions = e.admin().permissions();
+    if (permissions.contains(USER_WRITE)) {
+      return new IdSecPolicyResultPermitted();
+    }
+
+    return new IdSecPolicyResultDenied(
+      "Updating users requires the %s permission.".formatted(USER_WRITE)
+    );
+  }
+
+  private static IdSecPolicyResultType checkAdminActionUserUpdate(
+    final IdSecAdminActionUserUpdate e)
+  {
+    final var permissions = e.admin().permissions();
+    if (permissions.contains(USER_WRITE)) {
+      return new IdSecPolicyResultPermitted();
+    }
+
+    return new IdSecPolicyResultDenied(
+      "Updating users requires the %s permission.".formatted(USER_WRITE)
+    );
   }
 
   @Override

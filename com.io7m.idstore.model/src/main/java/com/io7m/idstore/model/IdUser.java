@@ -63,4 +63,21 @@ public record IdUser(
     Objects.requireNonNull(timeUpdated, "timeUpdated");
     Objects.requireNonNull(password, "password");
   }
+
+  /**
+   * Summarize this user.
+   *
+   * @return The summary
+   */
+
+  public IdUserSummary summary()
+  {
+    return new IdUserSummary(
+      this.id,
+      this.idName,
+      this.realName,
+      this.timeCreated,
+      this.timeUpdated
+    );
+  }
 }

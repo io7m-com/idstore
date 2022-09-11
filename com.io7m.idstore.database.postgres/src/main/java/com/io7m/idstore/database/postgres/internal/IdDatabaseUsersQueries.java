@@ -30,11 +30,13 @@ import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdPasswordAlgorithms;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
-import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserOrdering;
+import com.io7m.idstore.model.IdUserSearchByEmailParameters;
+import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
 import org.jooq.Condition;
+import org.jooq.DSLContext;
 import org.jooq.OrderField;
 import org.jooq.Result;
 import org.jooq.SelectForUpdateStep;
@@ -431,46 +433,6 @@ final class IdDatabaseUsersQueries
   }
 
   @Override
-  public List<IdUserSummary> userSearch(
-    final String query)
-    throws IdDatabaseException
-  {
-    Objects.requireNonNull(query, "query");
-
-    final var context =
-      this.transaction().createContext();
-
-    try {
-      final var wildcardQuery =
-        "%%%s%%".formatted(query);
-
-      final var records =
-        context.selectFrom(USERS)
-          .where(USERS.ID_NAME.likeIgnoreCase(wildcardQuery))
-          .or(USERS.REAL_NAME.likeIgnoreCase(wildcardQuery))
-          .or(USERS.ID.likeIgnoreCase(wildcardQuery))
-          .orderBy(USERS.REAL_NAME)
-          .fetch();
-
-      final var summaries = new ArrayList<IdUserSummary>(records.size());
-      for (final var record : records) {
-        summaries.add(
-          new IdUserSummary(
-            record.get(USERS.ID),
-            new IdName(record.get(USERS.ID_NAME)),
-            new IdRealName(record.get(USERS.REAL_NAME)),
-            record.getTimeCreated(),
-            record.getTimeUpdated()
-          )
-        );
-      }
-      return List.copyOf(summaries);
-    } catch (final DataAccessException e) {
-      throw handleDatabaseException(this.transaction(), e);
-    }
-  }
-
-  @Override
   public void userUpdate(
     final UUID id,
     final Optional<IdName> withIdName,
@@ -487,6 +449,52 @@ final class IdDatabaseUsersQueries
     final var context = transaction.createContext();
     final var owner = transaction.userId();
 
+    this.userUpdateActual(
+      id,
+      withIdName,
+      withRealName,
+      withPassword,
+      context,
+      owner
+    );
+  }
+
+  @Override
+  public void userUpdateAsAdmin(
+    final UUID id,
+    final Optional<IdName> withIdName,
+    final Optional<IdRealName> withRealName,
+    final Optional<IdPassword> withPassword)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+    Objects.requireNonNull(withIdName, "withIdName");
+    Objects.requireNonNull(withRealName, "withRealName");
+    Objects.requireNonNull(withPassword, "withPassword");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var owner = transaction.adminId();
+
+    this.userUpdateActual(
+      id,
+      withIdName,
+      withRealName,
+      withPassword,
+      context,
+      owner
+    );
+  }
+
+  private void userUpdateActual(
+    final UUID id,
+    final Optional<IdName> withIdName,
+    final Optional<IdRealName> withRealName,
+    final Optional<IdPassword> withPassword,
+    final DSLContext context,
+    final UUID owner)
+    throws IdDatabaseException
+  {
     try {
       final var record = context.fetchOne(USERS, USERS.ID.eq(id));
       if (record == null) {
@@ -538,19 +546,158 @@ final class IdDatabaseUsersQueries
   }
 
   @Override
-  public List<IdUserSummary> userList(
-    final IdTimeRange timeCreatedRange,
-    final IdTimeRange timeUpdatedRange,
-    final Optional<String> search,
-    final IdUserOrdering ordering,
-    final int limit,
+  public List<IdUserSummary> userSearchByEmail(
+    final IdUserSearchByEmailParameters parameters,
     final Optional<List<Object>> seek)
     throws IdDatabaseException
   {
-    Objects.requireNonNull(timeCreatedRange, "timeCreatedRange");
-    Objects.requireNonNull(timeUpdatedRange, "timeUpdatedRange");
-    Objects.requireNonNull(search, "search");
-    Objects.requireNonNull(ordering, "ordering");
+    Objects.requireNonNull(parameters, "parameters");
+    Objects.requireNonNull(seek, "seek");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+      final var baseSelection =
+        context.select(
+          USERS.ID,
+          USERS.ID_NAME,
+          USERS.REAL_NAME,
+          USERS.TIME_CREATED,
+          USERS.TIME_UPDATED)
+          .from(USERS.join(EMAILS).on(USERS.ID.eq(EMAILS.USER_ID)));
+
+      /*
+       * The users must lie within the given time ranges.
+       */
+
+      final var timeCreatedRange = parameters.timeCreatedRange();
+      final var timeCreatedCondition =
+        DSL.condition(
+          USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
+      final var timeUpdatedCondition =
+        DSL.condition(
+          USERS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(USERS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
+        );
+
+      /*
+       * Only users with matching email addresses will be returned.
+       */
+
+      final var searchLike =
+        "%%%s%%".formatted(parameters.search());
+      final var searchCondition =
+        DSL.condition(EMAILS.EMAIL_ADDRESS.like(searchLike));
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
+
+      final var baseOrdering =
+        baseSelection.where(allConditions)
+          .groupBy(USERS.ID)
+          .orderBy(orderFields(parameters.ordering()));
+
+      /*
+       * If a seek is specified, then seek!
+       */
+
+      final SelectForUpdateStep<?> next;
+      if (seek.isPresent()) {
+        final var page = seek.get();
+        final var fields = page.toArray();
+        next = baseOrdering.seek(fields)
+          .limit(Integer.valueOf(parameters.limit()));
+      } else {
+        next = baseOrdering.limit(Integer.valueOf(parameters.limit()));
+      }
+
+      final var results = new ArrayList<IdUserSummary>(parameters.limit());
+      final var records = next.fetch();
+      for (final var record : records) {
+        results.add(new IdUserSummary(
+          record.get(USERS.ID),
+          new IdName(record.get(USERS.ID_NAME)),
+          new IdRealName(record.get(USERS.REAL_NAME)),
+          record.get(USERS.TIME_CREATED),
+          record.get(USERS.TIME_UPDATED))
+        );
+      }
+      return results;
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public long userSearchByEmailCount(
+    final IdUserSearchByEmailParameters parameters)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(parameters, "parameters");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+      /*
+       * The users must lie within the given time ranges.
+       */
+
+      final var timeCreatedRange = parameters.timeCreatedRange();
+      final var timeCreatedCondition =
+        DSL.condition(
+          USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
+      final var timeUpdatedCondition =
+        DSL.condition(
+          USERS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(USERS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
+        );
+
+      /*
+       * Only users with matching email addresses will be returned.
+       */
+
+      final var searchLike =
+        "%%%s%%".formatted(parameters.search());
+      final var searchCondition =
+        DSL.condition(EMAILS.EMAIL_ADDRESS.like(searchLike));
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
+
+      final var query =
+        context.selectDistinct(DSL.count().over().as("Total"))
+          .from(USERS.join(EMAILS).on(USERS.ID.eq(EMAILS.USER_ID)))
+          .where(allConditions)
+          .groupBy(USERS.ID)
+          .fetchOneInto(int.class);
+
+      return query.longValue();
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public List<IdUserSummary> userSearch(
+    final IdUserSearchParameters parameters,
+    final Optional<List<Object>> seek)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(parameters, "parameters");
     Objects.requireNonNull(seek, "seek");
 
     final var transaction = this.transaction();
@@ -564,16 +711,18 @@ final class IdDatabaseUsersQueries
        * The users must lie within the given time ranges.
        */
 
+      final var timeCreatedRange = parameters.timeCreatedRange();
       final var timeCreatedCondition =
         DSL.condition(
           USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
             .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
         );
 
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
       final var timeUpdatedCondition =
         DSL.condition(
-          USERS.TIME_UPDATED.ge(timeCreatedRange.timeLower())
-            .and(USERS.TIME_UPDATED.le(timeCreatedRange.timeUpper()))
+          USERS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(USERS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
         );
 
       /*
@@ -581,6 +730,7 @@ final class IdDatabaseUsersQueries
        */
 
       final Condition searchCondition;
+      final var search = parameters.search();
       if (search.isPresent()) {
         final var searchText = "%%%s%%".formatted(search.get());
         searchCondition =
@@ -598,7 +748,7 @@ final class IdDatabaseUsersQueries
 
       final var baseOrdering =
         baseSelection.where(allConditions)
-          .orderBy(orderFields(ordering));
+          .orderBy(orderFields(parameters.ordering()));
 
       /*
        * If a seek is specified, then seek!
@@ -608,9 +758,10 @@ final class IdDatabaseUsersQueries
       if (seek.isPresent()) {
         final var page = seek.get();
         final var fields = page.toArray();
-        next = baseOrdering.seek(fields).limit(Integer.valueOf(limit));
+        next = baseOrdering.seek(fields)
+          .limit(Integer.valueOf(parameters.limit()));
       } else {
-        next = baseOrdering.limit(Integer.valueOf(limit));
+        next = baseOrdering.limit(Integer.valueOf(parameters.limit()));
       }
 
       return next.fetch()
@@ -623,41 +774,39 @@ final class IdDatabaseUsersQueries
             record.get(USERS.TIME_UPDATED)
           );
         });
-
     } catch (final DataAccessException e) {
       throw handleDatabaseException(this.transaction(), e);
     }
   }
 
   @Override
-  public long userCount(
-    final IdTimeRange timeCreatedRange,
-    final IdTimeRange timeUpdatedRange,
-    final Optional<String> search)
+  public long userSearchCount(
+    final IdUserSearchParameters parameters)
     throws IdDatabaseException
   {
-    Objects.requireNonNull(timeCreatedRange, "timeCreatedRange");
-    Objects.requireNonNull(timeUpdatedRange, "timeUpdatedRange");
-    Objects.requireNonNull(search, "search");
+    Objects.requireNonNull(parameters, "parameters");
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
 
     try {
+
       /*
        * The users must lie within the given time ranges.
        */
 
+      final var timeCreatedRange = parameters.timeCreatedRange();
       final var timeCreatedCondition =
         DSL.condition(
           USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
             .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
         );
 
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
       final var timeUpdatedCondition =
         DSL.condition(
-          USERS.TIME_UPDATED.ge(timeCreatedRange.timeLower())
-            .and(USERS.TIME_UPDATED.le(timeCreatedRange.timeUpper()))
+          USERS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(USERS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
         );
 
       /*
@@ -665,6 +814,7 @@ final class IdDatabaseUsersQueries
        */
 
       final Condition searchCondition;
+      final var search = parameters.search();
       if (search.isPresent()) {
         final var searchText = "%%%s%%".formatted(search.get());
         searchCondition =

@@ -18,11 +18,24 @@ package com.io7m.idstore.admin_client.internal;
 
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAuditEvent;
+import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdPage;
+import com.io7m.idstore.model.IdPassword;
+import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.model.IdTimeRange;
+import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdUserSearchByEmailParameters;
+import com.io7m.idstore.model.IdUserSearchParameters;
+import com.io7m.idstore.model.IdUserSummary;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * The "disconnected" protocol handler.
@@ -82,7 +95,113 @@ public final class IdAClientProtocolHandlerDisconnected
 
   @Override
   public IdAdmin adminSelf()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchBegin(
+    final IdUserSearchParameters parameters)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchNext()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchPrevious()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchByEmailBegin(
+    final IdUserSearchByEmailParameters parameters)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchByEmailNext()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdUserSummary> userSearchByEmailPrevious()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public Optional<IdUser> userGet(
+    final UUID id)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public Optional<IdUser> userGetByEmail(
+    final IdEmail email)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdUser userUpdate(
+    final IdUser user)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdUser userCreate(
+    final Optional<UUID> id,
+    final IdName idName,
+    final IdRealName realName,
+    final IdEmail email,
+    final IdPassword password)
     throws IdAClientException, InterruptedException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdAuditEvent> auditSearchBegin(
+    final IdTimeRange timeRange,
+    final Optional<String> owner,
+    final Optional<String> type,
+    final Optional<String> message,
+    final int pageSize)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdAuditEvent> auditSearchNext()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdAuditEvent> auditSearchPrevious()
+    throws IdAClientException
   {
     throw this.notLoggedIn();
   }

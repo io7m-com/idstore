@@ -26,6 +26,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdRequestLimits;
+import com.io7m.idstore.server.internal.IdUserSessionService;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,6 +59,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
   private final IdA1Messages messages;
   private final IdA1CommandExecutor executor;
   private final IdServiceDirectoryType services;
+  private final IdUserSessionService sessions;
 
   /**
    * A servlet for executing a single command.
@@ -78,6 +80,8 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
       inServices.requireService(IdRequestLimits.class);
     this.messages =
       inServices.requireService(IdA1Messages.class);
+    this.sessions =
+      inServices.requireService(IdUserSessionService.class);
     this.executor =
       new IdA1CommandExecutor();
   }
@@ -102,7 +106,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
       final var data = input.readAllBytes();
       final var message = this.messages.parse(data);
       if (message instanceof IdA1CommandType command) {
-        this.executeCommand(request, servletResponse, requestId, command);
+        this.executeCommand(request, servletResponse, session, requestId, command);
         return;
       }
     } catch (final IdProtocolException e) {
@@ -124,6 +128,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
   private void executeCommand(
     final HttpServletRequest request,
     final HttpServletResponse servletResponse,
+    final HttpSession session,
     final UUID requestId,
     final IdA1CommandType<?> command)
     throws IdDatabaseException, IOException
@@ -133,6 +138,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
         this.executeCommandInTransaction(
           request,
           servletResponse,
+          session,
           requestId,
           command,
           transaction
@@ -144,11 +150,17 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
   private void executeCommandInTransaction(
     final HttpServletRequest request,
     final HttpServletResponse servletResponse,
+    final HttpSession session,
     final UUID requestId,
     final IdA1CommandType<?> command,
     final IdDatabaseTransactionType transaction)
     throws IOException, IdDatabaseException
   {
+    final var admin =
+      this.admin();
+    final var userSession =
+      this.sessions.createOrGet(admin.id(), session.getId());
+
     final var context =
       new IdA1CommandContext(
         this.services,
@@ -156,7 +168,8 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
         requestId,
         transaction,
         this.clock(),
-        this.admin(),
+        admin,
+        userSession,
         request.getRemoteHost(),
         Optional.ofNullable(request.getHeader("User-Agent"))
           .orElse("<unavailable>")
@@ -167,6 +180,9 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
     try {
       final IdA1ResponseType result = this.executor.execute(context, command);
       sends.send(servletResponse, 200, result);
+      if (!(result instanceof IdA1ResponseError)) {
+        transaction.commit();
+      }
     } catch (final IdCommandExecutionFailure e) {
       sends.send(
         servletResponse,
@@ -177,7 +193,5 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
           e.getMessage()
         ));
     }
-
-    transaction.commit();
   }
 }

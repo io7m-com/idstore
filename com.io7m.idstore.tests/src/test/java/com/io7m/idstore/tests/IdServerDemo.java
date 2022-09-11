@@ -50,6 +50,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Flow;
@@ -204,14 +205,29 @@ public final class IdServerDemo
           final var password =
             algo.createHashed("12345678");
 
+          final var adminId = UUID.randomUUID();
           admins.adminCreateInitial(
-            UUID.randomUUID(),
+            adminId,
             new IdName("someone"),
             new IdRealName("Someone R. Incogito"),
             new IdEmail("admin@example.com"),
             OffsetDateTime.now(),
             password
           );
+
+          t.commit();
+          t.adminIdSet(adminId);
+
+          admins.adminCreate(
+            UUID.randomUUID(),
+            new IdName("someone-u"),
+            new IdRealName("Someone R. Incogito"),
+            new IdEmail("admin-u@example.com"),
+            OffsetDateTime.now(),
+            password,
+            Set.of()
+          );
+
           t.commit();
         }
       }

@@ -47,10 +47,16 @@ public interface IdDatabasePagingType<P, T, Q extends IdDatabaseQueriesType>
   int pageNumber();
 
   /**
+   * @return The index of the first item in the current page
+   */
+
+  long pageFirstOffset();
+
+  /**
    * @return An approximate count of the number of available pages
    */
 
-  long pageCount();
+  int pageCount();
 
   /**
    * @return {@code true} If the next page is currently available

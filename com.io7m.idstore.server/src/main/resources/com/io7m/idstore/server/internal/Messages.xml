@@ -3,7 +3,6 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 
 <properties>
-  <entry key="adminConsole">ADMINISTRATOR TERMINAL</entry>
   <entry key="productTitle">idstore</entry>
   <entry key="error">Error</entry>
   <entry key="errorInvalidUsernamePassword">Invalid username or password.</entry>
@@ -18,6 +17,7 @@
   <entry key="invalidParameter">Invalid value for parameter "{0}"</entry>
   <entry key="notFound">Not found.</entry>
   <entry key="commandNotHere">Cannot use this command here.</entry>
+  <entry key="userIdNameDuplicate">Duplicate user ID name: "{0}"</entry>
   <entry key="emailVerificationSuccessTitle">Verified</entry>
   <entry key="emailVerificationSuccess">Email verified successfully.</entry>
   <entry key="emailVerificationFailed">Email verification failed.</entry>

@@ -17,14 +17,16 @@
 package com.io7m.idstore.tests;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
-import com.io7m.idstore.database.api.IdDatabaseUserListPaging;
+import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPaging;
+import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUserColumnOrdering;
-import com.io7m.idstore.model.IdUserListParameters;
+import com.io7m.idstore.model.IdUserSearchByEmailParameters;
+import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserOrdering;
 import com.io7m.idstore.model.IdUserSummary;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -443,16 +444,19 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     }
 
     {
-      final var usersListed =
-        users.userList(
+      final var parameters =
+        new IdUserSearchParameters(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           Optional.empty(),
           new IdUserOrdering(List.of(new IdUserColumnOrdering(
             BY_IDNAME,
             true))),
-          600,
-          Optional.empty());
+          600
+        );
+
+      final var usersListed =
+        users.userSearch(parameters, Optional.empty());
 
       assertEquals(500, usersListed.size());
 
@@ -471,16 +475,19 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     }
 
     {
-      final var usersListed =
-        users.userList(
+      final var parameters =
+        new IdUserSearchParameters(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           Optional.empty(),
           new IdUserOrdering(List.of(new IdUserColumnOrdering(
             BY_IDNAME,
             false))),
-          600,
-          Optional.empty());
+          600
+        );
+
+      final var usersListed =
+        users.userSearch(parameters, Optional.empty());
 
       assertEquals(500, usersListed.size());
 
@@ -508,7 +515,7 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testUserListPaging()
+  public void testUserSearchPaging()
     throws Exception
   {
     assertTrue(this.containerIsRunning());
@@ -547,8 +554,8 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     }
 
     final var paging =
-      IdDatabaseUserListPaging.create(
-        new IdUserListParameters(
+      IdDatabaseUserSearchPaging.create(
+        new IdUserSearchParameters(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           Optional.empty(),
@@ -606,6 +613,77 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
   }
 
   /**
+   * Users can be listed and paging works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserSearchByEmailPaging()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    final var now =
+      now();
+    final var password =
+      databaseGenerateBadPassword();
+
+    final var userList = new ArrayList<>();
+    for (int index = 0; index < 500; ++index) {
+      userList.add(
+        users.userCreate(
+          randomUUID(),
+          new IdName("someone_%03d".formatted(index)),
+          new IdRealName("someone %03d".formatted(index)),
+          new IdEmail("someone_%03d@example.com".formatted(index)),
+          now,
+          password
+        )
+      );
+    }
+
+    final var paging =
+      IdDatabaseUserSearchByEmailPaging.create(
+        new IdUserSearchByEmailParameters(
+          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+          "0@example.com",
+          new IdUserOrdering(List.of(
+            new IdUserColumnOrdering(BY_IDNAME, true),
+            new IdUserColumnOrdering(BY_REALNAME, true),
+            new IdUserColumnOrdering(BY_TIME_UPDATED, true),
+            new IdUserColumnOrdering(BY_TIME_CREATED, true)
+          )),
+          150
+        ));
+
+    final List<IdUserSummary>  items = paging.pageCurrent(users);
+    assertEquals(0, paging.pageNumber());
+    assertEquals(1, paging.pageCount());
+    assertEquals(50, items.size());
+
+    for (final var item : items) {
+      assertTrue(item.idName().value().endsWith("0"));
+    }
+  }
+
+
+  /**
    * Users can be listed/searched and paging works.
    *
    * @throws Exception On errors
@@ -650,8 +728,8 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     }
 
     final var paging =
-      IdDatabaseUserListPaging.create(
-        new IdUserListParameters(
+      IdDatabaseUserSearchPaging.create(
+        new IdUserSearchParameters(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           Optional.of("od"),
@@ -710,7 +788,7 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       "Flammability Modernly",
       "Strip Nobody",
       "Spume Podding"
-      );
+    );
 
     for (final var e : expected) {
       assertTrue(
@@ -925,7 +1003,6 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       });
     assertEquals(EMAIL_ONE_REQUIRED, ex.errorCode());
   }
-
 
   private static void checkPage(
     final int indexLow,

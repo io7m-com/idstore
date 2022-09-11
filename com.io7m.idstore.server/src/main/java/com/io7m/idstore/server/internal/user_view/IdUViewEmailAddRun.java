@@ -101,6 +101,7 @@ public final class IdUViewEmailAddRun extends IdUViewAuthenticatedServlet
               this.services(),
               transaction,
               request,
+              session,
               this.user()
             );
 

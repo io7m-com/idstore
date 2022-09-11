@@ -60,6 +60,26 @@ public enum IdA1UserColumn
 
   BY_TIME_UPDATED;
 
+  /**
+   * Convert the given value.
+   *
+   * @param column The value
+   *
+   * @return The converted value
+   */
+
+  public static IdA1UserColumn of(
+    final IdUserColumn column)
+  {
+    return switch (column) {
+      case BY_TIME_CREATED -> BY_TIME_CREATED;
+      case BY_ID -> BY_ID;
+      case BY_IDNAME -> BY_IDNAME;
+      case BY_REALNAME -> BY_REALNAME;
+      case BY_TIME_UPDATED -> BY_TIME_UPDATED;
+    };
+  }
+
   @Override
   public IdUserColumn toModel()
   {

@@ -23,6 +23,8 @@
   <modules>
     <module>com.io7m.idstore.admin_client.api</module>
     <module>com.io7m.idstore.admin_client</module>
+    <module>com.io7m.idstore.admin_gui.main</module>
+    <module>com.io7m.idstore.admin_gui</module>
     <module>com.io7m.idstore.colors</module>
     <module>com.io7m.idstore.database.api</module>
     <module>com.io7m.idstore.database.postgres</module>
@@ -56,6 +58,7 @@
     <org.jline.version>3.21.0</org.jline.version>
     <testcontainers.version>1.17.3</testcontainers.version>
     <org.apache.james.version>3.7.0</org.apache.james.version>
+    <org.javafx.version>18.0.1</org.javafx.version>
   </properties>
 
   <licenses>
@@ -407,6 +410,36 @@
         <artifactId>subethasmtp</artifactId>
         <version>6.0.1</version>
       </dependency>
+      <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-graphics</artifactId>
+        <version>${org.javafx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-controls</artifactId>
+        <version>${org.javafx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-fxml</artifactId>
+        <version>${org.javafx.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.taskrecorder</groupId>
+        <artifactId>com.io7m.taskrecorder.core</artifactId>
+        <version>0.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.jade</groupId>
+        <artifactId>com.io7m.jade.api</artifactId>
+        <version>${com.io7m.jade.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.jade</groupId>
+        <artifactId>com.io7m.jade.vanilla</artifactId>
+        <version>${com.io7m.jade.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -419,6 +452,12 @@
           <configuration>
             <suppressionsLocation>checkstyle-filter.xml</suppressionsLocation>
           </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>com.io7m.stmp</groupId>
+          <artifactId>string-template-maven-plugin</artifactId>
+          <version>1.2.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
