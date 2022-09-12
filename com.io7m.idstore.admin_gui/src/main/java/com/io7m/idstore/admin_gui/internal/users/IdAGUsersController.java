@@ -271,8 +271,17 @@ public final class IdAGUsersController implements Initializable
 
   @FXML
   private void onUserDeleteSelected()
+    throws IOException
   {
+    final var controller =
+      this.openUserDeleteConfirmDialog();
 
+    if (controller.isDeleteRequested()) {
+      final var future = this.client.userDelete(this.user.id());
+      future.whenComplete((page, exception) -> {
+        // OK
+      });
+    }
   }
 
   @FXML
@@ -446,6 +455,36 @@ public final class IdAGUsersController implements Initializable
     stage.initModality(Modality.APPLICATION_MODAL);
     stage.setScene(new Scene(pane));
     stage.setTitle(this.strings.format("users.email"));
+    stage.showAndWait();
+    return controller;
+  }
+
+  private IdAGUserDeleteConfirmController openUserDeleteConfirmDialog()
+    throws IOException
+  {
+    final var stage = new Stage();
+    final var connectXML =
+      IdAGMainScreenController.class.getResource(
+        "/com/io7m/idstore/admin_gui/internal/userDeleteConfirm.fxml");
+
+    final var resources =
+      this.strings.resources();
+    final var loader =
+      new FXMLLoader(connectXML, resources);
+
+    loader.setControllerFactory(
+      clazz -> new IdAGUserDeleteConfirmController(
+        this.user,
+        stage)
+    );
+
+    final Pane pane = loader.load();
+    IdAGCSS.setCSS(this.configuration, pane);
+
+    final IdAGUserDeleteConfirmController controller = loader.getController();
+    stage.initModality(Modality.APPLICATION_MODAL);
+    stage.setScene(new Scene(pane));
+    stage.setTitle(this.strings.format("userDelete.confirmTitle"));
     stage.showAndWait();
     return controller;
   }

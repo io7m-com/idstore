@@ -597,4 +597,30 @@ public final class IdAGClientService implements IdServiceType, Closeable
     });
     return future;
   }
+
+  /**
+   * Delete a user.
+   *
+   * @param id The user ID
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<Void> userDelete(
+    final UUID id)
+  {
+    final var future = new CompletableFuture<Void>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        this.client.userDelete(id);
+        future.complete(null);
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
 }
