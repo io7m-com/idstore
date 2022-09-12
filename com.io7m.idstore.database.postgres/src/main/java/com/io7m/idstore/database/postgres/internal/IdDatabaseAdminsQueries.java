@@ -22,7 +22,10 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.postgres.internal.tables.records.AdminsRecord;
 import com.io7m.idstore.database.postgres.internal.tables.records.EmailsRecord;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAdminOrdering;
 import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
+import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -31,12 +34,17 @@ import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdPasswordAlgorithms;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
+import org.jooq.Condition;
+import org.jooq.OrderField;
 import org.jooq.Result;
+import org.jooq.SelectForUpdateStep;
 import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -75,6 +83,53 @@ final class IdDatabaseAdminsQueries
     final IdDatabaseTransaction inTransaction)
   {
     super(inTransaction);
+  }
+
+  private static Collection<? extends OrderField<?>> orderFields(
+    final IdAdminOrdering ordering)
+  {
+    final var columns = ordering.ordering();
+    final var fields = new ArrayList<OrderField<?>>(columns.size());
+    for (final var columnOrder : columns) {
+      fields.add(
+        switch (columnOrder.column()) {
+          case BY_ID -> {
+            if (columnOrder.ascending()) {
+              yield ADMINS.ID.asc();
+            }
+            yield ADMINS.ID.desc();
+          }
+
+          case BY_IDNAME -> {
+            if (columnOrder.ascending()) {
+              yield ADMINS.ID_NAME.asc();
+            }
+            yield ADMINS.ID_NAME.desc();
+          }
+
+          case BY_REALNAME -> {
+            if (columnOrder.ascending()) {
+              yield ADMINS.REAL_NAME.asc();
+            }
+            yield ADMINS.REAL_NAME.desc();
+          }
+
+          case BY_TIME_CREATED -> {
+            if (columnOrder.ascending()) {
+              yield ADMINS.TIME_CREATED.asc();
+            }
+            yield ADMINS.TIME_CREATED.desc();
+          }
+
+          case BY_TIME_UPDATED -> {
+            if (columnOrder.ascending()) {
+              yield ADMINS.TIME_UPDATED.asc();
+            }
+            yield ADMINS.TIME_UPDATED.desc();
+          }
+        });
+    }
+    return List.copyOf(fields);
   }
 
   private static IdAdmin adminMap(
@@ -466,38 +521,296 @@ final class IdDatabaseAdminsQueries
   }
 
   @Override
-  public List<IdAdminSummary> adminSearch(
-    final String query)
+  public List<IdAdminSummary> adminSearchByEmail(
+    final IdAdminSearchByEmailParameters parameters,
+    final Optional<List<Object>> seek)
     throws IdDatabaseException
   {
-    Objects.requireNonNull(query, "query");
+    Objects.requireNonNull(parameters, "parameters");
+    Objects.requireNonNull(seek, "seek");
 
-    final var context =
-      this.transaction().createContext();
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
 
     try {
-      final var wildcardQuery =
-        "%%%s%%".formatted(query);
+      final var baseSelection =
+        context.select(
+            ADMINS.ID,
+            ADMINS.ID_NAME,
+            ADMINS.REAL_NAME,
+            ADMINS.TIME_CREATED,
+            ADMINS.TIME_UPDATED)
+          .from(ADMINS.join(EMAILS).on(ADMINS.ID.eq(EMAILS.ADMIN_ID)));
 
-      final var records =
-        context.selectFrom(ADMINS)
-          .where(ADMINS.ID_NAME.likeIgnoreCase(wildcardQuery))
-          .or(ADMINS.REAL_NAME.likeIgnoreCase(wildcardQuery))
-          .or(ADMINS.ID.likeIgnoreCase(wildcardQuery))
-          .orderBy(ADMINS.REAL_NAME)
-          .fetch();
+      /*
+       * The admins must lie within the given time ranges.
+       */
 
-      final var summaries = new ArrayList<IdAdminSummary>(records.size());
+      final var timeCreatedRange = parameters.timeCreatedRange();
+      final var timeCreatedCondition =
+        DSL.condition(
+          ADMINS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(ADMINS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
+      final var timeUpdatedCondition =
+        DSL.condition(
+          ADMINS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(ADMINS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
+        );
+
+      /*
+       * Only admins with matching email addresses will be returned.
+       */
+
+      final var searchLike =
+        "%%%s%%".formatted(parameters.search());
+      final var searchCondition =
+        DSL.condition(EMAILS.EMAIL_ADDRESS.like(searchLike));
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
+
+      final var baseOrdering =
+        baseSelection.where(allConditions)
+          .groupBy(ADMINS.ID)
+          .orderBy(orderFields(parameters.ordering()));
+
+      /*
+       * If a seek is specified, then seek!
+       */
+
+      final SelectForUpdateStep<?> next;
+      if (seek.isPresent()) {
+        final var page = seek.get();
+        final var fields = page.toArray();
+        next = baseOrdering.seek(fields)
+          .limit(Integer.valueOf(parameters.limit()));
+      } else {
+        next = baseOrdering.limit(Integer.valueOf(parameters.limit()));
+      }
+
+      final var results = new ArrayList<IdAdminSummary>(parameters.limit());
+      final var records = next.fetch();
       for (final var record : records) {
-        summaries.add(
-          new IdAdminSummary(
-            record.get(ADMINS.ID),
-            new IdName(record.get(ADMINS.ID_NAME)),
-            new IdRealName(record.get(ADMINS.REAL_NAME))
-          )
+        results.add(new IdAdminSummary(
+          record.get(ADMINS.ID),
+          new IdName(record.get(ADMINS.ID_NAME)),
+          new IdRealName(record.get(ADMINS.REAL_NAME)),
+          record.get(ADMINS.TIME_CREATED),
+          record.get(ADMINS.TIME_UPDATED))
         );
       }
-      return List.copyOf(summaries);
+      return results;
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public long adminSearchByEmailCount(
+    final IdAdminSearchByEmailParameters parameters)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(parameters, "parameters");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+      /*
+       * The admins must lie within the given time ranges.
+       */
+
+      final var timeCreatedRange = parameters.timeCreatedRange();
+      final var timeCreatedCondition =
+        DSL.condition(
+          ADMINS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(ADMINS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
+      final var timeUpdatedCondition =
+        DSL.condition(
+          ADMINS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(ADMINS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
+        );
+
+      /*
+       * Only admins with matching email addresses will be returned.
+       */
+
+      final var searchLike =
+        "%%%s%%".formatted(parameters.search());
+      final var searchCondition =
+        DSL.condition(EMAILS.EMAIL_ADDRESS.like(searchLike));
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
+
+      final var query =
+        context.selectDistinct(DSL.count().over().as("Total"))
+          .from(ADMINS.join(EMAILS).on(ADMINS.ID.eq(EMAILS.ADMIN_ID)))
+          .where(allConditions)
+          .groupBy(ADMINS.ID)
+          .fetchOneInto(int.class);
+
+      return query.longValue();
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public List<IdAdminSummary> adminSearch(
+    final IdAdminSearchParameters parameters,
+    final Optional<List<Object>> seek)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(parameters, "parameters");
+    Objects.requireNonNull(seek, "seek");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+      final var baseSelection =
+        context.selectFrom(ADMINS);
+
+      /*
+       * The admins must lie within the given time ranges.
+       */
+
+      final var timeCreatedRange = parameters.timeCreatedRange();
+      final var timeCreatedCondition =
+        DSL.condition(
+          ADMINS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(ADMINS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
+      final var timeUpdatedCondition =
+        DSL.condition(
+          ADMINS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(ADMINS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
+        );
+
+      /*
+       * A search query might be present.
+       */
+
+      final Condition searchCondition;
+      final var search = parameters.search();
+      if (search.isPresent()) {
+        final var searchText = "%%%s%%".formatted(search.get());
+        searchCondition =
+          DSL.condition(ADMINS.ID_NAME.likeIgnoreCase(searchText))
+            .or(DSL.condition(ADMINS.REAL_NAME.likeIgnoreCase(searchText)))
+            .or(DSL.condition(ADMINS.ID.likeIgnoreCase(searchText)));
+      } else {
+        searchCondition = DSL.trueCondition();
+      }
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
+
+      final var baseOrdering =
+        baseSelection.where(allConditions)
+          .orderBy(orderFields(parameters.ordering()));
+
+      /*
+       * If a seek is specified, then seek!
+       */
+
+      final SelectForUpdateStep<?> next;
+      if (seek.isPresent()) {
+        final var page = seek.get();
+        final var fields = page.toArray();
+        next = baseOrdering.seek(fields)
+          .limit(Integer.valueOf(parameters.limit()));
+      } else {
+        next = baseOrdering.limit(Integer.valueOf(parameters.limit()));
+      }
+
+      return next.fetch()
+        .map(record -> {
+          return new IdAdminSummary(
+            record.get(ADMINS.ID),
+            new IdName(record.get(ADMINS.ID_NAME)),
+            new IdRealName(record.get(ADMINS.REAL_NAME)),
+            record.get(ADMINS.TIME_CREATED),
+            record.get(ADMINS.TIME_UPDATED)
+          );
+        });
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public long adminSearchCount(
+    final IdAdminSearchParameters parameters)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(parameters, "parameters");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+
+      /*
+       * The admins must lie within the given time ranges.
+       */
+
+      final var timeCreatedRange = parameters.timeCreatedRange();
+      final var timeCreatedCondition =
+        DSL.condition(
+          ADMINS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(ADMINS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
+      final var timeUpdatedCondition =
+        DSL.condition(
+          ADMINS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(ADMINS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
+        );
+
+      /*
+       * A search query might be present.
+       */
+
+      final Condition searchCondition;
+      final var search = parameters.search();
+      if (search.isPresent()) {
+        final var searchText = "%%%s%%".formatted(search.get());
+        searchCondition =
+          DSL.condition(ADMINS.ID_NAME.likeIgnoreCase(searchText))
+            .or(DSL.condition(ADMINS.REAL_NAME.likeIgnoreCase(searchText)))
+            .or(DSL.condition(ADMINS.ID.likeIgnoreCase(searchText)));
+      } else {
+        searchCondition = DSL.trueCondition();
+      }
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
+
+      return ((Integer) context.selectCount()
+        .from(ADMINS)
+        .where(allConditions)
+        .fetchOne()
+        .getValue(0))
+        .longValue();
     } catch (final DataAccessException e) {
       throw handleDatabaseException(this.transaction(), e);
     }
@@ -509,5 +822,172 @@ final class IdDatabaseAdminsQueries
     throws IdDatabaseException
   {
     return this.adminGet(id).orElseThrow(ADMIN_DOES_NOT_EXIST);
+  }
+
+  @Override
+  public void adminUpdate(
+    final UUID id,
+    final Optional<IdName> withIdName,
+    final Optional<IdRealName> withRealName,
+    final Optional<IdPassword> withPassword,
+    final Optional<Set<IdAdminPermission>> withPermissions)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+    Objects.requireNonNull(withIdName, "withIdName");
+    Objects.requireNonNull(withRealName, "withRealName");
+    Objects.requireNonNull(withPassword, "withPassword");
+    Objects.requireNonNull(withPermissions, "withPermissions");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var owner = transaction.adminId();
+
+    try {
+      final var record = context.fetchOne(ADMINS, ADMINS.ID.eq(id));
+      if (record == null) {
+        throw ADMIN_DOES_NOT_EXIST.get();
+      }
+
+      if (withIdName.isPresent()) {
+        final var name = withIdName.get();
+        record.setIdName(name.value());
+
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "ADMIN_CHANGED_ID_NAME")
+          .set(AUDIT.USER_ID, owner)
+          .set(AUDIT.MESSAGE, "%s|%s".formatted(id.toString(), name.value()))
+          .execute();
+      }
+
+      if (withRealName.isPresent()) {
+        final var name = withRealName.get();
+        record.setRealName(name.value());
+
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "ADMIN_CHANGED_REAL_NAME")
+          .set(AUDIT.USER_ID, owner)
+          .set(AUDIT.MESSAGE, "%s|%s".formatted(id.toString(), name.value()))
+          .execute();
+      }
+
+      if (withPassword.isPresent()) {
+        final var pass = withPassword.get();
+        record.setPasswordAlgo(pass.algorithm().identifier());
+        record.setPasswordHash(pass.hash());
+        record.setPasswordSalt(pass.salt());
+
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "ADMIN_CHANGED_PASSWORD")
+          .set(AUDIT.USER_ID, owner)
+          .set(AUDIT.MESSAGE, id.toString())
+          .execute();
+      }
+
+      if (withPermissions.isPresent()) {
+        final var permissions =
+          withPermissions.get();
+        final var permissionString =
+          permissionsSerialize(permissions);
+
+        record.setPermissions(permissionString);
+
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "ADMIN_CHANGED_PERMISSIONS")
+          .set(AUDIT.USER_ID, owner)
+          .set(AUDIT.MESSAGE, id.toString())
+          .execute();
+      }
+
+      record.store();
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public void adminEmailAdd(
+    final UUID id,
+    final IdEmail email)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+    Objects.requireNonNull(email, "email");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var owner = transaction.adminId();
+
+    try {
+      context.fetchOptional(ADMINS, ADMINS.ID.eq(id))
+        .orElseThrow(ADMIN_DOES_NOT_EXIST);
+
+      context.insertInto(EMAILS)
+        .set(EMAILS.ADMIN_ID, id)
+        .set(EMAILS.EMAIL_ADDRESS, email.value())
+        .execute();
+
+      context.insertInto(AUDIT)
+        .set(AUDIT.TIME, this.currentTime())
+        .set(AUDIT.TYPE, "ADMIN_EMAIL_ADDED")
+        .set(AUDIT.USER_ID, owner)
+        .set(AUDIT.MESSAGE, id + ":" + email.value())
+        .execute();
+
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public void adminEmailRemove(
+    final UUID id,
+    final IdEmail email)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+    Objects.requireNonNull(email, "email");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var owner = transaction.adminId();
+
+    try {
+      context.fetchOptional(ADMINS, ADMINS.ID.eq(id))
+        .orElseThrow(ADMIN_DOES_NOT_EXIST);
+
+      final var existing =
+        context.fetchOptional(
+          EMAILS,
+          EMAILS.ADMIN_ID.eq(id).and(EMAILS.EMAIL_ADDRESS.eq(email.value()))
+        );
+
+      if (existing.isEmpty()) {
+        return;
+      }
+
+      /*
+       * There is a database trigger that prevents the last email address
+       * being removed from the account, so we don't perform any check here.
+       */
+
+      context.deleteFrom(EMAILS)
+        .where(EMAILS.ADMIN_ID.eq(id).and(EMAILS.EMAIL_ADDRESS.eq(email.value())))
+        .execute();
+
+      context.insertInto(AUDIT)
+        .set(AUDIT.TIME, this.currentTime())
+        .set(AUDIT.TYPE, "ADMIN_EMAIL_REMOVED")
+        .set(AUDIT.USER_ID, owner)
+        .set(AUDIT.MESSAGE, id + ":" + email.value())
+        .execute();
+
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
   }
 }

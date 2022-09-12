@@ -14,6 +14,11 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+import com.io7m.idstore.tests.arbitraries.IdArbA1AdminColumnOrderingProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1AdminOrderingProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1AdminSearchByEmailParametersProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1AdminSearchParametersProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1AdminSummaryProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1AuditEventProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1AuditListParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider;
@@ -21,6 +26,7 @@ import com.io7m.idstore.tests.arbitraries.IdArbA1UserColumnOrderingProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1UserOrderingProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchByEmailParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbAdminSummaryProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAuditEventProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbHashProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1AdminProvider;
@@ -65,7 +71,12 @@ module com.io7m.idstore.tests.arbitraries
 
   provides ArbitraryProvider
     with
+      IdArbA1AdminColumnOrderingProvider,
+      IdArbA1AdminOrderingProvider,
       IdArbA1AdminProvider,
+      IdArbA1AdminSearchByEmailParametersProvider,
+      IdArbA1AdminSearchParametersProvider,
+      IdArbA1AdminSummaryProvider,
       IdArbA1AuditEventProvider,
       IdArbA1AuditListParametersProvider,
       IdArbA1MessageProvider,
@@ -78,6 +89,7 @@ module com.io7m.idstore.tests.arbitraries
       IdArbA1UserSearchParametersProvider,
       IdArbA1UserSummaryProvider,
       IdArbAdminProvider,
+      IdArbAdminSummaryProvider,
       IdArbAuditEventProvider,
       IdArbEmailProvider,
       IdArbHashProvider,

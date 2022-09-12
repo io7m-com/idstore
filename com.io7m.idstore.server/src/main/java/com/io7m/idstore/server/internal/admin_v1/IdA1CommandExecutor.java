@@ -16,7 +16,17 @@
 
 package com.io7m.idstore.server.internal.admin_v1;
 
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
@@ -77,7 +87,6 @@ public final class IdA1CommandExecutor
     if (command instanceof IdA1CommandUserSearchNext c) {
       return new IdA1CmdUserSearchNext().execute(context, c);
     }
-
     if (command instanceof IdA1CommandUserSearchByEmailBegin c) {
       return new IdA1CmdUserSearchByEmailBegin().execute(context, c);
     }
@@ -109,6 +118,38 @@ public final class IdA1CommandExecutor
     }
     if (command instanceof IdA1CommandAuditSearchNext c) {
       return new IdA1CmdAuditSearchNext().execute(context, c);
+    }
+
+    if (command instanceof IdA1CommandAdminGet c) {
+      return new IdA1CmdAdminGet().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminGetByEmail c) {
+      return new IdA1CmdAdminGetByEmail().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminCreate c) {
+      return new IdA1CmdAdminCreate().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminUpdate c) {
+      return new IdA1CmdAdminUpdate().execute(context, c);
+    }
+
+    if (command instanceof IdA1CommandAdminSearchBegin c) {
+      return new IdA1CmdAdminSearchBegin().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminSearchPrevious c) {
+      return new IdA1CmdAdminSearchPrevious().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminSearchNext c) {
+      return new IdA1CmdAdminSearchNext().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminSearchByEmailBegin c) {
+      return new IdA1CmdAdminSearchByEmailBegin().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminSearchByEmailPrevious c) {
+      return new IdA1CmdAdminSearchByEmailPrevious().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminSearchByEmailNext c) {
+      return new IdA1CmdAdminSearchByEmailNext().execute(context, c);
     }
 
     throw new IllegalStateException();

@@ -16,12 +16,27 @@
 
 package com.io7m.idstore.tests.arbitraries;
 
+import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.protocol.admin_v1.IdA1Admin;
+import com.io7m.idstore.protocol.admin_v1.IdA1AdminPermission;
+import com.io7m.idstore.protocol.admin_v1.IdA1AdminSearchByEmailParameters;
+import com.io7m.idstore.protocol.admin_v1.IdA1AdminSearchParameters;
+import com.io7m.idstore.protocol.admin_v1.IdA1AdminSummary;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditEvent;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditListParameters;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
@@ -39,7 +54,16 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Page;
 import com.io7m.idstore.protocol.admin_v1.IdA1Password;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSelf;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchPrevious;
@@ -67,6 +91,7 @@ import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * A provider of {@link IdA1MessageType} values.
@@ -96,7 +121,15 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
     final SubtypeProvider subtypeProvider)
   {
     return Set.of(
+      commandAdminCreate(),
+      commandAdminSearchBegin(),
+      commandAdminSearchByEmailBegin(),
+      commandAdminSearchByEmailNext(),
+      commandAdminSearchByEmailPrevious(),
+      commandAdminSearchNext(),
+      commandAdminSearchPrevious(),
       commandAdminSelf(),
+      commandAdminUpdate(),
       commandLogin(),
       commandUserCreate(),
       commandUserGet(),
@@ -107,6 +140,13 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       commandUserSearchNext(),
       commandUserSearchPrevious(),
       commandUserUpdate(),
+      responseAdminCreate(),
+      responseAdminSearchBegin(),
+      responseAdminSearchByEmailBegin(),
+      responseAdminSearchByEmailNext(),
+      responseAdminSearchByEmailPrevious(),
+      responseAdminSearchNext(),
+      responseAdminSearchPrevious(),
       responseAdminSelf(),
       responseError(),
       responseLogin(),
@@ -624,5 +664,336 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
           )
         );
       });
+  }
+
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminSearchBegin> commandAdminSearchBegin()
+  {
+    return Arbitraries.defaultFor(IdA1AdminSearchParameters.class)
+      .map(IdA1CommandAdminSearchBegin::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminSearchNext> commandAdminSearchNext()
+  {
+    return Arbitraries.of(new IdA1CommandAdminSearchNext());
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminSearchPrevious> commandAdminSearchPrevious()
+  {
+    return Arbitraries.of(new IdA1CommandAdminSearchPrevious());
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminSearchByEmailBegin> commandAdminSearchByEmailBegin()
+  {
+    return Arbitraries.defaultFor(IdA1AdminSearchByEmailParameters.class)
+      .map(IdA1CommandAdminSearchByEmailBegin::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminSearchByEmailNext> commandAdminSearchByEmailNext()
+  {
+    return Arbitraries.of(new IdA1CommandAdminSearchByEmailNext());
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminSearchByEmailPrevious> commandAdminSearchByEmailPrevious()
+  {
+    return Arbitraries.of(new IdA1CommandAdminSearchByEmailPrevious());
+  }
+
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminSearchByEmailBegin> responseAdminSearchByEmailBegin()
+  {
+    final var a_id =
+      Arbitraries.defaultFor(UUID.class);
+    final var a_s =
+      Arbitraries.defaultFor(IdA1AdminSummary.class)
+        .list();
+    final var a_i =
+      Arbitraries.integers();
+
+    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
+      .as((id, summaries, x0, x1, x2) -> {
+        return new IdA1ResponseAdminSearchByEmailBegin(
+          id,
+          new IdA1Page<>(
+            summaries,
+            x0.intValue(),
+            x1.intValue(),
+            x2.intValue()
+          )
+        );
+      });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminSearchByEmailPrevious> responseAdminSearchByEmailPrevious()
+  {
+    final var a_id =
+      Arbitraries.defaultFor(UUID.class);
+    final var a_s =
+      Arbitraries.defaultFor(IdA1AdminSummary.class)
+        .list();
+    final var a_i =
+      Arbitraries.integers();
+
+    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
+      .as((id, summaries, x0, x1, x2) -> {
+        return new IdA1ResponseAdminSearchByEmailPrevious(
+          id,
+          new IdA1Page<>(
+            summaries,
+            x0.intValue(),
+            x1.intValue(),
+            x2.intValue()
+          )
+        );
+      });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminSearchByEmailNext> responseAdminSearchByEmailNext()
+  {
+    final var a_id =
+      Arbitraries.defaultFor(UUID.class);
+    final var a_s =
+      Arbitraries.defaultFor(IdA1AdminSummary.class)
+        .list();
+    final var a_i =
+      Arbitraries.integers();
+
+    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
+      .as((id, summaries, x0, x1, x2) -> {
+        return new IdA1ResponseAdminSearchByEmailNext(
+          id,
+          new IdA1Page<>(
+            summaries,
+            x0.intValue(),
+            x1.intValue(),
+            x2.intValue()
+          )
+        );
+      });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminSearchBegin> responseAdminSearchBegin()
+  {
+    final var a_id =
+      Arbitraries.defaultFor(UUID.class);
+    final var a_s =
+      Arbitraries.defaultFor(IdA1AdminSummary.class)
+        .list();
+    final var a_i =
+      Arbitraries.integers();
+
+    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
+      .as((id, summaries, x0, x1, x2) -> {
+        return new IdA1ResponseAdminSearchBegin(
+          id,
+          new IdA1Page<>(
+            summaries,
+            x0.intValue(),
+            x1.intValue(),
+            x2.intValue()
+          )
+        );
+      });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminSearchPrevious> responseAdminSearchPrevious()
+  {
+    final var a_id =
+      Arbitraries.defaultFor(UUID.class);
+    final var a_s =
+      Arbitraries.defaultFor(IdA1AdminSummary.class)
+        .list();
+    final var a_i =
+      Arbitraries.integers();
+
+    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
+      .as((id, summaries, x0, x1, x2) -> {
+        return new IdA1ResponseAdminSearchPrevious(
+          id,
+          new IdA1Page<>(
+            summaries,
+            x0.intValue(),
+            x1.intValue(),
+            x2.intValue()
+          )
+        );
+      });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminSearchNext> responseAdminSearchNext()
+  {
+    final var a_id =
+      Arbitraries.defaultFor(UUID.class);
+    final var a_s =
+      Arbitraries.defaultFor(IdA1AdminSummary.class)
+        .list();
+    final var a_i =
+      Arbitraries.integers();
+
+    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
+      .as((id, summaries, x0, x1, x2) -> {
+        return new IdA1ResponseAdminSearchNext(
+          id,
+          new IdA1Page<>(
+            summaries,
+            x0.intValue(),
+            x1.intValue(),
+            x2.intValue()
+          )
+        );
+      });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminCreate> commandAdminCreate()
+  {
+    final var users =
+      Arbitraries.defaultFor(IdAdmin.class);
+
+    return users.map(user -> {
+      return new IdA1CommandAdminCreate(
+        Optional.of(user.id()),
+        user.idName().value(),
+        user.realName().value(),
+        user.emails().first().value(),
+        new IdA1Password(
+          user.password().algorithm().identifier(),
+          user.password().hash(),
+          user.password().salt()
+        ),
+        user.permissions()
+          .stream()
+          .map(IdA1AdminPermission::ofPermission)
+          .collect(Collectors.toUnmodifiableSet())
+      );
+    });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminCreate> responseAdminCreate()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    final var users =
+      Arbitraries.defaultFor(IdA1Admin.class);
+
+    return Combinators.combine(id, users).as(IdA1ResponseAdminCreate::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminGet> responseAdminGet()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    final var users =
+      Arbitraries.defaultFor(IdA1Admin.class);
+
+    return Combinators.combine(id, users).as((req, user) -> {
+      return new IdA1ResponseAdminGet(
+        req,
+        Optional.of(user)
+      );
+    });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminGet> commandAdminGet()
+  {
+    final var id = Arbitraries.defaultFor(UUID.class);
+    return id.map(IdA1CommandAdminGet::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminGetByEmail> commandAdminGetByEmail()
+  {
+    final var id = Arbitraries.defaultFor(IdEmail.class).map(IdEmail::toString);
+    return id.map(IdA1CommandAdminGetByEmail::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminUpdate> commandAdminUpdate()
+  {
+    return Arbitraries.defaultFor(IdA1Admin.class)
+      .map(IdA1CommandAdminUpdate::new);
+  }
+  
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminUpdate> responseAdminUpdate()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    final var users =
+      Arbitraries.defaultFor(IdA1Admin.class);
+
+    return Combinators.combine(id, users).as(IdA1ResponseAdminUpdate::new);
   }
 }

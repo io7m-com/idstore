@@ -16,9 +16,14 @@
 
 package com.io7m.idstore.server.security;
 
+import java.util.HashSet;
 import java.util.Objects;
 
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_CREATE;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_READ;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
+import static com.io7m.idstore.model.IdAdminPermission.USER_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_READ;
 import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
 
@@ -127,6 +132,17 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     if (action instanceof IdSecAdminActionUserUpdate e) {
       return checkAdminActionUserUpdate(e);
     }
+
+    if (action instanceof IdSecAdminActionAdminRead e) {
+      return checkAdminActionAdminRead(e);
+    }
+    if (action instanceof IdSecAdminActionAdminCreate e) {
+      return checkAdminActionAdminCreate(e);
+    }
+    if (action instanceof IdSecAdminActionAdminUpdate e) {
+      return checkAdminActionAdminUpdate(e);
+    }
+
     if (action instanceof IdSecAdminActionAuditRead e) {
       return checkAdminActionAuditRead(e);
     }
@@ -164,12 +180,12 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     final IdSecAdminActionUserCreate e)
   {
     final var permissions = e.admin().permissions();
-    if (permissions.contains(USER_WRITE)) {
+    if (permissions.contains(USER_CREATE)) {
       return new IdSecPolicyResultPermitted();
     }
 
     return new IdSecPolicyResultDenied(
-      "Updating users requires the %s permission.".formatted(USER_WRITE)
+      "Creating users requires the %s permission.".formatted(USER_CREATE)
     );
   }
 
@@ -183,6 +199,73 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
 
     return new IdSecPolicyResultDenied(
       "Updating users requires the %s permission.".formatted(USER_WRITE)
+    );
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAdminRead(
+    final IdSecAdminActionAdminRead e)
+  {
+    final var permissions = e.admin().permissions();
+    if (permissions.contains(ADMIN_READ)) {
+      return new IdSecPolicyResultPermitted();
+    }
+
+    return new IdSecPolicyResultDenied(
+      "Reading admins requires the %s permission.".formatted(ADMIN_READ)
+    );
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAdminCreate(
+    final IdSecAdminActionAdminCreate e)
+  {
+    final var permissionsHeld =
+      e.admin().permissions();
+    final var permissionsWanted =
+      e.targetPermissions();
+
+    if (!permissionsHeld.contains(ADMIN_CREATE)) {
+      return new IdSecPolicyResultDenied(
+        "Creating admins requires the %s permission.".formatted(ADMIN_CREATE)
+      );
+    }
+
+    if (permissionsHeld.containsAll(permissionsWanted)) {
+      return new IdSecPolicyResultPermitted();
+    }
+
+    final var missing = new HashSet<>(permissionsWanted);
+    missing.removeAll(permissionsHeld);
+
+    return new IdSecPolicyResultDenied(
+      "The current admin cannot grant the following permissions: %s"
+        .formatted(missing)
+    );
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAdminUpdate(
+    final IdSecAdminActionAdminUpdate e)
+  {
+    final var permissionsHeld =
+      e.admin().permissions();
+    final var permissionsWanted =
+      e.targetPermissions();
+
+    if (!permissionsHeld.contains(ADMIN_WRITE)) {
+      return new IdSecPolicyResultDenied(
+        "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+      );
+    }
+
+    if (permissionsHeld.containsAll(permissionsWanted)) {
+      return new IdSecPolicyResultPermitted();
+    }
+
+    final var missing = new HashSet<>(permissionsWanted);
+    missing.removeAll(permissionsHeld);
+
+    return new IdSecPolicyResultDenied(
+      "The current admin cannot grant the following permissions: %s"
+        .formatted(missing)
     );
   }
 

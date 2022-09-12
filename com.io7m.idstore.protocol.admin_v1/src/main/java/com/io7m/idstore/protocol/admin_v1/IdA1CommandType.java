@@ -24,7 +24,17 @@ package com.io7m.idstore.protocol.admin_v1;
 
 public sealed interface IdA1CommandType<R extends IdA1ResponseType>
   extends IdA1MessageType
-  permits IdA1CommandAdminSelf,
+  permits IdA1CommandAdminCreate,
+  IdA1CommandAdminGet,
+  IdA1CommandAdminGetByEmail,
+  IdA1CommandAdminSearchBegin,
+  IdA1CommandAdminSearchByEmailBegin,
+  IdA1CommandAdminSearchByEmailNext,
+  IdA1CommandAdminSearchByEmailPrevious,
+  IdA1CommandAdminSearchNext,
+  IdA1CommandAdminSearchPrevious,
+  IdA1CommandAdminSelf,
+  IdA1CommandAdminUpdate,
   IdA1CommandAuditSearchBegin,
   IdA1CommandAuditSearchNext,
   IdA1CommandAuditSearchPrevious,

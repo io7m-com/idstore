@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * An admin wants to read the audit log.
+ * An admin wants to create an admin.
  *
  * @param admin             The admin
  * @param targetPermissions The permissions the created admin will have
@@ -35,7 +35,7 @@ public record IdSecAdminActionAdminCreate(
   implements IdSecAdminActionType
 {
   /**
-   * An admin wants to read the audit log.
+   * An admin wants to create an admin.
    *
    * @param admin             The admin
    * @param targetPermissions The permissions the created admin will have

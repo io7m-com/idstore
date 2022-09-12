@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
- * A request to fetch the user's own profile.
+ * A request to fetch the admin's own profile.
  */
 
 @JsonDeserialize

@@ -29,10 +29,16 @@ import java.util.Objects;
 public enum IdA1AdminPermission
 {
   /**
-   * A permission that allows for creating/editing admins.
+   * A permission that allows for creating admins.
    */
 
   ADMIN_CREATE,
+
+  /**
+   * A permission that allows updating admins.
+   */
+
+  ADMIN_WRITE,
 
   /**
    * A permission that allows reading admins.
@@ -47,7 +53,13 @@ public enum IdA1AdminPermission
   AUDIT_READ,
 
   /**
-   * A permission that allows creating/editing users.
+   * A permission that allows creating users.
+   */
+
+  USER_CREATE,
+
+  /**
+   * A permission that allows updating users.
    */
 
   USER_WRITE,
@@ -76,9 +88,11 @@ public enum IdA1AdminPermission
 
     return switch (permission) {
       case ADMIN_CREATE -> ADMIN_CREATE;
+      case ADMIN_WRITE -> ADMIN_WRITE;
       case ADMIN_READ -> ADMIN_READ;
       case AUDIT_READ -> AUDIT_READ;
       case USER_READ -> USER_READ;
+      case USER_CREATE -> USER_CREATE;
       case USER_WRITE -> USER_WRITE;
     };
   }
@@ -96,9 +110,11 @@ public enum IdA1AdminPermission
   {
     return switch (this) {
       case ADMIN_CREATE -> IdAdminPermission.ADMIN_CREATE;
+      case ADMIN_WRITE -> IdAdminPermission.ADMIN_WRITE;
       case ADMIN_READ -> IdAdminPermission.ADMIN_READ;
       case AUDIT_READ -> IdAdminPermission.AUDIT_READ;
       case USER_READ -> IdAdminPermission.USER_READ;
+      case USER_CREATE -> IdAdminPermission.USER_CREATE;
       case USER_WRITE -> IdAdminPermission.USER_WRITE;
     };
   }

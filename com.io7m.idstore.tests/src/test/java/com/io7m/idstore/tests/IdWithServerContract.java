@@ -21,6 +21,7 @@ import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.database.postgres.IdDatabases;
+import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPassword;
@@ -53,6 +54,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
@@ -336,6 +338,41 @@ public abstract class IdWithServerContract
           new IdEmail(id + "@example.com"),
           OffsetDateTime.now(),
           password
+        );
+        t.commit();
+        return id;
+      }
+    }
+  }
+
+  protected final UUID serverCreateAdmin(
+    final UUID admin,
+    final String name)
+    throws IdDatabaseException, IdPasswordException
+  {
+    this.serverStartIfNecessary();
+
+    final var database = this.databases.mostRecent();
+    try (var c = database.openConnection(IDSTORE)) {
+      try (var t = c.openTransaction()) {
+        final var q =
+          t.queries(IdDatabaseAdminsQueriesType.class);
+
+        t.adminIdSet(admin);
+
+        final var password =
+          IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+            .createHashed("12345678");
+
+        final var id = UUID.randomUUID();
+        q.adminCreate(
+          id,
+          new IdName(name),
+          new IdRealName(name),
+          new IdEmail("extra_%s@example.com".formatted(name)),
+          OffsetDateTime.now(),
+          password,
+          EnumSet.allOf(IdAdminPermission.class)
         );
         t.commit();
         return id;

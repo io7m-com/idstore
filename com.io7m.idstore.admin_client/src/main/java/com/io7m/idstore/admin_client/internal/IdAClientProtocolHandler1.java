@@ -18,6 +18,10 @@ package com.io7m.idstore.admin_client.internal;
 
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
+import com.io7m.idstore.model.IdAdminSearchParameters;
+import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -30,8 +34,22 @@ import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
+import com.io7m.idstore.protocol.admin_v1.IdA1Admin;
+import com.io7m.idstore.protocol.admin_v1.IdA1AdminPermission;
+import com.io7m.idstore.protocol.admin_v1.IdA1AdminSearchByEmailParameters;
+import com.io7m.idstore.protocol.admin_v1.IdA1AdminSearchParameters;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditListParameters;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
@@ -49,7 +67,16 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
 import com.io7m.idstore.protocol.admin_v1.IdA1Password;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSelf;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchPrevious;
@@ -79,7 +106,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.net.http.HttpResponse.BodyHandlers;
 
@@ -266,8 +295,8 @@ public final class IdAClientProtocolHandler1
       this.sendCommand(IdA1ResponseAdminSelf.class, new IdA1CommandAdminSelf());
 
     try {
-      return response.admin().toAdmin();
-    } catch (final IdPasswordException e) {
+      return response.admin().toModel();
+    } catch (final IdProtocolException e) {
       throw new IdAClientException(e);
     }
   }
@@ -522,6 +551,198 @@ public final class IdAClientProtocolHandler1
           IdA1ResponseAuditSearchPrevious.class,
           new IdA1CommandAuditSearchPrevious()
         ).page()
+        .toModel();
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(e);
+    }
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchBegin(
+    final IdAdminSearchParameters parameters)
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      final var a1parameters =
+        IdA1AdminSearchParameters.of(parameters);
+
+      final var response =
+        this.sendCommand(
+          IdA1ResponseAdminSearchBegin.class,
+          new IdA1CommandAdminSearchBegin(a1parameters)
+        );
+
+      return response.page().toModel();
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(e);
+    }
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchNext()
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      return this.sendCommand(
+          IdA1ResponseAdminSearchNext.class,
+          new IdA1CommandAdminSearchNext()
+        ).page()
+        .toModel();
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(e);
+    }
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchPrevious()
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      return this.sendCommand(
+          IdA1ResponseAdminSearchPrevious.class,
+          new IdA1CommandAdminSearchPrevious()
+        ).page()
+        .toModel();
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(e);
+    }
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchByEmailBegin(
+    final IdAdminSearchByEmailParameters parameters)
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      final var a1parameters =
+        IdA1AdminSearchByEmailParameters.of(parameters);
+
+      final var response =
+        this.sendCommand(
+          IdA1ResponseAdminSearchByEmailBegin.class,
+          new IdA1CommandAdminSearchByEmailBegin(a1parameters)
+        );
+
+      return response.page().toModel();
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(e);
+    }
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchByEmailNext()
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      return this.sendCommand(
+          IdA1ResponseAdminSearchByEmailNext.class,
+          new IdA1CommandAdminSearchByEmailNext()
+        ).page()
+        .toModel();
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(e);
+    }
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchByEmailPrevious()
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      return this.sendCommand(
+          IdA1ResponseAdminSearchByEmailPrevious.class,
+          new IdA1CommandAdminSearchByEmailPrevious()
+        ).page()
+        .toModel();
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(e);
+    }
+  }
+
+  @Override
+  public Optional<IdAdmin> adminGet(
+    final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      final var admin =
+        this.sendCommand(
+            IdA1ResponseAdminGet.class,
+            new IdA1CommandAdminGet(id))
+          .admin();
+
+      if (admin.isPresent()) {
+        return Optional.of(admin.get().toModel());
+      }
+
+      return Optional.empty();
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(e);
+    }
+  }
+
+  @Override
+  public Optional<IdAdmin> adminGetByEmail(
+    final IdEmail email)
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      final var admin =
+        this.sendCommand(
+            IdA1ResponseAdminGet.class,
+            new IdA1CommandAdminGetByEmail(email.value()))
+          .admin();
+
+      if (admin.isPresent()) {
+        return Optional.of(admin.get().toModel());
+      }
+
+      return Optional.empty();
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(e);
+    }
+  }
+
+  @Override
+  public IdAdmin adminUpdate(
+    final IdAdmin admin)
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      return this.sendCommand(
+          IdA1ResponseAdminUpdate.class,
+          new IdA1CommandAdminUpdate(IdA1Admin.ofAdmin(admin))
+        ).admin()
+        .toModel();
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(e);
+    }
+  }
+
+  @Override
+  public IdAdmin adminCreate(
+    final Optional<UUID> id,
+    final IdName idName,
+    final IdRealName realName,
+    final IdEmail email,
+    final IdPassword password,
+    final Set<IdAdminPermission> permissions)
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      return this.sendCommand(
+          IdA1ResponseAdminCreate.class,
+          new IdA1CommandAdminCreate(
+            id,
+            idName.value(),
+            realName.value(),
+            email.value(),
+            IdA1Password.ofPassword(password),
+            permissions.stream()
+              .map(IdA1AdminPermission::ofPermission)
+              .collect(Collectors.toUnmodifiableSet())
+          )
+        ).admin()
         .toModel();
     } catch (final IdProtocolException e) {
       throw new IdAClientException(e);

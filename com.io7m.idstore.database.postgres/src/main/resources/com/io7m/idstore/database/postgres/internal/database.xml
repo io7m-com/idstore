@@ -128,7 +128,7 @@ create function email_check_delete() returns trigger as $$
     if old.user_id is null then
       select count(email_address) into count from emails e where e.admin_id = old.admin_id;
       if count = 1 then
-        raise sqlstate 'ID001' using message = 'Cannot remove the last email address for the user';
+        raise sqlstate 'ID001' using message = 'Cannot remove the last email address for the admin';
         return null;
       end if;
     else

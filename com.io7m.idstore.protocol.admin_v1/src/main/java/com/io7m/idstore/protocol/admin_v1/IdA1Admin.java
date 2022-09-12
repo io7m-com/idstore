@@ -23,8 +23,9 @@ import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolFromModel;
-import com.io7m.idstore.protocol.api.IdProtocolToModel;
+import com.io7m.idstore.protocol.api.IdProtocolToModelType;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -63,6 +64,7 @@ public record IdA1Admin(
   IdA1Password password,
   @JsonProperty(value = "Permissions", required = true)
   Set<IdA1AdminPermission> permissions)
+  implements IdProtocolToModelType<IdAdmin>
 {
   /**
    * Information for a single admin.
@@ -95,7 +97,7 @@ public record IdA1Admin(
    *
    * @return A v1 admin
    *
-   * @see #toAdmin()
+   * @see #toModel()
    */
 
   @IdProtocolFromModel
@@ -122,34 +124,29 @@ public record IdA1Admin(
     );
   }
 
-  /**
-   * Convert this to a model admin.
-   *
-   * @return This as a model admin
-   *
-   * @throws IdPasswordException On password errors
-   * @see #ofAdmin(IdAdmin)
-   */
-
-  @IdProtocolToModel
-  public IdAdmin toAdmin()
-    throws IdPasswordException
+  @Override
+  public IdAdmin toModel()
+    throws IdProtocolException
   {
-    return new IdAdmin(
-      this.id,
-      new IdName(this.idName),
-      new IdRealName(this.realName),
-      IdNonEmptyList.ofList(
-        this.emails.stream()
-          .map(IdEmail::new)
-          .toList()
-      ),
-      this.timeCreated,
-      this.timeUpdated,
-      this.password.toPassword(),
-      this.permissions.stream()
-        .map(IdA1AdminPermission::toPermission)
-        .collect(Collectors.toUnmodifiableSet())
-    );
+    try {
+      return new IdAdmin(
+        this.id,
+        new IdName(this.idName),
+        new IdRealName(this.realName),
+        IdNonEmptyList.ofList(
+          this.emails.stream()
+            .map(IdEmail::new)
+            .toList()
+        ),
+        this.timeCreated,
+        this.timeUpdated,
+        this.password.toPassword(),
+        this.permissions.stream()
+          .map(IdA1AdminPermission::toPermission)
+          .collect(Collectors.toUnmodifiableSet())
+      );
+    } catch (final IdPasswordException e) {
+      throw new IdProtocolException(e.getMessage(), e);
+    }
   }
 }

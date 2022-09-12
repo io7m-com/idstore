@@ -1,4 +1,9 @@
+com.io7m.idstore.tests.arbitraries.IdArbA1AdminColumnOrderingProvider
+com.io7m.idstore.tests.arbitraries.IdArbA1AdminOrderingProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1AdminProvider
+com.io7m.idstore.tests.arbitraries.IdArbA1AdminSearchByEmailParametersProvider
+com.io7m.idstore.tests.arbitraries.IdArbA1AdminSearchParametersProvider
+com.io7m.idstore.tests.arbitraries.IdArbA1AdminSummaryProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1AuditEventProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1AuditListParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider
@@ -11,6 +16,7 @@ com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchByEmailParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1UserSummaryProvider
 com.io7m.idstore.tests.arbitraries.IdArbAdminProvider
+com.io7m.idstore.tests.arbitraries.IdArbAdminSummaryProvider
 com.io7m.idstore.tests.arbitraries.IdArbAuditEventProvider
 com.io7m.idstore.tests.arbitraries.IdArbEmailProvider
 com.io7m.idstore.tests.arbitraries.IdArbHashProvider

@@ -18,6 +18,10 @@ package com.io7m.idstore.admin_client.internal;
 
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
+import com.io7m.idstore.model.IdAdminSearchParameters;
+import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -35,6 +39,7 @@ import java.net.http.HttpClient;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -95,6 +100,87 @@ public final class IdAClientProtocolHandlerDisconnected
 
   @Override
   public IdAdmin adminSelf()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchBegin(
+    final IdAdminSearchParameters parameters)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchNext()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchPrevious()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchByEmailBegin(
+    final IdAdminSearchByEmailParameters parameters)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchByEmailNext()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchByEmailPrevious()
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public Optional<IdAdmin> adminGet(
+    final UUID id)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public Optional<IdAdmin> adminGetByEmail(
+    final IdEmail email)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdAdmin adminUpdate(
+    final IdAdmin admin)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdAdmin adminCreate(
+    final Optional<UUID> id,
+    final IdName idName,
+    final IdRealName realName,
+    final IdEmail email,
+    final IdPassword password,
+    final Set<IdAdminPermission> permissions)
     throws IdAClientException
   {
     throw this.notLoggedIn();

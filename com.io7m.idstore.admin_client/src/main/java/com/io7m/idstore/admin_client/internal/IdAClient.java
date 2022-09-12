@@ -19,6 +19,10 @@ package com.io7m.idstore.admin_client.internal;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
+import com.io7m.idstore.model.IdAdminSearchParameters;
+import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -37,6 +41,7 @@ import java.net.http.HttpClient;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -73,6 +78,92 @@ public final class IdAClient implements IdAClientType
       Objects.requireNonNull(inHttpClient, "httpClient");
     this.handler =
       Objects.requireNonNull(inHandler, "handler");
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchBegin(
+    final IdAdminSearchParameters parameters)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminSearchBegin(parameters);
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchNext()
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminSearchNext();
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchPrevious()
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminSearchPrevious();
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchByEmailBegin(
+    final IdAdminSearchByEmailParameters parameters)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminSearchByEmailBegin(parameters);
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchByEmailNext()
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminSearchByEmailNext();
+  }
+
+  @Override
+  public IdPage<IdAdminSummary> adminSearchByEmailPrevious()
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminSearchByEmailPrevious();
+  }
+
+  @Override
+  public Optional<IdAdmin> adminGet(final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminGet(id);
+  }
+
+  @Override
+  public Optional<IdAdmin> adminGetByEmail(
+    final IdEmail email)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminGetByEmail(email);
+  }
+
+  @Override
+  public IdAdmin adminUpdate(
+    final IdAdmin admin)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminUpdate(admin);
+  }
+
+  @Override
+  public IdAdmin adminCreate(
+    final Optional<UUID> id,
+    final IdName idName,
+    final IdRealName realName,
+    final IdEmail email,
+    final IdPassword password,
+    final Set<IdAdminPermission> permissions)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminCreate(
+      id,
+      idName,
+      realName,
+      email,
+      password,
+      permissions);
   }
 
   @Override

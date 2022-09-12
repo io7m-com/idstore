@@ -23,10 +23,16 @@ package com.io7m.idstore.model;
 public enum IdAdminPermission
 {
   /**
-   * A permission that allows for creating/editing admins.
+   * A permission that allows for creating admins.
    */
 
   ADMIN_CREATE,
+
+  /**
+   * A permission that allows for modifying admins.
+   */
+
+  ADMIN_WRITE,
 
   /**
    * A permission that allows reading admins.
@@ -41,7 +47,13 @@ public enum IdAdminPermission
   AUDIT_READ,
 
   /**
-   * A permission that allows creating/editing users.
+   * A permission that allows creating users.
+   */
+
+  USER_CREATE,
+
+  /**
+   * A permission that allows modifying users.
    */
 
   USER_WRITE,

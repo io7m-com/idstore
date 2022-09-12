@@ -16,7 +16,17 @@
 
 package com.io7m.idstore.tests;
 
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
@@ -33,7 +43,16 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchNext;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSelf;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchPrevious;
@@ -91,36 +110,55 @@ public final class IdA1MessagesTest
     Class<? extends IdA1MessageType>,
     Arbitrary<? extends IdA1MessageType>> MESSAGE_ARBITRARIES =
     Map.ofEntries(
+      entry(IdA1CommandAdminCreate.class, commandAdminCreate()),
+      entry(IdA1CommandAdminGet.class, commandAdminGet()),
+      entry(IdA1CommandAdminGetByEmail.class, commandAdminGetByEmail()),
+      entry(IdA1CommandAdminSearchBegin.class, commandAdminSearchBegin()),
+      entry(IdA1CommandAdminSearchByEmailBegin.class, commandAdminSearchByEmailBegin()),
+      entry(IdA1CommandAdminSearchByEmailNext.class, commandAdminSearchByEmailNext()),
+      entry(IdA1CommandAdminSearchByEmailPrevious.class, commandAdminSearchByEmailPrevious()),
+      entry(IdA1CommandAdminSearchNext.class, commandAdminSearchNext()),
+      entry(IdA1CommandAdminSearchPrevious.class, commandAdminSearchPrevious()),
+      entry(IdA1CommandAdminSelf.class, commandAdminSelf()),
+      entry(IdA1CommandAdminUpdate.class, commandAdminUpdate()),
       entry(IdA1CommandAuditSearchBegin.class, commandAuditSearchBegin()),
       entry(IdA1CommandAuditSearchNext.class, commandAuditSearchNext()),
       entry(IdA1CommandAuditSearchPrevious.class, commandAuditSearchPrevious()),
-      entry(IdA1CommandAdminSelf.class, commandAdminSelf()),
       entry(IdA1CommandLogin.class, commandLogin()),
+      entry(IdA1CommandUserCreate.class, commandUserCreate()),
+      entry(IdA1CommandUserGet.class, commandUserGet()),
+      entry(IdA1CommandUserGetByEmail.class, commandUserGetByEmail()),
       entry(IdA1CommandUserSearchBegin.class, commandUserSearchBegin()),
-      entry(IdA1CommandUserSearchNext.class, commandUserSearchNext()),
-      entry(IdA1CommandUserSearchPrevious.class, commandUserSearchPrevious()),
       entry(IdA1CommandUserSearchByEmailBegin.class, commandUserSearchByEmailBegin()),
       entry(IdA1CommandUserSearchByEmailNext.class, commandUserSearchByEmailNext()),
       entry(IdA1CommandUserSearchByEmailPrevious.class, commandUserSearchByEmailPrevious()),
-      entry(IdA1CommandUserGet.class, commandUserGet()),
-      entry(IdA1CommandUserGetByEmail.class, commandUserGetByEmail()),
+      entry(IdA1CommandUserSearchNext.class, commandUserSearchNext()),
+      entry(IdA1CommandUserSearchPrevious.class, commandUserSearchPrevious()),
       entry(IdA1CommandUserUpdate.class, commandUserUpdate()),
-      entry(IdA1CommandUserCreate.class, commandUserCreate()),
+      entry(IdA1ResponseAdminCreate.class, responseAdminCreate()),
+      entry(IdA1ResponseAdminGet.class, responseAdminGet()),
+      entry(IdA1ResponseAdminSearchBegin.class, responseAdminSearchBegin()),
+      entry(IdA1ResponseAdminSearchByEmailBegin.class, responseAdminSearchByEmailBegin()),
+      entry(IdA1ResponseAdminSearchByEmailNext.class, responseAdminSearchByEmailNext()),
+      entry(IdA1ResponseAdminSearchByEmailPrevious.class, responseAdminSearchByEmailPrevious()),
+      entry(IdA1ResponseAdminSearchNext.class, responseAdminSearchNext()),
+      entry(IdA1ResponseAdminSearchPrevious.class, responseAdminSearchPrevious()),
       entry(IdA1ResponseAdminSelf.class, responseAdminSelf()),
+      entry(IdA1ResponseAdminUpdate.class, responseAdminUpdate()),
+      entry(IdA1ResponseAuditSearchBegin.class, responseAuditSearchBegin()),
+      entry(IdA1ResponseAuditSearchNext.class, responseAuditSearchNext()),
+      entry(IdA1ResponseAuditSearchPrevious.class, responseAuditSearchPrevious()),
       entry(IdA1ResponseError.class, responseError()),
       entry(IdA1ResponseLogin.class, responseLogin()),
+      entry(IdA1ResponseUserCreate.class, responseUserCreate()),
+      entry(IdA1ResponseUserGet.class, responseUserGet()),
       entry(IdA1ResponseUserSearchBegin.class, responseUserSearchBegin()),
-      entry(IdA1ResponseUserSearchNext.class, responseUserSearchNext()),
-      entry(IdA1ResponseUserSearchPrevious.class, responseUserSearchPrevious()),
       entry(IdA1ResponseUserSearchByEmailBegin.class, responseUserSearchByEmailBegin()),
       entry(IdA1ResponseUserSearchByEmailNext.class, responseUserSearchByEmailNext()),
       entry(IdA1ResponseUserSearchByEmailPrevious.class, responseUserSearchByEmailPrevious()),
-      entry(IdA1ResponseUserGet.class, responseUserGet()),
-      entry(IdA1ResponseUserUpdate.class, responseUserUpdate()),
-      entry(IdA1ResponseUserCreate.class, responseUserCreate()),
-      entry(IdA1ResponseAuditSearchBegin.class, responseAuditSearchBegin()),
-      entry(IdA1ResponseAuditSearchNext.class, responseAuditSearchNext()),
-      entry(IdA1ResponseAuditSearchPrevious.class, responseAuditSearchPrevious())
+      entry(IdA1ResponseUserSearchNext.class, responseUserSearchNext()),
+      entry(IdA1ResponseUserSearchPrevious.class, responseUserSearchPrevious()),
+      entry(IdA1ResponseUserUpdate.class, responseUserUpdate())
     );
 
   private static <T> List<Class<? extends T>> enumerateSubclasses(

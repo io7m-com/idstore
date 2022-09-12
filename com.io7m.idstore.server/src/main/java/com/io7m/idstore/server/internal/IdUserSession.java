@@ -16,12 +16,18 @@
 
 package com.io7m.idstore.server.internal;
 
+import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPaging;
+import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPagingType;
+import com.io7m.idstore.database.api.IdDatabaseAdminSearchPaging;
+import com.io7m.idstore.database.api.IdDatabaseAdminSearchPagingType;
 import com.io7m.idstore.database.api.IdDatabaseAuditListPaging;
 import com.io7m.idstore.database.api.IdDatabaseAuditListPagingType;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPaging;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPagingType;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchPagingType;
+import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
+import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAuditListParameters;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
@@ -45,6 +51,10 @@ public final class IdUserSession
   private Optional<IdSessionMessage> message;
   private IdAuditListParameters auditListParameters;
   private IdDatabaseAuditListPagingType auditPaging;
+  private IdAdminSearchParameters adminSearchParameters;
+  private IdDatabaseAdminSearchPagingType adminSearchPaging;
+  private IdAdminSearchByEmailParameters adminSearchByEmailParameters;
+  private IdDatabaseAdminSearchByEmailPagingType adminSearchByEmailPaging;
 
   /**
    * A controller for a single user session.
@@ -76,17 +86,19 @@ public final class IdUserSession
       IdAuditListParameters.defaults();
     this.auditPaging =
       IdDatabaseAuditListPaging.create(this.auditListParameters);
+
+    this.adminSearchParameters =
+      IdAdminSearchParameters.defaults();
+    this.adminSearchPaging =
+      IdDatabaseAdminSearchPaging.create(this.adminSearchParameters);
+
+    this.adminSearchByEmailParameters =
+      IdAdminSearchByEmailParameters.defaults();
+    this.adminSearchByEmailPaging =
+      IdDatabaseAdminSearchByEmailPaging.create(this.adminSearchByEmailParameters);
+
     this.message =
       Optional.empty();
-  }
-
-  /**
-   * @return The most recent user list parameters
-   */
-
-  public IdUserSearchParameters userListParameters()
-  {
-    return this.userSearchParameters;
   }
 
   /**
@@ -119,7 +131,9 @@ public final class IdUserSession
     this.userSearchParameters =
       Objects.requireNonNull(userParameters, "userParameters");
 
-    if (!Objects.equals(this.userSearchPaging.pageParameters(), userParameters)) {
+    if (!Objects.equals(
+      this.userSearchPaging.pageParameters(),
+      userParameters)) {
       this.userSearchPaging =
         IdDatabaseUserSearchPaging.create(userParameters);
     }
@@ -137,7 +151,9 @@ public final class IdUserSession
     this.userSearchByEmailParameters =
       Objects.requireNonNull(userParameters, "userParameters");
 
-    if (!Objects.equals(this.userSearchByEmailPaging.pageParameters(), userParameters)) {
+    if (!Objects.equals(
+      this.userSearchByEmailPaging.pageParameters(),
+      userParameters)) {
       this.userSearchByEmailPaging =
         IdDatabaseUserSearchByEmailPaging.create(userParameters);
     }
@@ -209,5 +225,64 @@ public final class IdUserSession
   public IdDatabaseAuditListPagingType auditPaging()
   {
     return this.auditPaging;
+  }
+
+
+  /**
+   * @return The most recent admin paging handler
+   */
+
+  public IdDatabaseAdminSearchPagingType adminPaging()
+  {
+    return this.adminSearchPaging;
+  }
+
+  /**
+   * @return The most recent admin paging handler
+   */
+
+  public IdDatabaseAdminSearchByEmailPagingType adminByEmailPaging()
+  {
+    return this.adminSearchByEmailPaging;
+  }
+
+  /**
+   * Set the admin listing parameters.
+   *
+   * @param adminParameters The admin parameters
+   */
+
+  public void setAdminSearchParameters(
+    final IdAdminSearchParameters adminParameters)
+  {
+    this.adminSearchParameters =
+      Objects.requireNonNull(adminParameters, "adminParameters");
+
+    if (!Objects.equals(
+      this.adminSearchPaging.pageParameters(),
+      adminParameters)) {
+      this.adminSearchPaging =
+        IdDatabaseAdminSearchPaging.create(adminParameters);
+    }
+  }
+
+  /**
+   * Set the admin listing parameters.
+   *
+   * @param adminParameters The admin parameters
+   */
+
+  public void setAdminSearchByEmailParameters(
+    final IdAdminSearchByEmailParameters adminParameters)
+  {
+    this.adminSearchByEmailParameters =
+      Objects.requireNonNull(adminParameters, "adminParameters");
+
+    if (!Objects.equals(
+      this.adminSearchByEmailPaging.pageParameters(),
+      adminParameters)) {
+      this.adminSearchByEmailPaging =
+        IdDatabaseAdminSearchByEmailPaging.create(adminParameters);
+    }
   }
 }

@@ -36,7 +36,7 @@ import java.util.UUID;
 public record IdA1ResponseAdminSelf(
   @JsonProperty(value = "RequestID", required = true)
   UUID requestId,
-  @JsonProperty(value = "User", required = true)
+  @JsonProperty(value = "Admin", required = true)
   IdA1Admin admin)
   implements IdA1ResponseType
 {

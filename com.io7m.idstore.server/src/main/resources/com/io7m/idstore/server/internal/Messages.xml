@@ -18,6 +18,7 @@
   <entry key="notFound">Not found.</entry>
   <entry key="commandNotHere">Cannot use this command here.</entry>
   <entry key="userIdNameDuplicate">Duplicate user ID name: "{0}"</entry>
+  <entry key="adminIdNameDuplicate">Duplicate admin ID name: "{0}"</entry>
   <entry key="emailVerificationSuccessTitle">Verified</entry>
   <entry key="emailVerificationSuccess">Email verified successfully.</entry>
   <entry key="emailVerificationFailed">Email verification failed.</entry>

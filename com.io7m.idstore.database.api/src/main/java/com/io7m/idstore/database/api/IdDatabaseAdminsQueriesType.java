@@ -18,6 +18,8 @@ package com.io7m.idstore.database.api;
 
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
+import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -186,17 +188,65 @@ public non-sealed interface IdDatabaseAdminsQueriesType
     throws IdDatabaseException;
 
   /**
-   * Search for admins that have an ID, email, or name that contains the given
-   * string, case-insensitive.
+   * List admins.
    *
-   * @param query The admin query
+   * @param parameters The search parameters
+   * @param seek       The record to which to seek, if any
    *
-   * @return A list of matching admins
+   * @return The admins
    *
    * @throws IdDatabaseException On errors
    */
 
-  List<IdAdminSummary> adminSearch(String query)
+  List<IdAdminSummary> adminSearch(
+    IdAdminSearchParameters parameters,
+    Optional<List<Object>> seek)
+    throws IdDatabaseException;
+
+  /**
+   * Determine approximate number of results that would be returned in total by
+   * a given search.
+   *
+   * @param parameters The search parameters
+   *
+   * @return The admins
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  long adminSearchCount(
+    IdAdminSearchParameters parameters)
+    throws IdDatabaseException;
+
+  /**
+   * List admins.
+   *
+   * @param parameters The search parameters
+   * @param seek       The record to which to seek, if any
+   *
+   * @return The admins
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  List<IdAdminSummary> adminSearchByEmail(
+    IdAdminSearchByEmailParameters parameters,
+    Optional<List<Object>> seek)
+    throws IdDatabaseException;
+
+  /**
+   * Determine approximate number of results that would be returned in total by
+   * a given search.
+   *
+   * @param parameters The search parameters
+   *
+   * @return The admins
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  long adminSearchByEmailCount(
+    IdAdminSearchByEmailParameters parameters)
     throws IdDatabaseException;
 
   /**
@@ -208,5 +258,54 @@ public non-sealed interface IdDatabaseAdminsQueriesType
    */
 
   IdAdmin adminGetRequire(UUID id)
+    throws IdDatabaseException;
+
+  /**
+   * Add an email address to the given admin.
+   *
+   * @param id    The admin ID
+   * @param email The new email
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  void adminEmailAdd(
+    UUID id,
+    IdEmail email)
+    throws IdDatabaseException;
+
+  /**
+   * Remove an email address from the given admin.
+   *
+   * @param id    The admin ID
+   * @param email The email
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  void adminEmailRemove(
+    UUID id,
+    IdEmail email)
+    throws IdDatabaseException;
+
+  /**
+   * Update the given admin.
+   *
+   * @param id              The admin ID
+   * @param withIdName      The new ID name, if desired
+   * @param withRealName    The new real name, if desired
+   * @param withPassword    The new password, if desired
+   * @param withPermissions The new permissions, if desired
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  @IdDatabaseRequiresAdmin
+  void adminUpdate(
+    UUID id,
+    Optional<IdName> withIdName,
+    Optional<IdRealName> withRealName,
+    Optional<IdPassword> withPassword,
+    Optional<Set<IdAdminPermission>> withPermissions)
     throws IdDatabaseException;
 }

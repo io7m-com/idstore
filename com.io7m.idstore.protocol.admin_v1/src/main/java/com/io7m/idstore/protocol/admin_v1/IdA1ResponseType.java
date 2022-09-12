@@ -25,7 +25,16 @@ import java.util.UUID;
 
 public sealed interface IdA1ResponseType
   extends IdA1MessageType
-  permits IdA1ResponseAdminSelf,
+  permits IdA1ResponseAdminCreate,
+  IdA1ResponseAdminGet,
+  IdA1ResponseAdminSearchBegin,
+  IdA1ResponseAdminSearchByEmailBegin,
+  IdA1ResponseAdminSearchByEmailNext,
+  IdA1ResponseAdminSearchByEmailPrevious,
+  IdA1ResponseAdminSearchNext,
+  IdA1ResponseAdminSearchPrevious,
+  IdA1ResponseAdminSelf,
+  IdA1ResponseAdminUpdate,
   IdA1ResponseAuditSearchBegin,
   IdA1ResponseAuditSearchNext,
   IdA1ResponseAuditSearchPrevious,

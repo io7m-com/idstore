@@ -34,7 +34,7 @@ public record IdTimeRange(
 {
   private static final OffsetDateTime TIME_LOWER =
     OffsetDateTime.of(
-      2000,
+      1970,
       1,
       1,
       0,

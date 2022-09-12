@@ -16,34 +16,43 @@
 
 package com.io7m.idstore.model;
 
+import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
  * A summary of the "identifier" parts of an admin.
  *
- * @param id       The admin ID
- * @param name     The admin name
- * @param realName The admin real name
+ * @param id          The admin ID
+ * @param idName      The admin name
+ * @param realName    The admin real name
+ * @param timeCreated The time the admin was created
+ * @param timeUpdated The time the admin was updated
  */
 
 public record IdAdminSummary(
   UUID id,
-  IdName name,
-  IdRealName realName)
+  IdName idName,
+  IdRealName realName,
+  OffsetDateTime timeCreated,
+  OffsetDateTime timeUpdated)
 {
   /**
    * A summary of the "identifier" parts of an admin.
    *
-   * @param id       The admin ID
-   * @param name     The admin name
-   * @param realName The admin real name
+   * @param id          The admin ID
+   * @param idName      The admin name
+   * @param realName    The admin real name
+   * @param timeCreated The time the admin was created
+   * @param timeUpdated The time the admin was updated
    */
 
   public IdAdminSummary
   {
     Objects.requireNonNull(id, "id");
-    Objects.requireNonNull(name, "name");
+    Objects.requireNonNull(idName, "name");
     Objects.requireNonNull(realName, "realName");
+    Objects.requireNonNull(timeCreated, "timeCreated");
+    Objects.requireNonNull(timeUpdated, "timeUpdated");
   }
 }

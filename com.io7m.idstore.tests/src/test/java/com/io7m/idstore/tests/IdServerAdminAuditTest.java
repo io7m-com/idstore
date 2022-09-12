@@ -18,9 +18,12 @@ package com.io7m.idstore.tests;
 
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientType;
+import com.io7m.idstore.model.IdAuditEvent;
+import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUserColumnOrdering;
 import com.io7m.idstore.model.IdUserOrdering;
+import com.io7m.idstore.model.IdUserSummary;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +35,6 @@ import java.util.Optional;
 
 import static com.io7m.idstore.model.IdUserColumn.BY_IDNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdServerAdminAuditTest extends IdWithServerContract
 {
@@ -79,7 +81,7 @@ public final class IdServerAdminAuditTest extends IdWithServerContract
     final var admin =
       this.serverCreateAdminInitial("admin", "12345678");
 
-    for (int index = 0; index < 100; ++index) {
+    for (int index = 0; index < 30; ++index) {
       this.serverCreateUser(admin, "user-%04d".formatted(index));
     }
 
@@ -90,12 +92,87 @@ public final class IdServerAdminAuditTest extends IdWithServerContract
     );
 
     {
-      this.client.auditSearchBegin(
-        IdTimeRange.largest(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        10
+      final var e =
+        this.client.auditSearchBegin(
+          IdTimeRange.largest(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          10
+        );
+
+      assertEquals(3, e.pageCount());
+      assertEquals(0, e.pageFirstOffset());
+      assertEquals(0, e.pageIndex());
+      assertEquals(10, e.items().size());
+      checkItems(e, 0, 10);
+    }
+
+    {
+      final var e = this.client.auditSearchNext();
+      assertEquals(3, e.pageCount());
+      assertEquals(10, e.pageFirstOffset());
+      assertEquals(1, e.pageIndex());
+      assertEquals(10, e.items().size());
+      checkItems(e, 10, 10);
+    }
+
+    {
+      final var e = this.client.auditSearchNext();
+      assertEquals(3, e.pageCount());
+      assertEquals(20, e.pageFirstOffset());
+      assertEquals(2, e.pageIndex());
+      assertEquals(10, e.items().size());
+      checkItems(e, 20, 10);
+    }
+
+    {
+      final var e = this.client.auditSearchNext();
+      assertEquals(3, e.pageCount());
+      assertEquals(30, e.pageFirstOffset());
+      assertEquals(3, e.pageIndex());
+      assertEquals(2, e.items().size());
+      checkItems(e, 30, 2);
+    }
+
+    {
+      final var e = this.client.auditSearchPrevious();
+      assertEquals(3, e.pageCount());
+      assertEquals(20, e.pageFirstOffset());
+      assertEquals(2, e.pageIndex());
+      assertEquals(10, e.items().size());
+      checkItems(e, 20, 10);
+    }
+
+    {
+      final var e = this.client.auditSearchPrevious();
+      assertEquals(3, e.pageCount());
+      assertEquals(10, e.pageFirstOffset());
+      assertEquals(1, e.pageIndex());
+      assertEquals(10, e.items().size());
+      checkItems(e, 10, 10);
+    }
+
+    {
+      final var e = this.client.auditSearchPrevious();
+      assertEquals(3, e.pageCount());
+      assertEquals(0, e.pageFirstOffset());
+      assertEquals(0, e.pageIndex());
+      assertEquals(10, e.items().size());
+      checkItems(e, 0, 10);
+    }
+  }
+
+  private static void checkItems(
+    final IdPage<IdAuditEvent> p,
+    final int start,
+    final int count)
+  {
+    final var u = p.items();
+    for (int index = 0; index < count; ++index) {
+      assertEquals(
+        start + index + 1,
+        u.get(index).id()
       );
     }
   }

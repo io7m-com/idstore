@@ -23,6 +23,7 @@ import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdValidityException;
+import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
@@ -36,6 +37,8 @@ import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_PARAMETER_INVALID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.MAIL_SYSTEM_FAILURE;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 
 /**
@@ -316,7 +319,27 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
       e,
       this.requestId,
       400,
-      HTTP_PARAMETER_INVALID
+      PASSWORD_ERROR
+    );
+  }
+
+  /**
+   * Produce an exception indicating a protocol error.
+   *
+   * @param e The exception
+   *
+   * @return An execution failure
+   */
+
+  public IdCommandExecutionFailure failProtocol(
+    final IdProtocolException e)
+  {
+    return new IdCommandExecutionFailure(
+      e.getMessage(),
+      e,
+      this.requestId,
+      400,
+      PROTOCOL_ERROR
     );
   }
 }
