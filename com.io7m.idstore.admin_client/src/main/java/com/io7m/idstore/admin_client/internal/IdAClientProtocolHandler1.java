@@ -40,6 +40,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1AdminSearchByEmailParameters;
 import com.io7m.idstore.protocol.admin_v1.IdA1AdminSearchParameters;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditListParameters;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
@@ -56,6 +57,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandType;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
@@ -68,6 +70,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
 import com.io7m.idstore.protocol.admin_v1.IdA1Password;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailBegin;
@@ -84,6 +87,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailBegin;
@@ -500,6 +504,17 @@ public final class IdAClientProtocolHandler1
   }
 
   @Override
+  public void userDelete(
+    final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    this.sendCommand(
+      IdA1ResponseUserDelete.class,
+      new IdA1CommandUserDelete(id)
+    );
+  }
+
+  @Override
   public IdPage<IdAuditEvent> auditSearchBegin(
     final IdTimeRange timeRange,
     final Optional<String> owner,
@@ -747,5 +762,16 @@ public final class IdAClientProtocolHandler1
     } catch (final IdProtocolException e) {
       throw new IdAClientException(e);
     }
+  }
+
+  @Override
+  public void adminDelete(
+    final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    this.sendCommand(
+      IdA1ResponseAdminDelete.class,
+      new IdA1CommandAdminDelete(id)
+    );
   }
 }

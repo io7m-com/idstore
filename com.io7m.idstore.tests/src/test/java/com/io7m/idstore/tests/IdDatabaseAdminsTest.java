@@ -21,6 +21,7 @@ import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPaging;
 import com.io7m.idstore.database.api.IdDatabaseAdminSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminOrdering;
 import com.io7m.idstore.model.IdAdminPermission;
@@ -1028,5 +1029,86 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
         admins.adminEmailRemove(reqId, new IdEmail("someone2@example.com"));
       });
     assertEquals(EMAIL_ONE_REQUIRED, ex.errorCode());
+  }
+
+  /**
+   * Deleting an admin works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminDelete()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var admins =
+      transaction.queries(IdDatabaseAdminsQueriesType.class);
+
+    final var reqId =
+      randomUUID();
+    final var now =
+      now();
+    final var password =
+      databaseGenerateBadPassword();
+
+    final var admin =
+      admins.adminCreate(
+        reqId,
+        new IdName("someone"),
+        new IdRealName("someone"),
+        new IdEmail("someone@example.com"),
+        now,
+        password,
+        EnumSet.allOf(IdAdminPermission.class)
+      );
+
+    admins.adminDelete(reqId);
+
+    {
+      final var ex =
+        assertThrows(IdDatabaseException.class, () -> {
+          admins.adminGetRequire(reqId);
+        });
+
+      assertEquals(ADMIN_NONEXISTENT, ex.errorCode());
+    }
+
+    {
+      final var ex =
+        assertThrows(IdDatabaseException.class, () -> {
+          admins.adminCreate(
+            reqId,
+            new IdName("someone"),
+            new IdRealName("someone"),
+            new IdEmail("someone@example.com"),
+            now,
+            password,
+            EnumSet.allOf(IdAdminPermission.class)
+          );
+        });
+
+      assertEquals(ADMIN_DUPLICATE_ID, ex.errorCode());
+    }
+
+    checkAuditLog(
+      transaction,
+      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
+      new ExpectedEvent("ADMIN_CREATED", admin.id().toString()),
+      new ExpectedEvent("ADMIN_EMAIL_REMOVED", reqId + ":someone@example.com"),
+      new ExpectedEvent("ADMIN_DELETED", admin.id().toString())
+    );
   }
 }

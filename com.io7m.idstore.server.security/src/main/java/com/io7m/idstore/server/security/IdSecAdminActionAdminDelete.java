@@ -18,27 +18,25 @@ package com.io7m.idstore.server.security;
 
 import com.io7m.idstore.model.IdAdmin;
 
+import java.util.Objects;
+
 /**
- * A view of an action within the security policy. An <i>action</i> may (or may
- * not) be performed by an <i>admin</i> according to the security policy.
+ * An admin wants to delete one or more admins.
+ *
+ * @param admin The admin
  */
 
-public sealed interface IdSecAdminActionType
-  extends IdSecActionType permits IdSecAdminActionAdminCreate,
-  IdSecAdminActionAdminDelete,
-  IdSecAdminActionAdminRead,
-  IdSecAdminActionAdminUpdate,
-  IdSecAdminActionAuditRead,
-  IdSecAdminActionUserBan,
-  IdSecAdminActionUserCreate,
-  IdSecAdminActionUserDelete,
-  IdSecAdminActionUserRead,
-  IdSecAdminActionUserUnban,
-  IdSecAdminActionUserUpdate
+public record IdSecAdminActionAdminDelete(IdAdmin admin)
+  implements IdSecAdminActionType
 {
   /**
-   * @return The admin performing the action
+   * An admin wants to delete one or more admins.
+   *
+   * @param admin The admin
    */
 
-  IdAdmin admin();
+  public IdSecAdminActionAdminDelete
+  {
+    Objects.requireNonNull(admin, "admin");
+  }
 }

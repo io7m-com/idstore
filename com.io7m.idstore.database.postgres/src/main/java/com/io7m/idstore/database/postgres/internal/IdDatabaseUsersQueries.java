@@ -56,6 +56,7 @@ import java.util.function.Supplier;
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
 import static com.io7m.idstore.database.postgres.internal.Tables.AUDIT;
 import static com.io7m.idstore.database.postgres.internal.Tables.EMAILS;
+import static com.io7m.idstore.database.postgres.internal.Tables.EMAIL_VERIFICATIONS;
 import static com.io7m.idstore.database.postgres.internal.Tables.LOGIN_HISTORY;
 import static com.io7m.idstore.database.postgres.internal.Tables.USERS;
 import static com.io7m.idstore.database.postgres.internal.Tables.USER_IDS;
@@ -64,6 +65,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_E
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID_NAME;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+import static java.lang.Boolean.TRUE;
 
 final class IdDatabaseUsersQueries
   extends IdBaseQueries
@@ -188,7 +190,7 @@ final class IdDatabaseUsersQueries
     try {
       {
         final var existing =
-          context.fetchOptional(USERS, USERS.ID.eq(id));
+          context.fetchOptional(USER_IDS, USER_IDS.ID.eq(id));
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "User ID already exists",
@@ -239,7 +241,8 @@ final class IdDatabaseUsersQueries
           .set(USERS.TIME_UPDATED, created)
           .set(USERS.PASSWORD_ALGO, password.algorithm().identifier())
           .set(USERS.PASSWORD_HASH, password.hash())
-          .set(USERS.PASSWORD_SALT, password.salt());
+          .set(USERS.PASSWORD_SALT, password.salt())
+          .set(USERS.DELETING, Boolean.FALSE);
 
       userCreate.execute();
 
@@ -560,11 +563,11 @@ final class IdDatabaseUsersQueries
     try {
       final var baseSelection =
         context.select(
-          USERS.ID,
-          USERS.ID_NAME,
-          USERS.REAL_NAME,
-          USERS.TIME_CREATED,
-          USERS.TIME_UPDATED)
+            USERS.ID,
+            USERS.ID_NAME,
+            USERS.REAL_NAME,
+            USERS.TIME_CREATED,
+            USERS.TIME_UPDATED)
           .from(USERS.join(EMAILS).on(USERS.ID.eq(EMAILS.USER_ID)));
 
       /*
@@ -942,6 +945,48 @@ final class IdDatabaseUsersQueries
         .stream()
         .map(IdDatabaseUsersQueries::mapLogin)
         .toList();
+
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public void userDelete(final UUID id)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var owner = transaction.adminId();
+
+    try {
+      final var user = this.userGetRequire(id);
+
+      context.update(USERS)
+        .set(USERS.DELETING, TRUE)
+        .where(USERS.ID.eq(id))
+        .execute();
+
+      for (final var email : user.emails()) {
+        this.userEmailRemove(id, email);
+      }
+
+      context.deleteFrom(EMAIL_VERIFICATIONS)
+        .where(EMAIL_VERIFICATIONS.USER_ID.eq(id))
+        .execute();
+
+      context.deleteFrom(USERS)
+        .where(USERS.ID.eq(id))
+        .execute();
+
+      context.insertInto(AUDIT)
+        .set(AUDIT.TIME, this.currentTime())
+        .set(AUDIT.TYPE, "USER_DELETED")
+        .set(AUDIT.USER_ID, owner)
+        .set(AUDIT.MESSAGE, id.toString())
+        .execute();
 
     } catch (final DataAccessException e) {
       throw handleDatabaseException(this.transaction(), e);

@@ -23,6 +23,12 @@ package com.io7m.idstore.model;
 public enum IdAdminPermission
 {
   /**
+   * A permission that allows for deleting admins.
+   */
+
+  ADMIN_DELETE,
+
+  /**
    * A permission that allows for creating admins.
    */
 
@@ -45,6 +51,12 @@ public enum IdAdminPermission
    */
 
   AUDIT_READ,
+
+  /**
+   * A permission that allows deleting users.
+   */
+
+  USER_DELETE,
 
   /**
    * A permission that allows creating users.

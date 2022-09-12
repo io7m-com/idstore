@@ -20,10 +20,12 @@ import java.util.HashSet;
 import java.util.Objects;
 
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_CREATE;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_READ;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
 import static com.io7m.idstore.model.IdAdminPermission.USER_CREATE;
+import static com.io7m.idstore.model.IdAdminPermission.USER_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_READ;
 import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
 
@@ -132,6 +134,9 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     if (action instanceof IdSecAdminActionUserUpdate e) {
       return checkAdminActionUserUpdate(e);
     }
+    if (action instanceof IdSecAdminActionUserDelete e) {
+      return checkAdminActionUserDelete(e);
+    }
 
     if (action instanceof IdSecAdminActionAdminRead e) {
       return checkAdminActionAdminRead(e);
@@ -141,6 +146,9 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     }
     if (action instanceof IdSecAdminActionAdminUpdate e) {
       return checkAdminActionAdminUpdate(e);
+    }
+    if (action instanceof IdSecAdminActionAdminDelete e) {
+      return checkAdminActionAdminDelete(e);
     }
 
     if (action instanceof IdSecAdminActionAuditRead e) {
@@ -173,6 +181,19 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
 
     return new IdSecPolicyResultDenied(
       "Reading users requires the %s permission.".formatted(USER_READ)
+    );
+  }
+
+  private static IdSecPolicyResultType checkAdminActionUserDelete(
+    final IdSecAdminActionUserDelete e)
+  {
+    final var permissions = e.admin().permissions();
+    if (permissions.contains(USER_DELETE)) {
+      return new IdSecPolicyResultPermitted();
+    }
+
+    return new IdSecPolicyResultDenied(
+      "Deleting users requires the %s permission.".formatted(USER_DELETE)
     );
   }
 
@@ -266,6 +287,19 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     return new IdSecPolicyResultDenied(
       "The current admin cannot grant the following permissions: %s"
         .formatted(missing)
+    );
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAdminDelete(
+    final IdSecAdminActionAdminDelete e)
+  {
+    final var permissionsHeld = e.admin().permissions();
+    if (permissionsHeld.contains(ADMIN_DELETE)) {
+      return new IdSecPolicyResultPermitted();
+    }
+
+    return new IdSecPolicyResultDenied(
+      "Deleting admins requires the %s permission.".formatted(ADMIN_DELETE)
     );
   }
 

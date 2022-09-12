@@ -356,7 +356,6 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
     }
   }
 
-
   /**
    * Creating, updating, and retrieving users works.
    *
@@ -415,6 +414,54 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
     assertEquals(user0r.idName(), user1.idName());
     assertEquals(user0r.realName(), user1.realName());
     assertEquals(user0r.password(), user1.password());
+  }
+
+  /**
+   * Deleting users works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserDeleting()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    final var id =
+      UUID.randomUUID();
+    final var password0 =
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+        .createHashed("12345678");
+
+    final var user0 =
+      this.client.userCreate(
+        Optional.of(id),
+        new IdName("someone-0"),
+        new IdRealName("Someone R. Incognito"),
+        new IdEmail("someone-0@example.com"),
+        password0
+      );
+
+    this.client.userDelete(id);
+
+    final var ex =
+      Assertions.assertThrows(IdAClientException.class, () -> {
+        this.client.userUpdate(user0);
+      });
+
+    assertTrue(
+      ex.getMessage().contains("error-user-nonexistent"),
+      ex.getMessage());
   }
 
   private static void checkItems(

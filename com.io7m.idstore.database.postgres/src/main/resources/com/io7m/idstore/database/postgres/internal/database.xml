@@ -64,12 +64,13 @@ create table admins (
   password_hash    varchar(1000000)         not null,
   password_salt    varchar(1000000)         not null,
   permissions      varchar(1000000)         not null,
+  deleting         boolean                  not null,
 
   foreign key (id) references user_ids (id)
 )
 ]]></Statement>
 
-    <Statement>grant select, insert, update on admins to idstore</Statement>
+    <Statement>grant select, insert, update, delete on admins to idstore</Statement>
     <Statement>grant select (id) on admins to idstore_none</Statement>
 
     <Comment>
@@ -86,12 +87,13 @@ create table users (
   password_algo    varchar(1000000)         not null,
   password_hash    varchar(1000000)         not null,
   password_salt    varchar(1000000)         not null,
+  deleting         boolean                  not null,
 
   foreign key (id) references user_ids (id)
 )
 ]]></Statement>
 
-    <Statement>grant select, insert, update on users to idstore</Statement>
+    <Statement>grant select, insert, update, delete on users to idstore</Statement>
     <Statement>grant select (id) on users to idstore_none</Statement>
 
     <Comment>The emails table stores the set of email addresses used by users/admins.</Comment>
@@ -124,16 +126,19 @@ create function email_check_delete() returns trigger as $$
     user_id uuid;
     admin_id uuid;
     count integer;
+    deleting boolean;
   begin
     if old.user_id is null then
+      select a.deleting into deleting from admins a where a.id = old.admin_id;
       select count(email_address) into count from emails e where e.admin_id = old.admin_id;
-      if count = 1 then
+      if count = 1 and (not deleting) then
         raise sqlstate 'ID001' using message = 'Cannot remove the last email address for the admin';
         return null;
       end if;
     else
+      select u.deleting into deleting from users u where u.id = old.user_id;
       select count(email_address) into count from emails e where e.user_id = old.user_id;
-      if count = 1 then
+      if count = 1 and (not deleting) then
         raise sqlstate 'ID001' using message = 'Cannot remove the last email address for the user';
         return null;
       end if;

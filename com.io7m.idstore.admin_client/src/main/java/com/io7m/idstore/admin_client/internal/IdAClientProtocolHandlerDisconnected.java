@@ -187,6 +187,13 @@ public final class IdAClientProtocolHandlerDisconnected
   }
 
   @Override
+  public void adminDelete(final UUID id)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
   public IdPage<IdUserSummary> userSearchBegin(
     final IdUserSearchParameters parameters)
     throws IdAClientException
@@ -262,6 +269,13 @@ public final class IdAClientProtocolHandlerDisconnected
     final IdEmail email,
     final IdPassword password)
     throws IdAClientException, InterruptedException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public void userDelete(final UUID id)
+    throws IdAClientException
   {
     throw this.notLoggedIn();
   }

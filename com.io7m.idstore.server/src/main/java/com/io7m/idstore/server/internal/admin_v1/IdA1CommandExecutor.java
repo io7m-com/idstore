@@ -17,6 +17,7 @@
 package com.io7m.idstore.server.internal.admin_v1;
 
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
@@ -33,6 +34,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandType;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
@@ -109,6 +111,9 @@ public final class IdA1CommandExecutor
     if (command instanceof IdA1CommandUserUpdate c) {
       return new IdA1CmdUserUpdate().execute(context, c);
     }
+    if (command instanceof IdA1CommandUserDelete c) {
+      return new IdA1CmdUserDelete().execute(context, c);
+    }
 
     if (command instanceof IdA1CommandAuditSearchBegin c) {
       return new IdA1CmdAuditSearchBegin().execute(context, c);
@@ -131,6 +136,9 @@ public final class IdA1CommandExecutor
     }
     if (command instanceof IdA1CommandAdminUpdate c) {
       return new IdA1CmdAdminUpdate().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminDelete c) {
+      return new IdA1CmdAdminDelete().execute(context, c);
     }
 
     if (command instanceof IdA1CommandAdminSearchBegin c) {

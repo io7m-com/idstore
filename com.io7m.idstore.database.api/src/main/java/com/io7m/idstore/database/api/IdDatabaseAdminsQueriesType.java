@@ -308,4 +308,17 @@ public non-sealed interface IdDatabaseAdminsQueriesType
     Optional<IdPassword> withPassword,
     Optional<Set<IdAdminPermission>> withPermissions)
     throws IdDatabaseException;
+
+  /**
+   * Delete the given admin.
+   *
+   * @param id The admin ID
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  @IdDatabaseRequiresAdmin
+  void adminDelete(
+    UUID id)
+    throws IdDatabaseException;
 }

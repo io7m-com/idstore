@@ -184,4 +184,16 @@ public interface IdAClientUsersType
     IdEmail email,
     IdPassword password)
     throws IdAClientException, InterruptedException;
+
+  /**
+   * Delete the given user.
+   *
+   * @param id The user ID
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  void userDelete(UUID id)
+    throws IdAClientException, InterruptedException;
 }

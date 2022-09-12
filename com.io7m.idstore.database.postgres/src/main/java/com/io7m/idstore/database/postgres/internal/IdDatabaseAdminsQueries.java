@@ -67,6 +67,8 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NOT_INITIAL;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 final class IdDatabaseAdminsQueries
   extends IdBaseQueries
@@ -244,7 +246,8 @@ final class IdDatabaseAdminsQueries
           .set(ADMINS.PASSWORD_ALGO, password.algorithm().identifier())
           .set(ADMINS.PASSWORD_HASH, password.hash())
           .set(ADMINS.PASSWORD_SALT, password.salt())
-          .set(ADMINS.PERMISSIONS, permissionString);
+          .set(ADMINS.PERMISSIONS, permissionString)
+          .set(ADMINS.DELETING, FALSE);
 
       adminCreate.execute();
 
@@ -346,7 +349,9 @@ final class IdDatabaseAdminsQueries
         .set(ADMINS.PASSWORD_ALGO, password.algorithm().identifier())
         .set(ADMINS.PASSWORD_HASH, password.hash())
         .set(ADMINS.PASSWORD_SALT, password.salt())
-        .set(ADMINS.PERMISSIONS, permissionString).execute();
+        .set(ADMINS.PERMISSIONS, permissionString)
+        .set(ADMINS.DELETING, FALSE)
+        .execute();
 
       context.insertInto(EMAILS)
         .set(EMAILS.EMAIL_ADDRESS, email.value())
@@ -984,6 +989,45 @@ final class IdDatabaseAdminsQueries
         .set(AUDIT.TYPE, "ADMIN_EMAIL_REMOVED")
         .set(AUDIT.USER_ID, owner)
         .set(AUDIT.MESSAGE, id + ":" + email.value())
+        .execute();
+
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public void adminDelete(
+    final UUID id)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var owner = transaction.adminId();
+
+    try {
+      final var user = this.adminGetRequire(id);
+
+      context.update(ADMINS)
+        .set(ADMINS.DELETING, TRUE)
+        .where(ADMINS.ID.eq(id))
+        .execute();
+
+      for (final var email : user.emails()) {
+        this.adminEmailRemove(id, email);
+      }
+
+      context.deleteFrom(ADMINS)
+        .where(ADMINS.ID.eq(id))
+        .execute();
+
+      context.insertInto(AUDIT)
+        .set(AUDIT.TIME, this.currentTime())
+        .set(AUDIT.TYPE, "ADMIN_DELETED")
+        .set(AUDIT.USER_ID, owner)
+        .set(AUDIT.MESSAGE, id.toString())
         .execute();
 
     } catch (final DataAccessException e) {

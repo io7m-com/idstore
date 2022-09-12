@@ -236,6 +236,7 @@ public non-sealed interface IdDatabaseUsersQueriesType
    * a given search.
    *
    * @param parameters The search parameters
+   *
    * @return The users
    *
    * @throws IdDatabaseException On errors
@@ -266,6 +267,7 @@ public non-sealed interface IdDatabaseUsersQueriesType
    * a given search.
    *
    * @param parameters The search parameters
+   *
    * @return The users
    *
    * @throws IdDatabaseException On errors
@@ -317,5 +319,18 @@ public non-sealed interface IdDatabaseUsersQueriesType
   List<IdLogin> userLoginHistory(
     UUID id,
     int limit)
+    throws IdDatabaseException;
+
+  /**
+   * Delete the given user.
+   *
+   * @param id The user ID
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  @IdDatabaseRequiresAdmin
+  void userDelete(
+    UUID id)
     throws IdDatabaseException;
 }

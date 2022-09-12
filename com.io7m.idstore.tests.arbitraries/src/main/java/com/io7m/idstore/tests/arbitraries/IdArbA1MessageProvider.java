@@ -27,6 +27,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1AdminSummary;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditEvent;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditListParameters;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
@@ -42,6 +43,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
@@ -55,6 +57,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Page;
 import com.io7m.idstore.protocol.admin_v1.IdA1Password;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailBegin;
@@ -70,6 +73,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailBegin;
@@ -122,6 +126,7 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
   {
     return Set.of(
       commandAdminCreate(),
+      commandAdminDelete(),
       commandAdminSearchBegin(),
       commandAdminSearchByEmailBegin(),
       commandAdminSearchByEmailNext(),
@@ -132,6 +137,7 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       commandAdminUpdate(),
       commandLogin(),
       commandUserCreate(),
+      commandUserDelete(),
       commandUserGet(),
       commandUserSearchBegin(),
       commandUserSearchByEmailBegin(),
@@ -141,6 +147,7 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       commandUserSearchPrevious(),
       commandUserUpdate(),
       responseAdminCreate(),
+      responseAdminDelete(),
       responseAdminSearchBegin(),
       responseAdminSearchByEmailBegin(),
       responseAdminSearchByEmailNext(),
@@ -151,6 +158,7 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       responseError(),
       responseLogin(),
       responseUserCreate(),
+      responseUserDelete(),
       responseUserGet(),
       responseUserSearchBegin(),
       responseUserSearchByEmailBegin(),
@@ -995,5 +1003,45 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       Arbitraries.defaultFor(IdA1Admin.class);
 
     return Combinators.combine(id, users).as(IdA1ResponseAdminUpdate::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandUserDelete> commandUserDelete()
+  {
+    final var id = Arbitraries.defaultFor(UUID.class);
+    return id.map(IdA1CommandUserDelete::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminDelete> commandAdminDelete()
+  {
+    final var id = Arbitraries.defaultFor(UUID.class);
+    return id.map(IdA1CommandAdminDelete::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseUserDelete> responseUserDelete()
+  {
+    final var id = Arbitraries.defaultFor(UUID.class);
+    return id.map(IdA1ResponseUserDelete::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminDelete> responseAdminDelete()
+  {
+    final var id = Arbitraries.defaultFor(UUID.class);
+    return id.map(IdA1ResponseAdminDelete::new);
   }
 }

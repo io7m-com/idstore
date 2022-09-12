@@ -319,4 +319,20 @@ public final class IdAClient implements IdAClientType
   {
     return this.handler.auditSearchPrevious();
   }
+
+  @Override
+  public void adminDelete(
+    final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    this.handler.adminDelete(id);
+  }
+
+  @Override
+  public void userDelete(
+    final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    this.handler.userDelete(id);
+  }
 }

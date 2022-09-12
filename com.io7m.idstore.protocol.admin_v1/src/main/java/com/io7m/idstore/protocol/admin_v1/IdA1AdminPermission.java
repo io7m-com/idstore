@@ -35,6 +35,12 @@ public enum IdA1AdminPermission
   ADMIN_CREATE,
 
   /**
+   * A permission that allows for deleting admins.
+   */
+
+  ADMIN_DELETE,
+
+  /**
    * A permission that allows updating admins.
    */
 
@@ -51,6 +57,12 @@ public enum IdA1AdminPermission
    */
 
   AUDIT_READ,
+
+  /**
+   * A permission that allows deleting users.
+   */
+
+  USER_DELETE,
 
   /**
    * A permission that allows creating users.
@@ -88,11 +100,13 @@ public enum IdA1AdminPermission
 
     return switch (permission) {
       case ADMIN_CREATE -> ADMIN_CREATE;
-      case ADMIN_WRITE -> ADMIN_WRITE;
+      case ADMIN_DELETE -> ADMIN_DELETE;
       case ADMIN_READ -> ADMIN_READ;
+      case ADMIN_WRITE -> ADMIN_WRITE;
       case AUDIT_READ -> AUDIT_READ;
-      case USER_READ -> USER_READ;
       case USER_CREATE -> USER_CREATE;
+      case USER_DELETE -> USER_DELETE;
+      case USER_READ -> USER_READ;
       case USER_WRITE -> USER_WRITE;
     };
   }
@@ -110,11 +124,13 @@ public enum IdA1AdminPermission
   {
     return switch (this) {
       case ADMIN_CREATE -> IdAdminPermission.ADMIN_CREATE;
-      case ADMIN_WRITE -> IdAdminPermission.ADMIN_WRITE;
+      case ADMIN_DELETE -> IdAdminPermission.ADMIN_DELETE;
       case ADMIN_READ -> IdAdminPermission.ADMIN_READ;
+      case ADMIN_WRITE -> IdAdminPermission.ADMIN_WRITE;
       case AUDIT_READ -> IdAdminPermission.AUDIT_READ;
-      case USER_READ -> IdAdminPermission.USER_READ;
       case USER_CREATE -> IdAdminPermission.USER_CREATE;
+      case USER_DELETE -> IdAdminPermission.USER_DELETE;
+      case USER_READ -> IdAdminPermission.USER_READ;
       case USER_WRITE -> IdAdminPermission.USER_WRITE;
     };
   }

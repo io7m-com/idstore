@@ -52,6 +52,7 @@ public sealed interface IdA1MessageType
   Map<Class<?>, String> TYPE_ID_FOR_CLASS =
     Stream.of(
       IdA1CommandAdminCreate.class,
+      IdA1CommandAdminDelete.class,
       IdA1CommandAdminGet.class,
       IdA1CommandAdminGetByEmail.class,
       IdA1CommandAdminSearchBegin.class,
@@ -67,6 +68,7 @@ public sealed interface IdA1MessageType
       IdA1CommandAuditSearchPrevious.class,
       IdA1CommandLogin.class,
       IdA1CommandUserCreate.class,
+      IdA1CommandUserDelete.class,
       IdA1CommandUserGet.class,
       IdA1CommandUserGetByEmail.class,
       IdA1CommandUserSearchBegin.class,
@@ -77,6 +79,7 @@ public sealed interface IdA1MessageType
       IdA1CommandUserSearchPrevious.class,
       IdA1CommandUserUpdate.class,
       IdA1ResponseAdminCreate.class,
+      IdA1ResponseAdminDelete.class,
       IdA1ResponseAdminGet.class,
       IdA1ResponseAdminSearchBegin.class,
       IdA1ResponseAdminSearchByEmailBegin.class,
@@ -92,6 +95,7 @@ public sealed interface IdA1MessageType
       IdA1ResponseError.class,
       IdA1ResponseLogin.class,
       IdA1ResponseUserCreate.class,
+      IdA1ResponseUserDelete.class,
       IdA1ResponseUserGet.class,
       IdA1ResponseUserSearchBegin.class,
       IdA1ResponseUserSearchByEmailBegin.class,

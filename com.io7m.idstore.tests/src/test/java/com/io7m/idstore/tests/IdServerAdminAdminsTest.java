@@ -46,6 +46,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.model.IdAdminColumn.BY_IDNAME;
+import static com.io7m.idstore.model.IdAdminPermission.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -412,6 +413,130 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
     assertEquals(admin0r.idName(), admin1.idName());
     assertEquals(admin0r.realName(), admin1.realName());
     assertEquals(admin0r.password(), admin1.password());
+  }
+
+  /**
+   * Trying to grant permissions to an admin without holding those permissions
+   * fails.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminUpdateUnprivileged()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    final var password0 =
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+        .createHashed("12345678");
+
+    final var admin0 =
+      this.client.adminCreate(
+        Optional.of(UUID.randomUUID()),
+        new IdName("someone-0"),
+        new IdRealName("Someone R. Incognito"),
+        new IdEmail("someone-0@example.com"),
+        password0,
+        EnumSet.of(ADMIN_CREATE, ADMIN_WRITE, ADMIN_READ)
+      );
+
+    final var admin1 =
+      this.client.adminCreate(
+        Optional.of(UUID.randomUUID()),
+        new IdName("someone-1"),
+        new IdRealName("Someone R. Incognito"),
+        new IdEmail("someone-1@example.com"),
+        password0,
+        EnumSet.noneOf(IdAdminPermission.class)
+      );
+
+    this.client.login(
+      "someone-0",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    var ex =
+      Assertions.assertThrows(IdAClientException.class, () -> {
+        this.client.adminUpdate(
+          new IdAdmin(
+            admin1.id(),
+            admin1.idName(),
+            admin1.realName(),
+            admin1.emails(),
+            admin1.timeCreated(),
+            admin1.timeUpdated(),
+            admin1.password(),
+            EnumSet.allOf(IdAdminPermission.class)
+          )
+        );
+      });
+
+    final var msg = ex.getMessage();
+    assertTrue(msg.contains("The current admin cannot grant the following permissions"));
+    assertTrue(msg.contains("USER_READ"));
+    assertTrue(msg.contains("USER_WRITE"));
+    assertTrue(msg.contains("ADMIN_DELETE"));
+  }
+
+  /**
+   * Deleting admins works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminDeleting()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    final var id =
+      UUID.randomUUID();
+    final var password0 =
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+        .createHashed("12345678");
+
+    final var admin0 =
+      this.client.adminCreate(
+        Optional.of(id),
+        new IdName("someone-0"),
+        new IdRealName("Someone R. Incognito"),
+        new IdEmail("someone-0@example.com"),
+        password0,
+        EnumSet.noneOf(IdAdminPermission.class)
+      );
+
+    this.client.adminDelete(id);
+
+    final var ex =
+      Assertions.assertThrows(IdAClientException.class, () -> {
+        this.client.adminUpdate(admin0);
+      });
+
+    assertTrue(
+      ex.getMessage().contains("error-admin-nonexistent"),
+      ex.getMessage());
   }
 
   private static void checkItems(

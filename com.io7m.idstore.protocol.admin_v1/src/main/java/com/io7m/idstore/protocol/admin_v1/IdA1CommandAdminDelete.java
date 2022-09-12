@@ -14,31 +14,36 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.security;
+package com.io7m.idstore.protocol.admin_v1;
 
-import com.io7m.idstore.model.IdAdmin;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.util.Objects;
+import java.util.UUID;
 
 /**
- * A view of an action within the security policy. An <i>action</i> may (or may
- * not) be performed by an <i>admin</i> according to the security policy.
+ * Delete the given admin.
+ *
+ * @param admin The admin ID
  */
 
-public sealed interface IdSecAdminActionType
-  extends IdSecActionType permits IdSecAdminActionAdminCreate,
-  IdSecAdminActionAdminDelete,
-  IdSecAdminActionAdminRead,
-  IdSecAdminActionAdminUpdate,
-  IdSecAdminActionAuditRead,
-  IdSecAdminActionUserBan,
-  IdSecAdminActionUserCreate,
-  IdSecAdminActionUserDelete,
-  IdSecAdminActionUserRead,
-  IdSecAdminActionUserUnban,
-  IdSecAdminActionUserUpdate
+@JsonDeserialize
+@JsonSerialize
+public record IdA1CommandAdminDelete(
+  @JsonProperty(value = "AdminID", required = true)
+  UUID admin)
+  implements IdA1CommandType<IdA1ResponseAdminDelete>
 {
   /**
-   * @return The admin performing the action
+   * Delete the given admin.
    */
 
-  IdAdmin admin();
+  @JsonCreator
+  public IdA1CommandAdminDelete
+  {
+    Objects.requireNonNull(admin, "admin");
+  }
 }

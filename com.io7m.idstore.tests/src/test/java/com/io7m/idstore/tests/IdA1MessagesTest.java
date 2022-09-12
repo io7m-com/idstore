@@ -17,6 +17,7 @@
 package com.io7m.idstore.tests;
 
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
@@ -32,6 +33,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
@@ -44,6 +46,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailBegin;
@@ -59,6 +62,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailBegin;
@@ -111,6 +115,7 @@ public final class IdA1MessagesTest
     Arbitrary<? extends IdA1MessageType>> MESSAGE_ARBITRARIES =
     Map.ofEntries(
       entry(IdA1CommandAdminCreate.class, commandAdminCreate()),
+      entry(IdA1CommandAdminDelete.class, commandAdminDelete()),
       entry(IdA1CommandAdminGet.class, commandAdminGet()),
       entry(IdA1CommandAdminGetByEmail.class, commandAdminGetByEmail()),
       entry(IdA1CommandAdminSearchBegin.class, commandAdminSearchBegin()),
@@ -126,6 +131,7 @@ public final class IdA1MessagesTest
       entry(IdA1CommandAuditSearchPrevious.class, commandAuditSearchPrevious()),
       entry(IdA1CommandLogin.class, commandLogin()),
       entry(IdA1CommandUserCreate.class, commandUserCreate()),
+      entry(IdA1CommandUserDelete.class, commandUserDelete()),
       entry(IdA1CommandUserGet.class, commandUserGet()),
       entry(IdA1CommandUserGetByEmail.class, commandUserGetByEmail()),
       entry(IdA1CommandUserSearchBegin.class, commandUserSearchBegin()),
@@ -136,6 +142,7 @@ public final class IdA1MessagesTest
       entry(IdA1CommandUserSearchPrevious.class, commandUserSearchPrevious()),
       entry(IdA1CommandUserUpdate.class, commandUserUpdate()),
       entry(IdA1ResponseAdminCreate.class, responseAdminCreate()),
+      entry(IdA1ResponseAdminDelete.class, responseAdminDelete()),
       entry(IdA1ResponseAdminGet.class, responseAdminGet()),
       entry(IdA1ResponseAdminSearchBegin.class, responseAdminSearchBegin()),
       entry(IdA1ResponseAdminSearchByEmailBegin.class, responseAdminSearchByEmailBegin()),
@@ -151,6 +158,7 @@ public final class IdA1MessagesTest
       entry(IdA1ResponseError.class, responseError()),
       entry(IdA1ResponseLogin.class, responseLogin()),
       entry(IdA1ResponseUserCreate.class, responseUserCreate()),
+      entry(IdA1ResponseUserDelete.class, responseUserDelete()),
       entry(IdA1ResponseUserGet.class, responseUserGet()),
       entry(IdA1ResponseUserSearchBegin.class, responseUserSearchBegin()),
       entry(IdA1ResponseUserSearchByEmailBegin.class, responseUserSearchByEmailBegin()),

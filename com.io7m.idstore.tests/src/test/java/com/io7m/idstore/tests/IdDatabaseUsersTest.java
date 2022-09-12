@@ -1004,6 +1004,119 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     assertEquals(EMAIL_ONE_REQUIRED, ex.errorCode());
   }
 
+  /**
+   * Deleting a user fails for nonexistent users.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserDeleteNonexistent()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    final var ex =
+      assertThrows(IdDatabaseException.class, () -> {
+        users.userDelete(randomUUID());
+      });
+
+    assertEquals(USER_NONEXISTENT, ex.errorCode());
+  }
+
+  /**
+   * Deleting a user works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserDelete()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    final var reqId =
+      randomUUID();
+    final var now =
+      now();
+    final var password =
+      databaseGenerateBadPassword();
+
+    final var user =
+      users.userCreate(
+        reqId,
+        new IdName("someone"),
+        new IdRealName("someone"),
+        new IdEmail("someone@example.com"),
+        now,
+        password
+      );
+
+    users.userDelete(reqId);
+
+    {
+      final var ex =
+        assertThrows(IdDatabaseException.class, () -> {
+          users.userGetRequire(reqId);
+        });
+
+      assertEquals(USER_NONEXISTENT, ex.errorCode());
+    }
+
+    {
+      final var ex =
+        assertThrows(IdDatabaseException.class, () -> {
+          users.userCreate(
+            reqId,
+            new IdName("someone"),
+            new IdRealName("someone"),
+            new IdEmail("someone@example.com"),
+            now,
+            password
+          );
+        });
+
+      assertEquals(USER_DUPLICATE_ID, ex.errorCode());
+    }
+
+    checkAuditLog(
+      transaction,
+      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
+      new ExpectedEvent("USER_CREATED", user.id().toString()),
+      new ExpectedEvent("USER_EMAIL_REMOVED", "someone@example.com"),
+      new ExpectedEvent("USER_DELETED", user.id().toString())
+    );
+  }
+
   private static void checkPage(
     final int indexLow,
     final int indexHigh,

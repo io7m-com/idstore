@@ -201,4 +201,15 @@ public interface IdAClientAdminsType
     Set<IdAdminPermission> permissions)
     throws IdAClientException, InterruptedException;
 
+  /**
+   * Delete the given admin.
+   *
+   * @param id The admin ID
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  void adminDelete(UUID id)
+    throws IdAClientException, InterruptedException;
 }

@@ -25,6 +25,7 @@ package com.io7m.idstore.protocol.admin_v1;
 public sealed interface IdA1CommandType<R extends IdA1ResponseType>
   extends IdA1MessageType
   permits IdA1CommandAdminCreate,
+  IdA1CommandAdminDelete,
   IdA1CommandAdminGet,
   IdA1CommandAdminGetByEmail,
   IdA1CommandAdminSearchBegin,
@@ -40,6 +41,7 @@ public sealed interface IdA1CommandType<R extends IdA1ResponseType>
   IdA1CommandAuditSearchPrevious,
   IdA1CommandLogin,
   IdA1CommandUserCreate,
+  IdA1CommandUserDelete,
   IdA1CommandUserGet,
   IdA1CommandUserGetByEmail,
   IdA1CommandUserSearchBegin,
