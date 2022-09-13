@@ -102,4 +102,17 @@ public interface IdDatabaseTransactionType extends AutoCloseable
 
   UUID adminId()
     throws IdDatabaseException;
+
+  /**
+   * Determine the executor ID. This is the value set by whichever of
+   * {@link #adminIdSet(UUID)} or {@link #userIdSet(UUID)} has been called
+   * most recently.
+   *
+   * @return The current executor ID
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  UUID executorId()
+    throws IdDatabaseException;
 }

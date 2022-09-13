@@ -28,6 +28,9 @@ import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.IdUserSession;
+import com.io7m.idstore.server.security.IdSecActionType;
+import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
+import com.io7m.idstore.server.security.IdSecurity;
 import com.io7m.idstore.server.security.IdSecurityException;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 
@@ -40,6 +43,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.MAIL_SYSTEM_FAIL
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
+import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
  * The context for execution of a command (or set of commands in a
@@ -341,5 +345,27 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
       400,
       PROTOCOL_ERROR
     );
+  }
+
+  /**
+   * Check the given action against the security policy.
+   *
+   * @param action The action
+   *
+   * @throws IdSecurityException       On errors
+   * @throws IdCommandExecutionFailure On errors
+   */
+
+  public void securityCheck(
+    final IdSecActionType action)
+    throws IdSecurityException, IdCommandExecutionFailure
+  {
+    if (IdSecurity.check(action) instanceof IdSecPolicyResultDenied denied) {
+      throw this.fail(
+        FORBIDDEN_403,
+        SECURITY_POLICY_DENIED,
+        denied.message()
+      );
+    }
   }
 }

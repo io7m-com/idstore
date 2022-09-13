@@ -1112,7 +1112,7 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       transaction,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("USER_CREATED", user.id().toString()),
-      new ExpectedEvent("USER_EMAIL_REMOVED", "someone@example.com"),
+      new ExpectedEvent("USER_EMAIL_REMOVED", user.id() + "|someone@example.com"),
       new ExpectedEvent("USER_DELETED", user.id().toString())
     );
   }

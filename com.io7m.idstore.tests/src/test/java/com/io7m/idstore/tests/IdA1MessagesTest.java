@@ -18,8 +18,12 @@ package com.io7m.idstore.tests;
 
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailAdd;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailRemove;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminPermissionGrant;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminPermissionRevoke;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailNext;
@@ -34,6 +38,8 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailRemove;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
@@ -72,11 +78,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserUpdate;
 import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider;
-import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
-import net.jqwik.api.CannotFindArbitraryException;
-import net.jqwik.engine.properties.arbitraries.DefaultTypeArbitrary;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
@@ -116,8 +118,12 @@ public final class IdA1MessagesTest
     Map.ofEntries(
       entry(IdA1CommandAdminCreate.class, commandAdminCreate()),
       entry(IdA1CommandAdminDelete.class, commandAdminDelete()),
+      entry(IdA1CommandAdminEmailAdd.class, commandAdminEmailAdd()),
+      entry(IdA1CommandAdminEmailRemove.class, commandAdminEmailRemove()),
       entry(IdA1CommandAdminGet.class, commandAdminGet()),
       entry(IdA1CommandAdminGetByEmail.class, commandAdminGetByEmail()),
+      entry(IdA1CommandAdminPermissionGrant.class, commandAdminPermissionGrant()),
+      entry(IdA1CommandAdminPermissionRevoke.class, commandAdminPermissionRevoke()),
       entry(IdA1CommandAdminSearchBegin.class, commandAdminSearchBegin()),
       entry(IdA1CommandAdminSearchByEmailBegin.class, commandAdminSearchByEmailBegin()),
       entry(IdA1CommandAdminSearchByEmailNext.class, commandAdminSearchByEmailNext()),
@@ -132,6 +138,8 @@ public final class IdA1MessagesTest
       entry(IdA1CommandLogin.class, commandLogin()),
       entry(IdA1CommandUserCreate.class, commandUserCreate()),
       entry(IdA1CommandUserDelete.class, commandUserDelete()),
+      entry(IdA1CommandUserEmailAdd.class, commandUserEmailAdd()),
+      entry(IdA1CommandUserEmailRemove.class, commandUserEmailRemove()),
       entry(IdA1CommandUserGet.class, commandUserGet()),
       entry(IdA1CommandUserGetByEmail.class, commandUserGetByEmail()),
       entry(IdA1CommandUserSearchBegin.class, commandUserSearchBegin()),

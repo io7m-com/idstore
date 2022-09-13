@@ -28,8 +28,12 @@ import com.io7m.idstore.protocol.admin_v1.IdA1AuditEvent;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditListParameters;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailAdd;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailRemove;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminPermissionGrant;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminPermissionRevoke;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailNext;
@@ -44,6 +48,8 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailRemove;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
@@ -127,6 +133,10 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
     return Set.of(
       commandAdminCreate(),
       commandAdminDelete(),
+      commandAdminEmailAdd(),
+      commandAdminEmailRemove(),
+      commandAdminPermissionGrant(),
+      commandAdminPermissionRevoke(),
       commandAdminSearchBegin(),
       commandAdminSearchByEmailBegin(),
       commandAdminSearchByEmailNext(),
@@ -138,6 +148,8 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       commandLogin(),
       commandUserCreate(),
       commandUserDelete(),
+      commandUserEmailAdd(),
+      commandUserEmailRemove(),
       commandUserGet(),
       commandUserSearchBegin(),
       commandUserSearchByEmailBegin(),
@@ -474,8 +486,17 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdA1CommandUserUpdate> commandUserUpdate()
   {
-    return Arbitraries.defaultFor(IdA1User.class)
-      .map(IdA1CommandUserUpdate::new);
+    final var users =
+      Arbitraries.defaultFor(IdA1User.class);
+
+    return users.map((user) -> {
+      return new IdA1CommandUserUpdate(
+        user.id(),
+        Optional.of(user.idName()),
+        Optional.of(user.realName()),
+        Optional.of(user.password())
+      );
+    });
   }
 
   /**
@@ -921,6 +942,7 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
           user.password().salt()
         ),
         user.permissions()
+          .impliedPermissions()
           .stream()
           .map(IdA1AdminPermission::ofPermission)
           .collect(Collectors.toUnmodifiableSet())
@@ -987,10 +1009,119 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdA1CommandAdminUpdate> commandAdminUpdate()
   {
-    return Arbitraries.defaultFor(IdA1Admin.class)
-      .map(IdA1CommandAdminUpdate::new);
+    final var users =
+      Arbitraries.defaultFor(IdA1Admin.class);
+
+    return users.map((admin) -> {
+      return new IdA1CommandAdminUpdate(
+        admin.id(),
+        Optional.of(admin.idName()),
+        Optional.of(admin.realName()),
+        Optional.of(admin.password())
+      );
+    });
   }
-  
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminPermissionGrant> commandAdminPermissionGrant()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    final var permissions =
+      Arbitraries.defaultFor(IdA1AdminPermission.class);
+
+    return Combinators.combine(id, permissions)
+      .as(IdA1CommandAdminPermissionGrant::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminPermissionRevoke> commandAdminPermissionRevoke()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    final var permissions =
+      Arbitraries.defaultFor(IdA1AdminPermission.class);
+
+    return Combinators.combine(id, permissions)
+      .as(IdA1CommandAdminPermissionRevoke::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminEmailAdd> commandAdminEmailAdd()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    final var mails =
+      Arbitraries.defaultFor(IdEmail.class);
+
+    return Combinators.combine(id, mails)
+      .as((uuid, idEmail) -> {
+        return new IdA1CommandAdminEmailAdd(uuid, idEmail.value());
+      });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminEmailRemove> commandAdminEmailRemove()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    final var mails =
+      Arbitraries.defaultFor(IdEmail.class);
+
+    return Combinators.combine(id, mails)
+      .as((uuid, idEmail) -> {
+        return new IdA1CommandAdminEmailRemove(uuid, idEmail.value());
+      });
+  }
+
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandUserEmailAdd> commandUserEmailAdd()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    final var mails =
+      Arbitraries.defaultFor(IdEmail.class);
+
+    return Combinators.combine(id, mails)
+      .as((uuid, idEmail) -> {
+        return new IdA1CommandUserEmailAdd(uuid, idEmail.value());
+      });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandUserEmailRemove> commandUserEmailRemove()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    final var mails =
+      Arbitraries.defaultFor(IdEmail.class);
+
+    return Combinators.combine(id, mails)
+      .as((uuid, idEmail) -> {
+        return new IdA1CommandUserEmailRemove(uuid, idEmail.value());
+      });
+  }
+
+
   /**
    * @return A message arbitrary
    */

@@ -120,6 +120,7 @@ public final class IdAGUsersController implements Initializable
   {
     if (statusNew == DISCONNECTED) {
       this.users.clear();
+      this.user = null;
       this.userDetailsLock();
       this.userTableControlsLock();
     }
@@ -398,65 +399,18 @@ public final class IdAGUsersController implements Initializable
   private void onEmailAddSelected()
     throws IOException
   {
-    final var controller = this.openEmailAddDialog();
+    final var controller =
+      IdAGUserEmailAddController.openDialog(this.configuration, this.strings);
     final var emailOpt = controller.result();
     if (emailOpt.isPresent()) {
-      final var newEmails = new ArrayList<>(this.user.emails().toList());
-      newEmails.add(emailOpt.get());
-
-      this.executeUserUpdate(new IdUser(
-        this.user.id(),
-        this.user.idName(),
-        this.user.realName(),
-        IdNonEmptyList.ofList(newEmails),
-        this.user.timeCreated(),
-        this.user.timeUpdated(),
-        this.user.password()
-      ));
+      final var future =
+        this.client.userEmailAdd(this.user.id(), emailOpt.get());
+      future.whenComplete((received, exception) -> {
+        if (received != null) {
+          this.onUserReceived(Optional.of(received));
+        }
+      });
     }
-  }
-
-  private void executeUserUpdate(
-    final IdUser newUser)
-  {
-    final var future = this.client.userUpdate(newUser);
-    future.whenComplete((received, exception) -> {
-      if (received != null) {
-        this.onUserReceived(Optional.of(received));
-      }
-    });
-  }
-
-  private IdAGUserEmailAddController openEmailAddDialog()
-    throws IOException
-  {
-    final var stage = new Stage();
-    final var connectXML =
-      IdAGMainScreenController.class.getResource(
-        "/com/io7m/idstore/admin_gui/internal/emailAdd.fxml");
-
-    final var resources =
-      this.strings.resources();
-    final var loader =
-      new FXMLLoader(connectXML, resources);
-
-    loader.setControllerFactory(
-      clazz -> new IdAGUserEmailAddController(
-        this.configuration,
-        this.strings,
-        this.user,
-        stage)
-    );
-
-    final Pane pane = loader.load();
-    IdAGCSS.setCSS(this.configuration, pane);
-
-    final IdAGUserEmailAddController controller = loader.getController();
-    stage.initModality(Modality.APPLICATION_MODAL);
-    stage.setScene(new Scene(pane));
-    stage.setTitle(this.strings.format("users.email"));
-    stage.showAndWait();
-    return controller;
   }
 
   private IdAGUserDeleteConfirmController openUserDeleteConfirmDialog()
@@ -492,34 +446,33 @@ public final class IdAGUsersController implements Initializable
   @FXML
   private void onEmailDeleteSelected()
   {
-    final var newEmails = new ArrayList<>(this.user.emails().toList());
-    newEmails.remove(
-      this.userEmailList.getSelectionModel()
-        .getSelectedItem()
-    );
-
-    this.executeUserUpdate(new IdUser(
-      this.user.id(),
-      this.user.idName(),
-      this.user.realName(),
-      IdNonEmptyList.ofList(newEmails),
-      this.user.timeCreated(),
-      this.user.timeUpdated(),
-      this.user.password()
-    ));
+    final var future =
+      this.client.userEmailRemove(
+        this.user.id(),
+        this.userEmailList.getSelectionModel().getSelectedItem()
+      );
+    future.whenComplete((received, exception) -> {
+      if (received != null) {
+        this.onUserReceived(Optional.of(received));
+      }
+    });
   }
 
   @FXML
   private void onUserUpdateSelected()
   {
-    this.executeUserUpdate(new IdUser(
-      this.user.id(),
-      new IdName(this.userIdNameField.getText()),
-      new IdRealName(this.userRealNameField.getText()),
-      this.user.emails(),
-      this.user.timeCreated(),
-      this.user.timeUpdated(),
-      this.user.password()
-    ));
+    final var future =
+      this.client.userUpdate(
+        this.user.id(),
+        Optional.of(new IdName(this.userIdNameField.getText())),
+        Optional.of(new IdRealName(this.userRealNameField.getText())),
+        Optional.empty()
+      );
+
+    future.whenComplete((received, exception) -> {
+      if (received != null) {
+        this.onUserReceived(Optional.of(received));
+      }
+    });
   }
 }

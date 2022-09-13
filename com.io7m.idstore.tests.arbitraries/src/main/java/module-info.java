@@ -25,6 +25,7 @@ import com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1UserColumnOrderingProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1UserOrderingProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchByEmailParametersProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbAdminPermissionSetProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminSummaryProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAuditEventProvider;
@@ -88,6 +89,7 @@ module com.io7m.idstore.tests.arbitraries
       IdArbA1UserSearchByEmailParametersProvider,
       IdArbA1UserSearchParametersProvider,
       IdArbA1UserSummaryProvider,
+      IdArbAdminPermissionSetProvider,
       IdArbAdminProvider,
       IdArbAdminSummaryProvider,
       IdArbAuditEventProvider,

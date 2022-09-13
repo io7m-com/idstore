@@ -19,29 +19,20 @@ package com.io7m.idstore.server.internal.admin_v1;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
-import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1User;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecAdminActionUserRead;
-import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
-import com.io7m.idstore.server.security.IdSecurity;
 import com.io7m.idstore.server.security.IdSecurityException;
-
-import java.util.Objects;
-
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
-import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
  * IdA1CmdUserGet
  */
 
 public final class IdA1CmdUserGet
-  implements IdCommandExecutorType<
+  extends IdA1CmdAbstract<
   IdA1CommandContext, IdA1CommandUserGet, IdA1ResponseType>
 {
   /**
@@ -54,44 +45,26 @@ public final class IdA1CmdUserGet
   }
 
   @Override
-  public IdA1ResponseType execute(
+  protected IdA1ResponseType executeActual(
     final IdA1CommandContext context,
     final IdA1CommandUserGet command)
-    throws IdCommandExecutionFailure
+    throws IdCommandExecutionFailure, IdSecurityException, IdDatabaseException
   {
-    Objects.requireNonNull(context, "context");
-    Objects.requireNonNull(command, "command");
+    final var transaction =
+      context.transaction();
+    final var admin =
+      context.admin();
 
-    try {
-      final var transaction =
-        context.transaction();
-      final var admin =
-        context.admin();
+    context.securityCheck(new IdSecAdminActionUserRead(admin));
 
-      if (IdSecurity.check(new IdSecAdminActionUserRead(admin))
-        instanceof IdSecPolicyResultDenied denied) {
-        throw context.fail(
-          FORBIDDEN_403,
-          SECURITY_POLICY_DENIED,
-          denied.message()
-        );
-      }
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+    final var user =
+      users.userGet(command.user());
 
-      final var users =
-        transaction.queries(IdDatabaseUsersQueriesType.class);
-      final var user =
-        users.userGet(command.user());
-
-      return new IdA1ResponseUserGet(
-        context.requestId(),
-        user.map(IdA1User::ofUser)
-      );
-    } catch (final IdValidityException e) {
-      throw context.failValidity(e);
-    } catch (final IdSecurityException e) {
-      throw context.failSecurity(e);
-    } catch (final IdDatabaseException e) {
-      throw context.failDatabase(e);
-    }
+    return new IdA1ResponseUserGet(
+      context.requestId(),
+      user.map(IdA1User::ofUser)
+    );
   }
 }

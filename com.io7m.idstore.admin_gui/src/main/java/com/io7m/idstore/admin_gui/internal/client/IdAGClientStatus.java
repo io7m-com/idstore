@@ -41,7 +41,13 @@ public enum IdAGClientStatus
   CONNECTION_FAILED,
 
   /**
-   * The client is connected to the server.
+   * The client managed to connect to the server.
+   */
+
+  CONNECTION_SUCCEEDED,
+
+  /**
+   * The client is connected to the server and is idle.
    */
 
   CONNECTED,

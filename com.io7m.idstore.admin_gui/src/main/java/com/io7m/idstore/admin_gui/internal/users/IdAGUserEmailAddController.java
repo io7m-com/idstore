@@ -18,17 +18,23 @@
 package com.io7m.idstore.admin_gui.internal.users;
 
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
+import com.io7m.idstore.admin_gui.internal.IdAGCSS;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
+import com.io7m.idstore.admin_gui.internal.main.IdAGMainScreenController;
 import com.io7m.idstore.admin_gui.internal.main.IdAGScreenControllerType;
 import com.io7m.idstore.model.IdEmail;
-import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdValidityException;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,7 +49,6 @@ public final class IdAGUserEmailAddController
 {
   private final IdAGConfiguration configuration;
   private final IdAGStrings strings;
-  private final IdUser user;
   private final Stage stage;
 
   @FXML private Button buttonCreate;
@@ -57,7 +62,6 @@ public final class IdAGUserEmailAddController
    * An email creation controller.
    *
    * @param inConfiguration The configuration
-   * @param inUser          The user
    * @param inStrings       The string resources
    * @param inStage         The owning stage
    */
@@ -65,15 +69,12 @@ public final class IdAGUserEmailAddController
   public IdAGUserEmailAddController(
     final IdAGConfiguration inConfiguration,
     final IdAGStrings inStrings,
-    final IdUser inUser,
     final Stage inStage)
   {
     this.configuration =
       Objects.requireNonNull(inConfiguration, "inConfiguration");
     this.strings =
       Objects.requireNonNull(inStrings, "inStrings");
-    this.user =
-      Objects.requireNonNull(inUser, "user");
     this.stage =
       Objects.requireNonNull(inStage, "stage");
     this.result =
@@ -122,5 +123,38 @@ public final class IdAGUserEmailAddController
   {
     this.emailFieldBad.setVisible(true);
     this.buttonCreate.setDisable(true);
+  }
+
+  public static IdAGUserEmailAddController openDialog(
+    final IdAGConfiguration configuration,
+    final IdAGStrings strings)
+    throws IOException
+  {
+    final var stage = new Stage();
+    final var connectXML =
+      IdAGMainScreenController.class.getResource(
+        "/com/io7m/idstore/admin_gui/internal/emailAdd.fxml");
+
+    final var resources =
+      strings.resources();
+    final var loader =
+      new FXMLLoader(connectXML, resources);
+
+    loader.setControllerFactory(
+      clazz -> new IdAGUserEmailAddController(
+        configuration,
+        strings,
+        stage)
+    );
+
+    final Pane pane = loader.load();
+    IdAGCSS.setCSS(configuration, pane);
+
+    final IdAGUserEmailAddController controller = loader.getController();
+    stage.initModality(Modality.APPLICATION_MODAL);
+    stage.setScene(new Scene(pane));
+    stage.setTitle(strings.format("users.email"));
+    stage.showAndWait();
+    return controller;
   }
 }

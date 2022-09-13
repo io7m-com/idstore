@@ -44,6 +44,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.model.IdUserColumn.BY_IDNAME;
+import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -185,7 +186,7 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
           new IdUserSearchParameters(
             TIME_LARGE_RANGE,
             TIME_LARGE_RANGE,
-            Optional.empty(),
+            empty(),
             ORDER_BY_IDNAME,
             100
           )
@@ -407,10 +408,14 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
       );
 
     final var user1 =
-      this.client.userUpdate(user0r);
+      this.client.userUpdate(
+        user0.id(),
+        Optional.of(user0r.idName()),
+        Optional.of(user0r.realName()),
+        Optional.of(user0r.password())
+      );
 
     assertEquals(user0r.id(), user1.id());
-    assertEquals(user0r.emails(), user1.emails());
     assertEquals(user0r.idName(), user1.idName());
     assertEquals(user0r.realName(), user1.realName());
     assertEquals(user0r.password(), user1.password());
@@ -456,7 +461,11 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
 
     final var ex =
       Assertions.assertThrows(IdAClientException.class, () -> {
-        this.client.userUpdate(user0);
+        this.client.userUpdate(
+          user0.id(),
+          empty(),
+          empty(),
+          empty());
       });
 
     assertTrue(

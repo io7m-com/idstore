@@ -18,7 +18,6 @@ package com.io7m.idstore.model;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -42,7 +41,7 @@ public record IdAdmin(
   OffsetDateTime timeCreated,
   OffsetDateTime timeUpdated,
   IdPassword password,
-  Set<IdAdminPermission> permissions)
+  IdAdminPermissionSet permissions)
 {
   /**
    * Information for a single administrator.

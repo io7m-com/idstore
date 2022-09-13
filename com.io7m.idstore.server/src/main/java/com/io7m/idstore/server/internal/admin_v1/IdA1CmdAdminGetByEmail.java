@@ -20,29 +20,20 @@ package com.io7m.idstore.server.internal.admin_v1;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.model.IdEmail;
-import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.admin_v1.IdA1Admin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminRead;
-import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
-import com.io7m.idstore.server.security.IdSecurity;
 import com.io7m.idstore.server.security.IdSecurityException;
-
-import java.util.Objects;
-
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
-import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
  * IdA1CmdAdminGet
  */
 
 public final class IdA1CmdAdminGetByEmail
-  implements IdCommandExecutorType<
+  extends IdA1CmdAbstract<
   IdA1CommandContext, IdA1CommandAdminGetByEmail, IdA1ResponseType>
 {
   /**
@@ -55,44 +46,26 @@ public final class IdA1CmdAdminGetByEmail
   }
 
   @Override
-  public IdA1ResponseType execute(
+  protected IdA1ResponseType executeActual(
     final IdA1CommandContext context,
     final IdA1CommandAdminGetByEmail command)
-    throws IdCommandExecutionFailure
+    throws IdCommandExecutionFailure, IdSecurityException, IdDatabaseException
   {
-    Objects.requireNonNull(context, "context");
-    Objects.requireNonNull(command, "command");
+    final var transaction =
+      context.transaction();
+    final var admin =
+      context.admin();
 
-    try {
-      final var transaction =
-        context.transaction();
-      final var admin =
-        context.admin();
+    context.securityCheck(new IdSecAdminActionAdminRead(admin));
 
-      if (IdSecurity.check(new IdSecAdminActionAdminRead(admin))
-        instanceof IdSecPolicyResultDenied denied) {
-        throw context.fail(
-          FORBIDDEN_403,
-          SECURITY_POLICY_DENIED,
-          denied.message()
-        );
-      }
+    final var admins =
+      transaction.queries(IdDatabaseAdminsQueriesType.class);
+    final var result =
+      admins.adminGetForEmail(new IdEmail(command.email()));
 
-      final var admins =
-        transaction.queries(IdDatabaseAdminsQueriesType.class);
-      final var result =
-        admins.adminGetForEmail(new IdEmail(command.email()));
-
-      return new IdA1ResponseAdminGet(
-        context.requestId(),
-        result.map(IdA1Admin::ofAdmin)
-      );
-    } catch (final IdValidityException e) {
-      throw context.failValidity(e);
-    } catch (final IdSecurityException e) {
-      throw context.failSecurity(e);
-    } catch (final IdDatabaseException e) {
-      throw context.failDatabase(e);
-    }
+    return new IdA1ResponseAdminGet(
+      context.requestId(),
+      result.map(IdA1Admin::ofAdmin)
+    );
   }
 }

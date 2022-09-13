@@ -18,8 +18,12 @@ package com.io7m.idstore.server.internal.admin_v1;
 
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailAdd;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailRemove;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminPermissionGrant;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminPermissionRevoke;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailNext;
@@ -35,6 +39,8 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandType;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailRemove;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
@@ -47,6 +53,8 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
+
+import java.io.IOException;
 
 /**
  * A command executor for public commands.
@@ -71,7 +79,7 @@ public final class IdA1CommandExecutor
   public IdA1ResponseType execute(
     final IdA1CommandContext context,
     final IdA1CommandType<? extends IdA1ResponseType> command)
-    throws IdCommandExecutionFailure
+    throws IdCommandExecutionFailure, IOException, InterruptedException
   {
     if (command instanceof IdA1CommandAdminSelf c) {
       return new IdA1CmdAdminSelf().execute(context, c);
@@ -113,6 +121,12 @@ public final class IdA1CommandExecutor
     }
     if (command instanceof IdA1CommandUserDelete c) {
       return new IdA1CmdUserDelete().execute(context, c);
+    }
+    if (command instanceof IdA1CommandUserEmailAdd c) {
+      return new IdA1CmdUserEmailAdd().execute(context, c);
+    }
+    if (command instanceof IdA1CommandUserEmailRemove c) {
+      return new IdA1CmdUserEmailRemove().execute(context, c);
     }
 
     if (command instanceof IdA1CommandAuditSearchBegin c) {
@@ -158,6 +172,19 @@ public final class IdA1CommandExecutor
     }
     if (command instanceof IdA1CommandAdminSearchByEmailNext c) {
       return new IdA1CmdAdminSearchByEmailNext().execute(context, c);
+    }
+
+    if (command instanceof IdA1CommandAdminEmailAdd c) {
+      return new IdA1CmdAdminEmailAdd().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminEmailRemove c) {
+      return new IdA1CmdAdminEmailRemove().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminPermissionRevoke c) {
+      return new IdA1CmdAdminPermissionRevoke().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminPermissionGrant c) {
+      return new IdA1CmdAdminPermissionGrant().execute(context, c);
     }
 
     throw new IllegalStateException();

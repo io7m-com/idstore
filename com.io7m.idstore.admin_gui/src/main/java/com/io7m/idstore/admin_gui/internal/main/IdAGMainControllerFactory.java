@@ -19,6 +19,7 @@ package com.io7m.idstore.admin_gui.internal.main;
 
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.audit.IdAGAuditController;
+import com.io7m.idstore.admin_gui.internal.profile.IdAGProfileController;
 import com.io7m.idstore.admin_gui.internal.users.IdAGUsersController;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import javafx.util.Callback;
@@ -62,6 +63,9 @@ public final class IdAGMainControllerFactory
       }
       case "com.io7m.idstore.admin_gui.internal.audit.IdAGAuditController" -> {
         yield new IdAGAuditController(this.services, this.configuration);
+      }
+      case "com.io7m.idstore.admin_gui.internal.profile.IdAGProfileController" -> {
+        yield new IdAGProfileController(this.services, this.configuration);
       }
 
       default -> {

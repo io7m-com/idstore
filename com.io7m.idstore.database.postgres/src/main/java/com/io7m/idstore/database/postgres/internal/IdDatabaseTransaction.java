@@ -39,6 +39,7 @@ import java.util.UUID;
 import static com.io7m.idstore.database.postgres.internal.Tables.ADMINS;
 import static com.io7m.idstore.database.postgres.internal.Tables.USERS;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_OR_USER_UNSET;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_UNSET;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNSUPPORTED_QUERY_CLASS;
@@ -261,5 +262,19 @@ final class IdDatabaseTransaction
         ADMIN_UNSET
       );
     });
+  }
+
+  @Override
+  public UUID executorId()
+    throws IdDatabaseException
+  {
+    return Optional.ofNullable(this.currentAdminId)
+      .or(() -> Optional.ofNullable(this.currentUserId))
+      .orElseThrow(() -> {
+        return new IdDatabaseException(
+          "A user or admin must be set before calling this method.",
+          ADMIN_OR_USER_UNSET
+        );
+      });
   }
 }

@@ -19,6 +19,7 @@ package com.io7m.idstore.admin_client.api;
 
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
@@ -29,7 +30,6 @@ import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdRealName;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -165,7 +165,10 @@ public interface IdAClientAdminsType
   /**
    * Update the given admin.
    *
-   * @param admin The admin
+   * @param admin    The admin
+   * @param idName   The new idname
+   * @param realName The new realname
+   * @param password The new password
    *
    * @return The updated admin
    *
@@ -173,7 +176,11 @@ public interface IdAClientAdminsType
    * @throws InterruptedException On interruption
    */
 
-  IdAdmin adminUpdate(IdAdmin admin)
+  IdAdmin adminUpdate(
+    UUID admin,
+    Optional<IdName> idName,
+    Optional<IdRealName> realName,
+    Optional<IdPassword> password)
     throws IdAClientException, InterruptedException;
 
   /**
@@ -198,7 +205,7 @@ public interface IdAClientAdminsType
     IdRealName realName,
     IdEmail email,
     IdPassword password,
-    Set<IdAdminPermission> permissions)
+    IdAdminPermissionSet permissions)
     throws IdAClientException, InterruptedException;
 
   /**
@@ -211,5 +218,73 @@ public interface IdAClientAdminsType
    */
 
   void adminDelete(UUID id)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Add an email to the given admin.
+   *
+   * @param id    The admin ID
+   * @param email The email address
+   *
+   * @return The updated admin
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdAdmin adminEmailAdd(
+    UUID id,
+    IdEmail email)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Remove an email from the given admin.
+   *
+   * @param id    The admin ID
+   * @param email The email address
+   *
+   * @return The updated admin
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdAdmin adminEmailRemove(
+    UUID id,
+    IdEmail email)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Grant a permission to the given admin.
+   *
+   * @param id         The admin ID
+   * @param permission The permission
+   *
+   * @return The updated admin
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdAdmin adminPermissionGrant(
+    UUID id,
+    IdAdminPermission permission)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Revoke a permission from the given admin.
+   *
+   * @param id         The admin ID
+   * @param permission The permission
+   *
+   * @return The updated admin
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdAdmin adminPermissionRevoke(
+    UUID id,
+    IdAdminPermission permission)
     throws IdAClientException, InterruptedException;
 }

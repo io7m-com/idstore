@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.admin_client.api;
 
+import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
@@ -151,7 +152,10 @@ public interface IdAClientUsersType
   /**
    * Update the given user.
    *
-   * @param user The user
+   * @param user    The user
+   * @param idName   The new idname
+   * @param realName The new realname
+   * @param password The new password
    *
    * @return The updated user
    *
@@ -159,9 +163,47 @@ public interface IdAClientUsersType
    * @throws InterruptedException On interruption
    */
 
-  IdUser userUpdate(IdUser user)
+  IdUser userUpdate(
+    UUID user,
+    Optional<IdName> idName,
+    Optional<IdRealName> realName,
+    Optional<IdPassword> password)
     throws IdAClientException, InterruptedException;
 
+  /**
+   * Add an email to the given user.
+   *
+   * @param id    The user ID
+   * @param email The email address
+   *
+   * @return The updated user
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdUser userEmailAdd(
+    UUID id,
+    IdEmail email)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Remove an email from the given user.
+   *
+   * @param id    The user ID
+   * @param email The email address
+   *
+   * @return The updated user
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  IdUser userEmailRemove(
+    UUID id,
+    IdEmail email)
+    throws IdAClientException, InterruptedException;
+  
   /**
    * Create a user.
    *

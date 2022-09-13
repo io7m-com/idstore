@@ -100,7 +100,7 @@ final class IdDatabaseEmailsQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
-    final var owner = transaction.userId();
+    final var executor = transaction.userId();
 
     try {
       context.selectFrom(USER_IDS)
@@ -130,7 +130,7 @@ final class IdDatabaseEmailsQueries
         .execute();
 
       context.insertInto(AUDIT)
-        .set(AUDIT.USER_ID, owner)
+        .set(AUDIT.USER_ID, executor)
         .set(AUDIT.MESSAGE,
              "%s|%s".formatted(verification.token(), verification.email()))
         .set(AUDIT.TYPE, "EMAIL_VERIFICATION_CREATED")
@@ -185,7 +185,7 @@ final class IdDatabaseEmailsQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
-    final var owner = transaction.userId();
+    final var executor = transaction.userId();
 
     try {
       context.deleteFrom(EMAIL_VERIFICATIONS)
@@ -193,7 +193,7 @@ final class IdDatabaseEmailsQueries
         .execute();
 
       context.insertInto(AUDIT)
-        .set(AUDIT.USER_ID, owner)
+        .set(AUDIT.USER_ID, executor)
         .set(AUDIT.MESSAGE, "%s|%s".formatted(token, resolution))
         .set(AUDIT.TYPE, "EMAIL_VERIFICATION_DELETED")
         .set(AUDIT.TIME, this.currentTime())

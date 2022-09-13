@@ -19,6 +19,7 @@ package com.io7m.idstore.admin_client.internal;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
@@ -39,7 +40,6 @@ import java.net.http.HttpClient;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -167,7 +167,10 @@ public final class IdAClientProtocolHandlerDisconnected
 
   @Override
   public IdAdmin adminUpdate(
-    final IdAdmin admin)
+    final UUID admin,
+    final Optional<IdName> idName,
+    final Optional<IdRealName> realName,
+    final Optional<IdPassword> password)
     throws IdAClientException
   {
     throw this.notLoggedIn();
@@ -180,7 +183,7 @@ public final class IdAClientProtocolHandlerDisconnected
     final IdRealName realName,
     final IdEmail email,
     final IdPassword password,
-    final Set<IdAdminPermission> permissions)
+    final IdAdminPermissionSet permissions)
     throws IdAClientException
   {
     throw this.notLoggedIn();
@@ -188,6 +191,42 @@ public final class IdAClientProtocolHandlerDisconnected
 
   @Override
   public void adminDelete(final UUID id)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdAdmin adminEmailAdd(
+    final UUID id,
+    final IdEmail email)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdAdmin adminEmailRemove(
+    final UUID id,
+    final IdEmail email)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdAdmin adminPermissionGrant(
+    final UUID id,
+    final IdAdminPermission permission)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdAdmin adminPermissionRevoke(
+    final UUID id,
+    final IdAdminPermission permission)
     throws IdAClientException
   {
     throw this.notLoggedIn();
@@ -255,7 +294,28 @@ public final class IdAClientProtocolHandlerDisconnected
 
   @Override
   public IdUser userUpdate(
-    final IdUser user)
+    final UUID user,
+    final Optional<IdName> idName,
+    final Optional<IdRealName> realName,
+    final Optional<IdPassword> password)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdUser userEmailAdd(
+    final UUID id,
+    final IdEmail email)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public IdUser userEmailRemove(
+    final UUID id,
+    final IdEmail email)
     throws IdAClientException
   {
     throw this.notLoggedIn();

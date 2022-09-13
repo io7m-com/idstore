@@ -855,6 +855,7 @@ final class IdDatabaseUsersQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
+    final var executor = transaction.executorId();
 
     try {
       context.fetchOptional(USERS, USERS.ID.eq(id))
@@ -868,8 +869,8 @@ final class IdDatabaseUsersQueries
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "USER_EMAIL_ADDED")
-        .set(AUDIT.USER_ID, id)
-        .set(AUDIT.MESSAGE, email.value())
+        .set(AUDIT.USER_ID, executor)
+        .set(AUDIT.MESSAGE, "%s|%s".formatted(id, email.value()))
         .execute();
 
     } catch (final DataAccessException e) {
@@ -888,6 +889,7 @@ final class IdDatabaseUsersQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
+    final var executor = transaction.executorId();
 
     try {
       context.fetchOptional(USERS, USERS.ID.eq(id))
@@ -915,8 +917,8 @@ final class IdDatabaseUsersQueries
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "USER_EMAIL_REMOVED")
-        .set(AUDIT.USER_ID, id)
-        .set(AUDIT.MESSAGE, email.value())
+        .set(AUDIT.USER_ID, executor)
+        .set(AUDIT.MESSAGE, "%s|%s".formatted(id, email.value()))
         .execute();
 
     } catch (final DataAccessException e) {
@@ -959,7 +961,7 @@ final class IdDatabaseUsersQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
-    final var owner = transaction.adminId();
+    final var executor = transaction.adminId();
 
     try {
       final var user = this.userGetRequire(id);
@@ -984,7 +986,7 @@ final class IdDatabaseUsersQueries
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "USER_DELETED")
-        .set(AUDIT.USER_ID, owner)
+        .set(AUDIT.USER_ID, executor)
         .set(AUDIT.MESSAGE, id.toString())
         .execute();
 

@@ -19,7 +19,13 @@ package com.io7m.idstore.tests;
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
-import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAdminColumnOrdering;
+import com.io7m.idstore.model.IdAdminOrdering;
+import com.io7m.idstore.model.IdAdminPermissionSet;
+import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
+import com.io7m.idstore.model.IdAdminSearchParameters;
+import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
@@ -27,27 +33,21 @@ import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
-import com.io7m.idstore.model.IdAdmin;
-import com.io7m.idstore.model.IdAdminColumnOrdering;
-import com.io7m.idstore.model.IdAdminOrdering;
-import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
-import com.io7m.idstore.model.IdAdminSearchParameters;
-import com.io7m.idstore.model.IdAdminSummary;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.OffsetDateTime;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.model.IdAdminColumn.BY_IDNAME;
-import static com.io7m.idstore.model.IdAdminPermission.*;
+import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdServerAdminAdminsTest extends IdWithServerContract
@@ -390,7 +390,7 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
         new IdRealName("Someone R. Incognito"),
         new IdEmail("someone-0@example.com"),
         password0,
-        EnumSet.allOf(IdAdminPermission.class)
+        IdAdminPermissionSet.all()
       );
 
     final var admin0r =
@@ -402,92 +402,20 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
         OffsetDateTime.now(this.clock()),
         OffsetDateTime.now(this.clock()),
         password1,
-        EnumSet.noneOf(IdAdminPermission.class)
+        IdAdminPermissionSet.empty()
       );
 
     final var admin1 =
-      this.client.adminUpdate(admin0r);
+      this.client.adminUpdate(
+        admin0r.id(),
+        Optional.of(admin0r.idName()),
+        Optional.of(admin0r.realName()),
+        Optional.of(admin0r.password()));
 
     assertEquals(admin0r.id(), admin1.id());
-    assertEquals(admin0r.emails(), admin1.emails());
     assertEquals(admin0r.idName(), admin1.idName());
     assertEquals(admin0r.realName(), admin1.realName());
     assertEquals(admin0r.password(), admin1.password());
-  }
-
-  /**
-   * Trying to grant permissions to an admin without holding those permissions
-   * fails.
-   *
-   * @throws Exception On errors
-   */
-
-  @Test
-  public void testAdminUpdateUnprivileged()
-    throws Exception
-  {
-    this.serverStartIfNecessary();
-
-    final var admin =
-      this.serverCreateAdminInitial("admin", "12345678");
-
-    this.client.login(
-      "admin",
-      "12345678",
-      this.serverAdminAPIURL()
-    );
-
-    final var password0 =
-      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
-        .createHashed("12345678");
-
-    final var admin0 =
-      this.client.adminCreate(
-        Optional.of(UUID.randomUUID()),
-        new IdName("someone-0"),
-        new IdRealName("Someone R. Incognito"),
-        new IdEmail("someone-0@example.com"),
-        password0,
-        EnumSet.of(ADMIN_CREATE, ADMIN_WRITE, ADMIN_READ)
-      );
-
-    final var admin1 =
-      this.client.adminCreate(
-        Optional.of(UUID.randomUUID()),
-        new IdName("someone-1"),
-        new IdRealName("Someone R. Incognito"),
-        new IdEmail("someone-1@example.com"),
-        password0,
-        EnumSet.noneOf(IdAdminPermission.class)
-      );
-
-    this.client.login(
-      "someone-0",
-      "12345678",
-      this.serverAdminAPIURL()
-    );
-
-    var ex =
-      Assertions.assertThrows(IdAClientException.class, () -> {
-        this.client.adminUpdate(
-          new IdAdmin(
-            admin1.id(),
-            admin1.idName(),
-            admin1.realName(),
-            admin1.emails(),
-            admin1.timeCreated(),
-            admin1.timeUpdated(),
-            admin1.password(),
-            EnumSet.allOf(IdAdminPermission.class)
-          )
-        );
-      });
-
-    final var msg = ex.getMessage();
-    assertTrue(msg.contains("The current admin cannot grant the following permissions"));
-    assertTrue(msg.contains("USER_READ"));
-    assertTrue(msg.contains("USER_WRITE"));
-    assertTrue(msg.contains("ADMIN_DELETE"));
   }
 
   /**
@@ -524,19 +452,197 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
         new IdRealName("Someone R. Incognito"),
         new IdEmail("someone-0@example.com"),
         password0,
-        EnumSet.noneOf(IdAdminPermission.class)
+        IdAdminPermissionSet.empty()
       );
 
     this.client.adminDelete(id);
 
     final var ex =
       Assertions.assertThrows(IdAClientException.class, () -> {
-        this.client.adminUpdate(admin0);
+        this.client.adminUpdate(
+          admin0.id(),
+          Optional.of(admin0.idName()),
+          Optional.of(admin0.realName()),
+          Optional.of(admin0.password())
+        );
       });
 
     assertTrue(
       ex.getMessage().contains("error-admin-nonexistent"),
       ex.getMessage());
+  }
+
+  /**
+   * Adding and removing emails works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminEmailAddRemove()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    final var id =
+      UUID.randomUUID();
+    final var password0 =
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+        .createHashed("12345678");
+
+    final var admin0 =
+      this.client.adminCreate(
+        Optional.of(id),
+        new IdName("someone-0"),
+        new IdRealName("Someone R. Incognito"),
+        new IdEmail("someone-0@example.com"),
+        password0,
+        IdAdminPermissionSet.all()
+      );
+
+    final var admin1 =
+      this.client.adminEmailAdd(
+        admin0.id(), new IdEmail("someone-1@example.com"));
+
+    assertTrue(
+      admin1.emails().contains(new IdEmail("someone-1@example.com"))
+    );
+
+    final var admin2 =
+      this.client.adminEmailRemove(
+        admin0.id(), new IdEmail("someone-1@example.com"));
+
+    assertFalse(
+      admin2.emails().contains(new IdEmail("someone-1@example.com"))
+    );
+  }
+
+  /**
+   * Adding and removing emails works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminEmailAddRemoveSelf()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    final var admin1 =
+      this.client.adminEmailAdd(
+        admin, new IdEmail("someone-x@example.com"));
+
+    assertTrue(
+      admin1.emails().contains(new IdEmail("someone-x@example.com"))
+    );
+
+    final var admin2 =
+      this.client.adminEmailRemove(
+        admin, new IdEmail("someone-x@example.com"));
+
+    assertFalse(
+      admin2.emails().contains(new IdEmail("someone-x@example.com"))
+    );
+  }
+
+  /**
+   * Adding and removing permissions works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminPermissionGrantRemove()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    final var id =
+      UUID.randomUUID();
+    final var password0 =
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+        .createHashed("12345678");
+
+    final var admin0 =
+      this.client.adminCreate(
+        Optional.of(id),
+        new IdName("someone-0"),
+        new IdRealName("Someone R. Incognito"),
+        new IdEmail("someone-0@example.com"),
+        password0,
+        IdAdminPermissionSet.empty()
+      );
+
+    final var admin1 =
+      this.client.adminPermissionGrant(admin0.id(), AUDIT_READ);
+
+    assertTrue(
+      admin1.permissions().implies(AUDIT_READ)
+    );
+
+    final var admin2 =
+      this.client.adminPermissionRevoke(admin0.id(), AUDIT_READ);
+
+    assertFalse(
+      admin2.permissions().implies(AUDIT_READ)
+    );
+  }
+
+  /**
+   * Adding and removing permissions works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminPermissionGrantRemoveSelf()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    final var admin2 =
+      this.client.adminPermissionRevoke(admin, AUDIT_READ);
+
+    assertFalse(
+      admin2.permissions().implies(AUDIT_READ)
+    );
   }
 
   private static void checkItems(

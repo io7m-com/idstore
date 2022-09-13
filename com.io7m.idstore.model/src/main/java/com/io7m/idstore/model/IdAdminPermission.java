@@ -16,6 +16,8 @@
 
 package com.io7m.idstore.model;
 
+import java.util.Set;
+
 /**
  * The type of admin permissions.
  */
@@ -26,53 +28,128 @@ public enum IdAdminPermission
    * A permission that allows for deleting admins.
    */
 
-  ADMIN_DELETE,
+  ADMIN_DELETE {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
 
   /**
    * A permission that allows for creating admins.
    */
 
-  ADMIN_CREATE,
+  ADMIN_CREATE {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
 
   /**
    * A permission that allows for modifying admins.
    */
 
-  ADMIN_WRITE,
+  ADMIN_WRITE {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return ADMIN_WRITE_SELF_IMPLIES;
+    }
+  },
+
+  /**
+   * A permission that allows an admin to modify itself.
+   */
+
+  ADMIN_WRITE_SELF {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
 
   /**
    * A permission that allows reading admins.
    */
 
-  ADMIN_READ,
+  ADMIN_READ {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
 
   /**
    * A permission that allows reading the audit log.
    */
 
-  AUDIT_READ,
+  AUDIT_READ {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
 
   /**
    * A permission that allows deleting users.
    */
 
-  USER_DELETE,
+  USER_DELETE {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
 
   /**
    * A permission that allows creating users.
    */
 
-  USER_CREATE,
+  USER_CREATE {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
 
   /**
    * A permission that allows modifying users.
    */
 
-  USER_WRITE,
+  USER_WRITE {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
 
   /**
    * A permission that allows reading users.
    */
 
-  USER_READ
+  USER_READ {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  };
+
+  private static final Set<IdAdminPermission> ADMIN_WRITE_SELF_IMPLIES =
+    Set.of(ADMIN_WRITE_SELF);
+
+  /**
+   * @return The set of permissions implied by this permission
+   */
+
+  public abstract Set<IdAdminPermission> implies();
 }

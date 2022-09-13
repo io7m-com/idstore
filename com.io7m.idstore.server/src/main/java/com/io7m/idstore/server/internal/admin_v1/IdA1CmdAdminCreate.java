@@ -30,25 +30,18 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminCreate;
-import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
-import com.io7m.idstore.server.security.IdSecurity;
 import com.io7m.idstore.server.security.IdSecurityException;
 
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
-import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
  * IdA1CmdAdminCreate
  */
 
 public final class IdA1CmdAdminCreate
-  implements IdCommandExecutorType<
+  extends IdA1CmdAbstract<
   IdA1CommandContext, IdA1CommandAdminCreate, IdA1ResponseType>
 {
   /**
@@ -61,75 +54,59 @@ public final class IdA1CmdAdminCreate
   }
 
   @Override
-  public IdA1ResponseType execute(
+  protected IdA1ResponseType executeActual(
     final IdA1CommandContext context,
     final IdA1CommandAdminCreate command)
-    throws IdCommandExecutionFailure
+    throws
+    IdValidityException,
+    IdSecurityException,
+    IdDatabaseException,
+    IdPasswordException,
+    IdCommandExecutionFailure
   {
-    Objects.requireNonNull(context, "context");
-    Objects.requireNonNull(command, "command");
+    final var transaction =
+      context.transaction();
+    final var admin =
+      context.admin();
 
-    try {
-      final var transaction =
-        context.transaction();
-      final var admin =
-        context.admin();
+    final var targetPermissions =
+      command.permissions()
+        .stream()
+        .map(IdA1AdminPermission::toPermission)
+        .collect(Collectors.toUnmodifiableSet());
 
-      final var targetPermissions =
-        command.permissions()
-          .stream()
-          .map(IdA1AdminPermission::toPermission)
-          .collect(Collectors.toUnmodifiableSet());
+    context.securityCheck(new IdSecAdminActionAdminCreate(admin, targetPermissions));
 
-      if (IdSecurity.check(
-        new IdSecAdminActionAdminCreate(admin, targetPermissions))
-        instanceof IdSecPolicyResultDenied denied) {
-        throw context.fail(
-          FORBIDDEN_403,
-          SECURITY_POLICY_DENIED,
-          denied.message()
-        );
-      }
+    transaction.adminIdSet(admin.id());
 
-      transaction.adminIdSet(admin.id());
+    final var admins =
+      transaction.queries(IdDatabaseAdminsQueriesType.class);
 
-      final var admins =
-        transaction.queries(IdDatabaseAdminsQueriesType.class);
+    final var id =
+      command.id().orElse(UUID.randomUUID());
+    final var idName =
+      new IdName(command.idName());
+    final var realName =
+      new IdRealName(command.realName());
+    final var email =
+      new IdEmail(command.email());
+    final var password =
+      command.password().toPassword();
 
-      final var id =
-        command.id().orElse(UUID.randomUUID());
-      final var idName =
-        new IdName(command.idName());
-      final var realName =
-        new IdRealName(command.realName());
-      final var email =
-        new IdEmail(command.email());
-      final var password =
-        command.password().toPassword();
-
-      final var newAdmin =
-        admins.adminCreate(
-          id,
-          idName,
-          realName,
-          email,
-          context.now(),
-          password,
-          targetPermissions
-        );
-
-      return new IdA1ResponseAdminCreate(
-        context.requestId(),
-        IdA1Admin.ofAdmin(newAdmin)
+    final var newAdmin =
+      admins.adminCreate(
+        id,
+        idName,
+        realName,
+        email,
+        context.now(),
+        password,
+        targetPermissions
       );
-    } catch (final IdValidityException e) {
-      throw context.failValidity(e);
-    } catch (final IdSecurityException e) {
-      throw context.failSecurity(e);
-    } catch (final IdDatabaseException e) {
-      throw context.failDatabase(e);
-    } catch (final IdPasswordException e) {
-      throw context.failPassword(e);
-    }
+
+    return new IdA1ResponseAdminCreate(
+      context.requestId(),
+      IdA1Admin.ofAdmin(newAdmin)
+    );
   }
 }

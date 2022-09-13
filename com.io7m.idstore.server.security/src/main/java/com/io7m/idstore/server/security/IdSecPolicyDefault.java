@@ -16,6 +16,9 @@
 
 package com.io7m.idstore.server.security;
 
+import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAdminPermission;
+
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -23,6 +26,7 @@ import static com.io7m.idstore.model.IdAdminPermission.ADMIN_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_READ;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_SELF;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
 import static com.io7m.idstore.model.IdAdminPermission.USER_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_DELETE;
@@ -151,6 +155,19 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
       return checkAdminActionAdminDelete(e);
     }
 
+    if (action instanceof IdSecAdminActionAdminEmailAdd e) {
+      return checkAdminActionAdminEmailAdd(e);
+    }
+    if (action instanceof IdSecAdminActionAdminEmailRemove e) {
+      return checkAdminActionAdminEmailRemove(e);
+    }
+    if (action instanceof IdSecAdminActionAdminPermissionGrant e) {
+      return checkAdminActionAdminPermissionGrant(e);
+    }
+    if (action instanceof IdSecAdminActionAdminPermissionRevoke e) {
+      return checkAdminActionAdminPermissionRevoke(e);
+    }
+
     if (action instanceof IdSecAdminActionAuditRead e) {
       return checkAdminActionAuditRead(e);
     }
@@ -158,11 +175,111 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     return new IdSecPolicyResultDenied("Operation not permitted.");
   }
 
+  private static IdSecPolicyResultType checkAdminActionAdminPermissionRevoke(
+    final IdSecAdminActionAdminPermissionRevoke e)
+  {
+    final var admin = e.admin();
+    if (Objects.equals(admin.id(), e.targetAdmin())) {
+      if (!admin.permissions().implies(ADMIN_WRITE_SELF)) {
+        return new IdSecPolicyResultDenied(
+          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE_SELF)
+        );
+      }
+    } else {
+      if (!admin.permissions().implies(ADMIN_WRITE)) {
+        return new IdSecPolicyResultDenied(
+          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+        );
+      }
+    }
+
+    final var permission = e.permission();
+    if (!admin.permissions().implies(permission)) {
+      return new IdSecPolicyResultDenied(
+        "The %s permission cannot be revoked by an admin that does not have it."
+          .formatted(permission)
+      );
+    }
+
+    return new IdSecPolicyResultPermitted();
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAdminPermissionGrant(
+    final IdSecAdminActionAdminPermissionGrant e)
+  {
+    final var admin = e.admin();
+    if (Objects.equals(admin.id(), e.targetAdmin())) {
+      if (!admin.permissions().implies(ADMIN_WRITE_SELF)) {
+        return new IdSecPolicyResultDenied(
+          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE_SELF)
+        );
+      }
+    } else {
+      if (!admin.permissions().implies(ADMIN_WRITE)) {
+        return new IdSecPolicyResultDenied(
+          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+        );
+      }
+    }
+
+    final var permission = e.permission();
+    if (!admin.permissions().implies(permission)) {
+      return new IdSecPolicyResultDenied(
+        "The %s permission cannot be granted by an admin that does not have it."
+          .formatted(permission)
+      );
+    }
+
+    return new IdSecPolicyResultPermitted();
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAdminEmailRemove(
+    final IdSecAdminActionAdminEmailRemove e)
+  {
+    final var admin = e.admin();
+    if (Objects.equals(admin.id(), e.targetAdmin())) {
+      if (!admin.permissions().implies(ADMIN_WRITE_SELF)) {
+        return new IdSecPolicyResultDenied(
+          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE_SELF)
+        );
+      }
+    } else {
+      if (!admin.permissions().implies(ADMIN_WRITE)) {
+        return new IdSecPolicyResultDenied(
+          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+        );
+      }
+    }
+
+    return new IdSecPolicyResultPermitted();
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAdminEmailAdd(
+    final IdSecAdminActionAdminEmailAdd e)
+  {
+    final var admin = e.admin();
+    if (Objects.equals(admin.id(), e.targetAdmin())) {
+      if (!admin.permissions().implies(ADMIN_WRITE_SELF)) {
+        return new IdSecPolicyResultDenied(
+          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE_SELF)
+        );
+      }
+    } else {
+      if (!admin.permissions().implies(ADMIN_WRITE)) {
+        return new IdSecPolicyResultDenied(
+          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+        );
+      }
+    }
+
+    return new IdSecPolicyResultPermitted();
+  }
+
   private static IdSecPolicyResultType checkAdminActionAuditRead(
     final IdSecAdminActionAuditRead e)
   {
     final var permissions = e.admin().permissions();
-    if (permissions.contains(AUDIT_READ)) {
+    if (permissions.implies(AUDIT_READ)) {
       return new IdSecPolicyResultPermitted();
     }
 
@@ -175,7 +292,7 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     final IdSecAdminActionUserRead e)
   {
     final var permissions = e.admin().permissions();
-    if (permissions.contains(USER_READ)) {
+    if (permissions.implies(USER_READ)) {
       return new IdSecPolicyResultPermitted();
     }
 
@@ -188,7 +305,7 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     final IdSecAdminActionUserDelete e)
   {
     final var permissions = e.admin().permissions();
-    if (permissions.contains(USER_DELETE)) {
+    if (permissions.implies(USER_DELETE)) {
       return new IdSecPolicyResultPermitted();
     }
 
@@ -201,7 +318,7 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     final IdSecAdminActionUserCreate e)
   {
     final var permissions = e.admin().permissions();
-    if (permissions.contains(USER_CREATE)) {
+    if (permissions.implies(USER_CREATE)) {
       return new IdSecPolicyResultPermitted();
     }
 
@@ -214,7 +331,7 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     final IdSecAdminActionUserUpdate e)
   {
     final var permissions = e.admin().permissions();
-    if (permissions.contains(USER_WRITE)) {
+    if (permissions.implies(USER_WRITE)) {
       return new IdSecPolicyResultPermitted();
     }
 
@@ -227,7 +344,7 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     final IdSecAdminActionAdminRead e)
   {
     final var permissions = e.admin().permissions();
-    if (permissions.contains(ADMIN_READ)) {
+    if (permissions.implies(ADMIN_READ)) {
       return new IdSecPolicyResultPermitted();
     }
 
@@ -244,18 +361,18 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     final var permissionsWanted =
       e.targetPermissions();
 
-    if (!permissionsHeld.contains(ADMIN_CREATE)) {
+    if (!permissionsHeld.implies(ADMIN_CREATE)) {
       return new IdSecPolicyResultDenied(
         "Creating admins requires the %s permission.".formatted(ADMIN_CREATE)
       );
     }
 
-    if (permissionsHeld.containsAll(permissionsWanted)) {
+    if (permissionsHeld.impliesAll(permissionsWanted)) {
       return new IdSecPolicyResultPermitted();
     }
 
     final var missing = new HashSet<>(permissionsWanted);
-    missing.removeAll(permissionsHeld);
+    missing.removeAll(permissionsHeld.impliedPermissions());
 
     return new IdSecPolicyResultDenied(
       "The current admin cannot grant the following permissions: %s"
@@ -266,35 +383,30 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   private static IdSecPolicyResultType checkAdminActionAdminUpdate(
     final IdSecAdminActionAdminUpdate e)
   {
-    final var permissionsHeld =
-      e.admin().permissions();
-    final var permissionsWanted =
-      e.targetPermissions();
-
-    if (!permissionsHeld.contains(ADMIN_WRITE)) {
-      return new IdSecPolicyResultDenied(
-        "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
-      );
+    final var admin = e.admin();
+    final var permissionsHeld = admin.permissions();
+    if (Objects.equals(admin.id(), e.targetAdmin())) {
+      if (!permissionsHeld.implies(ADMIN_WRITE_SELF)) {
+        return new IdSecPolicyResultDenied(
+          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE_SELF)
+        );
+      }
+    } else {
+      if (!permissionsHeld.implies(ADMIN_WRITE)) {
+        return new IdSecPolicyResultDenied(
+          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+        );
+      }
     }
 
-    if (permissionsHeld.containsAll(permissionsWanted)) {
-      return new IdSecPolicyResultPermitted();
-    }
-
-    final var missing = new HashSet<>(permissionsWanted);
-    missing.removeAll(permissionsHeld);
-
-    return new IdSecPolicyResultDenied(
-      "The current admin cannot grant the following permissions: %s"
-        .formatted(missing)
-    );
+    return new IdSecPolicyResultPermitted();
   }
 
   private static IdSecPolicyResultType checkAdminActionAdminDelete(
     final IdSecAdminActionAdminDelete e)
   {
     final var permissionsHeld = e.admin().permissions();
-    if (permissionsHeld.contains(ADMIN_DELETE)) {
+    if (permissionsHeld.implies(ADMIN_DELETE)) {
       return new IdSecPolicyResultPermitted();
     }
 

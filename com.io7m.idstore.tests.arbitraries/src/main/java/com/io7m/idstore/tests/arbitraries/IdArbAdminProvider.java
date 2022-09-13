@@ -18,6 +18,7 @@ package com.io7m.idstore.tests.arbitraries;
 
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
@@ -76,7 +77,8 @@ public final class IdArbAdminProvider extends IdArbAbstractProvider
       Arbitraries.defaultFor(IdPassword.class);
     final var pp =
       Arbitraries.defaultFor(IdAdminPermission.class)
-        .set();
+        .set()
+        .map(IdAdminPermissionSet::of);
 
     final Arbitrary<IdAdmin> a =
       Combinators.combine(u, un, rn, e, t, t, p, pp)

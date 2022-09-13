@@ -28,6 +28,7 @@ public sealed interface IdAGClientEventType
   permits IdAGClientEventConnected,
   IdAGClientEventConnecting,
   IdAGClientEventConnectionFailed,
+  IdAGClientEventConnectionSucceeded,
   IdAGClientEventDisconnected,
   IdAGClientEventRequestFailed,
   IdAGClientEventRequesting

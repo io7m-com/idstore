@@ -47,6 +47,12 @@ public enum IdA1AdminPermission
   ADMIN_WRITE,
 
   /**
+   * A permission that allows an admin to update itself.
+   */
+
+  ADMIN_WRITE_SELF,
+
+  /**
    * A permission that allows reading admins.
    */
 
@@ -101,6 +107,7 @@ public enum IdA1AdminPermission
     return switch (permission) {
       case ADMIN_CREATE -> ADMIN_CREATE;
       case ADMIN_DELETE -> ADMIN_DELETE;
+      case ADMIN_WRITE_SELF -> ADMIN_WRITE_SELF;
       case ADMIN_READ -> ADMIN_READ;
       case ADMIN_WRITE -> ADMIN_WRITE;
       case AUDIT_READ -> AUDIT_READ;
@@ -125,6 +132,7 @@ public enum IdA1AdminPermission
     return switch (this) {
       case ADMIN_CREATE -> IdAdminPermission.ADMIN_CREATE;
       case ADMIN_DELETE -> IdAdminPermission.ADMIN_DELETE;
+      case ADMIN_WRITE_SELF -> IdAdminPermission.ADMIN_WRITE_SELF;
       case ADMIN_READ -> IdAdminPermission.ADMIN_READ;
       case ADMIN_WRITE -> IdAdminPermission.ADMIN_WRITE;
       case AUDIT_READ -> IdAdminPermission.AUDIT_READ;

@@ -17,33 +17,32 @@
 package com.io7m.idstore.server.security;
 
 import com.io7m.idstore.model.IdAdmin;
-import com.io7m.idstore.model.IdAdminPermission;
 
 import java.util.Objects;
-import java.util.Set;
+import java.util.UUID;
 
 /**
  * An admin wants to update an admin.
  *
- * @param admin             The admin
- * @param targetPermissions The permissions the update admin will have
+ * @param admin       The admin
+ * @param targetAdmin The admin being updated
  */
 
 public record IdSecAdminActionAdminUpdate(
   IdAdmin admin,
-  Set<IdAdminPermission> targetPermissions)
+  UUID targetAdmin)
   implements IdSecAdminActionType
 {
   /**
    * An admin wants to update an admin.
    *
-   * @param admin             The admin
-   * @param targetPermissions The permissions the update admin will have
+   * @param admin       The admin
+   * @param targetAdmin The admin being updated
    */
 
   public IdSecAdminActionAdminUpdate
   {
     Objects.requireNonNull(admin, "admin");
-    Objects.requireNonNull(targetPermissions, "targetPermissions");
+    Objects.requireNonNull(targetAdmin, "targetAdmin");
   }
 }

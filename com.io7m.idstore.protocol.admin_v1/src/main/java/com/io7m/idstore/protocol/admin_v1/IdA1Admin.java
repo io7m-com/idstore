@@ -18,6 +18,7 @@ package com.io7m.idstore.protocol.admin_v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
@@ -118,6 +119,7 @@ public record IdA1Admin(
       admin.timeUpdated(),
       IdA1Password.ofPassword(admin.password()),
       admin.permissions()
+        .impliedPermissions()
         .stream()
         .map(IdA1AdminPermission::ofPermission)
         .collect(Collectors.toUnmodifiableSet())
@@ -141,9 +143,10 @@ public record IdA1Admin(
         this.timeCreated,
         this.timeUpdated,
         this.password.toPassword(),
-        this.permissions.stream()
-          .map(IdA1AdminPermission::toPermission)
-          .collect(Collectors.toUnmodifiableSet())
+        IdAdminPermissionSet.of(
+          this.permissions.stream()
+            .map(IdA1AdminPermission::toPermission)
+            .collect(Collectors.toUnmodifiableSet()))
       );
     } catch (final IdPasswordException e) {
       throw new IdProtocolException(e.getMessage(), e);

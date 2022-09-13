@@ -19,30 +19,21 @@ package com.io7m.idstore.server.internal.admin_v1;
 
 import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
-import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditEvent;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1Page;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecAdminActionAuditRead;
-import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
-import com.io7m.idstore.server.security.IdSecurity;
 import com.io7m.idstore.server.security.IdSecurityException;
-
-import java.util.Objects;
-
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
-import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
  * IdA1CmdAuditSearchPrevious
  */
 
 public final class IdA1CmdAuditSearchPrevious
-  implements IdCommandExecutorType<
+  extends IdA1CmdAbstract<
   IdA1CommandContext, IdA1CommandAuditSearchPrevious, IdA1ResponseType>
 {
   /**
@@ -55,54 +46,35 @@ public final class IdA1CmdAuditSearchPrevious
   }
 
   @Override
-  public IdA1ResponseType execute(
+  protected IdA1ResponseType executeActual(
     final IdA1CommandContext context,
     final IdA1CommandAuditSearchPrevious command)
-    throws IdCommandExecutionFailure
+    throws IdCommandExecutionFailure, IdSecurityException, IdDatabaseException
   {
-    Objects.requireNonNull(context, "context");
-    Objects.requireNonNull(command, "command");
+    final var transaction =
+      context.transaction();
+    final var admin =
+      context.admin();
 
-    try {
-      final var transaction =
-        context.transaction();
-      final var admin =
-        context.admin();
+    context.securityCheck(new IdSecAdminActionAuditRead(admin));
 
-      if (IdSecurity.check(new IdSecAdminActionAuditRead(admin))
-        instanceof IdSecPolicyResultDenied denied) {
-        throw context.fail(
-          FORBIDDEN_403,
-          SECURITY_POLICY_DENIED,
-          denied.message()
-        );
-      }
+    final var users =
+      transaction.queries(IdDatabaseAuditQueriesType.class);
 
-      final var users =
-        transaction.queries(IdDatabaseAuditQueriesType.class);
+    final var session = context.userSession();
+    final var paging = session.auditPaging();
+    final var data = paging.pagePrevious(users);
 
-      final var session = context.userSession();
-      final var paging = session.auditPaging();
-      final var data = paging.pagePrevious(users);
-
-      return new IdA1ResponseAuditSearchPrevious(
-        context.requestId(),
-        new IdA1Page<>(
-          data.stream()
-            .map(IdA1AuditEvent::of)
-            .toList(),
-          paging.pageNumber(),
-          paging.pageCount(),
-          paging.pageFirstOffset()
-        )
-      );
-
-    } catch (final IdValidityException e) {
-      throw context.failValidity(e);
-    } catch (final IdSecurityException e) {
-      throw context.failSecurity(e);
-    } catch (final IdDatabaseException e) {
-      throw context.failDatabase(e);
-    }
+    return new IdA1ResponseAuditSearchPrevious(
+      context.requestId(),
+      new IdA1Page<>(
+        data.stream()
+          .map(IdA1AuditEvent::of)
+          .toList(),
+        paging.pageNumber(),
+        paging.pageCount(),
+        paging.pageFirstOffset()
+      )
+    );
   }
 }

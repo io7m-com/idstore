@@ -139,7 +139,6 @@ public final class IdStandardErrorCodes
   public static final IdErrorCode HTTP_SIZE_LIMIT =
     new IdErrorCode("error-http-size-limit");
 
-
   /**
    * An attempt was made to create a user that already exists.
    */
@@ -229,11 +228,18 @@ public final class IdStandardErrorCodes
     new IdErrorCode("error-admin-nonexistent");
 
   /**
-   * An attempt was made to perform an operation that requires a admin.
+   * An attempt was made to perform an operation that requires an admin.
    */
 
   public static final IdErrorCode ADMIN_UNSET =
     new IdErrorCode("error-admin-unset");
+
+  /**
+   * An attempt was made to perform an operation that requires an admin or user.
+   */
+
+  public static final IdErrorCode ADMIN_OR_USER_UNSET =
+    new IdErrorCode("error-admin-or-user-unset");
 
   /**
    * An attempt was made to create an initial admin in a database, but a admin

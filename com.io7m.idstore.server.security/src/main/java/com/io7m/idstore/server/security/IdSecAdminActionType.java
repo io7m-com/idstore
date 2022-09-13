@@ -26,6 +26,10 @@ import com.io7m.idstore.model.IdAdmin;
 public sealed interface IdSecAdminActionType
   extends IdSecActionType permits IdSecAdminActionAdminCreate,
   IdSecAdminActionAdminDelete,
+  IdSecAdminActionAdminEmailAdd,
+  IdSecAdminActionAdminEmailRemove,
+  IdSecAdminActionAdminPermissionGrant,
+  IdSecAdminActionAdminPermissionRevoke,
   IdSecAdminActionAdminRead,
   IdSecAdminActionAdminUpdate,
   IdSecAdminActionAuditRead,

@@ -24,16 +24,13 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSelf;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
-
-import java.util.Objects;
 
 /**
  * IdA1CmdAdminSelf
  */
 
 public final class IdA1CmdAdminSelf
-  implements IdCommandExecutorType<
+  extends IdA1CmdAbstract<
   IdA1CommandContext, IdA1CommandAdminSelf, IdA1ResponseType>
 {
   /**
@@ -46,30 +43,23 @@ public final class IdA1CmdAdminSelf
   }
 
   @Override
-  public IdA1ResponseType execute(
+  protected IdA1ResponseType executeActual(
     final IdA1CommandContext context,
     final IdA1CommandAdminSelf command)
-    throws IdCommandExecutionFailure
+    throws IdCommandExecutionFailure, IdDatabaseException
   {
-    Objects.requireNonNull(context, "context");
-    Objects.requireNonNull(command, "command");
+    final var transaction =
+      context.transaction();
+    final var admins =
+      transaction.queries(IdDatabaseAdminsQueriesType.class);
 
-    try {
-      final var transaction =
-        context.transaction();
-      final var admins =
-        transaction.queries(IdDatabaseAdminsQueriesType.class);
+    final var adminId = context.admin().id();
+    transaction.adminIdSet(adminId);
+    final var user = admins.adminGetRequire(adminId);
 
-      final var adminId = context.admin().id();
-      transaction.adminIdSet(adminId);
-      final var user = admins.adminGetRequire(adminId);
-
-      return new IdA1ResponseAdminSelf(
-        context.requestId(),
-        IdA1Admin.ofAdmin(user)
-      );
-    } catch (final IdDatabaseException e) {
-      throw context.failDatabase(e);
-    }
+    return new IdA1ResponseAdminSelf(
+      context.requestId(),
+      IdA1Admin.ofAdmin(user)
+    );
   }
 }

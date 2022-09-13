@@ -20,6 +20,7 @@ import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
@@ -41,7 +42,6 @@ import java.net.http.HttpClient;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -141,10 +141,13 @@ public final class IdAClient implements IdAClientType
 
   @Override
   public IdAdmin adminUpdate(
-    final IdAdmin admin)
+    final UUID admin,
+    final Optional<IdName> idName,
+    final Optional<IdRealName> realName,
+    final Optional<IdPassword> password)
     throws IdAClientException, InterruptedException
   {
-    return this.handler.adminUpdate(admin);
+    return this.handler.adminUpdate(admin, idName, realName, password);
   }
 
   @Override
@@ -154,7 +157,7 @@ public final class IdAClient implements IdAClientType
     final IdRealName realName,
     final IdEmail email,
     final IdPassword password,
-    final Set<IdAdminPermission> permissions)
+    final IdAdminPermissionSet permissions)
     throws IdAClientException, InterruptedException
   {
     return this.handler.adminCreate(
@@ -270,13 +273,6 @@ public final class IdAClient implements IdAClientType
   }
 
   @Override
-  public IdUser userUpdate(final IdUser user)
-    throws IdAClientException, InterruptedException
-  {
-    return this.handler.userUpdate(user);
-  }
-
-  @Override
   public IdUser userCreate(
     final Optional<UUID> id,
     final IdName idName,
@@ -334,5 +330,70 @@ public final class IdAClient implements IdAClientType
     throws IdAClientException, InterruptedException
   {
     this.handler.userDelete(id);
+  }
+
+  @Override
+  public IdAdmin adminEmailAdd(
+    final UUID id,
+    final IdEmail email)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminEmailAdd(id, email);
+  }
+
+  @Override
+  public IdAdmin adminEmailRemove(
+    final UUID id,
+    final IdEmail email)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminEmailRemove(id, email);
+  }
+
+  @Override
+  public IdAdmin adminPermissionGrant(
+    final UUID id,
+    final IdAdminPermission permission)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminPermissionGrant(id, permission);
+  }
+
+  @Override
+  public IdAdmin adminPermissionRevoke(
+    final UUID id,
+    final IdAdminPermission permission)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminPermissionRevoke(id, permission);
+  }
+
+  @Override
+  public IdUser userUpdate(
+    final UUID user,
+    final Optional<IdName> idName,
+    final Optional<IdRealName> realName,
+    final Optional<IdPassword> password)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userUpdate(user, idName, realName, password);
+  }
+
+  @Override
+  public IdUser userEmailAdd(
+    final UUID id,
+    final IdEmail email)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userEmailAdd(id, email);
+  }
+
+  @Override
+  public IdUser userEmailRemove(
+    final UUID id,
+    final IdEmail email)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userEmailRemove(id, email);
   }
 }

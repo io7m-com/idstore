@@ -69,6 +69,12 @@
 
 }
 
+.permissionTable
+{
+  -fx-font-size: 10pt;
+  -fx-font-family: "Monospaced";
+}
+
 .emailTable
 {
   -fx-font-size: 10pt;

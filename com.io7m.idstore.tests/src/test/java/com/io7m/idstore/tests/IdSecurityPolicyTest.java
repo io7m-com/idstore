@@ -18,6 +18,7 @@
 package com.io7m.idstore.tests;
 
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
@@ -28,6 +29,10 @@ import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.server.security.IdSecActionType;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminCreate;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminDelete;
+import com.io7m.idstore.server.security.IdSecAdminActionAdminEmailAdd;
+import com.io7m.idstore.server.security.IdSecAdminActionAdminEmailRemove;
+import com.io7m.idstore.server.security.IdSecAdminActionAdminPermissionGrant;
+import com.io7m.idstore.server.security.IdSecAdminActionAdminPermissionRevoke;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminRead;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminUpdate;
 import com.io7m.idstore.server.security.IdSecAdminActionAuditRead;
@@ -51,6 +56,7 @@ import static com.io7m.idstore.model.IdAdminPermission.ADMIN_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_READ;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_SELF;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
 import static com.io7m.idstore.model.IdAdminPermission.USER_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_DELETE;
@@ -95,7 +101,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of()
+          IdAdminPermissionSet.empty()
         ),
         Set.of()
       );
@@ -123,7 +129,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(ADMIN_CREATE)
+          IdAdminPermissionSet.of(ADMIN_CREATE)
         ),
         Set.of(ADMIN_CREATE, ADMIN_WRITE)
       );
@@ -153,7 +159,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(ADMIN_CREATE)
+          IdAdminPermissionSet.of(ADMIN_CREATE)
         ),
         Set.of(ADMIN_CREATE)
       );
@@ -162,7 +168,7 @@ public final class IdSecurityPolicyTest
   }
 
   /**
-   * Admins cannot be updated by an admin without ADMIN_UPDATE.
+   * Admins cannot be updated by an admin without ADMIN_WRITE.
    *
    * @throws IdSecurityException On errors
    */
@@ -181,42 +187,41 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of()
+          IdAdminPermissionSet.empty()
         ),
-        Set.of()
+        UUID.randomUUID()
       );
 
     failsWith(action, "Modifying admins requires the ADMIN_WRITE permission.");
   }
 
   /**
-   * Admins cannot be updated with more permissions.
+   * Admins cannot be updated by an admin without ADMIN_WRITE.
    *
    * @throws IdSecurityException On errors
    */
 
   @Test
-  public void testAdminUpdateMorePermissions()
+  public void testAdminUpdateNoUpdateSelf()
     throws IdSecurityException
   {
+    final var id = UUID.randomUUID();
     final var action =
       new IdSecAdminActionAdminUpdate(
         new IdAdmin(
-          UUID.randomUUID(),
+          id,
           new IdName("admin-0"),
           new IdRealName("Someone R. Incognito"),
           IdNonEmptyList.single(new IdEmail("someone@example.com")),
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(ADMIN_WRITE)
+          IdAdminPermissionSet.empty()
         ),
-        Set.of(ADMIN_READ, ADMIN_WRITE)
+        id
       );
 
-    failsWith(
-      action,
-      "The current admin cannot grant the following permissions: [ADMIN_READ]");
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE_SELF permission.");
   }
 
   /**
@@ -239,9 +244,67 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE)
         ),
-        Set.of(ADMIN_WRITE)
+        UUID.randomUUID()
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admins can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminUpdateOKSelf0()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminUpdate(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        id
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admins can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminUpdateOKSelf1()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminUpdate(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE_SELF)
+        ),
+        id
       );
 
     succeeds(action);
@@ -267,7 +330,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE)
         )
       );
 
@@ -296,7 +359,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(ADMIN_READ)
+          IdAdminPermissionSet.of(ADMIN_READ)
         )
       );
 
@@ -324,7 +387,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(ADMIN_READ)
+          IdAdminPermissionSet.of(ADMIN_READ)
         )
       );
 
@@ -353,7 +416,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(ADMIN_DELETE)
+          IdAdminPermissionSet.of(ADMIN_DELETE)
         )
       );
 
@@ -381,7 +444,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of()
+          IdAdminPermissionSet.of()
         )
       );
 
@@ -408,7 +471,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(USER_CREATE)
+          IdAdminPermissionSet.of(USER_CREATE)
         )
       );
 
@@ -435,7 +498,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of()
+          IdAdminPermissionSet.of()
         )
       );
 
@@ -462,7 +525,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(USER_WRITE)
+          IdAdminPermissionSet.of(USER_WRITE)
         )
       );
 
@@ -489,7 +552,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(USER_WRITE)
+          IdAdminPermissionSet.of(USER_WRITE)
         )
       );
 
@@ -518,7 +581,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(USER_READ)
+          IdAdminPermissionSet.of(USER_READ)
         )
       );
 
@@ -546,7 +609,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(USER_READ)
+          IdAdminPermissionSet.of(USER_READ)
         )
       );
 
@@ -575,7 +638,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(USER_DELETE)
+          IdAdminPermissionSet.of(USER_DELETE)
         )
       );
 
@@ -602,7 +665,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(AUDIT_READ)
+          IdAdminPermissionSet.of(AUDIT_READ)
         )
       );
 
@@ -629,13 +692,730 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          Set.of(USER_READ)
+          IdAdminPermissionSet.of(USER_READ)
         )
       );
 
     failsWith(
       action,
       "Reading audit records requires the AUDIT_READ permission.");
+  }
+
+  /**
+   * Admin emails can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminEmailAddOK()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionAdminEmailAdd(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        UUID.randomUUID()
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin emails can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminEmailAddSelf0OK()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminEmailAdd(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE_SELF)
+        ),
+        id
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin emails can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminEmailAddSelf1OK()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminEmailAdd(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        id
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin emails cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminEmailAddFailure0()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminEmailAdd(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of()
+        ),
+        id
+      );
+
+    failsWith(
+      action,
+      "Modifying admins requires the ADMIN_WRITE_SELF permission.");
+  }
+
+  /**
+   * Admin emails cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminEmailAddFailure1()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionAdminEmailAdd(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of()
+        ),
+        UUID.randomUUID()
+      );
+
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE permission.");
+  }
+
+  /**
+   * Admin emails can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminEmailRemoveOK()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionAdminEmailRemove(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        UUID.randomUUID()
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin emails can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminEmailRemoveSelf0OK()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminEmailRemove(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE_SELF)
+        ),
+        id
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin emails can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminEmailRemoveSelf1OK()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminEmailRemove(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        id
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin emails cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminEmailRemoveFailure0()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminEmailRemove(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of()
+        ),
+        id
+      );
+
+    failsWith(
+      action,
+      "Modifying admins requires the ADMIN_WRITE_SELF permission.");
+  }
+
+  /**
+   * Admin emails cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminEmailRemoveFailure1()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionAdminEmailRemove(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of()
+        ),
+        UUID.randomUUID()
+      );
+
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE permission.");
+  }
+
+  /**
+   * Admin permissions can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionGrantOK()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionAdminPermissionGrant(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        UUID.randomUUID(),
+        ADMIN_WRITE
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin permissions can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionGrantSelf0OK()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminPermissionGrant(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE_SELF)
+        ),
+        id,
+        ADMIN_WRITE_SELF
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin permissions can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionGrantSelf1OK()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminPermissionGrant(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        id,
+        ADMIN_WRITE
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin permissions cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionGrantFailure0()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminPermissionGrant(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of()
+        ),
+        id,
+        ADMIN_WRITE
+      );
+
+    failsWith(
+      action,
+      "Modifying admins requires the ADMIN_WRITE_SELF permission.");
+  }
+
+  /**
+   * Admin permissions cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionGrantFailure1()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionAdminPermissionGrant(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of()
+        ),
+        UUID.randomUUID(),
+        ADMIN_WRITE
+      );
+
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE permission.");
+  }
+
+  /**
+   * Admin permissions cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionGrantFailure2()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionAdminPermissionGrant(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        UUID.randomUUID(),
+        ADMIN_READ
+      );
+
+    failsWith(
+      action,
+      "The ADMIN_READ permission cannot be granted by an admin that does not have it.");
+  }
+
+  /**
+   * Admin permissions cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionGrantFailure3()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminPermissionGrant(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        id,
+        ADMIN_READ
+      );
+
+    failsWith(
+      action,
+      "The ADMIN_READ permission cannot be granted by an admin that does not have it.");
+  }
+
+
+  /**
+   * Admin permissions can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionRevokeOK()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionAdminPermissionRevoke(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        UUID.randomUUID(),
+        ADMIN_WRITE
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin permissions can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionRevokeSelf0OK()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminPermissionRevoke(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE_SELF)
+        ),
+        id,
+        ADMIN_WRITE_SELF
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin permissions can be updated.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionRevokeSelf1OK()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminPermissionRevoke(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        id,
+        ADMIN_WRITE
+      );
+
+    succeeds(action);
+  }
+
+  /**
+   * Admin permissions cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionRevokeFailure0()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminPermissionRevoke(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of()
+        ),
+        id,
+        ADMIN_WRITE
+      );
+
+    failsWith(
+      action,
+      "Modifying admins requires the ADMIN_WRITE_SELF permission.");
+  }
+
+  /**
+   * Admin permissions cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionRevokeFailure1()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionAdminPermissionRevoke(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of()
+        ),
+        UUID.randomUUID(),
+        ADMIN_WRITE
+      );
+
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE permission.");
+  }
+
+  /**
+   * Admin permissions cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionRevokeFailure2()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionAdminPermissionRevoke(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        UUID.randomUUID(),
+        ADMIN_READ
+      );
+
+    failsWith(
+      action,
+      "The ADMIN_READ permission cannot be revoked by an admin that does not have it.");
+  }
+
+  /**
+   * Admin permissions cannot be updated without permissions.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testAdminPermissionRevokeFailure3()
+    throws IdSecurityException
+  {
+    final var id = UUID.randomUUID();
+    final var action =
+      new IdSecAdminActionAdminPermissionRevoke(
+        new IdAdmin(
+          id,
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(ADMIN_WRITE)
+        ),
+        id,
+        ADMIN_READ
+      );
+
+    failsWith(
+      action,
+      "The ADMIN_READ permission cannot be revoked by an admin that does not have it.");
   }
 
   private static void succeeds(

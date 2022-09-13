@@ -21,9 +21,13 @@ import com.io7m.idstore.admin_client.api.IdAClientFactoryType;
 import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.events.IdAGEventBus;
+import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
+import com.io7m.idstore.model.IdPassword;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserColumnOrdering;
@@ -201,6 +205,10 @@ public final class IdAGClientService implements IdServiceType, Closeable
       new IdAGClientEventConnecting(
         this.strings.format("client.connecting", this.serverLatest));
 
+    final var eventConnectionOK =
+      new IdAGClientEventConnectionSucceeded(
+        this.strings.format("client.connected", this.serverLatest));
+
     final var eventConnected =
       new IdAGClientEventConnected(
         this.strings.format("client.connected", this.serverLatest));
@@ -214,6 +222,7 @@ public final class IdAGClientService implements IdServiceType, Closeable
       try {
         this.client.login(username, password, this.serverLatest);
         task.setSucceeded();
+        this.publishEvent(eventConnectionOK);
         this.publishEvent(eventConnected);
       } catch (final Exception e) {
         final var text =
@@ -387,20 +396,21 @@ public final class IdAGClientService implements IdServiceType, Closeable
   /**
    * Update the given user.
    *
-   * @param newUser The user to update
-   *
    * @return A future representing the operation in progress
    */
 
   public CompletableFuture<IdUser> userUpdate(
-    final IdUser newUser)
+    final UUID id,
+    final Optional<IdName> idName,
+    final Optional<IdRealName> realName,
+    final Optional<IdPassword> password)
   {
     final var future = new CompletableFuture<IdUser>();
     this.executor.submit(() -> {
       final var task = this.requestStart();
 
       try {
-        future.complete(this.client.userUpdate(newUser));
+        future.complete(this.client.userUpdate(id, idName, realName, password));
         this.requestFinish();
       } catch (final Exception e) {
         future.completeExceptionally(this.requestFailed(task, e));
@@ -616,6 +626,136 @@ public final class IdAGClientService implements IdServiceType, Closeable
       try {
         this.client.userDelete(id);
         future.complete(null);
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Fetch the admin's own profile.
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdAdmin> self()
+  {
+    final var future = new CompletableFuture<IdAdmin>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.adminSelf());
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Add an email to the given admin.
+   *
+   * @param email The email
+   * @param id    The ID
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdAdmin> adminEmailAdd(
+    final UUID id,
+    final IdEmail email)
+  {
+    final var future = new CompletableFuture<IdAdmin>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.adminEmailAdd(id, email));
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Remove an email from the given admin.
+   *
+   * @param email The email
+   * @param id    The ID
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdAdmin> adminEmailRemove(
+    final UUID id,
+    final IdEmail email)
+  {
+    final var future = new CompletableFuture<IdAdmin>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.adminEmailRemove(id, email));
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Add an email to the given user.
+   *
+   * @param email The email
+   * @param id    The ID
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdUser> userEmailAdd(
+    final UUID id,
+    final IdEmail email)
+  {
+    final var future = new CompletableFuture<IdUser>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.userEmailAdd(id, email));
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Remove an email from the given user.
+   *
+   * @param email The email
+   * @param id    The ID
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdUser> userEmailRemove(
+    final UUID id,
+    final IdEmail email)
+  {
+    final var future = new CompletableFuture<IdUser>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.userEmailRemove(id, email));
         this.requestFinish();
       } catch (final Exception e) {
         future.completeExceptionally(this.requestFailed(task, e));

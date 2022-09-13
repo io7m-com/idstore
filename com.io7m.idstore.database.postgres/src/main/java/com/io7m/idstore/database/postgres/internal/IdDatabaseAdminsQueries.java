@@ -24,6 +24,7 @@ import com.io7m.idstore.database.postgres.internal.tables.records.EmailsRecord;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminOrdering;
 import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
@@ -43,7 +44,6 @@ import org.jooq.impl.DSL;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -159,19 +159,10 @@ final class IdDatabaseAdminsQueries
     );
   }
 
-  private static Set<IdAdminPermission> permissionsDeserializeRecord(
+  private static IdAdminPermissionSet permissionsDeserializeRecord(
     final AdminsRecord adminRecord)
   {
-    return permissionsDeserialize(adminRecord.getPermissions());
-  }
-
-  private static Set<IdAdminPermission> permissionsDeserialize(
-    final String str)
-  {
-    return Arrays.stream(str.split(","))
-      .filter(s -> !s.isBlank())
-      .map(IdAdminPermission::valueOf)
-      .collect(Collectors.toUnmodifiableSet());
+    return IdAdminPermissionSet.parse(adminRecord.getPermissions());
   }
 
   private static String permissionsSerialize(
@@ -292,7 +283,7 @@ final class IdDatabaseAdminsQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
-    final var adminId = transaction.adminId();
+    final var executor = transaction.adminId();
 
     try {
       {
@@ -361,7 +352,7 @@ final class IdDatabaseAdminsQueries
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "ADMIN_CREATED")
-        .set(AUDIT.USER_ID, adminId)
+        .set(AUDIT.USER_ID, executor)
         .set(AUDIT.MESSAGE, id.toString()).execute();
 
       return this.adminGet(id).orElseThrow();
@@ -846,7 +837,7 @@ final class IdDatabaseAdminsQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
-    final var owner = transaction.adminId();
+    final var executor = transaction.adminId();
 
     try {
       final var record = context.fetchOne(ADMINS, ADMINS.ID.eq(id));
@@ -861,7 +852,7 @@ final class IdDatabaseAdminsQueries
         context.insertInto(AUDIT)
           .set(AUDIT.TIME, this.currentTime())
           .set(AUDIT.TYPE, "ADMIN_CHANGED_ID_NAME")
-          .set(AUDIT.USER_ID, owner)
+          .set(AUDIT.USER_ID, executor)
           .set(AUDIT.MESSAGE, "%s|%s".formatted(id.toString(), name.value()))
           .execute();
       }
@@ -873,7 +864,7 @@ final class IdDatabaseAdminsQueries
         context.insertInto(AUDIT)
           .set(AUDIT.TIME, this.currentTime())
           .set(AUDIT.TYPE, "ADMIN_CHANGED_REAL_NAME")
-          .set(AUDIT.USER_ID, owner)
+          .set(AUDIT.USER_ID, executor)
           .set(AUDIT.MESSAGE, "%s|%s".formatted(id.toString(), name.value()))
           .execute();
       }
@@ -887,7 +878,7 @@ final class IdDatabaseAdminsQueries
         context.insertInto(AUDIT)
           .set(AUDIT.TIME, this.currentTime())
           .set(AUDIT.TYPE, "ADMIN_CHANGED_PASSWORD")
-          .set(AUDIT.USER_ID, owner)
+          .set(AUDIT.USER_ID, executor)
           .set(AUDIT.MESSAGE, id.toString())
           .execute();
       }
@@ -903,8 +894,8 @@ final class IdDatabaseAdminsQueries
         context.insertInto(AUDIT)
           .set(AUDIT.TIME, this.currentTime())
           .set(AUDIT.TYPE, "ADMIN_CHANGED_PERMISSIONS")
-          .set(AUDIT.USER_ID, owner)
-          .set(AUDIT.MESSAGE, id.toString())
+          .set(AUDIT.USER_ID, executor)
+          .set(AUDIT.MESSAGE, "%s|%s".formatted(id, permissionString))
           .execute();
       }
 
@@ -925,7 +916,7 @@ final class IdDatabaseAdminsQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
-    final var owner = transaction.adminId();
+    final var executor = transaction.adminId();
 
     try {
       context.fetchOptional(ADMINS, ADMINS.ID.eq(id))
@@ -939,8 +930,8 @@ final class IdDatabaseAdminsQueries
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "ADMIN_EMAIL_ADDED")
-        .set(AUDIT.USER_ID, owner)
-        .set(AUDIT.MESSAGE, id + ":" + email.value())
+        .set(AUDIT.USER_ID, executor)
+        .set(AUDIT.MESSAGE, "%s|%s".formatted(id, email.value()))
         .execute();
 
     } catch (final DataAccessException e) {
@@ -959,7 +950,7 @@ final class IdDatabaseAdminsQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
-    final var owner = transaction.adminId();
+    final var executor = transaction.adminId();
 
     try {
       context.fetchOptional(ADMINS, ADMINS.ID.eq(id))
@@ -987,8 +978,8 @@ final class IdDatabaseAdminsQueries
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "ADMIN_EMAIL_REMOVED")
-        .set(AUDIT.USER_ID, owner)
-        .set(AUDIT.MESSAGE, id + ":" + email.value())
+        .set(AUDIT.USER_ID, executor)
+        .set(AUDIT.MESSAGE, "%s|%s".formatted(id, email.value()))
         .execute();
 
     } catch (final DataAccessException e) {
@@ -1005,17 +996,17 @@ final class IdDatabaseAdminsQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
-    final var owner = transaction.adminId();
+    final var executor = transaction.adminId();
 
     try {
-      final var user = this.adminGetRequire(id);
+      final var admin = this.adminGetRequire(id);
 
       context.update(ADMINS)
         .set(ADMINS.DELETING, TRUE)
         .where(ADMINS.ID.eq(id))
         .execute();
 
-      for (final var email : user.emails()) {
+      for (final var email : admin.emails()) {
         this.adminEmailRemove(id, email);
       }
 
@@ -1026,7 +1017,7 @@ final class IdDatabaseAdminsQueries
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "ADMIN_DELETED")
-        .set(AUDIT.USER_ID, owner)
+        .set(AUDIT.USER_ID, executor)
         .set(AUDIT.MESSAGE, id.toString())
         .execute();
 

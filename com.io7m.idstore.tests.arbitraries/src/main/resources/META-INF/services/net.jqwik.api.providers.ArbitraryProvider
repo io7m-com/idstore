@@ -15,6 +15,7 @@ com.io7m.idstore.tests.arbitraries.IdArbA1UserProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchByEmailParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1UserSummaryProvider
+com.io7m.idstore.tests.arbitraries.IdArbAdminPermissionSetProvider
 com.io7m.idstore.tests.arbitraries.IdArbAdminProvider
 com.io7m.idstore.tests.arbitraries.IdArbAdminSummaryProvider
 com.io7m.idstore.tests.arbitraries.IdArbAuditEventProvider

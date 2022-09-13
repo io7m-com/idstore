@@ -25,6 +25,7 @@ import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminOrdering;
 import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
@@ -890,7 +891,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     assertEquals(now.toEpochSecond(), admin.timeCreated().toEpochSecond());
     assertEquals(now.toEpochSecond(), admin.timeUpdated().toEpochSecond());
     assertEquals(otherPassword, admin.password());
-    assertEquals(EnumSet.noneOf(IdAdminPermission.class), admin.permissions());
+    assertEquals(IdAdminPermissionSet.empty(), admin.permissions());
 
     checkAuditLog(
       transaction,
@@ -1107,7 +1108,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
       transaction,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("ADMIN_CREATED", admin.id().toString()),
-      new ExpectedEvent("ADMIN_EMAIL_REMOVED", reqId + ":someone@example.com"),
+      new ExpectedEvent("ADMIN_EMAIL_REMOVED", reqId + "|someone@example.com"),
       new ExpectedEvent("ADMIN_DELETED", admin.id().toString())
     );
   }

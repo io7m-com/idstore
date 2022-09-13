@@ -22,18 +22,29 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Update the given admin.
  *
- * @param admin The admin to be updated
+ * @param admin    The admin to be updated
+ * @param idName   The admin's ID name
+ * @param realName The admin's realname
+ * @param password The admin's password
  */
 
 @JsonDeserialize
 @JsonSerialize
 public record IdA1CommandAdminUpdate(
-  @JsonProperty(value = "Admin", required = true)
-  IdA1Admin admin)
+  @JsonProperty(value = "AdminID", required = true)
+  UUID admin,
+  @JsonProperty(value = "IDName", required = true)
+  Optional<String> idName,
+  @JsonProperty(value = "RealName", required = true)
+  Optional<String> realName,
+  @JsonProperty(value = "Password", required = true)
+  Optional<IdA1Password> password)
   implements IdA1CommandType<IdA1ResponseAdminUpdate>
 {
   /**
@@ -44,5 +55,8 @@ public record IdA1CommandAdminUpdate(
   public IdA1CommandAdminUpdate
   {
     Objects.requireNonNull(admin, "admin");
+    Objects.requireNonNull(idName, "idName");
+    Objects.requireNonNull(realName, "realName");
+    Objects.requireNonNull(password, "password");
   }
 }
