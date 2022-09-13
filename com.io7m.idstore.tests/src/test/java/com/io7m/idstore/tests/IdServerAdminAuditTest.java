@@ -23,7 +23,6 @@ import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUserColumnOrdering;
 import com.io7m.idstore.model.IdUserOrdering;
-import com.io7m.idstore.model.IdUserSummary;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

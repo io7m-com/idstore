@@ -29,6 +29,14 @@ import com.io7m.idstore.server.security.IdSecurityException;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * The abstract base command class.
+ *
+ * @param <T> The type of command contexts
+ * @param <C> The type of accepted commands
+ * @param <R> The type of responses
+ */
+
 public abstract class IdA1CmdAbstract<
   T extends IdCommandContext<R>,
   C extends IdProtocolMessageType,

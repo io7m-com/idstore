@@ -16,9 +16,9 @@
 
 package com.io7m.idstore.tests.arbitraries;
 
-import com.io7m.idstore.protocol.admin_v1.IdA1TimeRange;
 import com.io7m.idstore.protocol.admin_v1.IdA1AdminOrdering;
 import com.io7m.idstore.protocol.admin_v1.IdA1AdminSearchByEmailParameters;
+import com.io7m.idstore.protocol.admin_v1.IdA1TimeRange;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Combinators;

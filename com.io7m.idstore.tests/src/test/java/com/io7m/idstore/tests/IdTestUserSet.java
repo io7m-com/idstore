@@ -20,7 +20,6 @@ package com.io7m.idstore.tests;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUserSummary;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;

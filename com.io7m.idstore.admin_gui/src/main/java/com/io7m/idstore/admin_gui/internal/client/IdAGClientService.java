@@ -396,6 +396,11 @@ public final class IdAGClientService implements IdServiceType, Closeable
   /**
    * Update the given user.
    *
+   * @param id       The ID
+   * @param idName   The ID name
+   * @param realName The real name
+   * @param password The password
+   *
    * @return A future representing the operation in progress
    */
 

@@ -125,6 +125,17 @@ public final class IdAGUserEmailAddController
     this.buttonCreate.setDisable(true);
   }
 
+  /**
+   * Open a dialog box.
+   *
+   * @param configuration The configuration
+   * @param strings       The string resources
+   *
+   * @return The controller
+   *
+   * @throws IOException On I/O errors
+   */
+
   public static IdAGUserEmailAddController openDialog(
     final IdAGConfiguration configuration,
     final IdAGStrings strings)

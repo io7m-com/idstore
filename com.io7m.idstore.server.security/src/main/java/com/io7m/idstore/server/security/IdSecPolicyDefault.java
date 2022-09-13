@@ -16,9 +16,6 @@
 
 package com.io7m.idstore.server.security;
 
-import com.io7m.idstore.model.IdAdmin;
-import com.io7m.idstore.model.IdAdminPermission;
-
 import java.util.HashSet;
 import java.util.Objects;
 

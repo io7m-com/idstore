@@ -16,9 +16,7 @@
 
 package com.io7m.idstore.tests;
 
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;

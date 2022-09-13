@@ -16,9 +16,9 @@
 
 package com.io7m.idstore.tests.arbitraries;
 
+import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
-import com.io7m.idstore.model.IdAdminSummary;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Combinators;

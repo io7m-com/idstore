@@ -18,39 +18,32 @@
 package com.io7m.idstore.admin_gui.internal.profile;
 
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
-import com.io7m.idstore.admin_gui.internal.IdAGCSS;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientService;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus;
-import com.io7m.idstore.admin_gui.internal.main.IdAGMainScreenController;
 import com.io7m.idstore.admin_gui.internal.users.IdAGUserEmailAddController;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdEmail;
-import com.io7m.idstore.model.IdNonEmptyList;
-import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
+
+/**
+ * The profile screen controller.
+ */
 
 public final class IdAGProfileController
   implements Initializable
@@ -70,6 +63,13 @@ public final class IdAGProfileController
   @FXML private ListView<IdEmail> emailList;
 
   private volatile IdAdmin admin;
+
+  /**
+   * The profile screen controller.
+   *
+   * @param inConfiguration The configuration
+   * @param inServices The service directory
+   */
 
   public IdAGProfileController(
     final IdServiceDirectoryType inServices,

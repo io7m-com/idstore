@@ -22,7 +22,6 @@ import com.io7m.idstore.admin_gui.internal.events.IdAGEventStatusType;
 
 import java.util.Objects;
 
-import static com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus.CONNECTED;
 import static com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus.CONNECTION_SUCCEEDED;
 
 /**

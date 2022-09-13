@@ -21,7 +21,6 @@ import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPaging;
 import com.io7m.idstore.database.api.IdDatabaseAdminSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
-import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminOrdering;
 import com.io7m.idstore.model.IdAdminPermission;
@@ -54,7 +53,6 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTEN
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NOT_INITIAL;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_UNSET;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIRED;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static com.io7m.idstore.model.IdAdminColumn.BY_IDNAME;
 import static com.io7m.idstore.model.IdAdminColumn.BY_REALNAME;
 import static com.io7m.idstore.model.IdAdminColumn.BY_TIME_CREATED;
@@ -674,7 +672,8 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     final List<IdAdminSummary>  items = paging.pageCurrent(admins);
     assertEquals(0, paging.pageNumber());
     assertEquals(1, paging.pageCount());
-    assertEquals(50, items.size());
+    assertTrue(items.size() >= 50);
+    assertTrue(items.size() < 52);
 
     for (final var item : items) {
       assertTrue(item.idName().value().endsWith("0"));

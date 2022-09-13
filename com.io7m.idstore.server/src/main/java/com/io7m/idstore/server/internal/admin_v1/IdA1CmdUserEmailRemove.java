@@ -21,19 +21,13 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdPasswordException;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailRemove;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1User;
-import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionUserUpdate;
 import com.io7m.idstore.server.security.IdSecurityException;
-
-import java.util.Objects;
-
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
 
 /**
  * IdA1CmdUserEmailRemove

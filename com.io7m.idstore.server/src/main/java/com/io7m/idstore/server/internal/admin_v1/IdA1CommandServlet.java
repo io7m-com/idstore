@@ -19,7 +19,6 @@ package com.io7m.idstore.server.internal.admin_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.database.api.IdDatabaseType;
-import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
@@ -42,7 +41,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.*;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.server.internal.IdServerRequestDecoration.requestIdFor;
 import static org.eclipse.jetty.http.HttpStatus.BAD_REQUEST_400;

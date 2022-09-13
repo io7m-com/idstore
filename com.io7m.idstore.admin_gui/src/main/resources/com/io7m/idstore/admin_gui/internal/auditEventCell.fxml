@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.text.Font?>
 
-
+<?import javafx.scene.control.TextField?><?import javafx.scene.layout.HBox?><?import javafx.scene.text.Font?>
 <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="24.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.io7m.idstore.admin_gui.internal.audit.IdAGAuditEventCellController">
    <children>
       <TextField fx:id="eventId" editable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="160.0" text="18446744073709551615">

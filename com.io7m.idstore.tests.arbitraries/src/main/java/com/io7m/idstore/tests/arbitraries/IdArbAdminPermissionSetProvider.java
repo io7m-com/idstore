@@ -18,7 +18,6 @@ package com.io7m.idstore.tests.arbitraries;
 
 import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdAdminPermissionSet;
-import com.io7m.idstore.model.IdToken;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.providers.TypeUsage;

@@ -17,7 +17,6 @@
 
 package com.io7m.idstore.admin_client.api;
 
-import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;

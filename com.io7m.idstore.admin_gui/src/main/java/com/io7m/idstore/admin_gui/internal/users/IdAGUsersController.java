@@ -24,7 +24,6 @@ import com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus;
 import com.io7m.idstore.admin_gui.internal.main.IdAGMainScreenController;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
-import com.io7m.idstore.model.IdNonEmptyList;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
@@ -50,7 +49,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
