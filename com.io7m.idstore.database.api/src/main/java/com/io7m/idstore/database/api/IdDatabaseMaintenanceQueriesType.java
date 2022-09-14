@@ -16,36 +16,19 @@
 
 package com.io7m.idstore.database.api;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-
-import static java.time.ZoneOffset.UTC;
-
 /**
- * The base type of query interfaces.
+ * The database queries involving maintenance.
  */
 
-public sealed interface IdDatabaseQueriesType
-  permits IdDatabaseAdminsQueriesType,
-  IdDatabaseAuditQueriesType,
-  IdDatabaseEmailsQueriesType,
-  IdDatabaseMaintenanceQueriesType,
-  IdDatabaseUsersQueriesType
+public non-sealed interface IdDatabaseMaintenanceQueriesType
+  extends IdDatabaseQueriesType
 {
   /**
-   * The earliest possible time considered by the server
+   * Run maintenance tasks.
+   *
+   * @throws IdDatabaseException On errors
    */
 
-  OffsetDateTime EARLIEST =
-    LocalDateTime.ofEpochSecond(0L, 0, UTC)
-      .atOffset(UTC);
-
-  /**
-   * @return The earliest possible time considered by the server
-   */
-
-  static OffsetDateTime earliest()
-  {
-    return EARLIEST;
-  }
+  void runMaintenance()
+    throws IdDatabaseException;
 }

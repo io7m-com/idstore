@@ -20,6 +20,7 @@ import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.database.api.IdDatabaseMaintenanceQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseRole;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
@@ -106,6 +107,9 @@ final class IdDatabaseTransaction
     }
     if (Objects.equals(qClass, IdDatabaseEmailsQueriesType.class)) {
       return qClass.cast(new IdDatabaseEmailsQueries(this));
+    }
+    if (Objects.equals(qClass, IdDatabaseMaintenanceQueriesType.class)) {
+      return qClass.cast(new IdDatabaseMaintenanceQueries(this));
     }
 
     throw new IdDatabaseException(

@@ -224,6 +224,10 @@ public final class IdServer implements IdServerType
     final var config = new IdServerConfigurationService(this.configuration);
     services.register(IdServerConfigurationService.class, config);
 
+    final var maintenance =
+      IdServerMaintenanceService.create(clock, inDatabase);
+    services.register(IdServerMaintenanceService.class, maintenance);
+
     services.register(IdRequestLimits.class, new IdRequestLimits(strings));
     return services;
   }
