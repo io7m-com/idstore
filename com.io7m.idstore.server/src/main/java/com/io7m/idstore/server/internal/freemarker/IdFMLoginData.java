@@ -27,8 +27,9 @@ import java.util.Optional;
  * @param htmlTitle       The HTML title
  * @param pageHeaderTitle The page header title
  * @param logo            {@code true} if the logo should be displayed
- * @param loginTitle The login title, if any
+ * @param loginTitle      The login title, if any
  * @param errorMessage    The error message, if any
+ * @param loginExtraText  The extra branding text inserted below the login form
  */
 
 public record IdFMLoginData(
@@ -36,7 +37,8 @@ public record IdFMLoginData(
   String pageHeaderTitle,
   boolean logo,
   Optional<String> loginTitle,
-  Optional<String> errorMessage)
+  Optional<String> errorMessage,
+  Optional<String> loginExtraText)
   implements IdFMDataModelType
 {
   /**
@@ -45,8 +47,10 @@ public record IdFMLoginData(
    * @param htmlTitle       The HTML title
    * @param pageHeaderTitle The page header title
    * @param logo            {@code true} if the logo should be displayed
-   * @param loginTitle The login title, if any
+   * @param loginTitle      The login title, if any
    * @param errorMessage    The error message, if any
+   * @param loginExtraText  The extra branding text inserted below the login
+   *                        form
    */
 
   public IdFMLoginData
@@ -55,6 +59,7 @@ public record IdFMLoginData(
     Objects.requireNonNull(pageHeaderTitle, "pageHeaderTitle");
     Objects.requireNonNull(loginTitle, "loginTitle");
     Objects.requireNonNull(errorMessage, "errorMessage");
+    Objects.requireNonNull(loginExtraText, "brandingExtraText");
   }
 
   @Override
@@ -64,8 +69,13 @@ public record IdFMLoginData(
     m.put("htmlTitle", this.htmlTitle);
     m.put("pageHeaderTitle", this.pageHeaderTitle);
     m.put("logo", Boolean.valueOf(this.logo));
-    this.loginTitle.ifPresent(title -> m.put("loginTitle", title));
-    this.errorMessage().ifPresent(error -> m.put("errorMessage", error));
+
+    this.loginTitle.ifPresent(
+      title -> m.put("loginTitle", title));
+    this.errorMessage().ifPresent(
+      error -> m.put("errorMessage", error));
+    this.loginExtraText.ifPresent(
+      text -> m.put("loginExtraText", text));
     return m;
   }
 }

@@ -42,6 +42,8 @@
         <p class="ids_message_error">${errorMessage}</p>
       </div>
       [/#if]
+
+      [#if loginExtraText??]${loginExtraText?no_esc}[/#if]
     </div>
   </div>
 </div>

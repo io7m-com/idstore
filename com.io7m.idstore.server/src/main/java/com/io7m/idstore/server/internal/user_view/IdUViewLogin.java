@@ -148,7 +148,8 @@ public final class IdUViewLogin extends HttpServlet
           this.branding.title(),
           true,
           Optional.empty(),
-          Optional.ofNullable((String) session.getAttribute("ErrorMessage"))
+          Optional.ofNullable((String) session.getAttribute("ErrorMessage")),
+          this.branding.loginExtraText()
         ),
         writer
       );

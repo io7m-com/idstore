@@ -275,6 +275,7 @@ public abstract class IdWithServerContract
       new IdServerBrandingConfiguration(
         Optional.empty(),
         Optional.empty(),
+        Optional.empty(),
         Optional.empty()
       );
 

@@ -30,6 +30,7 @@ import java.util.Optional;
  *
  * @param productTitle The product title
  * @param logo         The path to a logo image
+ * @param loginExtra   An XHTML file inserted into the login screen
  * @param scheme       The color scheme
  */
 
@@ -37,11 +38,14 @@ import java.util.Optional;
 @JsonSerialize
 public record IdServerBrandingConfiguration(
   @JsonProperty(value = "ProductTitle", required = false)
+  @JsonInclude(value = JsonInclude.Include.NON_ABSENT)
   Optional<String> productTitle,
-
   @JsonProperty(value = "Logo", required = false)
+  @JsonInclude(value = JsonInclude.Include.NON_ABSENT)
   Optional<Path> logo,
-
+  @JsonProperty(value = "LoginExtraXHTML", required = false)
+  @JsonInclude(value = JsonInclude.Include.NON_ABSENT)
+  Optional<Path> loginExtra,
   @JsonProperty(value = "ColorScheme", required = false)
   @JsonInclude(value = JsonInclude.Include.NON_ABSENT)
   Optional<IdServerColorScheme> scheme)
@@ -51,6 +55,7 @@ public record IdServerBrandingConfiguration(
    *
    * @param productTitle The product title
    * @param logo         The path to a logo image
+   * @param loginExtra   An XHTML file inserted into the login screen
    * @param scheme       The color scheme
    */
 
@@ -58,6 +63,7 @@ public record IdServerBrandingConfiguration(
   {
     Objects.requireNonNull(productTitle, "productTitle");
     Objects.requireNonNull(logo, "logo");
+    Objects.requireNonNull(loginExtra, "loginExtra");
     Objects.requireNonNull(scheme, "scheme");
   }
 }

@@ -35,6 +35,8 @@ import com.io7m.idstore.server.internal.freemarker.IdFMLoginData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMUserSelfData;
 import freemarker.template.TemplateException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedWriter;
@@ -43,6 +45,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -54,6 +57,22 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class IdFMTemplateServiceTest
 {
+  private Path directory;
+
+  @BeforeEach
+  public void setup()
+    throws IOException
+  {
+    this.directory = IdTestDirectories.createTempDirectory();
+  }
+
+  @AfterEach
+  public void tearDown()
+    throws IOException
+  {
+    IdTestDirectories.deleteDirectory(this.directory);
+  }
+
   @Test
   public void testGetLogin()
     throws IOException, TemplateException
@@ -72,7 +91,39 @@ public final class IdFMTemplateServiceTest
       "idstore",
       true,
       Optional.empty(),
-      Optional.of("Error!")
+      Optional.of("Error!"),
+      Optional.empty()
+    ), writer);
+
+    writer.flush();
+  }
+
+  @Test
+  public void testGetLoginExtraBranding()
+    throws IOException, TemplateException
+  {
+    final var service =
+      IdFMTemplateService.create();
+
+    final var template =
+      service.pageLoginTemplate();
+
+    final var writer =
+      new BufferedWriter(new OutputStreamWriter(System.out, UTF_8));
+
+    template.process(new IdFMLoginData(
+      "idstore: Login",
+      "idstore",
+      true,
+      Optional.empty(),
+      Optional.of("Error!"),
+      Optional.of(
+        Files.readString(
+          IdTestDirectories.resourceOf(
+            IdFMTemplateServiceTest.class,
+            this.directory,
+            "loginExtra.xhtml"))
+      )
     ), writer);
 
     writer.flush();

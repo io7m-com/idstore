@@ -75,6 +75,16 @@ public final class IdServerDemo
     System.setProperty("org.jooq.no-tips", "true");
     System.setProperty("org.jooq.no-logo", "true");
 
+    final var tmpDirectory =
+      IdTestDirectories.createTempDirectory();
+
+    final var loginExtraText =
+      IdTestDirectories.resourceOf(
+        IdServerDemo.class,
+        tmpDirectory,
+        "loginExtra.xhtml"
+      );
+
     final var databaseConfiguration =
       new IdDatabaseConfiguration(
         "postgres",
@@ -131,6 +141,7 @@ public final class IdServerDemo
       new IdServerBrandingConfiguration(
         Optional.of("Lemon"),
         Optional.empty(),
+        Optional.of(loginExtraText),
         Optional.empty()
       );
 

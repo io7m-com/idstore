@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.internal;
 
+import com.io7m.idstore.model.IdOptional;
 import com.io7m.idstore.server.api.IdServerBrandingConfiguration;
 import com.io7m.idstore.server.api.IdServerColorScheme;
 import com.io7m.idstore.server.internal.freemarker.IdFMCSSData;
@@ -28,6 +29,7 @@ import freemarker.template.TemplateException;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -43,12 +45,14 @@ public final class IdServerBrandingService implements IdServiceType
   private final String mainCss;
   private final String xButtonCSS;
   private final String title;
+  private final Optional<String> loginExtraText;
 
   private IdServerBrandingService(
     final byte[] inLogo,
     final String inMainCss,
     final String inXButtonCss,
-    final String inTitle)
+    final String inTitle,
+    final Optional<String> inLoginExtraText)
   {
     this.logo =
       Objects.requireNonNull(inLogo, "logo");
@@ -58,6 +62,8 @@ public final class IdServerBrandingService implements IdServiceType
       Objects.requireNonNull(inXButtonCss, "xButtonCss");
     this.title =
       Objects.requireNonNull(inTitle, "title");
+    this.loginExtraText =
+      Objects.requireNonNull(inLoginExtraText, "inLoginExtraText");
   }
 
   /**
@@ -90,13 +96,26 @@ public final class IdServerBrandingService implements IdServiceType
     final var title =
       configuration.productTitle()
         .orElse(strings.format("productTitle"));
+    final var brandingText =
+      IdOptional.mapPartial(
+        configuration.loginExtra(),
+        IdServerBrandingService::loadLoginExtraText);
+
 
     return new IdServerBrandingService(
       logo,
       mainCss,
       xbuttonCss,
-      title
+      title,
+      brandingText
     );
+  }
+
+  private static String loadLoginExtraText(
+    final Path file)
+    throws IOException
+  {
+    return Files.readString(file, StandardCharsets.UTF_8);
   }
 
   private static String loadXButtonCSS(
@@ -196,5 +215,14 @@ public final class IdServerBrandingService implements IdServiceType
     final String name)
   {
     return "%s: %s".formatted(this.title, name);
+  }
+
+  /**
+   * @return The extra text inserted below the login form (XHTML)
+   */
+
+  public Optional<String> loginExtraText()
+  {
+    return this.loginExtraText;
   }
 }
