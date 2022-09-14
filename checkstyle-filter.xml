@@ -58,11 +58,17 @@
             checks="CyclomaticComplexity"/>
   <suppress files="IdSecPolicyDefault\.java"
             checks="NPathComplexity"/>
+  <suppress files="IdSecPolicyDefault\.java"
+            checks="CyclomaticComplexity"/>
 
   <suppress files="IdAClientProtocolHandler1\.java"
             checks="ClassDataAbstractionCoupling"/>
   <suppress files="IdArbA1MessageProvider\.java"
             checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdA1CommandExecutor\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdA1CommandExecutor\.java"
+            checks="ExecutableStatementCount"/>
 
   <suppress files="IdA1CmdAbstract\.java"
             checks="ThrowsCount"/>

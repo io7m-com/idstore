@@ -23,6 +23,7 @@ import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
@@ -286,5 +287,43 @@ public interface IdAClientAdminsType
   IdAdmin adminPermissionRevoke(
     UUID id,
     IdAdminPermission permission)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Create a ban on the given admin account.
+   *
+   * @param ban The ban
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  void adminBanCreate(IdBan ban)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Get the ban for the given admin, if one exists.
+   *
+   * @param id The admin ID
+   *
+   * @return The ban, if any
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  Optional<IdBan> adminBanGet(UUID id)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Delete the given ban.
+   *
+   * @param ban The ban
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  void adminBanDelete(IdBan ban)
     throws IdAClientException, InterruptedException;
 }

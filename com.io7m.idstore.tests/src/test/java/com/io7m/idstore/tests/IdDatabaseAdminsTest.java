@@ -28,6 +28,7 @@ import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPassword;
@@ -1109,6 +1110,51 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
       new ExpectedEvent("ADMIN_CREATED", admin.id().toString()),
       new ExpectedEvent("ADMIN_EMAIL_REMOVED", reqId + "|someone@example.com"),
       new ExpectedEvent("ADMIN_DELETED", admin.id().toString())
+    );
+  }
+
+  /**
+   * Bans work.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminBan()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var admins =
+      transaction.queries(IdDatabaseAdminsQueriesType.class);
+
+    final var now =
+      timeNow();
+
+    transaction.adminIdSet(adminId);
+
+    final var ban = new IdBan(adminId, "No reason.", Optional.of(now));
+    admins.adminBanCreate(ban);
+    assertEquals(Optional.of(ban), admins.adminBanGet(adminId));
+    admins.adminBanDelete(ban);
+    assertEquals(Optional.empty(), admins.adminBanGet(adminId));
+
+    checkAuditLog(
+      transaction,
+      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
+      new ExpectedEvent("ADMIN_BANNED", adminId.toString()),
+      new ExpectedEvent("ADMIN_BAN_REMOVED", adminId.toString())
     );
   }
 }

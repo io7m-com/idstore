@@ -29,4 +29,6 @@
   <entry key="mailSystemFailure"><![CDATA[An error occurred with the mail system whilst attempting to send a verification email to {0}:
   {1}
 ]]></entry>
+  <entry key="banned"><![CDATA[You have been temporarily banned for the following reason: {0}. Your ban will expire on {1}.]]></entry>
+  <entry key="bannedNoExpire"><![CDATA[You have been permanently banned for the following reason: {0}.]]></entry>
 </properties>

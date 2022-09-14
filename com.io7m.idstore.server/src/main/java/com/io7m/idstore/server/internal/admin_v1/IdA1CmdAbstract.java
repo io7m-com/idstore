@@ -20,6 +20,7 @@ package com.io7m.idstore.server.internal.admin_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdValidityException;
+import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandContext;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
@@ -67,6 +68,8 @@ public abstract class IdA1CmdAbstract<
       throw context.failDatabase(e);
     } catch (final IdPasswordException e) {
       throw context.failPassword(e);
+    } catch (final IdProtocolException e) {
+      throw context.failProtocol(e);
     }
   }
 
@@ -76,5 +79,5 @@ public abstract class IdA1CmdAbstract<
     throws IdValidityException,
     IdSecurityException,
     IdDatabaseException,
-    IdPasswordException, IdCommandExecutionFailure;
+    IdPasswordException, IdCommandExecutionFailure, IdProtocolException;
 }

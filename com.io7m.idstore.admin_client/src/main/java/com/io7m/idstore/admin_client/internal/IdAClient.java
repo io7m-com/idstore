@@ -25,6 +25,7 @@ import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdAuditEvent;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
@@ -395,5 +396,47 @@ public final class IdAClient implements IdAClientType
     throws IdAClientException, InterruptedException
   {
     return this.handler.userEmailRemove(id, email);
+  }
+
+  @Override
+  public void adminBanCreate(final IdBan ban)
+    throws IdAClientException, InterruptedException
+  {
+    this.handler.adminBanCreate(ban);
+  }
+
+  @Override
+  public Optional<IdBan> adminBanGet(final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.adminBanGet(id);
+  }
+
+  @Override
+  public void adminBanDelete(final IdBan ban)
+    throws IdAClientException, InterruptedException
+  {
+    this.handler.adminBanDelete(ban);
+  }
+
+  @Override
+  public void userBanCreate(final IdBan ban)
+    throws IdAClientException, InterruptedException
+  {
+    this.handler.userBanCreate(ban);
+  }
+
+  @Override
+  public Optional<IdBan> userBanGet(final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userBanGet(id);
+  }
+
+  @Override
+  public void userBanDelete(final IdBan ban)
+    throws IdAClientException, InterruptedException
+  {
+    this.handler.userBanDelete(ban);
   }
 }

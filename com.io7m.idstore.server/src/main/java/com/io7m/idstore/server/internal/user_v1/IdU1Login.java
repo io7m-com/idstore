@@ -44,6 +44,7 @@ import java.util.Objects;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_METHOD_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
@@ -51,6 +52,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.server.internal.IdServerRequestDecoration.requestIdFor;
 import static com.io7m.idstore.server.logging.IdServerMDCRequestProcessor.mdcForRequest;
 import static org.eclipse.jetty.http.HttpStatus.BAD_REQUEST_400;
+import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 import static org.eclipse.jetty.http.HttpStatus.INTERNAL_SERVER_ERROR_500;
 import static org.eclipse.jetty.http.HttpStatus.METHOD_NOT_ALLOWED_405;
 import static org.eclipse.jetty.http.HttpStatus.UNAUTHORIZED_401;
@@ -154,6 +156,53 @@ public final class IdU1Login extends HttpServlet
     }
   }
 
+  private void checkBan(
+    final IdDatabaseUsersQueriesType users,
+    final IdUser user)
+    throws IdDatabaseException, IdHTTPErrorStatusException
+  {
+    final var banOpt =
+      users.userBanGet(user.id());
+
+    /*
+     * If there's no ban, allow the login.
+     */
+
+    if (banOpt.isEmpty()) {
+      return;
+    }
+
+    final var ban = banOpt.get();
+    final var expiresOpt = ban.expires();
+
+    /*
+     * If there's no expiration on the ban, deny the login.
+     */
+
+    if (expiresOpt.isEmpty()) {
+      throw new IdHTTPErrorStatusException(
+        FORBIDDEN_403,
+        BANNED,
+        this.strings.format("bannedNoExpire", ban.reason())
+      );
+    }
+
+    /*
+     * If the current time is before the expiration date, deny the login.
+     */
+
+    final var timeExpires = expiresOpt.get();
+    final var timeNow = this.clock.now();
+
+    if (timeNow.compareTo(timeExpires) < 0) {
+      throw new IdHTTPErrorStatusException(
+        FORBIDDEN_403,
+        BANNED,
+        this.strings.format("banned", ban.reason(), timeExpires)
+      );
+    }
+  }
+
   private void tryLogin(
     final HttpServletRequest request,
     final HttpServletResponse response,
@@ -175,8 +224,9 @@ public final class IdU1Login extends HttpServlet
       );
     }
 
-    final var user =
-      userOpt.get();
+    final var user = userOpt.get();
+    this.checkBan(users, user);
+
     final var ok =
       user.password().check(login.password());
 

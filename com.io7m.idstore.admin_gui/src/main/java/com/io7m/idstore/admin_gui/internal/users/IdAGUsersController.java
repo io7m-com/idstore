@@ -22,6 +22,7 @@ import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientService;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus;
 import com.io7m.idstore.admin_gui.internal.main.IdAGMainScreenController;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
@@ -39,9 +40,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
@@ -49,6 +53,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -69,6 +76,7 @@ public final class IdAGUsersController implements Initializable
   private final ObservableList<IdAGUser> users;
   private final ObservableList<IdEmail> userEmails;
   private IdUser user;
+  private IdBan ban;
   private IdAGUserSearchKind searchKindAtStart;
 
   @FXML private Parent userTableContainer;
@@ -87,6 +95,13 @@ public final class IdAGUsersController implements Initializable
   @FXML private Button emailAdd;
   @FXML private Button emailDelete;
   @FXML private ChoiceBox<IdAGUserSearchKind> searchKind;
+
+  @FXML private CheckBox banExpires;
+  @FXML private DatePicker banExpiryPicker;
+  @FXML private Button banUnban;
+  @FXML private Button banBan;
+  @FXML private TextArea banReason;
+  @FXML private Label banLabel;
 
   /**
    * The user tab controller.
@@ -111,6 +126,61 @@ public final class IdAGUsersController implements Initializable
       FXCollections.observableArrayList();
     this.userEmails =
       FXCollections.observableArrayList();
+  }
+
+  @FXML
+  private void onBanSelected()
+  {
+    final Optional<OffsetDateTime> expiration;
+    if (this.banExpires.isSelected()) {
+      expiration = Optional.of(
+        OffsetDateTime.of(
+          this.banExpiryPicker.getValue(),
+          LocalTime.MIDNIGHT,
+          ZoneOffset.UTC)
+      );
+    } else {
+      expiration = Optional.empty();
+    }
+
+    final var future = this.client.userBanCreate(
+      new IdBan(
+        this.user.id(),
+        this.banReason.getText(),
+        expiration
+      )
+    );
+
+    future.whenComplete((received, exception) -> {
+      if (received != null) {
+        this.onUserBanReceived(Optional.of(received));
+      }
+    });
+  }
+
+  @FXML
+  private void onBanUnbanSelected()
+  {
+    final var future =
+      this.client.userBanDelete(this.user.id());
+
+    future.whenComplete((received, exception) -> {
+      if (received != null) {
+        this.onUserBanReceived(Optional.empty());
+      }
+    });
+  }
+
+  @FXML
+  private void onBanExpiresSelected()
+  {
+
+  }
+
+  @FXML
+  private void onBanReasonChanged()
+  {
+    this.banBan.setDisable(this.banReason.getText().isBlank());
   }
 
   private void onClientStatusChanged(
@@ -166,6 +236,12 @@ public final class IdAGUsersController implements Initializable
       .addListener((obs, statusOld, statusNew) -> {
         this.onClientStatusChanged(statusNew);
       });
+
+    this.banExpires.selectedProperty()
+      .addListener((obs, vOld, vNew) -> {
+        this.banExpiryPicker.setDisable(!this.banExpires.isSelected());
+      });
+    this.banExpiryPicker.setDisable(true);
   }
 
   private void onSearchKindSelected(
@@ -230,14 +306,53 @@ public final class IdAGUsersController implements Initializable
       return;
     }
 
-    final var future = this.client.userGet(userNew.id());
-    future.whenComplete((received, exception) -> {
-      if (received != null) {
-        this.onUserReceived(received);
-      }
-    });
+    {
+      final var future = this.client.userGet(userNew.id());
+      future.whenComplete((received, exception) -> {
+        if (received != null) {
+          this.onUserReceived(received);
+        }
+      });
+    }
+
+    {
+      final var future = this.client.userBanGet(userNew.id());
+      future.whenComplete((received, exception) -> {
+        if (received != null) {
+          this.onUserBanReceived(received);
+        }
+      });
+    }
 
     this.userDetailsUnlock();
+  }
+
+  private void onUserBanReceived(
+    final Optional<IdBan> banOpt)
+  {
+    Platform.runLater(() -> {
+      if (banOpt.isEmpty()) {
+        this.ban = null;
+        this.banReason.setText("");
+        this.banLabel.setText(this.strings.format("users.ban.notBanned"));
+        this.banExpires.setSelected(false);
+        this.banUnban.setDisable(true);
+        this.banBan.setDisable(false);
+        return;
+      }
+
+      this.ban = banOpt.get();
+      this.banUnban.setDisable(false);
+      this.banBan.setDisable(!this.ban.reason().isBlank());
+      this.banReason.setText(this.ban.reason());
+      this.banLabel.setText(this.strings.format("users.ban.banned"));
+
+      final var expiresOpt = this.ban.expires();
+      this.banExpires.setSelected(expiresOpt.isPresent());
+      expiresOpt.ifPresent(time -> {
+        this.banExpiryPicker.setValue(time.toLocalDate());
+      });
+    });
   }
 
   private void onUserReceived(

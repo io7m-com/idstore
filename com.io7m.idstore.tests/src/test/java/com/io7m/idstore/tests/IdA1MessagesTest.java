@@ -16,6 +16,9 @@
 
 package com.io7m.idstore.tests;
 
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailAdd;
@@ -36,6 +39,9 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
@@ -51,6 +57,9 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminBanCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminBanDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminGet;
@@ -67,6 +76,9 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseLogin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
@@ -97,6 +109,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandAdminBanCreate;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandAdminBanDelete;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandAdminBanGet;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandAdminCreate;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandAdminDelete;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandAdminEmailAdd;
@@ -117,6 +132,9 @@ import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandA
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandAuditSearchNext;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandAuditSearchPrevious;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandLogin;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserBanCreate;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserBanDelete;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserBanGet;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserCreate;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserDelete;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserEmailAdd;
@@ -130,6 +148,9 @@ import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandU
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserSearchNext;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserSearchPrevious;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserUpdate;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseAdminBanCreate;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseAdminBanDelete;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseAdminBanGet;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseAdminCreate;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseAdminDelete;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseAdminGet;
@@ -146,6 +167,9 @@ import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.response
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseAuditSearchPrevious;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseError;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseLogin;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserBanCreate;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserBanDelete;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserBanGet;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserCreate;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserDelete;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserGet;
@@ -174,6 +198,9 @@ public final class IdA1MessagesTest
     Class<? extends IdA1MessageType>,
     Arbitrary<? extends IdA1MessageType>> MESSAGE_ARBITRARIES =
     Map.ofEntries(
+      entry(IdA1CommandAdminBanCreate.class, commandAdminBanCreate()),
+      entry(IdA1CommandAdminBanDelete.class, commandAdminBanDelete()),
+      entry(IdA1CommandAdminBanGet.class, commandAdminBanGet()),
       entry(IdA1CommandAdminCreate.class, commandAdminCreate()),
       entry(IdA1CommandAdminDelete.class, commandAdminDelete()),
       entry(IdA1CommandAdminEmailAdd.class, commandAdminEmailAdd()),
@@ -194,6 +221,9 @@ public final class IdA1MessagesTest
       entry(IdA1CommandAuditSearchNext.class, commandAuditSearchNext()),
       entry(IdA1CommandAuditSearchPrevious.class, commandAuditSearchPrevious()),
       entry(IdA1CommandLogin.class, commandLogin()),
+      entry(IdA1CommandUserBanCreate.class, commandUserBanCreate()),
+      entry(IdA1CommandUserBanDelete.class, commandUserBanDelete()),
+      entry(IdA1CommandUserBanGet.class, commandUserBanGet()),
       entry(IdA1CommandUserCreate.class, commandUserCreate()),
       entry(IdA1CommandUserDelete.class, commandUserDelete()),
       entry(IdA1CommandUserEmailAdd.class, commandUserEmailAdd()),
@@ -207,6 +237,9 @@ public final class IdA1MessagesTest
       entry(IdA1CommandUserSearchNext.class, commandUserSearchNext()),
       entry(IdA1CommandUserSearchPrevious.class, commandUserSearchPrevious()),
       entry(IdA1CommandUserUpdate.class, commandUserUpdate()),
+      entry(IdA1ResponseAdminBanCreate.class, responseAdminBanCreate()),
+      entry(IdA1ResponseAdminBanDelete.class, responseAdminBanDelete()),
+      entry(IdA1ResponseAdminBanGet.class, responseAdminBanGet()),
       entry(IdA1ResponseAdminCreate.class, responseAdminCreate()),
       entry(IdA1ResponseAdminDelete.class, responseAdminDelete()),
       entry(IdA1ResponseAdminGet.class, responseAdminGet()),
@@ -223,6 +256,9 @@ public final class IdA1MessagesTest
       entry(IdA1ResponseAuditSearchPrevious.class, responseAuditSearchPrevious()),
       entry(IdA1ResponseError.class, responseError()),
       entry(IdA1ResponseLogin.class, responseLogin()),
+      entry(IdA1ResponseUserBanCreate.class, responseUserBanCreate()),
+      entry(IdA1ResponseUserBanDelete.class, responseUserBanDelete()),
+      entry(IdA1ResponseUserBanGet.class, responseUserBanGet()),
       entry(IdA1ResponseUserCreate.class, responseUserCreate()),
       entry(IdA1ResponseUserDelete.class, responseUserDelete()),
       entry(IdA1ResponseUserGet.class, responseUserGet()),

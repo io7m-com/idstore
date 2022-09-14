@@ -22,6 +22,7 @@ import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.database.postgres.internal.tables.records.EmailsRecord;
 import com.io7m.idstore.database.postgres.internal.tables.records.LoginHistoryRecord;
 import com.io7m.idstore.database.postgres.internal.tables.records.UsersRecord;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
@@ -55,6 +56,7 @@ import java.util.function.Supplier;
 
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
 import static com.io7m.idstore.database.postgres.internal.Tables.AUDIT;
+import static com.io7m.idstore.database.postgres.internal.Tables.BANS;
 import static com.io7m.idstore.database.postgres.internal.Tables.EMAILS;
 import static com.io7m.idstore.database.postgres.internal.Tables.EMAIL_VERIFICATIONS;
 import static com.io7m.idstore.database.postgres.internal.Tables.LOGIN_HISTORY;
@@ -992,6 +994,111 @@ final class IdDatabaseUsersQueries
 
     } catch (final DataAccessException e) {
       throw handleDatabaseException(this.transaction(), e);
+    }
+  }
+
+  @Override
+  public void userBanCreate(
+    final IdBan ban)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(ban, "ban");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var executor = transaction.adminId();
+
+    try {
+      final var user =
+        this.userGetRequire(ban.user());
+      var banRecord =
+        context.fetchOne(BANS, BANS.USER_ID.eq(user.id()));
+
+      if (banRecord == null) {
+        banRecord = context.newRecord(BANS);
+      }
+
+      banRecord.set(BANS.USER_ID, user.id());
+      banRecord.set(BANS.EXPIRES, ban.expires().orElse(null));
+      banRecord.set(BANS.REASON, ban.reason());
+      banRecord.store();
+
+      context.insertInto(AUDIT)
+        .set(AUDIT.TIME, this.currentTime())
+        .set(AUDIT.TYPE, "USER_BANNED")
+        .set(AUDIT.USER_ID, executor)
+        .set(AUDIT.MESSAGE, user.id().toString())
+        .execute();
+
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(transaction, e);
+    }
+  }
+
+  @Override
+  public Optional<IdBan> userBanGet(
+    final UUID id)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    try {
+      final var user =
+        this.userGetRequire(id);
+      final var banRecord =
+        context.fetchOne(BANS, BANS.USER_ID.eq(user.id()));
+
+      if (banRecord == null) {
+        return Optional.empty();
+      }
+
+      return Optional.of(
+        new IdBan(
+          banRecord.getUserId(),
+          banRecord.getReason(),
+          Optional.ofNullable(banRecord.getExpires())
+        )
+      );
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(transaction, e);
+    }
+  }
+
+  @Override
+  public void userBanDelete(
+    final IdBan ban)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(ban, "ban");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var executor = transaction.adminId();
+
+    try {
+      final var user =
+        this.userGetRequire(ban.user());
+      final var banRecord =
+        context.fetchOne(BANS, BANS.USER_ID.eq(user.id()));
+
+      if (banRecord == null) {
+        return;
+      }
+
+      banRecord.delete();
+
+      context.insertInto(AUDIT)
+        .set(AUDIT.TIME, this.currentTime())
+        .set(AUDIT.TYPE, "USER_BAN_REMOVED")
+        .set(AUDIT.USER_ID, executor)
+        .set(AUDIT.MESSAGE, user.id().toString())
+        .execute();
+
+    } catch (final DataAccessException e) {
+      throw handleDatabaseException(transaction, e);
     }
   }
 

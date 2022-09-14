@@ -19,12 +19,14 @@ package com.io7m.idstore.server.security;
 import java.util.HashSet;
 import java.util.Objects;
 
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_BAN;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_READ;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_SELF;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
+import static com.io7m.idstore.model.IdAdminPermission.USER_BAN;
 import static com.io7m.idstore.model.IdAdminPermission.USER_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_READ;
@@ -126,6 +128,26 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   private static IdSecPolicyResultType checkAdminAction(
     final IdSecAdminActionType action)
   {
+    if (action instanceof IdSecAdminActionAdminBanGet e) {
+      return checkAdminActionAdminBanGet(e);
+    }
+    if (action instanceof IdSecAdminActionAdminBanCreate e) {
+      return checkAdminActionAdminBanCreate(e);
+    }
+    if (action instanceof IdSecAdminActionAdminBanDelete e) {
+      return checkAdminActionAdminBanDelete(e);
+    }
+
+    if (action instanceof IdSecAdminActionUserBanGet e) {
+      return checkAdminActionUserBanGet(e);
+    }
+    if (action instanceof IdSecAdminActionUserBanCreate e) {
+      return checkAdminActionUserBanCreate(e);
+    }
+    if (action instanceof IdSecAdminActionUserBanDelete e) {
+      return checkAdminActionUserBanDelete(e);
+    }
+
     if (action instanceof IdSecAdminActionUserRead e) {
       return checkAdminActionUserRead(e);
     }
@@ -170,6 +192,78 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     }
 
     return new IdSecPolicyResultDenied("Operation not permitted.");
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAdminBanDelete(
+    final IdSecAdminActionAdminBanDelete e)
+  {
+    final var admin = e.admin();
+    if (!admin.permissions().implies(ADMIN_BAN)) {
+      return new IdSecPolicyResultDenied(
+        "Unbanning admins requires the %s permission.".formatted(ADMIN_BAN)
+      );
+    }
+    return new IdSecPolicyResultPermitted();
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAdminBanCreate(
+    final IdSecAdminActionAdminBanCreate e)
+  {
+    final var admin = e.admin();
+    if (!admin.permissions().implies(ADMIN_BAN)) {
+      return new IdSecPolicyResultDenied(
+        "Banning admins requires the %s permission.".formatted(ADMIN_BAN)
+      );
+    }
+    return new IdSecPolicyResultPermitted();
+  }
+
+  private static IdSecPolicyResultType checkAdminActionAdminBanGet(
+    final IdSecAdminActionAdminBanGet e)
+  {
+    final var admin = e.admin();
+    if (!admin.permissions().implies(ADMIN_READ)) {
+      return new IdSecPolicyResultDenied(
+        "Unbanning admins requires the %s permission.".formatted(ADMIN_READ)
+      );
+    }
+    return new IdSecPolicyResultPermitted();
+  }
+
+  private static IdSecPolicyResultType checkAdminActionUserBanDelete(
+    final IdSecAdminActionUserBanDelete e)
+  {
+    final var admin = e.admin();
+    if (!admin.permissions().implies(USER_BAN)) {
+      return new IdSecPolicyResultDenied(
+        "Unbanning users requires the %s permission.".formatted(USER_BAN)
+      );
+    }
+    return new IdSecPolicyResultPermitted();
+  }
+
+  private static IdSecPolicyResultType checkAdminActionUserBanCreate(
+    final IdSecAdminActionUserBanCreate e)
+  {
+    final var admin = e.admin();
+    if (!admin.permissions().implies(USER_BAN)) {
+      return new IdSecPolicyResultDenied(
+        "Banning users requires the %s permission.".formatted(USER_BAN)
+      );
+    }
+    return new IdSecPolicyResultPermitted();
+  }
+
+  private static IdSecPolicyResultType checkAdminActionUserBanGet(
+    final IdSecAdminActionUserBanGet e)
+  {
+    final var admin = e.admin();
+    if (!admin.permissions().implies(USER_READ)) {
+      return new IdSecPolicyResultDenied(
+        "Unbanning users requires the %s permission.".formatted(USER_READ)
+      );
+    }
+    return new IdSecPolicyResultPermitted();
   }
 
   private static IdSecPolicyResultType checkAdminActionAdminPermissionRevoke(

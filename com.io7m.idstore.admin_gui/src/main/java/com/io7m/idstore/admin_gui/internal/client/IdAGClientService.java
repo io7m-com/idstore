@@ -23,6 +23,7 @@ import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.events.IdAGEventBus;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAuditEvent;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
@@ -761,6 +762,83 @@ public final class IdAGClientService implements IdServiceType, Closeable
 
       try {
         future.complete(this.client.userEmailRemove(id, email));
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Get the ban for the given user.
+   *
+   * @param id The ID
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<Optional<IdBan>> userBanGet(
+    final UUID id)
+  {
+    final var future = new CompletableFuture<Optional<IdBan>>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.userBanGet(id));
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Create a ban for the given user.
+   *
+   * @param ban The ban
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdBan> userBanCreate(
+    final IdBan ban)
+  {
+    final var future = new CompletableFuture<IdBan>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        this.client.userBanCreate(ban);
+        future.complete(ban);
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Delete a ban for the given user.
+   *
+   * @param id The user ID
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<Optional<IdBan>> userBanDelete(
+    final UUID id)
+  {
+    final var future = new CompletableFuture<Optional<IdBan>>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        this.client.userBanDelete(new IdBan(id, "", Optional.empty()));
+        future.complete(Optional.empty());
         this.requestFinish();
       } catch (final Exception e) {
         future.completeExceptionally(this.requestFailed(task, e));

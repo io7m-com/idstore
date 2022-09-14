@@ -17,6 +17,7 @@
 package com.io7m.idstore.database.api;
 
 
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
@@ -332,5 +333,42 @@ public non-sealed interface IdDatabaseUsersQueriesType
   @IdDatabaseRequiresAdmin
   void userDelete(
     UUID id)
+    throws IdDatabaseException;
+
+  /**
+   * Create a ban on the given user account.
+   *
+   * @param ban The ban
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  @IdDatabaseRequiresAdmin
+  void userBanCreate(IdBan ban)
+    throws IdDatabaseException;
+
+  /**
+   * Get the ban for the given user, if one exists.
+   *
+   * @param id The user ID
+   *
+   * @return The ban, if any
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  Optional<IdBan> userBanGet(UUID id)
+    throws IdDatabaseException;
+
+  /**
+   * Delete the given ban.
+   *
+   * @param ban The ban
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  @IdDatabaseRequiresAdmin
+  void userBanDelete(IdBan ban)
     throws IdDatabaseException;
 }

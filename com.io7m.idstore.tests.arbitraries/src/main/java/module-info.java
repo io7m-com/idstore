@@ -22,6 +22,7 @@ import com.io7m.idstore.tests.arbitraries.IdArbA1AdminSearchParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1AdminSummaryProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1AuditEventProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1AuditListParametersProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbA1BanProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1PasswordProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1TimeRangeProvider;
@@ -35,6 +36,7 @@ import com.io7m.idstore.tests.arbitraries.IdArbAdminPermissionSetProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminSummaryProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAuditEventProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbBanProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbEmailProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbHashProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbIdNameProvider;
@@ -80,6 +82,7 @@ module com.io7m.idstore.tests.arbitraries
       IdArbA1AdminSummaryProvider,
       IdArbA1AuditEventProvider,
       IdArbA1AuditListParametersProvider,
+      IdArbA1BanProvider,
       IdArbA1MessageProvider,
       IdArbA1PasswordProvider,
       IdArbA1TimeRangeProvider,
@@ -93,6 +96,7 @@ module com.io7m.idstore.tests.arbitraries
       IdArbAdminProvider,
       IdArbAdminSummaryProvider,
       IdArbAuditEventProvider,
+      IdArbBanProvider,
       IdArbEmailProvider,
       IdArbHashProvider,
       IdArbIdNameProvider,

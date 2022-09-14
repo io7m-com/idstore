@@ -19,6 +19,7 @@ package com.io7m.idstore.tests;
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
@@ -32,6 +33,9 @@ import com.io7m.idstore.model.IdUserOrdering;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
+import com.io7m.idstore.user_client.IdUClients;
+import com.io7m.idstore.user_client.api.IdUClientException;
+import com.io7m.idstore.user_client.api.IdUClientType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +50,7 @@ import java.util.UUID;
 import static com.io7m.idstore.model.IdUserColumn.BY_IDNAME;
 import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdServerAdminUsersTest extends IdWithServerContract
@@ -63,12 +68,16 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
 
   private IdAClients clients;
   private IdAClientType client;
+  private IdUClients userClients;
+  private IdUClientType userClient;
 
   @BeforeEach
   public void setup()
   {
     this.clients = new IdAClients();
     this.client = this.clients.create(Locale.getDefault());
+    this.userClients = new IdUClients();
+    this.userClient = this.userClients.create(Locale.getDefault());
   }
 
   @AfterEach
@@ -92,8 +101,6 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
 
     final var admin =
       this.serverCreateAdminInitial("admin", "12345678");
-    final var userId =
-      this.serverCreateUser(admin, "someone");
 
     this.client.login("admin", "12345678", this.serverAdminAPIURL());
 
@@ -471,6 +478,108 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
     assertTrue(
       ex.getMessage().contains("error-user-nonexistent"),
       ex.getMessage());
+  }
+
+
+  /**
+   * Banning causes logins to fail.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testBanLogin()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    final var other =
+      this.serverCreateUser(admin, "other");
+
+    this.client.login("admin", "12345678", this.serverAdminAPIURL());
+
+    this.client.userBanCreate(new IdBan(
+      other,
+      "Spite",
+      Optional.of(timeNow().plusDays(1L))
+    ));
+
+    final var ex =
+      assertThrows(IdUClientException.class, () -> {
+        this.userClient.login("other", "12345678", this.serverUserAPIURL());
+      });
+
+    assertTrue(
+      ex.getMessage().contains("error-banned"),
+      ex.getMessage());
+  }
+
+  /**
+   * Banning causes logins to fail.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testBanLoginPermanent()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    final var other =
+      this.serverCreateUser(admin, "other");
+
+    this.client.login("admin", "12345678", this.serverAdminAPIURL());
+
+    this.client.userBanCreate(new IdBan(
+      other,
+      "Spite",
+      Optional.empty()
+    ));
+
+    final var ex =
+      assertThrows(IdUClientException.class, () -> {
+        this.userClient.login("other", "12345678", this.serverUserAPIURL());
+      });
+
+    assertTrue(
+      ex.getMessage().contains("error-banned"),
+      ex.getMessage());
+  }
+
+  /**
+   * Expired bans don't cause logins to fail.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testBanLoginExpired()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    final var other =
+      this.serverCreateUser(admin, "other");
+
+    this.client.login("admin", "12345678", this.serverAdminAPIURL());
+
+    this.client.userBanCreate(new IdBan(
+      other,
+      "Spite",
+      Optional.of(timeNow().minusYears(1000L))
+    ));
+
+    this.userClient.login("other", "12345678", this.serverUserAPIURL());
   }
 
   private static void checkItems(

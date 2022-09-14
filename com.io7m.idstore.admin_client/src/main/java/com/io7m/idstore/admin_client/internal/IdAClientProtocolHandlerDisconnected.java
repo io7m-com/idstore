@@ -24,6 +24,7 @@ import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdAuditEvent;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
@@ -233,6 +234,27 @@ public final class IdAClientProtocolHandlerDisconnected
   }
 
   @Override
+  public void adminBanCreate(final IdBan ban)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public Optional<IdBan> adminBanGet(final UUID id)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public void adminBanDelete(final IdBan ban)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
   public IdPage<IdUserSummary> userSearchBegin(
     final IdUserSearchParameters parameters)
     throws IdAClientException
@@ -335,6 +357,27 @@ public final class IdAClientProtocolHandlerDisconnected
 
   @Override
   public void userDelete(final UUID id)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public void userBanCreate(final IdBan ban)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public Optional<IdBan> userBanGet(final UUID id)
+    throws IdAClientException
+  {
+    throw this.notLoggedIn();
+  }
+
+  @Override
+  public void userBanDelete(final IdBan ban)
     throws IdAClientException
   {
     throw this.notLoggedIn();

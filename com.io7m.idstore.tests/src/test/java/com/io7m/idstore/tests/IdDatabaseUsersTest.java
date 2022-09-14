@@ -20,6 +20,7 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPaging;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
@@ -1114,6 +1115,55 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       new ExpectedEvent("USER_CREATED", user.id().toString()),
       new ExpectedEvent("USER_EMAIL_REMOVED", user.id() + "|someone@example.com"),
       new ExpectedEvent("USER_DELETED", user.id().toString())
+    );
+  }
+
+  /**
+   * Bans work.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserBan()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var user =
+      this.databaseCreateUserInitial(adminId, "someone", "12345678");
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    final var now =
+      timeNow();
+
+    transaction.adminIdSet(adminId);
+
+    final var ban = new IdBan(user, "No reason.", Optional.of(now));
+    users.userBanCreate(ban);
+    assertEquals(Optional.of(ban), users.userBanGet(user));
+    users.userBanDelete(ban);
+    assertEquals(Optional.empty(), users.userBanGet(user));
+
+    checkAuditLog(
+      transaction,
+      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
+      new ExpectedEvent("USER_CREATED", user.toString()),
+      new ExpectedEvent("USER_BANNED", user.toString()),
+      new ExpectedEvent("USER_BAN_REMOVED", user.toString())
     );
   }
 

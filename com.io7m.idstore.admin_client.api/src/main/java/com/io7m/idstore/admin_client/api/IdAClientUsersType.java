@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.admin_client.api;
 
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
@@ -236,5 +237,43 @@ public interface IdAClientUsersType
    */
 
   void userDelete(UUID id)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Create a ban on the given user account.
+   *
+   * @param ban The ban
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  void userBanCreate(IdBan ban)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Get the ban for the given user, if one exists.
+   *
+   * @param id The user ID
+   *
+   * @return The ban, if any
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  Optional<IdBan> userBanGet(UUID id)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * Delete the given ban.
+   *
+   * @param ban The ban
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  void userBanDelete(IdBan ban)
     throws IdAClientException, InterruptedException;
 }

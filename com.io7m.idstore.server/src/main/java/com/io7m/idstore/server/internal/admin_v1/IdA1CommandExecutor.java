@@ -16,6 +16,9 @@
 
 package com.io7m.idstore.server.internal.admin_v1;
 
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailAdd;
@@ -37,6 +40,9 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandType;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
@@ -185,6 +191,26 @@ public final class IdA1CommandExecutor
     }
     if (command instanceof IdA1CommandAdminPermissionGrant c) {
       return new IdA1CmdAdminPermissionGrant().execute(context, c);
+    }
+
+    if (command instanceof IdA1CommandAdminBanCreate c) {
+      return new IdA1CmdAdminBanCreate().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminBanDelete c) {
+      return new IdA1CmdAdminBanDelete().execute(context, c);
+    }
+    if (command instanceof IdA1CommandAdminBanGet c) {
+      return new IdA1CmdAdminBanGet().execute(context, c);
+    }
+
+    if (command instanceof IdA1CommandUserBanCreate c) {
+      return new IdA1CmdUserBanCreate().execute(context, c);
+    }
+    if (command instanceof IdA1CommandUserBanDelete c) {
+      return new IdA1CmdUserBanDelete().execute(context, c);
+    }
+    if (command instanceof IdA1CommandUserBanGet c) {
+      return new IdA1CmdUserBanGet().execute(context, c);
     }
 
     throw new IllegalStateException();

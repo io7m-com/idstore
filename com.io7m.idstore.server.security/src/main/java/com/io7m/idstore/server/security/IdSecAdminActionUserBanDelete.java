@@ -21,21 +21,22 @@ import com.io7m.idstore.model.IdAdmin;
 import java.util.Objects;
 
 /**
- * An admin wants to ban a user.
+ * An admin wants to unban a user.
  *
- * @param admin The admin
+ * @param admin The admin performing the unban
  */
 
-public record IdSecAdminActionUserBan(IdAdmin admin)
+public record IdSecAdminActionUserBanDelete(
+  IdAdmin admin)
   implements IdSecAdminActionType
 {
   /**
-   * An admin wants to ban a user.
+   * An admin wants to unban a user.
    *
-   * @param admin The admin
+   * @param admin The admin performing the unban
    */
 
-  public IdSecAdminActionUserBan
+  public IdSecAdminActionUserBanDelete
   {
     Objects.requireNonNull(admin, "admin");
   }

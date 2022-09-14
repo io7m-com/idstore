@@ -14,29 +14,40 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.security;
+package com.io7m.idstore.protocol.admin_v1;
 
-import com.io7m.idstore.model.IdAdmin;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
- * An admin wants to unban a user.
+ * A response to {@link IdA1CommandUserBanCreate}.
  *
- * @param admin The admin
+ * @param requestId The request ID
+ * @param ban     The ban
  */
 
-public record IdSecAdminActionUserUnban(IdAdmin admin)
-  implements IdSecAdminActionType
+@JsonDeserialize
+@JsonSerialize
+public record IdA1ResponseUserBanCreate(
+  @JsonProperty(value = "RequestID", required = true)
+  UUID requestId,
+  @JsonProperty(value = "Ban", required = true)
+  IdA1Ban ban)
+  implements IdA1ResponseType
 {
   /**
-   * An admin wants to unban a user.
-   *
-   * @param admin The admin
+   * A response to {@link IdA1CommandUserBanCreate}.
    */
 
-  public IdSecAdminActionUserUnban
+  @JsonCreator
+  public IdA1ResponseUserBanCreate
   {
-    Objects.requireNonNull(admin, "admin");
+    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(ban, "ban");
   }
 }

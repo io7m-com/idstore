@@ -49,6 +49,30 @@ public enum IdAdminPermission
   },
 
   /**
+   * A permission that allows for banning users.
+   */
+
+  USER_BAN {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
+
+  /**
+   * A permission that allows for banning admins.
+   */
+
+  ADMIN_BAN {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
+
+  /**
    * A permission that allows for modifying admins.
    */
 

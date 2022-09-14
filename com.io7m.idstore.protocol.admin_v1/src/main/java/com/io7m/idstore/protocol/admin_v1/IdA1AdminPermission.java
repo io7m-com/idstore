@@ -29,6 +29,12 @@ import java.util.Objects;
 public enum IdA1AdminPermission
 {
   /**
+   * A permission that allows for banning admins.
+   */
+
+  ADMIN_BAN,
+
+  /**
    * A permission that allows for creating admins.
    */
 
@@ -86,7 +92,13 @@ public enum IdA1AdminPermission
    * A permission that allows reading users.
    */
 
-  USER_READ;
+  USER_READ,
+
+  /**
+   * A permission that allows for banning users.
+   */
+
+  USER_BAN;
 
   /**
    * Create a v1 permission from the given model permission.
@@ -109,6 +121,8 @@ public enum IdA1AdminPermission
       case ADMIN_DELETE -> ADMIN_DELETE;
       case ADMIN_WRITE_SELF -> ADMIN_WRITE_SELF;
       case ADMIN_READ -> ADMIN_READ;
+      case USER_BAN -> USER_BAN;
+      case ADMIN_BAN -> ADMIN_BAN;
       case ADMIN_WRITE -> ADMIN_WRITE;
       case AUDIT_READ -> AUDIT_READ;
       case USER_CREATE -> USER_CREATE;
@@ -130,6 +144,7 @@ public enum IdA1AdminPermission
   public IdAdminPermission toPermission()
   {
     return switch (this) {
+      case ADMIN_BAN -> IdAdminPermission.ADMIN_BAN;
       case ADMIN_CREATE -> IdAdminPermission.ADMIN_CREATE;
       case ADMIN_DELETE -> IdAdminPermission.ADMIN_DELETE;
       case ADMIN_WRITE_SELF -> IdAdminPermission.ADMIN_WRITE_SELF;
@@ -140,6 +155,7 @@ public enum IdA1AdminPermission
       case USER_DELETE -> IdAdminPermission.USER_DELETE;
       case USER_READ -> IdAdminPermission.USER_READ;
       case USER_WRITE -> IdAdminPermission.USER_WRITE;
+      case USER_BAN -> IdAdminPermission.USER_BAN;
     };
   }
 }

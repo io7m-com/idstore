@@ -26,6 +26,10 @@ import com.io7m.idstore.protocol.admin_v1.IdA1AdminSearchParameters;
 import com.io7m.idstore.protocol.admin_v1.IdA1AdminSummary;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditEvent;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditListParameters;
+import com.io7m.idstore.protocol.admin_v1.IdA1Ban;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailAdd;
@@ -46,6 +50,9 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
@@ -62,6 +69,9 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
 import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Page;
 import com.io7m.idstore.protocol.admin_v1.IdA1Password;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminBanCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminBanDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminGet;
@@ -78,6 +88,9 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseLogin;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanCreate;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanDelete;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
@@ -131,6 +144,20 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
     final SubtypeProvider subtypeProvider)
   {
     return Set.of(
+      commandAdminBanCreate(),
+      commandAdminBanGet(),
+      commandAdminBanDelete(),
+      responseAdminBanCreate(),
+      responseAdminBanGet(),
+      responseAdminBanDelete(),
+
+      commandUserBanCreate(),
+      commandUserBanGet(),
+      commandUserBanDelete(),
+      responseUserBanCreate(),
+      responseUserBanGet(),
+      responseUserBanDelete(),
+
       commandAdminCreate(),
       commandAdminDelete(),
       commandAdminEmailAdd(),
@@ -1174,5 +1201,139 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
   {
     final var id = Arbitraries.defaultFor(UUID.class);
     return id.map(IdA1ResponseAdminDelete::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminBanCreate> commandAdminBanCreate()
+  {
+    final var id = Arbitraries.defaultFor(IdA1Ban.class);
+    return id.map(IdA1CommandAdminBanCreate::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminBanDelete> commandAdminBanDelete()
+  {
+    final var id = Arbitraries.defaultFor(UUID.class);
+    return id.map(IdA1CommandAdminBanDelete::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandAdminBanGet> commandAdminBanGet()
+  {
+    final var id = Arbitraries.defaultFor(UUID.class);
+    return id.map(IdA1CommandAdminBanGet::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandUserBanCreate> commandUserBanCreate()
+  {
+    final var id = Arbitraries.defaultFor(IdA1Ban.class);
+    return id.map(IdA1CommandUserBanCreate::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandUserBanDelete> commandUserBanDelete()
+  {
+    final var id = Arbitraries.defaultFor(UUID.class);
+    return id.map(IdA1CommandUserBanDelete::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandUserBanGet> commandUserBanGet()
+  {
+    final var id = Arbitraries.defaultFor(UUID.class);
+    return id.map(IdA1CommandUserBanGet::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminBanCreate> responseAdminBanCreate()
+  {
+    final var i =
+      Arbitraries.defaultFor(UUID.class);
+    final var b =
+      Arbitraries.defaultFor(IdA1Ban.class);
+    return Combinators.combine(i, b).as(IdA1ResponseAdminBanCreate::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminBanDelete> responseAdminBanDelete()
+  {
+    final var i = Arbitraries.defaultFor(UUID.class);
+    return i.map(IdA1ResponseAdminBanDelete::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseAdminBanGet> responseAdminBanGet()
+  {
+    final var i =
+      Arbitraries.defaultFor(UUID.class);
+    final var b =
+      Arbitraries.defaultFor(IdA1Ban.class)
+        .optional();
+    return Combinators.combine(i, b).as(IdA1ResponseAdminBanGet::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseUserBanCreate> responseUserBanCreate()
+  {
+    final var i =
+      Arbitraries.defaultFor(UUID.class);
+    final var b =
+      Arbitraries.defaultFor(IdA1Ban.class);
+    return Combinators.combine(i, b).as(IdA1ResponseUserBanCreate::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseUserBanDelete> responseUserBanDelete()
+  {
+    final var i = Arbitraries.defaultFor(UUID.class);
+    return i.map(IdA1ResponseUserBanDelete::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseUserBanGet> responseUserBanGet()
+  {
+    final var i =
+      Arbitraries.defaultFor(UUID.class);
+    final var b =
+      Arbitraries.defaultFor(IdA1Ban.class)
+        .optional();
+    return Combinators.combine(i, b).as(IdA1ResponseUserBanGet::new);
   }
 }

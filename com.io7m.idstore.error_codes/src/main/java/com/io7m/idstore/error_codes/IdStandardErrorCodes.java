@@ -35,6 +35,13 @@ public final class IdStandardErrorCodes
     new IdErrorCode("error-protocol");
 
   /**
+   * A user or admin is banned.
+   */
+
+  public static final IdErrorCode BANNED =
+    new IdErrorCode("error-banned");
+
+  /**
    * Authenticating a user or admin failed.
    */
 

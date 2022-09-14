@@ -27,11 +27,11 @@ create role idstore_none with nosuperuser nocreatedb nocreaterole noinherit nolo
 
     <Statement><![CDATA[
 create table schema_version (
-  version_lock   char(1) not null default 'x',
+  version_ban   char(1) not null default 'x',
   version_number bigint  not null,
 
-  constraint check_lock_primary primary key (version_lock),
-  constraint check_lock_locked check (version_lock = 'x')
+  constraint check_ban_primary primary key (version_ban),
+  constraint check_ban_baned check (version_ban = 'x')
 )
 ]]></Statement>
   </Schema>
@@ -209,6 +209,22 @@ create table email_verifications (
 ]]></Statement>
 
     <Statement>grant insert, select, delete on email_verifications to idstore</Statement>
+
+    <Comment>
+      The bans table records the reason any given account might be banned, and when that ban expires (if it expires).
+    </Comment>
+
+    <Statement><![CDATA[
+create table bans (
+  user_id     uuid                      not null primary key,
+  reason      varchar(1000000)          not null,
+  expires     timestamp with time zone,
+
+  foreign key (user_id) references user_ids (id)
+)
+]]></Statement>
+
+    <Statement>grant insert, select, update, delete on bans to idstore</Statement>
   </Schema>
 
 </Schemas>

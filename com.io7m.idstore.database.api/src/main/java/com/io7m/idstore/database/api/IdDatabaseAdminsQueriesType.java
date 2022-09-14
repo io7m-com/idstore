@@ -21,6 +21,7 @@ import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPassword;
@@ -320,5 +321,42 @@ public non-sealed interface IdDatabaseAdminsQueriesType
   @IdDatabaseRequiresAdmin
   void adminDelete(
     UUID id)
+    throws IdDatabaseException;
+
+  /**
+   * Create a ban on the given admin account.
+   *
+   * @param ban The ban
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  @IdDatabaseRequiresAdmin
+  void adminBanCreate(IdBan ban)
+    throws IdDatabaseException;
+
+  /**
+   * Get the ban for the given admin, if one exists.
+   *
+   * @param id The admin ID
+   *
+   * @return The ban, if any
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  Optional<IdBan> adminBanGet(UUID id)
+    throws IdDatabaseException;
+
+  /**
+   * Delete the given ban.
+   *
+   * @param ban The ban
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  @IdDatabaseRequiresAdmin
+  void adminBanDelete(IdBan ban)
     throws IdDatabaseException;
 }

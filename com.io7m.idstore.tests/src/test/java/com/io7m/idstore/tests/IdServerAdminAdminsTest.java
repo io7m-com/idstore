@@ -26,6 +26,7 @@ import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
+import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
@@ -48,6 +49,7 @@ import static com.io7m.idstore.model.IdAdminColumn.BY_IDNAME;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdServerAdminAdminsTest extends IdWithServerContract
@@ -643,6 +645,107 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
     assertFalse(
       admin2.permissions().implies(AUDIT_READ)
     );
+  }
+
+  /**
+   * Banning causes logins to fail.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testBanLogin()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    final var other =
+      this.serverCreateAdmin(admin, "other");
+
+    this.client.login("admin", "12345678", this.serverAdminAPIURL());
+
+    this.client.adminBanCreate(new IdBan(
+      other,
+      "Spite",
+      Optional.of(timeNow().plusDays(1L))
+    ));
+
+    final var ex =
+      assertThrows(IdAClientException.class, () -> {
+        this.client.login("other", "12345678", this.serverAdminAPIURL());
+      });
+
+    assertTrue(
+      ex.getMessage().contains("error-banned"),
+      ex.getMessage());
+  }
+
+  /**
+   * Banning causes logins to fail.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testBanLoginPermanent()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    final var other =
+      this.serverCreateAdmin(admin, "other");
+
+    this.client.login("admin", "12345678", this.serverAdminAPIURL());
+
+    this.client.adminBanCreate(new IdBan(
+      other,
+      "Spite",
+      Optional.empty()
+    ));
+
+    final var ex =
+      assertThrows(IdAClientException.class, () -> {
+        this.client.login("other", "12345678", this.serverAdminAPIURL());
+      });
+
+    assertTrue(
+      ex.getMessage().contains("error-banned"),
+      ex.getMessage());
+  }
+
+  /**
+   * Expired bans don't cause logins to fail.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testBanLoginExpired()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    final var other =
+      this.serverCreateAdmin(admin, "other");
+
+    this.client.login("admin", "12345678", this.serverAdminAPIURL());
+
+    this.client.adminBanCreate(new IdBan(
+      other,
+      "Spite",
+      Optional.of(timeNow().minusYears(1000L))
+    ));
+
+    this.client.login("other", "12345678", this.serverAdminAPIURL());
   }
 
   private static void checkItems(
