@@ -24,8 +24,11 @@ import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdValidityException;
+import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdRequests;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
+import com.io7m.idstore.server.internal.IdServerClock;
+import com.io7m.idstore.server.internal.IdServerConfigurationService;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.freemarker.IdFMLoginData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
@@ -45,7 +48,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
  * The login form.
@@ -60,6 +65,8 @@ public final class IdUViewLogin extends HttpServlet
   private final IdDatabaseType database;
   private final IdServerStrings strings;
   private final IdServerBrandingService branding;
+  private final IdServerConfigurationService configuration;
+  private final IdServerClock clock;
 
   /**
    * The login form.
@@ -74,10 +81,14 @@ public final class IdUViewLogin extends HttpServlet
 
     this.database =
       inServices.requireService(IdDatabaseType.class);
+    this.clock =
+      inServices.requireService(IdServerClock.class);
     this.strings =
       inServices.requireService(IdServerStrings.class);
     this.branding =
       inServices.requireService(IdServerBrandingService.class);
+    this.configuration =
+      inServices.requireService(IdServerConfigurationService.class);
 
     this.template =
       inServices.requireService(IdFMTemplateService.class)
@@ -171,8 +182,9 @@ public final class IdUViewLogin extends HttpServlet
     final IdUser user;
 
     try {
-      user =
-        users.userGetForNameRequire(new IdName(username));
+      user = users.userGetForNameRequire(new IdName(username));
+      this.checkBan(users, user);
+
       final var ok =
         user.password().check(password);
 
@@ -189,6 +201,9 @@ public final class IdUViewLogin extends HttpServlet
     } catch (final IdValidityException e) {
       this.fail(response, session);
       return;
+    } catch (final IdHTTPErrorStatusException e) {
+      this.failWith(response, session, e);
+      return;
     }
 
     LOG.info("user '{}' logged in", username);
@@ -197,9 +212,59 @@ public final class IdUViewLogin extends HttpServlet
     users.userLogin(
       user.id(),
       IdRequests.requestUserAgent(request),
-      request.getRemoteAddr()
+      request.getRemoteAddr(),
+      this.configuration.configuration()
+        .history()
+        .userLoginHistoryLimit()
     );
     response.sendRedirect("/");
+  }
+
+  private void checkBan(
+    final IdDatabaseUsersQueriesType users,
+    final IdUser user)
+    throws IdDatabaseException, IdHTTPErrorStatusException
+  {
+    final var banOpt =
+      users.userBanGet(user.id());
+
+    /*
+     * If there's no ban, allow the login.
+     */
+
+    if (banOpt.isEmpty()) {
+      return;
+    }
+
+    final var ban = banOpt.get();
+    final var expiresOpt = ban.expires();
+
+    /*
+     * If there's no expiration on the ban, deny the login.
+     */
+
+    if (expiresOpt.isEmpty()) {
+      throw new IdHTTPErrorStatusException(
+        FORBIDDEN_403,
+        BANNED,
+        this.strings.format("bannedNoExpire", ban.reason())
+      );
+    }
+
+    /*
+     * If the current time is before the expiration date, deny the login.
+     */
+
+    final var timeExpires = expiresOpt.get();
+    final var timeNow = this.clock.now();
+
+    if (timeNow.compareTo(timeExpires) < 0) {
+      throw new IdHTTPErrorStatusException(
+        FORBIDDEN_403,
+        BANNED,
+        this.strings.format("banned", ban.reason(), timeExpires)
+      );
+    }
   }
 
   private void fail(
@@ -213,6 +278,21 @@ public final class IdUViewLogin extends HttpServlet
     );
 
     response.setStatus(401);
+    this.showForm(response, session);
+  }
+
+  private void failWith(
+    final HttpServletResponse response,
+    final HttpSession session,
+    final IdHTTPErrorStatusException e)
+    throws IOException
+  {
+    session.setAttribute(
+      "ErrorMessage",
+      e.getMessage()
+    );
+
+    response.setStatus(403);
     this.showForm(response, session);
   }
 }

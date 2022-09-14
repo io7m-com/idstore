@@ -34,6 +34,7 @@ import com.io7m.idstore.server.api.IdServerBrandingConfiguration;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerException;
 import com.io7m.idstore.server.api.IdServerHTTPServiceConfiguration;
+import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerType;
@@ -277,6 +278,12 @@ public abstract class IdWithServerContract
         Optional.empty()
       );
 
+    final var history =
+      new IdServerHistoryConfiguration(
+        100,
+        100
+      );
+
     return this.servers.createServer(
       new IdServerConfiguration(
         Locale.getDefault(),
@@ -288,7 +295,8 @@ public abstract class IdWithServerContract
         userViewService,
         adminApiService,
         adminViewService,
-        branding
+        branding,
+        history
       )
     );
   }

@@ -7,6 +7,7 @@ com.io7m.idstore.tests.arbitraries.IdArbA1AdminSummaryProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1AuditEventProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1AuditListParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1BanProvider
+com.io7m.idstore.tests.arbitraries.IdArbA1LoginProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1PasswordProvider
 com.io7m.idstore.tests.arbitraries.IdArbA1TimeRangeProvider

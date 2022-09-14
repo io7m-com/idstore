@@ -35,6 +35,8 @@
             checks="HiddenField"/>
   <suppress files="IdAdminPermissionSet\.java"
             checks="HiddenField"/>
+  <suppress files="IdServerHistoryConfiguration\.java"
+            checks="HiddenField"/>
 
   <suppress files="IdSCommandVersion\.java"
             checks="IllegalInstantiation"/>

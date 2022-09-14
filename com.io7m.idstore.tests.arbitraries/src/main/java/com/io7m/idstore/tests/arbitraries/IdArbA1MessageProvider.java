@@ -59,6 +59,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailRemove;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserLoginHistory;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailNext;
@@ -66,6 +67,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchNext;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchPrevious;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
+import com.io7m.idstore.protocol.admin_v1.IdA1Login;
 import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
 import com.io7m.idstore.protocol.admin_v1.IdA1Page;
 import com.io7m.idstore.protocol.admin_v1.IdA1Password;
@@ -94,6 +96,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserLoginHistory;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailNext;
@@ -145,19 +148,8 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
   {
     return Set.of(
       commandAdminBanCreate(),
-      commandAdminBanGet(),
       commandAdminBanDelete(),
-      responseAdminBanCreate(),
-      responseAdminBanGet(),
-      responseAdminBanDelete(),
-
-      commandUserBanCreate(),
-      commandUserBanGet(),
-      commandUserBanDelete(),
-      responseUserBanCreate(),
-      responseUserBanGet(),
-      responseUserBanDelete(),
-
+      commandAdminBanGet(),
       commandAdminCreate(),
       commandAdminDelete(),
       commandAdminEmailAdd(),
@@ -173,11 +165,15 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       commandAdminSelf(),
       commandAdminUpdate(),
       commandLogin(),
+      commandUserBanCreate(),
+      commandUserBanDelete(),
+      commandUserBanGet(),
       commandUserCreate(),
       commandUserDelete(),
       commandUserEmailAdd(),
       commandUserEmailRemove(),
       commandUserGet(),
+      commandUserLoginHistory(),
       commandUserSearchBegin(),
       commandUserSearchByEmailBegin(),
       commandUserSearchByEmailNext(),
@@ -185,6 +181,9 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       commandUserSearchNext(),
       commandUserSearchPrevious(),
       commandUserUpdate(),
+      responseAdminBanCreate(),
+      responseAdminBanDelete(),
+      responseAdminBanGet(),
       responseAdminCreate(),
       responseAdminDelete(),
       responseAdminSearchBegin(),
@@ -196,9 +195,13 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       responseAdminSelf(),
       responseError(),
       responseLogin(),
+      responseUserBanCreate(),
+      responseUserBanDelete(),
+      responseUserBanGet(),
       responseUserCreate(),
       responseUserDelete(),
       responseUserGet(),
+      responseUserLoginHistory(),
       responseUserSearchBegin(),
       responseUserSearchByEmailBegin(),
       responseUserSearchByEmailNext(),
@@ -1335,5 +1338,31 @@ public final class IdArbA1MessageProvider extends IdArbAbstractProvider
       Arbitraries.defaultFor(IdA1Ban.class)
         .optional();
     return Combinators.combine(i, b).as(IdA1ResponseUserBanGet::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1CommandUserLoginHistory> commandUserLoginHistory()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    return id.map(IdA1CommandUserLoginHistory::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdA1ResponseUserLoginHistory> responseUserLoginHistory()
+  {
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+    final var hist =
+      Arbitraries.defaultFor(IdA1Login.class)
+        .list();
+
+    return Combinators.combine(id, hist).as(IdA1ResponseUserLoginHistory::new);
   }
 }

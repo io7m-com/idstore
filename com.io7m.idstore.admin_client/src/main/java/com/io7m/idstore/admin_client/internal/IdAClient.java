@@ -27,6 +27,7 @@ import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPassword;
@@ -40,6 +41,7 @@ import com.io7m.idstore.model.IdUserSummary;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -438,5 +440,13 @@ public final class IdAClient implements IdAClientType
     throws IdAClientException, InterruptedException
   {
     this.handler.userBanDelete(ban);
+  }
+
+  @Override
+  public List<IdLogin> userLoginHistory(
+    final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    return this.handler.userLoginHistory(id);
   }
 }

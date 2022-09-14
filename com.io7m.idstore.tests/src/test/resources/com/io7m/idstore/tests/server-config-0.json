@@ -91,6 +91,11 @@
     }
   },
 
+  "History": {
+    "UserLoginHistoryLimit": 100,
+    "AdminLoginHistoryLimit": 10000
+  },
+
   "Database": {
     "Kind": "POSTGRESQL",
     "User": "postgres",

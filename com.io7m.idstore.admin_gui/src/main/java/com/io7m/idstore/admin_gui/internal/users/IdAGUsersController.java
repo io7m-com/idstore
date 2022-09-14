@@ -24,6 +24,7 @@ import com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus;
 import com.io7m.idstore.admin_gui.internal.main.IdAGMainScreenController;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdRealName;
@@ -45,6 +46,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
@@ -56,6 +58,7 @@ import java.net.URL;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -75,33 +78,35 @@ public final class IdAGUsersController implements Initializable
   private final IdAGClientService client;
   private final ObservableList<IdAGUser> users;
   private final ObservableList<IdEmail> userEmails;
+  private final ObservableList<IdLogin> userLoginHistory;
   private IdUser user;
   private IdBan ban;
   private IdAGUserSearchKind searchKindAtStart;
 
-  @FXML private Parent userTableContainer;
-  @FXML private Parent userDetailContainer;
+  @FXML private Button banBan;
+  @FXML private Button banUnban;
+  @FXML private Button emailAdd;
+  @FXML private Button emailDelete;
   @FXML private Button userCreate;
   @FXML private Button userDelete;
-  @FXML private ListView<IdAGUser> userList;
-  @FXML private ListView<IdEmail> userEmailList;
-  @FXML private TextField userSearchField;
   @FXML private Button userPageNext;
   @FXML private Button userPagePrev;
+  @FXML private CheckBox banExpires;
+  @FXML private ChoiceBox<IdAGUserSearchKind> searchKind;
+  @FXML private DatePicker banExpiryPicker;
+  @FXML private Label banLabel;
   @FXML private Label userPageLabel;
+  @FXML private ListView<IdAGUser> userList;
+  @FXML private ListView<IdEmail> userEmailList;
+  @FXML private Parent userDetailContainer;
+  @FXML private Parent userTableContainer;
+  @FXML private Tab tabLoginHistory;
+  @FXML private TextArea banReason;
   @FXML private TextField userIdField;
   @FXML private TextField userIdNameField;
   @FXML private TextField userRealNameField;
-  @FXML private Button emailAdd;
-  @FXML private Button emailDelete;
-  @FXML private ChoiceBox<IdAGUserSearchKind> searchKind;
-
-  @FXML private CheckBox banExpires;
-  @FXML private DatePicker banExpiryPicker;
-  @FXML private Button banUnban;
-  @FXML private Button banBan;
-  @FXML private TextArea banReason;
-  @FXML private Label banLabel;
+  @FXML private TextField userSearchField;
+  @FXML private ListView<IdLogin> loginHistoryList;
 
   /**
    * The user tab controller.
@@ -126,6 +131,20 @@ public final class IdAGUsersController implements Initializable
       FXCollections.observableArrayList();
     this.userEmails =
       FXCollections.observableArrayList();
+    this.userLoginHistory =
+      FXCollections.observableArrayList();
+  }
+
+  private void onUserLoginHistoryReceived(
+    final List<IdLogin> received)
+  {
+    Platform.runLater(() -> {
+      if (received == null) {
+        this.userLoginHistory.clear();
+        return;
+      }
+      this.userLoginHistory.setAll(received);
+    });
   }
 
   @FXML
@@ -225,6 +244,12 @@ public final class IdAGUsersController implements Initializable
       this.onUserSelected(userNew);
     });
 
+    this.loginHistoryList.setCellFactory(
+      new IsAGUserLoginHistoryCellFactory(this.strings));
+    this.loginHistoryList.setItems(this.userLoginHistory);
+    this.loginHistoryList.setFixedCellSize(24.0);
+    this.loginHistoryList.getSelectionModel().setSelectionMode(SINGLE);
+
     this.userEmailList.setItems(this.userEmails);
     this.userEmailList.getSelectionModel()
       .selectedItemProperty()
@@ -290,6 +315,7 @@ public final class IdAGUsersController implements Initializable
     this.userEmails.clear();
     this.emailAdd.setDisable(true);
     this.emailDelete.setDisable(true);
+    this.userLoginHistory.clear();
   }
 
   private void userDetailsUnlock()
@@ -320,6 +346,15 @@ public final class IdAGUsersController implements Initializable
       future.whenComplete((received, exception) -> {
         if (received != null) {
           this.onUserBanReceived(received);
+        }
+      });
+    }
+
+    {
+      final var future = this.client.userLoginHistory(userNew.id());
+      future.whenComplete((received, exception) -> {
+        if (received != null) {
+          this.onUserLoginHistoryReceived(received);
         }
       });
     }

@@ -48,6 +48,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailRemove;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserLoginHistory;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailNext;
@@ -82,6 +83,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserLoginHistory;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailNext;
@@ -102,6 +104,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -141,6 +144,7 @@ import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandU
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserEmailRemove;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserGet;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserGetByEmail;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserLoginHistory;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserSearchBegin;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserSearchByEmailBegin;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.commandUserSearchByEmailNext;
@@ -173,6 +177,7 @@ import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.response
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserCreate;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserDelete;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserGet;
+import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserLoginHistory;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserSearchBegin;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserSearchByEmailBegin;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserSearchByEmailNext;
@@ -181,7 +186,6 @@ import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.response
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserSearchPrevious;
 import static com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider.responseUserUpdate;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -196,80 +200,110 @@ public final class IdA1MessagesTest
 
   private static final Map<
     Class<? extends IdA1MessageType>,
-    Arbitrary<? extends IdA1MessageType>> MESSAGE_ARBITRARIES =
-    Map.ofEntries(
-      entry(IdA1CommandAdminBanCreate.class, commandAdminBanCreate()),
-      entry(IdA1CommandAdminBanDelete.class, commandAdminBanDelete()),
-      entry(IdA1CommandAdminBanGet.class, commandAdminBanGet()),
-      entry(IdA1CommandAdminCreate.class, commandAdminCreate()),
-      entry(IdA1CommandAdminDelete.class, commandAdminDelete()),
-      entry(IdA1CommandAdminEmailAdd.class, commandAdminEmailAdd()),
-      entry(IdA1CommandAdminEmailRemove.class, commandAdminEmailRemove()),
-      entry(IdA1CommandAdminGet.class, commandAdminGet()),
-      entry(IdA1CommandAdminGetByEmail.class, commandAdminGetByEmail()),
-      entry(IdA1CommandAdminPermissionGrant.class, commandAdminPermissionGrant()),
-      entry(IdA1CommandAdminPermissionRevoke.class, commandAdminPermissionRevoke()),
-      entry(IdA1CommandAdminSearchBegin.class, commandAdminSearchBegin()),
-      entry(IdA1CommandAdminSearchByEmailBegin.class, commandAdminSearchByEmailBegin()),
-      entry(IdA1CommandAdminSearchByEmailNext.class, commandAdminSearchByEmailNext()),
-      entry(IdA1CommandAdminSearchByEmailPrevious.class, commandAdminSearchByEmailPrevious()),
-      entry(IdA1CommandAdminSearchNext.class, commandAdminSearchNext()),
-      entry(IdA1CommandAdminSearchPrevious.class, commandAdminSearchPrevious()),
-      entry(IdA1CommandAdminSelf.class, commandAdminSelf()),
-      entry(IdA1CommandAdminUpdate.class, commandAdminUpdate()),
-      entry(IdA1CommandAuditSearchBegin.class, commandAuditSearchBegin()),
-      entry(IdA1CommandAuditSearchNext.class, commandAuditSearchNext()),
-      entry(IdA1CommandAuditSearchPrevious.class, commandAuditSearchPrevious()),
-      entry(IdA1CommandLogin.class, commandLogin()),
-      entry(IdA1CommandUserBanCreate.class, commandUserBanCreate()),
-      entry(IdA1CommandUserBanDelete.class, commandUserBanDelete()),
-      entry(IdA1CommandUserBanGet.class, commandUserBanGet()),
-      entry(IdA1CommandUserCreate.class, commandUserCreate()),
-      entry(IdA1CommandUserDelete.class, commandUserDelete()),
-      entry(IdA1CommandUserEmailAdd.class, commandUserEmailAdd()),
-      entry(IdA1CommandUserEmailRemove.class, commandUserEmailRemove()),
-      entry(IdA1CommandUserGet.class, commandUserGet()),
-      entry(IdA1CommandUserGetByEmail.class, commandUserGetByEmail()),
-      entry(IdA1CommandUserSearchBegin.class, commandUserSearchBegin()),
-      entry(IdA1CommandUserSearchByEmailBegin.class, commandUserSearchByEmailBegin()),
-      entry(IdA1CommandUserSearchByEmailNext.class, commandUserSearchByEmailNext()),
-      entry(IdA1CommandUserSearchByEmailPrevious.class, commandUserSearchByEmailPrevious()),
-      entry(IdA1CommandUserSearchNext.class, commandUserSearchNext()),
-      entry(IdA1CommandUserSearchPrevious.class, commandUserSearchPrevious()),
-      entry(IdA1CommandUserUpdate.class, commandUserUpdate()),
-      entry(IdA1ResponseAdminBanCreate.class, responseAdminBanCreate()),
-      entry(IdA1ResponseAdminBanDelete.class, responseAdminBanDelete()),
-      entry(IdA1ResponseAdminBanGet.class, responseAdminBanGet()),
-      entry(IdA1ResponseAdminCreate.class, responseAdminCreate()),
-      entry(IdA1ResponseAdminDelete.class, responseAdminDelete()),
-      entry(IdA1ResponseAdminGet.class, responseAdminGet()),
-      entry(IdA1ResponseAdminSearchBegin.class, responseAdminSearchBegin()),
-      entry(IdA1ResponseAdminSearchByEmailBegin.class, responseAdminSearchByEmailBegin()),
-      entry(IdA1ResponseAdminSearchByEmailNext.class, responseAdminSearchByEmailNext()),
-      entry(IdA1ResponseAdminSearchByEmailPrevious.class, responseAdminSearchByEmailPrevious()),
-      entry(IdA1ResponseAdminSearchNext.class, responseAdminSearchNext()),
-      entry(IdA1ResponseAdminSearchPrevious.class, responseAdminSearchPrevious()),
-      entry(IdA1ResponseAdminSelf.class, responseAdminSelf()),
-      entry(IdA1ResponseAdminUpdate.class, responseAdminUpdate()),
-      entry(IdA1ResponseAuditSearchBegin.class, responseAuditSearchBegin()),
-      entry(IdA1ResponseAuditSearchNext.class, responseAuditSearchNext()),
-      entry(IdA1ResponseAuditSearchPrevious.class, responseAuditSearchPrevious()),
-      entry(IdA1ResponseError.class, responseError()),
-      entry(IdA1ResponseLogin.class, responseLogin()),
-      entry(IdA1ResponseUserBanCreate.class, responseUserBanCreate()),
-      entry(IdA1ResponseUserBanDelete.class, responseUserBanDelete()),
-      entry(IdA1ResponseUserBanGet.class, responseUserBanGet()),
-      entry(IdA1ResponseUserCreate.class, responseUserCreate()),
-      entry(IdA1ResponseUserDelete.class, responseUserDelete()),
-      entry(IdA1ResponseUserGet.class, responseUserGet()),
-      entry(IdA1ResponseUserSearchBegin.class, responseUserSearchBegin()),
-      entry(IdA1ResponseUserSearchByEmailBegin.class, responseUserSearchByEmailBegin()),
-      entry(IdA1ResponseUserSearchByEmailNext.class, responseUserSearchByEmailNext()),
-      entry(IdA1ResponseUserSearchByEmailPrevious.class, responseUserSearchByEmailPrevious()),
-      entry(IdA1ResponseUserSearchNext.class, responseUserSearchNext()),
-      entry(IdA1ResponseUserSearchPrevious.class, responseUserSearchPrevious()),
-      entry(IdA1ResponseUserUpdate.class, responseUserUpdate())
-    );
+    Arbitrary<? extends IdA1MessageType>> MESSAGE_ARBITRARIES;
+
+  static {
+    MESSAGE_ARBITRARIES = new HashMap<>();
+
+    final var m = MESSAGE_ARBITRARIES;
+    m.put(IdA1CommandUserLoginHistory.class, commandUserLoginHistory());
+    m.put(IdA1ResponseUserLoginHistory.class, responseUserLoginHistory());
+    m.put(IdA1CommandAdminBanCreate.class, commandAdminBanCreate());
+    m.put(IdA1CommandAdminBanDelete.class, commandAdminBanDelete());
+    m.put(IdA1CommandAdminBanGet.class, commandAdminBanGet());
+    m.put(IdA1CommandAdminCreate.class, commandAdminCreate());
+    m.put(IdA1CommandAdminDelete.class, commandAdminDelete());
+    m.put(IdA1CommandAdminEmailAdd.class, commandAdminEmailAdd());
+    m.put(IdA1CommandAdminEmailRemove.class, commandAdminEmailRemove());
+    m.put(IdA1CommandAdminGet.class, commandAdminGet());
+    m.put(IdA1CommandAdminGetByEmail.class, commandAdminGetByEmail());
+    m.put(IdA1CommandAdminPermissionGrant.class, commandAdminPermissionGrant());
+    m.put(IdA1CommandAdminPermissionRevoke.class, commandAdminPermissionRevoke());
+    m.put(IdA1CommandAdminSearchBegin.class, commandAdminSearchBegin());
+    m.put(
+      IdA1CommandAdminSearchByEmailBegin.class,
+      commandAdminSearchByEmailBegin());
+    m.put(
+      IdA1CommandAdminSearchByEmailNext.class,
+      commandAdminSearchByEmailNext());
+    m.put(
+      IdA1CommandAdminSearchByEmailPrevious.class,
+      commandAdminSearchByEmailPrevious());
+    m.put(IdA1CommandAdminSearchNext.class, commandAdminSearchNext());
+    m.put(IdA1CommandAdminSearchPrevious.class, commandAdminSearchPrevious());
+    m.put(IdA1CommandAdminSelf.class, commandAdminSelf());
+    m.put(IdA1CommandAdminUpdate.class, commandAdminUpdate());
+    m.put(IdA1CommandAuditSearchBegin.class, commandAuditSearchBegin());
+    m.put(IdA1CommandAuditSearchNext.class, commandAuditSearchNext());
+    m.put(IdA1CommandAuditSearchPrevious.class, commandAuditSearchPrevious());
+    m.put(IdA1CommandLogin.class, commandLogin());
+    m.put(IdA1CommandUserBanCreate.class, commandUserBanCreate());
+    m.put(IdA1CommandUserBanDelete.class, commandUserBanDelete());
+    m.put(IdA1CommandUserBanGet.class, commandUserBanGet());
+    m.put(IdA1CommandUserCreate.class, commandUserCreate());
+    m.put(IdA1CommandUserDelete.class, commandUserDelete());
+    m.put(IdA1CommandUserEmailAdd.class, commandUserEmailAdd());
+    m.put(IdA1CommandUserEmailRemove.class, commandUserEmailRemove());
+    m.put(IdA1CommandUserGet.class, commandUserGet());
+    m.put(IdA1CommandUserGetByEmail.class, commandUserGetByEmail());
+    m.put(IdA1CommandUserSearchBegin.class, commandUserSearchBegin());
+    m.put(
+      IdA1CommandUserSearchByEmailBegin.class,
+      commandUserSearchByEmailBegin());
+    m.put(
+      IdA1CommandUserSearchByEmailNext.class,
+      commandUserSearchByEmailNext());
+    m.put(
+      IdA1CommandUserSearchByEmailPrevious.class,
+      commandUserSearchByEmailPrevious());
+    m.put(IdA1CommandUserSearchNext.class, commandUserSearchNext());
+    m.put(IdA1CommandUserSearchPrevious.class, commandUserSearchPrevious());
+    m.put(IdA1CommandUserUpdate.class, commandUserUpdate());
+    m.put(IdA1ResponseAdminBanCreate.class, responseAdminBanCreate());
+    m.put(IdA1ResponseAdminBanDelete.class, responseAdminBanDelete());
+    m.put(IdA1ResponseAdminBanGet.class, responseAdminBanGet());
+    m.put(IdA1ResponseAdminCreate.class, responseAdminCreate());
+    m.put(IdA1ResponseAdminDelete.class, responseAdminDelete());
+    m.put(IdA1ResponseAdminGet.class, responseAdminGet());
+    m.put(IdA1ResponseAdminSearchBegin.class, responseAdminSearchBegin());
+    m.put(
+      IdA1ResponseAdminSearchByEmailBegin.class,
+      responseAdminSearchByEmailBegin());
+    m.put(
+      IdA1ResponseAdminSearchByEmailNext.class,
+      responseAdminSearchByEmailNext());
+    m.put(
+      IdA1ResponseAdminSearchByEmailPrevious.class,
+      responseAdminSearchByEmailPrevious());
+    m.put(IdA1ResponseAdminSearchNext.class, responseAdminSearchNext());
+    m.put(IdA1ResponseAdminSearchPrevious.class, responseAdminSearchPrevious());
+    m.put(IdA1ResponseAdminSelf.class, responseAdminSelf());
+    m.put(IdA1ResponseAdminUpdate.class, responseAdminUpdate());
+    m.put(IdA1ResponseAuditSearchBegin.class, responseAuditSearchBegin());
+    m.put(IdA1ResponseAuditSearchNext.class, responseAuditSearchNext());
+    m.put(IdA1ResponseAuditSearchPrevious.class, responseAuditSearchPrevious());
+    m.put(IdA1ResponseError.class, responseError());
+    m.put(IdA1ResponseLogin.class, responseLogin());
+    m.put(IdA1ResponseUserBanCreate.class, responseUserBanCreate());
+    m.put(IdA1ResponseUserBanDelete.class, responseUserBanDelete());
+    m.put(IdA1ResponseUserBanGet.class, responseUserBanGet());
+    m.put(IdA1ResponseUserCreate.class, responseUserCreate());
+    m.put(IdA1ResponseUserDelete.class, responseUserDelete());
+    m.put(IdA1ResponseUserGet.class, responseUserGet());
+    m.put(IdA1ResponseUserSearchBegin.class, responseUserSearchBegin());
+    m.put(
+      IdA1ResponseUserSearchByEmailBegin.class,
+      responseUserSearchByEmailBegin());
+    m.put(
+      IdA1ResponseUserSearchByEmailNext.class,
+      responseUserSearchByEmailNext());
+    m.put(
+      IdA1ResponseUserSearchByEmailPrevious.class,
+      responseUserSearchByEmailPrevious());
+    m.put(IdA1ResponseUserSearchNext.class, responseUserSearchNext());
+    m.put(IdA1ResponseUserSearchPrevious.class, responseUserSearchPrevious());
+    m.put(IdA1ResponseUserUpdate.class, responseUserUpdate());
+  }
 
   private static <T> List<Class<? extends T>> enumerateSubclasses(
     final Class<? extends T> clazz)
@@ -302,9 +336,9 @@ public final class IdA1MessagesTest
   {
     final var arbitrary =
       Optional.ofNullable(MESSAGE_ARBITRARIES.get(c))
-          .orElseThrow(() -> {
-            return new NoSuchElementException(c.getCanonicalName());
-          });
+        .orElseThrow(() -> {
+          return new NoSuchElementException(c.getCanonicalName());
+        });
 
     LOG.debug("arbitrary: {}", arbitrary);
     final var v = arbitrary.sample();

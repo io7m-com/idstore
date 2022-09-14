@@ -392,7 +392,8 @@ final class IdDatabaseUsersQueries
   public void userLogin(
     final UUID id,
     final String userAgent,
-    final String host)
+    final String host,
+    final int limitHistory)
     throws IdDatabaseException
   {
     Objects.requireNonNull(id, "id");
@@ -403,10 +404,40 @@ final class IdDatabaseUsersQueries
       this.transaction().createContext();
 
     try {
-      final var time = this.currentTime();
+      final var limit =
+        Math.max(limitHistory, 1);
+      final var time =
+        this.currentTime();
 
       context.fetchOptional(USERS, USERS.ID.eq(id))
         .orElseThrow(USER_DOES_NOT_EXIST);
+
+      /*
+       * Find the oldest login record.
+       */
+
+      final var records =
+        context.selectFrom(LOGIN_HISTORY)
+          .where(LOGIN_HISTORY.USER_ID.eq(id))
+          .orderBy(LOGIN_HISTORY.TIME.desc())
+          .limit(Integer.valueOf(limit))
+          .fetch();
+
+      /*
+       * If the number of records is at the limit, delete any older records.
+       */
+
+      if (records.size() == limit) {
+        final var last =
+          records.get(records.size() - 1);
+        final var lastTime =
+          last.getTime();
+        final var condition =
+          LOGIN_HISTORY.USER_ID.eq(id).and(LOGIN_HISTORY.TIME.lt(lastTime));
+        context.deleteFrom(LOGIN_HISTORY)
+          .where(condition)
+          .execute();
+      }
 
       /*
        * Record the login.

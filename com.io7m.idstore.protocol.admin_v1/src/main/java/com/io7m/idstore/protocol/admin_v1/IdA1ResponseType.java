@@ -50,6 +50,7 @@ public sealed interface IdA1ResponseType
   IdA1ResponseUserCreate,
   IdA1ResponseUserDelete,
   IdA1ResponseUserGet,
+  IdA1ResponseUserLoginHistory,
   IdA1ResponseUserSearchBegin,
   IdA1ResponseUserSearchByEmailBegin,
   IdA1ResponseUserSearchByEmailNext,

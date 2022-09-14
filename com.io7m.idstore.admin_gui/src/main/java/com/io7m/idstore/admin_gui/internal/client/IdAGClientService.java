@@ -25,6 +25,7 @@ import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPassword;
@@ -839,6 +840,31 @@ public final class IdAGClientService implements IdServiceType, Closeable
       try {
         this.client.userBanDelete(new IdBan(id, "", Optional.empty()));
         future.complete(Optional.empty());
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Get the login history for the given user.
+   *
+   * @param id The user ID
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<List<IdLogin>> userLoginHistory(
+    final UUID id)
+  {
+    final var future = new CompletableFuture<List<IdLogin>>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.userLoginHistory(id));
         this.requestFinish();
       } catch (final Exception e) {
         future.completeExceptionally(this.requestFailed(task, e));

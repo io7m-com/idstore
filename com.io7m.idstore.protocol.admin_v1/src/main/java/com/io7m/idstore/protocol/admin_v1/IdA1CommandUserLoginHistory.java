@@ -14,37 +14,36 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.api;
+package com.io7m.idstore.protocol.admin_v1;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
- * The type of JSON configuration elements.
+ * Get the given user's login history.
+ *
+ * @param user The user ID
  */
 
-@JsonPropertyOrder({"%Schema"})
-public sealed interface IdServerJSONConfigurationElementType
-  permits IdServerConfigurationFile,
-  IdServerDatabaseConfiguration,
-  IdServerHTTPConfiguration,
-  IdServerHTTPServiceConfiguration,
-  IdServerHistoryConfiguration,
-  IdServerMailAuthenticationConfiguration,
-  IdServerMailConfiguration,
-  IdServerMailTransportConfigurationType
+@JsonDeserialize
+@JsonSerialize
+public record IdA1CommandUserLoginHistory(
+  @JsonProperty(value = "UserID", required = true)
+  UUID user)
+  implements IdA1CommandType<IdA1ResponseUserLoginHistory>
 {
   /**
-   * @return The schema identifier
+   * Get the given user's login history.
    */
 
-  @JsonProperty(value = "%Schema", required = false, access = READ_ONLY)
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  default String schemaId()
+  @JsonCreator
+  public IdA1CommandUserLoginHistory
   {
-    return IdServerConfigurationFiles.SCHEMA_ID;
+    Objects.requireNonNull(user, "user");
   }
 }

@@ -38,6 +38,7 @@ import java.util.Objects;
  * @param userViewAddress       The user view address
  * @param mailConfiguration     The mail server configuration
  * @param branding              The branding configuration
+ * @param history               The history configuration
  */
 
 public record IdServerConfiguration(
@@ -50,7 +51,8 @@ public record IdServerConfiguration(
   IdServerHTTPServiceConfiguration userViewAddress,
   IdServerHTTPServiceConfiguration adminApiAddress,
   IdServerHTTPServiceConfiguration adminViewAddress,
-  IdServerBrandingConfiguration branding)
+  IdServerBrandingConfiguration branding,
+  IdServerHistoryConfiguration history)
 {
   /**
    * The configuration for a server.
@@ -66,6 +68,7 @@ public record IdServerConfiguration(
    * @param userViewAddress       The user view address
    * @param mailConfiguration     The mail server configuration
    * @param branding              The branding configuration
+   * @param history               The history configuration
    */
 
   public IdServerConfiguration
@@ -80,6 +83,7 @@ public record IdServerConfiguration(
     Objects.requireNonNull(userApiAddress, "userApiAddress");
     Objects.requireNonNull(userViewAddress, "userViewAddress");
     Objects.requireNonNull(branding, "branding");
+    Objects.requireNonNull(history, "history");
   }
 
   /**

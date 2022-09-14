@@ -31,6 +31,7 @@ import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdRequestLimits;
 import com.io7m.idstore.server.internal.IdRequests;
 import com.io7m.idstore.server.internal.IdServerClock;
+import com.io7m.idstore.server.internal.IdServerConfigurationService;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.http.HttpServlet;
@@ -72,6 +73,7 @@ public final class IdU1Login extends HttpServlet
   private final IdServerClock clock;
   private final IdU1Sends errors;
   private final IdRequestLimits limits;
+  private final IdServerConfigurationService configuration;
 
   /**
    * A servlet that handles user logins.
@@ -96,6 +98,8 @@ public final class IdU1Login extends HttpServlet
       inServices.requireService(IdU1Sends.class);
     this.limits =
       inServices.requireService(IdRequestLimits.class);
+    this.configuration =
+      inServices.requireService(IdServerConfigurationService.class);
   }
 
   @Override
@@ -246,7 +250,10 @@ public final class IdU1Login extends HttpServlet
     users.userLogin(
       user.id(),
       IdRequests.requestUserAgent(request),
-      request.getRemoteAddr()
+      request.getRemoteAddr(),
+      this.configuration.configuration()
+        .history()
+        .userLoginHistoryLimit()
     );
 
     this.sendLoginResponse(request, response, user);

@@ -360,7 +360,8 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     users.userLogin(
       user.id(),
       "Mozilla/5.0 (X11; Linux x86_64)",
-      "127.0.0.1"
+      "127.0.0.1",
+      100
     );
 
     checkAuditLog(
@@ -394,7 +395,9 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
         users.userLogin(
           randomUUID(),
           "Mozilla/5.0 (X11; Linux x86_64)",
-          "127.0.0.1");
+          "127.0.0.1",
+          100
+          );
       });
     assertEquals(USER_NONEXISTENT, ex.errorCode());
   }

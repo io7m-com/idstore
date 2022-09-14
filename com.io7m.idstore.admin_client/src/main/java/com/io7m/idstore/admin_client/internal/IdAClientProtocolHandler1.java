@@ -27,6 +27,7 @@ import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdOptional;
 import com.io7m.idstore.model.IdPage;
@@ -76,6 +77,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailRemove;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
+import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserLoginHistory;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailNext;
@@ -111,6 +113,7 @@ import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanGet;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserCreate;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserDelete;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
+import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserLoginHistory;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailNext;
@@ -129,6 +132,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -984,5 +989,26 @@ public final class IdAClientProtocolHandler1
       IdA1ResponseUserBanDelete.class,
       new IdA1CommandUserBanDelete(ban.user())
     );
+  }
+
+  @Override
+  public List<IdLogin> userLoginHistory(final UUID id)
+    throws IdAClientException, InterruptedException
+  {
+    try {
+      final var records =
+        this.sendCommand(
+        IdA1ResponseUserLoginHistory.class,
+        new IdA1CommandUserLoginHistory(id)
+      ).history();
+
+      final var results = new ArrayList<IdLogin>(records.size());
+      for (final var record : records) {
+        results.add(record.toModel());
+      }
+      return results;
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(PROTOCOL_ERROR, e);
+    }
   }
 }

@@ -165,9 +165,11 @@ public non-sealed interface IdDatabaseUsersQueriesType
   /**
    * Record the fact that the given user has logged in.
    *
-   * @param id        The user ID
-   * @param userAgent The user agent
-   * @param host      The host from which the user logged in
+   * @param id           The user ID
+   * @param userAgent    The user agent
+   * @param host         The host from which the user logged in
+   * @param limitHistory The limit on the number of login records that will be
+   *                     kept
    *
    * @throws IdDatabaseException On errors
    */
@@ -175,7 +177,8 @@ public non-sealed interface IdDatabaseUsersQueriesType
   void userLogin(
     UUID id,
     String userAgent,
-    String host)
+    String host,
+    int limitHistory)
     throws IdDatabaseException;
 
   /**

@@ -19,6 +19,7 @@ package com.io7m.idstore.admin_client.api;
 
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPassword;
@@ -28,6 +29,7 @@ import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -275,5 +277,20 @@ public interface IdAClientUsersType
    */
 
   void userBanDelete(IdBan ban)
+    throws IdAClientException, InterruptedException;
+
+  /**
+   * List the login history for the given user.
+   *
+   * @param id The user ID
+   *
+   * @return The login history
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  List<IdLogin> userLoginHistory(
+    UUID id)
     throws IdAClientException, InterruptedException;
 }

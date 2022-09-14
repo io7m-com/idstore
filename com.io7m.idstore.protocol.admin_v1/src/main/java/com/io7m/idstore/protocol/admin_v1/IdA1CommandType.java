@@ -56,6 +56,7 @@ public sealed interface IdA1CommandType<R extends IdA1ResponseType>
   IdA1CommandUserEmailRemove,
   IdA1CommandUserGet,
   IdA1CommandUserGetByEmail,
+  IdA1CommandUserLoginHistory,
   IdA1CommandUserSearchBegin,
   IdA1CommandUserSearchByEmailBegin,
   IdA1CommandUserSearchByEmailNext,
