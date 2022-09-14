@@ -26,7 +26,7 @@ import java.util.Objects;
  */
 
 public sealed interface IdPasswordAlgorithmType
-  permits IdPasswordAlgorithmPBKDF2HmacSHA256
+  permits IdPasswordAlgorithmPBKDF2HmacSHA256, IdPasswordAlgorithmRedacted
 {
   /**
    * Check if the given plain text password matches the expected hash.

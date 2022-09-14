@@ -87,7 +87,8 @@ public final class IdA1CmdAdminEmailAdd
     }
 
     final var afterAdmin =
-      admins.adminGetRequire(newAdmin);
+      admins.adminGetRequire(newAdmin)
+        .redactPassword();
 
     return new IdA1ResponseAdminUpdate(
       context.requestId(),

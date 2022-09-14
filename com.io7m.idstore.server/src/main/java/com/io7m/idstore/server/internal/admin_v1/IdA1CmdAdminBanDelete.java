@@ -75,8 +75,6 @@ public final class IdA1CmdAdminBanDelete
 
     admins.adminBanDelete(new IdBan(command.admin(), "", Optional.empty()));
 
-    return new IdA1ResponseAdminBanDelete(
-      context.requestId()
-    );
+    return new IdA1ResponseAdminBanDelete(context.requestId());
   }
 }

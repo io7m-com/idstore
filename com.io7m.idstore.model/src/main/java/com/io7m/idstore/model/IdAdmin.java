@@ -67,4 +67,26 @@ public record IdAdmin(
     Objects.requireNonNull(password, "password");
     Objects.requireNonNull(permissions, "permissions");
   }
+
+  /**
+   * @return This admin with the password redacted
+   */
+
+  public IdAdmin redactPassword()
+  {
+    try {
+      return new IdAdmin(
+        this.id(),
+        this.idName(),
+        this.realName(),
+        this.emails(),
+        this.timeCreated(),
+        this.timeUpdated(),
+        IdPasswordAlgorithmRedacted.create().createHashed(""),
+        this.permissions()
+      );
+    } catch (final IdPasswordException e) {
+      throw new IllegalStateException(e);
+    }
+  }
 }

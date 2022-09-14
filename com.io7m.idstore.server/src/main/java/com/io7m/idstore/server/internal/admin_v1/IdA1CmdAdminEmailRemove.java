@@ -68,7 +68,8 @@ public final class IdA1CmdAdminEmailRemove
     admins.adminEmailRemove(command.admin(), new IdEmail(command.email()));
 
     final var afterAdmin =
-      admins.adminGetRequire(newAdmin);
+      admins.adminGetRequire(newAdmin)
+        .redactPassword();
 
     return new IdA1ResponseAdminUpdate(
       context.requestId(),

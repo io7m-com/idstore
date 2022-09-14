@@ -19,6 +19,7 @@ package com.io7m.idstore.server.internal.admin_v1;
 
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.protocol.admin_v1.IdA1Admin;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
@@ -61,7 +62,8 @@ public final class IdA1CmdAdminGetByEmail
     final var admins =
       transaction.queries(IdDatabaseAdminsQueriesType.class);
     final var result =
-      admins.adminGetForEmail(new IdEmail(command.email()));
+      admins.adminGetForEmail(new IdEmail(command.email()))
+        .map(IdAdmin::redactPassword);
 
     return new IdA1ResponseAdminGet(
       context.requestId(),

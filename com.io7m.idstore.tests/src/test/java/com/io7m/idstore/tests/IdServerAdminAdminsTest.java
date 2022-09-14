@@ -32,6 +32,7 @@ import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
+import com.io7m.idstore.model.IdPasswordAlgorithmRedacted;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import org.junit.jupiter.api.AfterEach;
@@ -417,7 +418,7 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
     assertEquals(admin0r.id(), admin1.id());
     assertEquals(admin0r.idName(), admin1.idName());
     assertEquals(admin0r.realName(), admin1.realName());
-    assertEquals(admin0r.password(), admin1.password());
+    assertEquals(IdPasswordAlgorithmRedacted.create().createHashed(""), admin1.password());
   }
 
   /**

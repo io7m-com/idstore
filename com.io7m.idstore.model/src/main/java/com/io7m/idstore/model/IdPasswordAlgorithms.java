@@ -53,6 +53,10 @@ public final class IdPasswordAlgorithms
 
     final var name = segments.get(0);
     return switch (name) {
+      case "REDACTED" -> {
+        yield IdPasswordAlgorithmRedacted.create();
+      }
+
       case "PBKDF2WithHmacSHA256" -> {
         try {
           if (segments.size() == 3) {
@@ -79,9 +83,10 @@ public final class IdPasswordAlgorithms
           throw new IdPasswordException(e.getMessage(), e);
         }
       }
+
       default -> {
         throw new IdPasswordException(
-          "Unsupported algorithm: " + name
+          "Unsupported algorithm: %s".formatted(name)
         );
       }
     };

@@ -102,7 +102,7 @@ public final class IdA1CmdAdminCreate
         context.now(),
         password,
         targetPermissions
-      );
+      ).redactPassword();
 
     return new IdA1ResponseAdminCreate(
       context.requestId(),
