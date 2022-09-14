@@ -16,38 +16,46 @@
 
 package com.io7m.idstore.admin_client.api;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
+import com.io7m.idstore.error_codes.IdException;
+
 import java.util.Objects;
 
 /**
  * The type of client exceptions.
  */
 
-public final class IdAClientException extends Exception
+public final class IdAClientException extends IdException
 {
   /**
    * Construct an exception.
    *
-   * @param message The message
+   * @param errorCode The error code
+   * @param message   The message
    */
 
   public IdAClientException(
+    final IdErrorCode errorCode,
     final String message)
   {
-    super(Objects.requireNonNull(message, "message"));
+    super(errorCode, Objects.requireNonNull(message, "message"));
   }
 
   /**
    * Construct an exception.
    *
-   * @param message The message
-   * @param cause   The cause
+   * @param errorCode The error code
+   * @param message   The message
+   * @param cause     The cause
    */
 
   public IdAClientException(
+    final IdErrorCode errorCode,
     final String message,
     final Throwable cause)
   {
     super(
+      errorCode,
       Objects.requireNonNull(message, "message"),
       Objects.requireNonNull(cause, "cause")
     );
@@ -56,12 +64,14 @@ public final class IdAClientException extends Exception
   /**
    * Construct an exception.
    *
-   * @param cause The cause
+   * @param errorCode The error code
+   * @param cause     The cause
    */
 
   public IdAClientException(
+    final IdErrorCode errorCode,
     final Throwable cause)
   {
-    super(Objects.requireNonNull(cause, "cause"));
+    super(errorCode, Objects.requireNonNull(cause, "cause"));
   }
 }

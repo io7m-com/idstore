@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
+
 /**
  * Information for a single user.
  *
@@ -150,7 +152,7 @@ public record IdA1User(
     try {
       return this.toUser();
     } catch (final IdPasswordException e) {
-      throw new IdProtocolException(e.getMessage(), e);
+      throw new IdProtocolException(PASSWORD_ERROR, e.getMessage(), e);
     }
   }
 }

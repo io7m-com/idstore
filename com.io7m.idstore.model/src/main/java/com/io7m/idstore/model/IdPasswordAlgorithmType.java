@@ -21,6 +21,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Objects;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
+
 /**
  * The type of password hashing algorithms.
  */
@@ -87,7 +89,7 @@ public sealed interface IdPasswordAlgorithmType
       rng.nextBytes(salt);
       return this.createHashed(passwordText, salt);
     } catch (final NoSuchAlgorithmException e) {
-      throw new IdPasswordException(e.getMessage(), e);
+      throw new IdPasswordException(PASSWORD_ERROR, e.getMessage(), e);
     }
   }
 

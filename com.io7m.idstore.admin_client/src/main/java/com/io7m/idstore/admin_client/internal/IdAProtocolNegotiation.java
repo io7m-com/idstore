@@ -41,6 +41,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NO_SUPPORTED_PROTOCOLS;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static java.net.http.HttpResponse.BodyHandlers.ofByteArray;
 
 /**
@@ -77,13 +81,14 @@ public final class IdAProtocolNegotiation
     try {
       response = httpClient.send(request, ofByteArray());
     } catch (final IOException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(IO_ERROR, e);
     }
 
     LOG.debug("server: status {}", response.statusCode());
 
     if (response.statusCode() >= 400) {
       throw new IdAClientException(
+        HTTP_ERROR,
         strings.format("httpError", Integer.valueOf(response.statusCode()))
       );
     }
@@ -92,7 +97,7 @@ public final class IdAProtocolNegotiation
     try {
       message = vMessages.parse(response.body());
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(e.errorCode(), e);
     }
 
     if (message instanceof IdVProtocols protocols) {
@@ -113,6 +118,7 @@ public final class IdAProtocolNegotiation
     }
 
     throw new IdAClientException(
+      PROTOCOL_ERROR,
       strings.format(
         "unexpectedMessage", "IdVProtocols", message.getClass())
     );
@@ -184,7 +190,7 @@ public final class IdAProtocolNegotiation
         List.of(IdA1Messages.schemaId())
       );
     } catch (final GenProtocolException e) {
-      throw new IdAClientException(e.getMessage(), e);
+      throw new IdAClientException(NO_SUPPORTED_PROTOCOLS, e.getMessage(), e);
     }
 
     final var serverEndpoint =

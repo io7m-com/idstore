@@ -15,63 +15,71 @@
  */
 
 
-package com.io7m.idstore.database.api;
-
-import com.io7m.idstore.error_codes.IdErrorCode;
-import com.io7m.idstore.error_codes.IdException;
+package com.io7m.idstore.error_codes;
 
 import java.util.Objects;
 
 /**
- * The type of exceptions raised by the server database.
+ * The base type of exceptions.
  */
 
-public final class IdDatabaseException extends IdException
+public class IdException extends Exception
 {
+  private final IdErrorCode errorCode;
+
   /**
-   * Create an exception.
+   * Construct an exception.
    *
-   * @param message     The message
    * @param inErrorCode The error code
+   * @param message     The message
    */
 
-  public IdDatabaseException(
-    final String message,
-    final IdErrorCode inErrorCode)
+  public IdException(
+    final IdErrorCode inErrorCode,
+    final String message)
   {
-    super(inErrorCode, Objects.requireNonNull(message, "message"));
+    super(message);
+    this.errorCode = Objects.requireNonNull(inErrorCode, "errorCode");
   }
 
   /**
-   * Create an exception.
+   * Construct an exception.
    *
+   * @param inErrorCode The error code
    * @param message     The message
    * @param cause       The cause
-   * @param inErrorCode The error code
    */
 
-  public IdDatabaseException(
+  public IdException(
+    final IdErrorCode inErrorCode,
     final String message,
-    final Throwable cause,
-    final IdErrorCode inErrorCode)
+    final Throwable cause)
   {
-    super(
-      inErrorCode,
-      Objects.requireNonNull(message, "message"),
-      Objects.requireNonNull(cause, "cause"));
+    super(message, cause);
+    this.errorCode = Objects.requireNonNull(inErrorCode, "errorCode");
   }
 
   /**
-   * Create an exception.
+   * Construct an exception.
    *
-   * @param cause       The cause
    * @param inErrorCode The error code
+   * @param cause       The cause
    */
 
-  public IdDatabaseException(
-    final Throwable cause,
-    final IdErrorCode inErrorCode)
+  public IdException(
+    final IdErrorCode inErrorCode,
+    final Throwable cause)
   {
-    super(inErrorCode, Objects.requireNonNull(cause, "cause"));
+    super(cause);
+    this.errorCode = Objects.requireNonNull(inErrorCode, "errorCode");
+  }
+
+  /**
+   * @return The error code
+   */
+
+  public final IdErrorCode errorCode()
+  {
+    return this.errorCode;
   }
 }

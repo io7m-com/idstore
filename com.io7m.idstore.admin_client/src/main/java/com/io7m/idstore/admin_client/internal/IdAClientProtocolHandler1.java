@@ -17,6 +17,7 @@
 package com.io7m.idstore.admin_client.internal;
 
 import com.io7m.idstore.admin_client.api.IdAClientException;
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdAdminPermissionSet;
@@ -133,6 +134,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static java.net.http.HttpResponse.BodyHandlers;
 
 /**
@@ -246,6 +250,7 @@ public final class IdAClientProtocolHandler1
 
       if (!contentType.equals(IdA1Messages.contentType())) {
         throw new IdAClientException(
+          PROTOCOL_ERROR,
           this.strings()
             .format(
               "errorContentType",
@@ -260,6 +265,7 @@ public final class IdAClientProtocolHandler1
 
       if (!(responseMessage instanceof IdA1ResponseType)) {
         throw new IdAClientException(
+          PROTOCOL_ERROR,
           this.strings()
             .format(
               "errorResponseType",
@@ -273,6 +279,7 @@ public final class IdAClientProtocolHandler1
       final var responseActual = (IdA1ResponseType) responseMessage;
       if (responseActual instanceof IdA1ResponseError error) {
         throw new IdAClientException(
+          new IdErrorCode(error.errorCode()),
           this.strings()
             .format(
               "errorResponse",
@@ -286,6 +293,7 @@ public final class IdAClientProtocolHandler1
 
       if (!Objects.equals(responseActual.getClass(), responseClass)) {
         throw new IdAClientException(
+          PROTOCOL_ERROR,
           this.strings()
             .format(
               "errorResponseType",
@@ -297,8 +305,10 @@ public final class IdAClientProtocolHandler1
       }
 
       return Optional.of(responseClass.cast(responseMessage));
-    } catch (final IdProtocolException | IOException e) {
-      throw new IdAClientException(e);
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(PROTOCOL_ERROR, e);
+    } catch (final IOException e) {
+      throw new IdAClientException(IO_ERROR, e);
     }
   }
 
@@ -312,7 +322,7 @@ public final class IdAClientProtocolHandler1
     try {
       return response.admin().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -345,7 +355,7 @@ public final class IdAClientProtocolHandler1
 
       return response.page().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -360,7 +370,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -375,7 +385,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -396,7 +406,7 @@ public final class IdAClientProtocolHandler1
 
       return response.page().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -411,7 +421,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -426,7 +436,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -446,7 +456,7 @@ public final class IdAClientProtocolHandler1
 
       return Optional.empty();
     } catch (final IdPasswordException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -468,7 +478,7 @@ public final class IdAClientProtocolHandler1
 
       return Optional.empty();
     } catch (final IdPasswordException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PASSWORD_ERROR, e);
     }
   }
 
@@ -492,7 +502,7 @@ public final class IdAClientProtocolHandler1
         ).user()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -508,7 +518,7 @@ public final class IdAClientProtocolHandler1
         new IdA1CommandUserEmailAdd(id, email.value())
       ).user().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -524,7 +534,7 @@ public final class IdAClientProtocolHandler1
         new IdA1CommandUserEmailRemove(id, email.value())
       ).user().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -550,7 +560,7 @@ public final class IdAClientProtocolHandler1
         ).user()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -589,7 +599,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -604,7 +614,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -619,7 +629,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -640,7 +650,7 @@ public final class IdAClientProtocolHandler1
 
       return response.page().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -655,7 +665,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -670,7 +680,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -691,7 +701,7 @@ public final class IdAClientProtocolHandler1
 
       return response.page().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -706,7 +716,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -721,7 +731,7 @@ public final class IdAClientProtocolHandler1
         ).page()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -743,7 +753,7 @@ public final class IdAClientProtocolHandler1
 
       return Optional.empty();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -765,7 +775,7 @@ public final class IdAClientProtocolHandler1
 
       return Optional.empty();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -789,7 +799,7 @@ public final class IdAClientProtocolHandler1
         ).admin()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -820,7 +830,7 @@ public final class IdAClientProtocolHandler1
         ).admin()
         .toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -847,7 +857,7 @@ public final class IdAClientProtocolHandler1
         new IdA1CommandAdminEmailAdd(id, email.value())
       ).admin().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -863,7 +873,7 @@ public final class IdAClientProtocolHandler1
         new IdA1CommandAdminEmailRemove(id, email.value())
       ).admin().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -880,7 +890,7 @@ public final class IdAClientProtocolHandler1
           id, IdA1AdminPermission.ofPermission(permission))
       ).admin().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -897,7 +907,7 @@ public final class IdAClientProtocolHandler1
           id, IdA1AdminPermission.ofPermission(permission))
       ).admin().toModel();
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -924,7 +934,7 @@ public final class IdAClientProtocolHandler1
         IdA1Ban::toModel
       );
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -962,7 +972,7 @@ public final class IdAClientProtocolHandler1
         IdA1Ban::toModel
       );
     } catch (final IdProtocolException e) {
-      throw new IdAClientException(e);
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
   }
 

@@ -32,6 +32,7 @@ import java.math.BigInteger;
 import static com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTEGER_FOR_INTS;
 import static com.fasterxml.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY;
 import static com.fasterxml.jackson.databind.SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 
 /**
  * The Versioning protocol.
@@ -132,7 +133,7 @@ public final class IdVMessages
     try {
       return this.mapper.readValue(data, IdVMessageType.class);
     } catch (final IOException e) {
-      throw new IdProtocolException(e.getMessage(), e);
+      throw new IdProtocolException(IO_ERROR, e.getMessage(), e);
     }
   }
 
@@ -144,7 +145,7 @@ public final class IdVMessages
     try {
       return this.mapper.writeValueAsBytes(message);
     } catch (final JsonProcessingException e) {
-      throw new IdProtocolException(e.getMessage(), e);
+      throw new IdProtocolException(IO_ERROR, e.getMessage(), e);
     }
   }
 

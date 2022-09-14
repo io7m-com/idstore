@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.user_client.internal;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
@@ -56,6 +57,9 @@ import java.net.http.HttpRequest;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static java.net.http.HttpResponse.BodyHandlers;
 
 /**
@@ -188,6 +192,7 @@ public final class IdUClientProtocolHandler1
 
       if (!contentType.equals(IdU1Messages.contentType())) {
         throw new IdUClientException(
+          PROTOCOL_ERROR,
           this.strings()
             .format(
               "errorContentType",
@@ -202,6 +207,7 @@ public final class IdUClientProtocolHandler1
 
       if (!(responseMessage instanceof IdU1ResponseType)) {
         throw new IdUClientException(
+          PROTOCOL_ERROR,
           this.strings()
             .format(
               "errorResponseType",
@@ -215,6 +221,7 @@ public final class IdUClientProtocolHandler1
       final var responseActual = (IdU1ResponseType) responseMessage;
       if (responseActual instanceof IdU1ResponseError error) {
         throw new IdUClientException(
+          new IdErrorCode(error.errorCode()),
           this.strings()
             .format(
               "errorResponse",
@@ -228,6 +235,7 @@ public final class IdUClientProtocolHandler1
 
       if (!Objects.equals(responseActual.getClass(), responseClass)) {
         throw new IdUClientException(
+          PROTOCOL_ERROR,
           this.strings()
             .format(
               "errorResponseType",
@@ -239,8 +247,10 @@ public final class IdUClientProtocolHandler1
       }
 
       return Optional.of(responseClass.cast(responseMessage));
-    } catch (final IdProtocolException | IOException e) {
-      throw new IdUClientException(e);
+    } catch (final IOException e) {
+      throw new IdUClientException(IO_ERROR, e);
+    } catch (final IdProtocolException e) {
+      throw new IdUClientException(PROTOCOL_ERROR, e);
     }
   }
 
@@ -257,7 +267,7 @@ public final class IdUClientProtocolHandler1
 
       return response.user().toUser();
     } catch (final IdPasswordException e) {
-      throw new IdUClientException(e);
+      throw new IdUClientException(PASSWORD_ERROR, e);
     }
   }
 

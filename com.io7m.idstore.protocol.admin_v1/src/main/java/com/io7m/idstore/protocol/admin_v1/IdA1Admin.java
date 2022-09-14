@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
+
 /**
  * Information for a single admin.
  *
@@ -149,7 +151,7 @@ public record IdA1Admin(
             .collect(Collectors.toUnmodifiableSet()))
       );
     } catch (final IdPasswordException e) {
-      throw new IdProtocolException(e.getMessage(), e);
+      throw new IdProtocolException(PASSWORD_ERROR, e.getMessage(), e);
     }
   }
 }

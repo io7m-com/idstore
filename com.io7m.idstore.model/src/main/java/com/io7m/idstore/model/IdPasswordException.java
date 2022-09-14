@@ -16,38 +16,46 @@
 
 package com.io7m.idstore.model;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
+import com.io7m.idstore.error_codes.IdException;
+
 import java.util.Objects;
 
 /**
  * An exception raised by a password hashing algorithm.
  */
 
-public final class IdPasswordException extends Exception
+public final class IdPasswordException extends IdException
 {
   /**
    * Construct an exception.
    *
+   * @param errorCode The error code
    * @param message The message
    */
 
   public IdPasswordException(
+    final IdErrorCode errorCode,
     final String message)
   {
-    super(Objects.requireNonNull(message, "message"));
+    super(errorCode, Objects.requireNonNull(message, "message"));
   }
 
   /**
    * Construct an exception.
    *
+   * @param errorCode The error code
    * @param message The message
    * @param cause   The cause
    */
 
   public IdPasswordException(
+    final IdErrorCode errorCode,
     final String message,
     final Throwable cause)
   {
     super(
+      errorCode,
       Objects.requireNonNull(message, "message"),
       Objects.requireNonNull(cause, "cause"));
   }

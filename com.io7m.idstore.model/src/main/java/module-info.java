@@ -23,6 +23,8 @@ module com.io7m.idstore.model
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
+  requires transitive com.io7m.idstore.error_codes;
+
   requires com.sanctionco.jmail;
 
   exports com.io7m.idstore.model;

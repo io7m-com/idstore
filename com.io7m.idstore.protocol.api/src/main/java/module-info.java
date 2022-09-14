@@ -23,5 +23,7 @@ module com.io7m.idstore.protocol.api
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
+  requires transitive com.io7m.idstore.error_codes;
+
   exports com.io7m.idstore.protocol.api;
 }

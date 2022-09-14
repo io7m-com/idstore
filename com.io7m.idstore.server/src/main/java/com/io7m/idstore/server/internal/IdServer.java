@@ -18,6 +18,7 @@ package com.io7m.idstore.server.internal;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
 import com.io7m.idstore.protocol.user_v1.IdU1Messages;
 import com.io7m.idstore.protocol.versions.IdVMessages;
@@ -103,8 +104,8 @@ public final class IdServer implements IdServerType
       CloseableCollection.create(
         () -> {
           return new IdServerException(
-            "Server creation failed.",
-            "server-creation"
+            new IdErrorCode("server-creation"),
+            "Server creation failed."
           );
         }
       );
@@ -145,14 +146,14 @@ public final class IdServer implements IdServerType
       } catch (final IdServerException ex) {
         e.addSuppressed(ex);
       }
-      throw new IdServerException(e.getMessage(), e, "database");
+      throw new IdServerException(new IdErrorCode("database"), e.getMessage(), e);
     } catch (final Exception e) {
       try {
         this.close();
       } catch (final IdServerException ex) {
         e.addSuppressed(ex);
       }
-      throw new IdServerException(e.getMessage(), e, "startup");
+      throw new IdServerException(new IdErrorCode("startup"), e.getMessage(), e);
     }
   }
 

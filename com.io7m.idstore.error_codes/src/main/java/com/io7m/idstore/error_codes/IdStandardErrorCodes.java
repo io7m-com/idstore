@@ -147,6 +147,13 @@ public final class IdStandardErrorCodes
     new IdErrorCode("error-http-size-limit");
 
   /**
+   * The server returned an error code for an HTTP request.
+   */
+
+  public static final IdErrorCode HTTP_ERROR =
+    new IdErrorCode("error-http");
+
+  /**
    * An attempt was made to create a user that already exists.
    */
 
@@ -305,4 +312,18 @@ public final class IdStandardErrorCodes
 
   public static final IdErrorCode MAIL_SYSTEM_FAILURE =
     new IdErrorCode("mail-system-failure");
+
+  /**
+   * The client and server have no supported protocols in common.
+   */
+
+  public static final IdErrorCode NO_SUPPORTED_PROTOCOLS =
+    new IdErrorCode("error-no-supported-protocols");
+
+  /**
+   * The client is not logged in.
+   */
+
+  public static final IdErrorCode NOT_LOGGED_IN =
+    new IdErrorCode("error-not-logged-in");
 }

@@ -20,6 +20,8 @@ package com.io7m.idstore.model;
 import java.util.List;
 import java.util.Objects;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
+
 /**
  * Functions over password algorithms.
  */
@@ -68,6 +70,7 @@ public final class IdPasswordAlgorithms
 
           final var lineSeparator = System.lineSeparator();
           throw new IdPasswordException(
+            PASSWORD_ERROR,
             new StringBuilder(128)
               .append("Unparseable password algorithm.")
               .append(lineSeparator)
@@ -80,12 +83,13 @@ public final class IdPasswordAlgorithms
               .toString()
           );
         } catch (final NumberFormatException e) {
-          throw new IdPasswordException(e.getMessage(), e);
+          throw new IdPasswordException(PASSWORD_ERROR, e.getMessage(), e);
         }
       }
 
       default -> {
         throw new IdPasswordException(
+          PASSWORD_ERROR,
           "Unsupported algorithm: %s".formatted(name)
         );
       }

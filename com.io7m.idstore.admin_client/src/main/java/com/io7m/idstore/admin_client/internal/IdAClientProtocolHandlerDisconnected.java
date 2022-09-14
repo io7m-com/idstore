@@ -43,6 +43,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NOT_LOGGED_IN;
+
 /**
  * The "disconnected" protocol handler.
  */
@@ -95,6 +97,7 @@ public final class IdAClientProtocolHandlerDisconnected
   private IdAClientException notLoggedIn()
   {
     return new IdAClientException(
+      NOT_LOGGED_IN,
       this.strings.format("notLoggedIn")
     );
   }

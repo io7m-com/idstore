@@ -17,38 +17,46 @@
 
 package com.io7m.idstore.protocol.api;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
+import com.io7m.idstore.error_codes.IdException;
+
 import java.util.Objects;
 
 /**
  * An exception encountered whilst handling a protocol.
  */
 
-public final class IdProtocolException extends Exception
+public final class IdProtocolException extends IdException
 {
   /**
    * Construct an exception.
    *
-   * @param message The message
+   * @param errorCode The error code
+   * @param message   The message
    */
 
   public IdProtocolException(
+    final IdErrorCode errorCode,
     final String message)
   {
-    super(Objects.requireNonNull(message, "message"));
+    super(errorCode, Objects.requireNonNull(message, "message"));
   }
 
   /**
    * Construct an exception.
    *
-   * @param message The message
-   * @param cause   The cause
+   * @param errorCode The error code
+   * @param message   The message
+   * @param cause     The cause
    */
 
   public IdProtocolException(
+    final IdErrorCode errorCode,
     final String message,
     final Throwable cause)
   {
     super(
+      errorCode,
       Objects.requireNonNull(message, "message"),
       Objects.requireNonNull(cause, "cause")
     );

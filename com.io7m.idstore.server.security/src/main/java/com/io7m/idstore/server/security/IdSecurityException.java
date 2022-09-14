@@ -17,38 +17,46 @@
 
 package com.io7m.idstore.server.security;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
+import com.io7m.idstore.error_codes.IdException;
+
 import java.util.Objects;
 
 /**
  * The type of exceptions raised during security policy evaluations.
  */
 
-public final class IdSecurityException extends Exception
+public final class IdSecurityException extends IdException
 {
   /**
    * Create an exception.
    *
+   * @param errorCode The error code
    * @param message The exception message
    */
 
   public IdSecurityException(
+    final IdErrorCode errorCode,
     final String message)
   {
-    super(Objects.requireNonNull(message, "message"));
+    super(errorCode, Objects.requireNonNull(message, "message"));
   }
 
   /**
    * Create an exception.
    *
+   * @param errorCode The error code
    * @param message The exception message
    * @param cause   The cause
    */
 
   public IdSecurityException(
+    final IdErrorCode errorCode,
     final String message,
     final Throwable cause)
   {
     super(
+      errorCode,
       Objects.requireNonNull(message, "message"),
       Objects.requireNonNull(cause, "cause")
     );
@@ -57,12 +65,14 @@ public final class IdSecurityException extends Exception
   /**
    * Create an exception.
    *
+   * @param errorCode The error code
    * @param cause The cause
    */
 
   public IdSecurityException(
+    final IdErrorCode errorCode,
     final Throwable cause)
   {
-    super(Objects.requireNonNull(cause, "cause"));
+    super(errorCode, Objects.requireNonNull(cause, "cause"));
   }
 }

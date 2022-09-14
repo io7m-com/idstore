@@ -36,6 +36,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_INTE
 import static com.fasterxml.jackson.databind.MapperFeature.SORT_PROPERTIES_ALPHABETICALLY;
 import static com.fasterxml.jackson.databind.SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 
 /**
  * The Public API v1 message protocol.
@@ -179,7 +180,7 @@ public final class IdA1Messages
     try {
       return this.mapper.readValue(data, IdA1MessageType.class);
     } catch (final IOException e) {
-      throw new IdProtocolException(e.getMessage(), e);
+      throw new IdProtocolException(IO_ERROR, e.getMessage(), e);
     }
   }
 
@@ -191,7 +192,7 @@ public final class IdA1Messages
     try {
       return this.mapper.writeValueAsBytes(message);
     } catch (final JsonProcessingException e) {
-      throw new IdProtocolException(e.getMessage(), e);
+      throw new IdProtocolException(IO_ERROR, e.getMessage(), e);
     }
   }
 

@@ -26,6 +26,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.Objects;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NOT_LOGGED_IN;
+
 /**
  * The "disconnected" protocol handler.
  */
@@ -72,6 +74,7 @@ public final class IdUClientProtocolHandlerDisconnected
   private IdUClientException notLoggedIn()
   {
     return new IdUClientException(
+      NOT_LOGGED_IN,
       this.strings.format("notLoggedIn")
     );
   }
