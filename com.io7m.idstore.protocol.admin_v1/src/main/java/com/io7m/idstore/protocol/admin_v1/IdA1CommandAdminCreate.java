@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.protocol.admin_v1;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -40,6 +41,7 @@ import java.util.UUID;
 @JsonSerialize
 public record IdA1CommandAdminCreate(
   @JsonProperty(value = "Id", required = true)
+  @JsonInclude(JsonInclude.Include.NON_ABSENT)
   Optional<UUID> id,
   @JsonProperty(value = "IdName", required = true)
   String idName,

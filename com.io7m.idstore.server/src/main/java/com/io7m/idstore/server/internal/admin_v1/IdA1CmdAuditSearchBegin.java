@@ -19,7 +19,7 @@ package com.io7m.idstore.server.internal.admin_v1;
 
 import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
-import com.io7m.idstore.model.IdAuditListParameters;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.admin_v1.IdA1AuditEvent;
 import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchBegin;
@@ -82,13 +82,13 @@ public final class IdA1CmdAuditSearchBegin
     );
   }
 
-  private static IdAuditListParameters obtainListParameters(
+  private static IdAuditSearchParameters obtainListParameters(
     final IdA1CommandAuditSearchBegin command)
   {
     try {
       final var model = command.parameters().toModel();
       if (model.limit() > 1000) {
-        return new IdAuditListParameters(
+        return new IdAuditSearchParameters(
           model.timeRange(),
           model.owner(),
           model.type(),

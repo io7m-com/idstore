@@ -33,25 +33,35 @@ import com.io7m.idstore.tests.arbitraries.IdArbA1UserProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchByEmailParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbA1UserSummaryProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbAMessageProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbAdminOrderingProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminPermissionSetProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbAdminSearchByEmailParametersProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbAdminSearchParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminSummaryProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAuditEventProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbAuditSearchParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbBanProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbEmailProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbHashProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbIdNameProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbLoginProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbOffsetDateTimeProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbPasswordProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbRealNameProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbSubsetMatchProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbTimeRangeProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbTokenProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbU1MessageProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbU1PasswordProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbU1UserProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbURIProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUUIDProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbUserOrderingProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUserProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbUserSearchByEmailParametersProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbUserSearchParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUserSummaryProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbVMessagesProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbVProtocolSupportedProvider;
@@ -66,11 +76,12 @@ module com.io7m.idstore.tests.arbitraries
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
+  requires transitive com.io7m.idstore.model;
+  requires transitive com.io7m.idstore.protocol.admin;
+  requires transitive com.io7m.idstore.protocol.admin_v1;
   requires transitive com.io7m.idstore.protocol.api;
   requires transitive com.io7m.idstore.protocol.user_v1;
-  requires transitive com.io7m.idstore.protocol.admin_v1;
   requires transitive com.io7m.idstore.protocol.versions;
-  requires transitive com.io7m.idstore.model;
   requires transitive net.jqwik.api;
 
   provides ArbitraryProvider
@@ -94,25 +105,35 @@ module com.io7m.idstore.tests.arbitraries
       IdArbA1UserSearchByEmailParametersProvider,
       IdArbA1UserSearchParametersProvider,
       IdArbA1UserSummaryProvider,
+      IdArbAMessageProvider,
+      IdArbAdminOrderingProvider,
       IdArbAdminPermissionSetProvider,
       IdArbAdminProvider,
+      IdArbAdminSearchByEmailParametersProvider,
+      IdArbAdminSearchParametersProvider,
       IdArbAdminSummaryProvider,
       IdArbAuditEventProvider,
+      IdArbAuditSearchParametersProvider,
       IdArbBanProvider,
       IdArbEmailProvider,
       IdArbHashProvider,
       IdArbIdNameProvider,
+      IdArbLoginProvider,
       IdArbOffsetDateTimeProvider,
       IdArbPasswordProvider,
       IdArbRealNameProvider,
       IdArbSubsetMatchProvider,
+      IdArbTimeRangeProvider,
       IdArbTokenProvider,
       IdArbU1MessageProvider,
       IdArbU1PasswordProvider,
       IdArbU1UserProvider,
       IdArbURIProvider,
       IdArbUUIDProvider,
+      IdArbUserOrderingProvider,
       IdArbUserProvider,
+      IdArbUserSearchByEmailParametersProvider,
+      IdArbUserSearchParametersProvider,
       IdArbUserSummaryProvider,
       IdArbVMessagesProvider,
       IdArbVProtocolSupportedProvider

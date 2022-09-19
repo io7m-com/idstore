@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.protocol.admin_v1;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.api.IdProtocolToModelType;
@@ -31,7 +32,9 @@ import java.util.Objects;
  */
 
 public record IdA1TimeRange(
+  @JsonProperty(value = "TimeLower", required = true)
   OffsetDateTime timeLower,
+  @JsonProperty(value = "TimeUpper", required = true)
   OffsetDateTime timeUpper)
   implements IdProtocolToModelType<IdTimeRange>
 {

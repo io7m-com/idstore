@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.protocol.admin_v1;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUserSummary;
@@ -36,10 +37,15 @@ import java.util.UUID;
  */
 
 public record IdA1UserSummary(
+  @JsonProperty(value = "ID", required = true)
   UUID id,
+  @JsonProperty(value = "IDName", required = true)
   String idName,
+  @JsonProperty(value = "RealName", required = true)
   String realName,
+  @JsonProperty(value = "TimeCreated", required = true)
   OffsetDateTime timeCreated,
+  @JsonProperty(value = "TimeUpdated", required = true)
   OffsetDateTime timeUpdated)
   implements IdProtocolToModelType<IdUserSummary>
 {

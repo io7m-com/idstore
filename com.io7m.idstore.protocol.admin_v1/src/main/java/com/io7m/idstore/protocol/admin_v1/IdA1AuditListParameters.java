@@ -17,7 +17,7 @@
 
 package com.io7m.idstore.protocol.admin_v1;
 
-import com.io7m.idstore.model.IdAuditListParameters;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolToModelType;
 
@@ -40,7 +40,7 @@ public record IdA1AuditListParameters(
   Optional<String> type,
   Optional<String> message,
   int limit)
-  implements IdProtocolToModelType<IdAuditListParameters>
+  implements IdProtocolToModelType<IdAuditSearchParameters>
 {
   /**
    * The immutable parameters required to list events.
@@ -72,10 +72,10 @@ public record IdA1AuditListParameters(
 
 
   @Override
-  public IdAuditListParameters toModel()
+  public IdAuditSearchParameters toModel()
     throws IdProtocolException
   {
-    return new IdAuditListParameters(
+    return new IdAuditSearchParameters(
       this.timeRange.toModel(),
       this.owner,
       this.type,

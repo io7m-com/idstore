@@ -63,6 +63,48 @@
   <suppress files="IdSecPolicyDefault\.java"
             checks="CyclomaticComplexity"/>
 
+  <suppress files="IdACB1ValidationAdmin\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACB1ValidationAdmin\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdACB1ValidationAdmin\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdACB1ValidationAdmin\.java"
+            checks="MissingJavadocMethod"/>
+
+  <suppress files="IdACB1ValidationGeneral\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACB1ValidationGeneral\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdACB1ValidationGeneral\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdACB1ValidationGeneral\.java"
+            checks="MissingJavadocMethod"/>
+
+  <suppress files="IdACB1ValidationUser\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACB1ValidationUser\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdACB1ValidationUser\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdACB1ValidationUser\.java"
+            checks="MissingJavadocMethod"/>
+
+  <suppress files="IdACB1Validation\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="MissingJavadocMethod"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="ClassFanOutComplexity"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="JavaNCSS"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="ExecutableStatementCount"/>
+
   <suppress files="IdAClientProtocolHandler1\.java"
             checks="ClassDataAbstractionCoupling"/>
   <suppress files="IdArbA1MessageProvider\.java"

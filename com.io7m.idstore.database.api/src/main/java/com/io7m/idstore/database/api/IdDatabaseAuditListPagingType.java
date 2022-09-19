@@ -17,7 +17,7 @@
 package com.io7m.idstore.database.api;
 
 import com.io7m.idstore.model.IdAuditEvent;
-import com.io7m.idstore.model.IdAuditListParameters;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 
 /**
  * The type of paging handlers that handle audit events.
@@ -25,7 +25,7 @@ import com.io7m.idstore.model.IdAuditListParameters;
 
 public interface IdDatabaseAuditListPagingType
   extends IdDatabasePagingType<
-  IdAuditListParameters, IdAuditEvent, IdDatabaseAuditQueriesType>
+  IdAuditSearchParameters, IdAuditEvent, IdDatabaseAuditQueriesType>
 {
 
 }

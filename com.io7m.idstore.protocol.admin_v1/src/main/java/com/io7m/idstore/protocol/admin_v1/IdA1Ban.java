@@ -16,6 +16,8 @@
 
 package com.io7m.idstore.protocol.admin_v1;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolToModelType;
@@ -34,8 +36,12 @@ import java.util.UUID;
  */
 
 public record IdA1Ban(
+  @JsonProperty(value = "User", required = true)
   UUID user,
+  @JsonProperty(value = "Reason", required = true)
   String reason,
+  @JsonProperty(value = "Expires")
+  @JsonInclude(JsonInclude.Include.NON_ABSENT)
   Optional<OffsetDateTime> expires)
   implements IdProtocolToModelType<IdBan>
 {

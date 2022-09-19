@@ -28,8 +28,11 @@
     <module>com.io7m.idstore.colors</module>
     <module>com.io7m.idstore.database.api</module>
     <module>com.io7m.idstore.database.postgres</module>
+    <module>com.io7m.idstore.documentation</module>
     <module>com.io7m.idstore.error_codes</module>
     <module>com.io7m.idstore.model</module>
+    <module>com.io7m.idstore.protocol.admin</module>
+    <module>com.io7m.idstore.protocol.admin.cb1</module>
     <module>com.io7m.idstore.protocol.admin_v1</module>
     <module>com.io7m.idstore.protocol.api</module>
     <module>com.io7m.idstore.protocol.user_v1</module>
@@ -47,6 +50,7 @@
 
   <properties>
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
+    <com.io7m.cedarbridge.version>0.0.3-SNAPSHOT</com.io7m.cedarbridge.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
     <com.io7m.trasco.version>0.0.4</com.io7m.trasco.version>
@@ -54,11 +58,12 @@
     <jackson.version>2.13.4</jackson.version>
     <jetty.version>11.0.11</jetty.version>
     <jooq.version>3.17.4</jooq.version>
+    <jsonschema-generator.version>4.26.0</jsonschema-generator.version>
     <logback.version>1.4.0</logback.version>
-    <org.jline.version>3.21.0</org.jline.version>
-    <testcontainers.version>1.17.3</testcontainers.version>
     <org.apache.james.version>3.7.0</org.apache.james.version>
     <org.javafx.version>18.0.1</org.javafx.version>
+    <org.jline.version>3.21.0</org.jline.version>
+    <testcontainers.version>1.17.3</testcontainers.version>
   </properties>
 
   <licenses>
@@ -439,6 +444,26 @@
         <groupId>com.io7m.jade</groupId>
         <artifactId>com.io7m.jade.vanilla</artifactId>
         <version>${com.io7m.jade.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.victools</groupId>
+        <artifactId>jsonschema-generator</artifactId>
+        <version>${jsonschema-generator.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.victools</groupId>
+        <artifactId>jsonschema-module-jackson</artifactId>
+        <version>${jsonschema-generator.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.cedarbridge</groupId>
+        <artifactId>com.io7m.cedarbridge.cmdline</artifactId>
+        <version>${com.io7m.cedarbridge.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.cedarbridge</groupId>
+        <artifactId>com.io7m.cedarbridge.runtime.api</artifactId>
+        <version>${com.io7m.cedarbridge.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

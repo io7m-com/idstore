@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.protocol.admin_v1;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolToModelType;
@@ -36,9 +37,13 @@ import java.util.Objects;
  */
 
 public record IdA1Page<U, T extends IdProtocolToModelType<U>>(
+  @JsonProperty(value = "PageItems", required = true)
   List<T> items,
+  @JsonProperty(value = "PageIndex", required = true)
   int pageIndex,
+  @JsonProperty(value = "PageCount", required = true)
   int pageCount,
+  @JsonProperty(value = "PageFirstOffset", required = true)
   long pageFirstOffset)
   implements IdProtocolToModelType<IdPage<U>>
 {

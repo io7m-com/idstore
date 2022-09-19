@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.protocol.admin_v1;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolToModelType;
@@ -35,10 +36,15 @@ import java.util.UUID;
  */
 
 public record IdA1AuditEvent(
+  @JsonProperty(value = "ID", required = true)
   long id,
+  @JsonProperty(value = "Owner", required = true)
   UUID owner,
+  @JsonProperty(value = "Time", required = true)
   OffsetDateTime time,
+  @JsonProperty(value = "Type", required = true)
   String type,
+  @JsonProperty(value = "Message", required = true)
   String message)
   implements IdProtocolToModelType<IdAuditEvent>
 {

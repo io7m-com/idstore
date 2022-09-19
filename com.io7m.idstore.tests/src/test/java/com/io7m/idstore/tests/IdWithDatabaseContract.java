@@ -27,7 +27,7 @@ import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.database.postgres.IdDatabases;
-import com.io7m.idstore.model.IdAuditListParameters;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPassword;
@@ -96,7 +96,7 @@ public abstract class IdWithDatabaseContract
       transaction.queries(IdDatabaseAuditQueriesType.class);
     final var events =
       audit.auditEvents(
-        new IdAuditListParameters(
+        new IdAuditSearchParameters(
           new IdTimeRange(timeNow().minusYears(1L), timeNow().plusYears(1L)),
           Optional.empty(),
           Optional.empty(),

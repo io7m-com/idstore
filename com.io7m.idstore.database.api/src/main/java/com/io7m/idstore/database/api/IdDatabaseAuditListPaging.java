@@ -18,7 +18,7 @@
 package com.io7m.idstore.database.api;
 
 import com.io7m.idstore.model.IdAuditEvent;
-import com.io7m.idstore.model.IdAuditListParameters;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 
 import java.util.List;
 import java.util.Objects;
@@ -32,13 +32,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class IdDatabaseAuditListPaging
   implements IdDatabaseAuditListPagingType
 {
-  private final IdAuditListParameters parameters;
+  private final IdAuditSearchParameters parameters;
   private volatile int currentPage;
   private final ConcurrentHashMap<Integer, Page> pages;
   private volatile int pagesCountApproximate;
 
   private IdDatabaseAuditListPaging(
-    final IdAuditListParameters inParameters)
+    final IdAuditSearchParameters inParameters)
   {
     this.parameters =
       Objects.requireNonNull(inParameters, "parameters");
@@ -67,13 +67,13 @@ public final class IdDatabaseAuditListPaging
    */
 
   public static IdDatabaseAuditListPagingType create(
-    final IdAuditListParameters inParameters)
+    final IdAuditSearchParameters inParameters)
   {
     return new IdDatabaseAuditListPaging(inParameters);
   }
 
   @Override
-  public IdAuditListParameters pageParameters()
+  public IdAuditSearchParameters pageParameters()
   {
     return this.parameters;
   }

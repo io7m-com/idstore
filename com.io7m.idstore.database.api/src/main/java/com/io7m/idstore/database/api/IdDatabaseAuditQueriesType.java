@@ -17,7 +17,7 @@
 package com.io7m.idstore.database.api;
 
 import com.io7m.idstore.model.IdAuditEvent;
-import com.io7m.idstore.model.IdAuditListParameters;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -43,7 +43,7 @@ public non-sealed interface IdDatabaseAuditQueriesType
    */
 
   List<IdAuditEvent> auditEvents(
-    IdAuditListParameters parameters,
+    IdAuditSearchParameters parameters,
     OptionalLong seek)
     throws IdDatabaseException;
 
@@ -71,7 +71,7 @@ public non-sealed interface IdDatabaseAuditQueriesType
    * @return The number of events matching the given parameter
    */
 
-  long auditCount(IdAuditListParameters parameters)
+  long auditCount(IdAuditSearchParameters parameters)
     throws IdDatabaseException;
 
 }

@@ -30,7 +30,7 @@ import java.util.Optional;
  * @param type      Only include events with this type
  */
 
-public record IdAuditListParameters(
+public record IdAuditSearchParameters(
   IdTimeRange timeRange,
   Optional<String> owner,
   Optional<String> type,
@@ -47,7 +47,7 @@ public record IdAuditListParameters(
    * @param type      Only include events with this type
    */
 
-  public IdAuditListParameters
+  public IdAuditSearchParameters
   {
     Objects.requireNonNull(timeRange, "timeRange");
     Objects.requireNonNull(owner, "owner");
@@ -59,9 +59,9 @@ public record IdAuditListParameters(
    * @return Sensible default values
    */
 
-  public static IdAuditListParameters defaults()
+  public static IdAuditSearchParameters defaults()
   {
-    return new IdAuditListParameters(
+    return new IdAuditSearchParameters(
       IdTimeRange.largest(),
       Optional.empty(),
       Optional.empty(),

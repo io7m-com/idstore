@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.protocol.admin_v1;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolToModelType;
@@ -34,9 +35,13 @@ import java.util.UUID;
  */
 
 public record IdA1Login(
+  @JsonProperty(value = "User", required = true)
   UUID userId,
+  @JsonProperty(value = "Time", required = true)
   OffsetDateTime time,
+  @JsonProperty(value = "Host", required = true)
   String host,
+  @JsonProperty(value = "UserAgent", required = true)
   String userAgent)
   implements IdProtocolToModelType<IdLogin>
 {
