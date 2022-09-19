@@ -117,7 +117,7 @@ public final class IdU1Sends implements IdServiceType
   @Override
   public String toString()
   {
-    return "[IdA1Sends 0x%s]"
+    return "[IdACB1Sends 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode()));
   }
 }

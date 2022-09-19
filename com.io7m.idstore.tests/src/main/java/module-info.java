@@ -23,6 +23,8 @@ open module com.io7m.idstore.tests
   requires transitive com.io7m.idstore.admin_client.api;
   requires transitive com.io7m.idstore.admin_client;
   requires transitive com.io7m.idstore.model;
+  requires transitive com.io7m.idstore.protocol.admin.cb1;
+  requires transitive com.io7m.idstore.protocol.admin;
   requires transitive com.io7m.idstore.protocol.admin_v1;
   requires transitive com.io7m.idstore.protocol.api;
   requires transitive com.io7m.idstore.protocol.user_v1;

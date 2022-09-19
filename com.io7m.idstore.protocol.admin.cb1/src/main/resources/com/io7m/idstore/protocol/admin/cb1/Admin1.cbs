@@ -25,7 +25,7 @@
 [documentation IdA1TimestampUTC "A UTC timestamp value."]
 [record IdA1TimestampUTC
   [documentation year "The year."]
-  [field year cb:IntegerUnsigned16]
+  [field year cb:IntegerUnsigned32]
   [documentation month "The month in the range [1, 12]."]
   [field month cb:IntegerUnsigned8]
   [documentation day "The day of the month in the range [1, 31]."]
@@ -37,7 +37,7 @@
   [documentation second "The second in the range [0, 59]."]
   [field second cb:IntegerUnsigned8]
   [documentation millisecond "The millisecond in the range [0, 999]."]
-  [field millisecond cb:IntegerUnsigned16]
+  [field millisecond cb:IntegerUnsigned32]
 ]
 
 [documentation IdA1Ban "An account ban."]
@@ -536,44 +536,12 @@
   [field requestId IdA1UUID]
 ]
 
-[documentation IdA1ResponseAdminEmailAdd "A response to IdA1CommandAdminEmailAdd."]
-[record IdA1ResponseAdminEmailAdd
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdA1UUID]
-  [documentation admin "The admin."]
-  [field admin IdA1Admin]
-]
-
-[documentation IdA1ResponseAdminEmailRemove "A response to IdA1CommandAdminEmailRemove."]
-[record IdA1ResponseAdminEmailRemove
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdA1UUID]
-  [documentation admin "The admin."]
-  [field admin IdA1Admin]
-]
-
 [documentation IdA1ResponseAdminGet "A response to IdA1CommandAdminGet."]
 [record IdA1ResponseAdminGet
   [documentation requestId "The ID of the request that yielded this response."]
   [field requestId IdA1UUID]
   [documentation admin "The admin."]
   [field admin [cb:Option IdA1Admin]]
-]
-
-[documentation IdA1ResponseAdminPermissionGrant "A response to IdA1CommandAdminPermissionGrant."]
-[record IdA1ResponseAdminPermissionGrant
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdA1UUID]
-  [documentation admin "The admin."]
-  [field admin IdA1Admin]
-]
-
-[documentation IdA1ResponseAdminPermissionRevoke "A response to IdA1CommandAdminPermissionRevoke."]
-[record IdA1ResponseAdminPermissionRevoke
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdA1UUID]
-  [documentation admin "The admin."]
-  [field admin IdA1Admin]
 ]
 
 [documentation IdA1ResponseAdminSearchBegin "A response to IdA1CommandAdminSearchBegin."]
@@ -712,22 +680,6 @@
   [field user [cb:Option IdA1User]]
 ]
 
-[documentation IdA1ResponseUserEmailAdd "A response to IdA1CommandUserEmailAdd."]
-[record IdA1ResponseUserEmailAdd
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdA1UUID]
-  [documentation user "The user."]
-  [field user IdA1User]
-]
-
-[documentation IdA1ResponseUserEmailRemove "A response to IdA1CommandUserEmailRemove."]
-[record IdA1ResponseUserEmailRemove
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdA1UUID]
-  [documentation user "The user."]
-  [field user IdA1User]
-]
-
 [documentation IdA1ResponseUserSearchBegin "A response to IdA1CommandUserSearchBegin."]
 [record IdA1ResponseUserSearchBegin
   [documentation requestId "The ID of the request that yielded this response."]
@@ -860,11 +812,7 @@
     IdA1ResponseAdminBanGet
     IdA1ResponseAdminCreate
     IdA1ResponseAdminDelete
-    IdA1ResponseAdminEmailAdd
-    IdA1ResponseAdminEmailRemove
     IdA1ResponseAdminGet
-    IdA1ResponseAdminPermissionGrant
-    IdA1ResponseAdminPermissionRevoke
     IdA1ResponseAdminSearchBegin
     IdA1ResponseAdminSearchByEmailBegin
     IdA1ResponseAdminSearchByEmailNext
@@ -883,8 +831,6 @@
     IdA1ResponseUserBanGet
     IdA1ResponseUserCreate
     IdA1ResponseUserDelete
-    IdA1ResponseUserEmailAdd
-    IdA1ResponseUserEmailRemove
     IdA1ResponseUserGet
     IdA1ResponseUserLoginHistory
     IdA1ResponseUserSearchBegin

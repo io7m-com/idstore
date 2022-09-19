@@ -179,8 +179,7 @@ public final class IdAProtocolNegotiation
     LOG.debug("server supports {} protocols", serverProtocols.size());
 
     final var solver =
-      GenProtocolSolver.<IdAClientProtocolHandlerFactoryType, IdAServerEndpoint>create(
-        locale);
+      GenProtocolSolver.<IdAClientProtocolHandlerFactoryType, IdAServerEndpoint>create(locale);
 
     final GenProtocolSolved<IdAClientProtocolHandlerFactoryType, IdAServerEndpoint> solved;
     try {

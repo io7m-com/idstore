@@ -19,7 +19,7 @@ package com.io7m.idstore.server.internal;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.error_codes.IdErrorCode;
-import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
+import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
 import com.io7m.idstore.protocol.user_v1.IdU1Messages;
 import com.io7m.idstore.protocol.versions.IdVMessages;
 import com.io7m.idstore.server.api.IdServerConfiguration;
@@ -29,7 +29,7 @@ import com.io7m.idstore.server.api.events.IdServerEventReady;
 import com.io7m.idstore.server.api.events.IdServerEventType;
 import com.io7m.idstore.server.internal.admin_v1.IdA1CommandServlet;
 import com.io7m.idstore.server.internal.admin_v1.IdA1Login;
-import com.io7m.idstore.server.internal.admin_v1.IdA1Sends;
+import com.io7m.idstore.server.internal.admin_v1.IdACB1Sends;
 import com.io7m.idstore.server.internal.admin_v1.IdA1Versions;
 import com.io7m.idstore.server.internal.common.IdCommonCSSServlet;
 import com.io7m.idstore.server.internal.common.IdCommonLogoServlet;
@@ -214,9 +214,9 @@ public final class IdServer implements IdServerType
     services.register(IdU1Messages.class, idU1Messages);
     services.register(IdU1Sends.class, new IdU1Sends(idU1Messages));
 
-    final var idA1Messages = new IdA1Messages();
-    services.register(IdA1Messages.class, idA1Messages);
-    services.register(IdA1Sends.class, new IdA1Sends(idA1Messages));
+    final var idA1Messages = new IdACB1Messages();
+    services.register(IdACB1Messages.class, idA1Messages);
+    services.register(IdACB1Sends.class, new IdACB1Sends(idA1Messages));
 
     final var clock = new IdServerClock(this.configuration.clock());
     services.register(IdServerClock.class, clock);

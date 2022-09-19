@@ -31,7 +31,7 @@ import java.util.UUID;
 public record IdACommandAdminEmailAdd(
   UUID admin,
   IdEmail email)
-  implements IdACommandType<IdAResponseAdminEmailAdd>
+  implements IdACommandType<IdAResponseAdminUpdate>
 {
   /**
    * Add an email address to the given admin.

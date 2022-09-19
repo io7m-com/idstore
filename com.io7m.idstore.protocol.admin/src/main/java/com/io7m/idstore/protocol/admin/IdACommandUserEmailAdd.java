@@ -31,7 +31,7 @@ import java.util.UUID;
 public record IdACommandUserEmailAdd(
   UUID user,
   IdEmail email)
-  implements IdACommandType<IdAResponseUserEmailAdd>
+  implements IdACommandType<IdAResponseUserUpdate>
 {
   /**
    * Add an email address to the given user.

@@ -46,6 +46,10 @@
   <!-- Without pattern matching... -->
   <suppress files="IdACommandExecutor\.java"
             checks="NPathComplexity"/>
+  <suppress files="IdACommandExecutor\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdACommandExecutor\.java"
+            checks="ExecutableStatementCount"/>
   <suppress files="IdU1CommandExecutor\.java"
             checks="NPathComplexity"/>
   <suppress files="IdACommandExecutor\.java"
@@ -54,9 +58,9 @@
             checks="NPathComplexity"/>
   <suppress files="IdPCommandExecutor\.java"
             checks="CyclomaticComplexity"/>
-  <suppress files="IdA1CommandExecutor\.java"
+  <suppress files="IdACommandExecutor\.java"
             checks="NPathComplexity"/>
-  <suppress files="IdA1CommandExecutor\.java"
+  <suppress files="IdACommandExecutor\.java"
             checks="CyclomaticComplexity"/>
   <suppress files="IdSecPolicyDefault\.java"
             checks="NPathComplexity"/>

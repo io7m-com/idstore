@@ -16,10 +16,11 @@
 
 package com.io7m.idstore.tests;
 
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
-import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
-import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
+import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.protocol.admin.IdACommandLogin;
+import com.io7m.idstore.protocol.admin.IdAMessageType;
+import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import net.jqwik.api.Arbitraries;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,12 +45,12 @@ public final class IdServerAdminErrorsTest extends IdWithServerContract
   private static final Logger LOG =
     LoggerFactory.getLogger(IdServerAdminErrorsTest.class);
 
-  private IdA1Messages message;
+  private IdACB1Messages message;
 
   @BeforeEach
   public void setup()
   {
-    this.message = new IdA1Messages();
+    this.message = new IdACB1Messages();
   }
 
   /**
@@ -68,7 +69,7 @@ public final class IdServerAdminErrorsTest extends IdWithServerContract
       HttpClient.newHttpClient();
 
     final var arb =
-      Arbitraries.defaultFor(IdA1MessageType.class);
+      Arbitraries.defaultFor(IdAMessageType.class);
 
     for (int index = 0; index < 1000; ++index) {
       final var message = arb.sample();
@@ -104,7 +105,7 @@ public final class IdServerAdminErrorsTest extends IdWithServerContract
       HttpClient.newHttpClient();
 
     final var arb =
-      Arbitraries.defaultFor(IdA1MessageType.class);
+      Arbitraries.defaultFor(IdAMessageType.class);
 
     for (int index = 0; index < 1000; ++index) {
       final var message = arb.sample();
@@ -145,10 +146,10 @@ public final class IdServerAdminErrorsTest extends IdWithServerContract
     this.doLogin(client);
 
     final var arb =
-      Arbitraries.defaultFor(IdA1MessageType.class)
-        .filter(c -> c instanceof IdA1ResponseType);
+      Arbitraries.defaultFor(IdAMessageType.class)
+        .filter(c -> c instanceof IdAResponseType);
 
-    final var succeeded = new ArrayList<IdA1MessageType>();
+    final var succeeded = new ArrayList<IdAMessageType>();
     for (int index = 0; index < 1000; ++index) {
       final var message = arb.sample();
       LOG.debug("send: {}", message);
@@ -179,7 +180,7 @@ public final class IdServerAdminErrorsTest extends IdWithServerContract
           URI.create(this.serverAdminAPIURL() + "admin/1/0/login")
         ).POST(ofByteArray(
           this.message.serialize(
-            new IdA1CommandLogin("admin", "12345678"))))
+            new IdACommandLogin(new IdName("admin"), "12345678"))))
         .build();
 
     final var response =

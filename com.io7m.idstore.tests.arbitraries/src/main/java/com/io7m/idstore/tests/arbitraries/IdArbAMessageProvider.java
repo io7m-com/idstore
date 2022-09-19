@@ -78,11 +78,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanGet;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminDelete;
-import com.io7m.idstore.protocol.admin.IdAResponseAdminEmailAdd;
-import com.io7m.idstore.protocol.admin.IdAResponseAdminEmailRemove;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminGet;
-import com.io7m.idstore.protocol.admin.IdAResponseAdminPermissionGrant;
-import com.io7m.idstore.protocol.admin.IdAResponseAdminPermissionRevoke;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailNext;
@@ -101,8 +97,6 @@ import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanGet;
 import com.io7m.idstore.protocol.admin.IdAResponseUserCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseUserDelete;
-import com.io7m.idstore.protocol.admin.IdAResponseUserEmailAdd;
-import com.io7m.idstore.protocol.admin.IdAResponseUserEmailRemove;
 import com.io7m.idstore.protocol.admin.IdAResponseUserGet;
 import com.io7m.idstore.protocol.admin.IdAResponseUserLoginHistory;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchBegin;
@@ -195,11 +189,7 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       responseAdminBanGet(),
       responseAdminCreate(),
       responseAdminDelete(),
-      responseAdminEmailAdd(),
-      responseAdminEmailRemove(),
       responseAdminGet(),
-      responseAdminPermissionGrant(),
-      responseAdminPermissionRevoke(),
       responseAdminSearchBegin(),
       responseAdminSearchByEmailBegin(),
       responseAdminSearchByEmailNext(),
@@ -218,8 +208,6 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       responseUserBanGet(),
       responseUserCreate(),
       responseUserDelete(),
-      responseUserEmailAdd(),
-      responseUserEmailRemove(),
       responseUserGet(),
       responseUserLoginHistory(),
       responseUserSearchBegin(),
@@ -230,90 +218,6 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       responseUserSearchPrevious(),
       responseUserUpdate()
     );
-  }
-
-  /**
-   * @return A message arbitrary
-   */
-
-  public static Arbitrary<IdAResponseAdminPermissionGrant> responseAdminPermissionGrant()
-  {
-    final var id =
-      Arbitraries.defaultFor(UUID.class);
-    final var a =
-      Arbitraries.defaultFor(IdAdmin.class);
-
-    return Combinators.combine(id, a).as(IdAResponseAdminPermissionGrant::new);
-  }
-
-  /**
-   * @return A message arbitrary
-   */
-
-  public static Arbitrary<IdAResponseAdminPermissionRevoke> responseAdminPermissionRevoke()
-  {
-    final var id =
-      Arbitraries.defaultFor(UUID.class);
-    final var a =
-      Arbitraries.defaultFor(IdAdmin.class);
-
-    return Combinators.combine(id, a).as(IdAResponseAdminPermissionRevoke::new);
-  }
-
-  /**
-   * @return A message arbitrary
-   */
-
-  public static Arbitrary<IdAResponseAdminEmailAdd> responseAdminEmailAdd()
-  {
-    final var id =
-      Arbitraries.defaultFor(UUID.class);
-    final var a =
-      Arbitraries.defaultFor(IdAdmin.class);
-
-    return Combinators.combine(id, a).as(IdAResponseAdminEmailAdd::new);
-  }
-
-  /**
-   * @return A message arbitrary
-   */
-
-  public static Arbitrary<IdAResponseAdminEmailRemove> responseAdminEmailRemove()
-  {
-    final var id =
-      Arbitraries.defaultFor(UUID.class);
-    final var a =
-      Arbitraries.defaultFor(IdAdmin.class);
-
-    return Combinators.combine(id, a).as(IdAResponseAdminEmailRemove::new);
-  }
-
-  /**
-   * @return A message arbitrary
-   */
-
-  public static Arbitrary<IdAResponseUserEmailAdd> responseUserEmailAdd()
-  {
-    final var id =
-      Arbitraries.defaultFor(UUID.class);
-    final var a =
-      Arbitraries.defaultFor(IdUser.class);
-
-    return Combinators.combine(id, a).as(IdAResponseUserEmailAdd::new);
-  }
-
-  /**
-   * @return A message arbitrary
-   */
-
-  public static Arbitrary<IdAResponseUserEmailRemove> responseUserEmailRemove()
-  {
-    final var id =
-      Arbitraries.defaultFor(UUID.class);
-    final var a =
-      Arbitraries.defaultFor(IdUser.class);
-
-    return Combinators.combine(id, a).as(IdAResponseUserEmailRemove::new);
   }
 
   /**

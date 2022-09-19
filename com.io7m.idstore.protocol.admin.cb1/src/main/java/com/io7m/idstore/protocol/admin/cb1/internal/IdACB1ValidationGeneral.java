@@ -17,7 +17,6 @@
 
 package com.io7m.idstore.protocol.admin.cb1.internal;
 
-import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned16;
 import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned32;
 import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned64;
 import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned8;
@@ -97,13 +96,13 @@ public final class IdACB1ValidationGeneral
     final OffsetDateTime t)
   {
     return new IdA1TimestampUTC(
-      new CBIntegerUnsigned16(t.getYear()),
+      new CBIntegerUnsigned32(Integer.toUnsignedLong(t.getYear())),
       new CBIntegerUnsigned8(t.getMonthValue()),
       new CBIntegerUnsigned8(t.getDayOfMonth()),
       new CBIntegerUnsigned8(t.getHour()),
       new CBIntegerUnsigned8(t.getMinute()),
       new CBIntegerUnsigned8(t.getSecond()),
-      new CBIntegerUnsigned16(t.getNano() / 1000)
+      new CBIntegerUnsigned32(Integer.toUnsignedLong(t.getNano() / 1000))
     );
   }
 
@@ -224,13 +223,13 @@ public final class IdACB1ValidationGeneral
     final IdA1TimestampUTC t)
   {
     return OffsetDateTime.of(
-      t.fieldYear().value(),
+      (int) (t.fieldYear().value() & 0xffffffffL),
       t.fieldMonth().value(),
       t.fieldDay().value(),
       t.fieldHour().value(),
       t.fieldMinute().value(),
       t.fieldSecond().value(),
-      t.fieldMillisecond().value() * 1000,
+      (int) (t.fieldMillisecond().value() * 1000L),
       ZoneOffset.UTC
     );
   }

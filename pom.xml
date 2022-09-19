@@ -50,7 +50,7 @@
 
   <properties>
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
-    <com.io7m.cedarbridge.version>0.0.3-SNAPSHOT</com.io7m.cedarbridge.version>
+    <com.io7m.cedarbridge.version>0.0.3</com.io7m.cedarbridge.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
     <com.io7m.trasco.version>0.0.4</com.io7m.trasco.version>
@@ -64,6 +64,7 @@
     <org.javafx.version>18.0.1</org.javafx.version>
     <org.jline.version>3.21.0</org.jline.version>
     <testcontainers.version>1.17.3</testcontainers.version>
+    <com.io7m.jbssio.version>1.1.1</com.io7m.jbssio.version>
   </properties>
 
   <licenses>
@@ -464,6 +465,21 @@
         <groupId>com.io7m.cedarbridge</groupId>
         <artifactId>com.io7m.cedarbridge.runtime.api</artifactId>
         <version>${com.io7m.cedarbridge.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.cedarbridge</groupId>
+        <artifactId>com.io7m.cedarbridge.runtime.bssio</artifactId>
+        <version>${com.io7m.cedarbridge.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.jbssio</groupId>
+        <artifactId>com.io7m.jbssio.vanilla</artifactId>
+        <version>${com.io7m.jbssio.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.jbssio</groupId>
+        <artifactId>com.io7m.jbssio.api</artifactId>
+        <version>${com.io7m.jbssio.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

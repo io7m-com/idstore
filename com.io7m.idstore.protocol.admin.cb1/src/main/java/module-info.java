@@ -23,9 +23,13 @@ module com.io7m.idstore.protocol.admin.cb1
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
+  requires com.io7m.cedarbridge.runtime.bssio;
+  requires com.io7m.jbssio.api;
+  requires com.io7m.jbssio.vanilla;
   requires transitive com.io7m.cedarbridge.runtime.api;
-  requires transitive com.io7m.idstore.protocol.api;
   requires transitive com.io7m.idstore.protocol.admin;
+  requires transitive com.io7m.idstore.protocol.api;
+  requires transitive com.io7m.idstore.services.api;
 
   exports com.io7m.idstore.protocol.admin.cb1;
 }

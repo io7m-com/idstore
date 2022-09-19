@@ -53,8 +53,6 @@ import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanGet;
 import com.io7m.idstore.protocol.admin.IdAResponseUserCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseUserDelete;
-import com.io7m.idstore.protocol.admin.IdAResponseUserEmailAdd;
-import com.io7m.idstore.protocol.admin.IdAResponseUserEmailRemove;
 import com.io7m.idstore.protocol.admin.IdAResponseUserGet;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailBegin;
@@ -84,8 +82,6 @@ import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseUserBanGet;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseUserCreate;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseUserDelete;
-import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseUserEmailAdd;
-import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseUserEmailRemove;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseUserGet;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseUserSearchBegin;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseUserSearchByEmailBegin;
@@ -226,24 +222,6 @@ public final class IdACB1ValidationUser
     return new IdA1ResponseUserGet(
       toWireUUID(r.requestId()),
       fromOptional(r.user().map(IdACB1ValidationUser::toWireUser))
-    );
-  }
-
-  public static IdA1ResponseUserEmailAdd toWireResponseUserEmailAdd(
-    final IdAResponseUserEmailAdd r)
-  {
-    return new IdA1ResponseUserEmailAdd(
-      toWireUUID(r.requestId()),
-      toWireUser(r.user())
-    );
-  }
-
-  public static IdA1ResponseUserEmailRemove toWireResponseUserEmailRemove(
-    final IdAResponseUserEmailRemove r)
-  {
-    return new IdA1ResponseUserEmailRemove(
-      toWireUUID(r.requestId()),
-      toWireUser(r.user())
     );
   }
 
@@ -544,26 +522,6 @@ public final class IdACB1ValidationUser
   {
     return new IdAResponseUserDelete(
       fromWireUUID(c.fieldRequestId())
-    );
-  }
-
-  public static IdAResponseUserEmailAdd fromWireResponseUserEmailAdd(
-    final IdA1ResponseUserEmailAdd c)
-    throws IdProtocolException, IdPasswordException
-  {
-    return new IdAResponseUserEmailAdd(
-      fromWireUUID(c.fieldRequestId()),
-      fromWireUser(c.fieldUser())
-    );
-  }
-
-  public static IdAResponseUserEmailRemove fromWireResponseUserEmailRemove(
-    final IdA1ResponseUserEmailRemove c)
-    throws IdProtocolException, IdPasswordException
-  {
-    return new IdAResponseUserEmailRemove(
-      fromWireUUID(c.fieldRequestId()),
-      fromWireUser(c.fieldUser())
     );
   }
 

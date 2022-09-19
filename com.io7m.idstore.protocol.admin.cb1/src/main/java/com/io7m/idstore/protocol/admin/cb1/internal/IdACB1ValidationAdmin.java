@@ -58,11 +58,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanGet;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminDelete;
-import com.io7m.idstore.protocol.admin.IdAResponseAdminEmailAdd;
-import com.io7m.idstore.protocol.admin.IdAResponseAdminEmailRemove;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminGet;
-import com.io7m.idstore.protocol.admin.IdAResponseAdminPermissionGrant;
-import com.io7m.idstore.protocol.admin.IdAResponseAdminPermissionRevoke;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailNext;
@@ -103,11 +99,7 @@ import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminBanDelete;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminBanGet;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminCreate;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminDelete;
-import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminEmailAdd;
-import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminEmailRemove;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminGet;
-import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminPermissionGrant;
-import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminPermissionRevoke;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminSearchBegin;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin.cb1.IdA1ResponseAdminSearchByEmailNext;
@@ -259,48 +251,12 @@ public final class IdACB1ValidationAdmin
     );
   }
 
-  public static IdA1ResponseAdminPermissionRevoke toWireResponseAdminPermissionRevoke(
-    final IdAResponseAdminPermissionRevoke r)
-  {
-    return new IdA1ResponseAdminPermissionRevoke(
-      toWireUUID(r.requestId()),
-      toWireAdmin(r.admin())
-    );
-  }
-
-  public static IdA1ResponseAdminPermissionGrant toWireResponseAdminPermissionGrant(
-    final IdAResponseAdminPermissionGrant r)
-  {
-    return new IdA1ResponseAdminPermissionGrant(
-      toWireUUID(r.requestId()),
-      toWireAdmin(r.admin())
-    );
-  }
-
   public static IdA1ResponseAdminGet toWireResponseAdminGet(
     final IdAResponseAdminGet r)
   {
     return new IdA1ResponseAdminGet(
       toWireUUID(r.requestId()),
       fromOptional(r.admin().map(IdACB1ValidationAdmin::toWireAdmin))
-    );
-  }
-
-  public static IdA1ResponseAdminEmailAdd toWireResponseAdminEmailAdd(
-    final IdAResponseAdminEmailAdd r)
-  {
-    return new IdA1ResponseAdminEmailAdd(
-      toWireUUID(r.requestId()),
-      toWireAdmin(r.admin())
-    );
-  }
-
-  public static IdA1ResponseAdminEmailRemove toWireResponseAdminEmailRemove(
-    final IdAResponseAdminEmailRemove r)
-  {
-    return new IdA1ResponseAdminEmailRemove(
-      toWireUUID(r.requestId()),
-      toWireAdmin(r.admin())
     );
   }
 
@@ -659,26 +615,6 @@ public final class IdACB1ValidationAdmin
     );
   }
 
-  public static IdAResponseAdminEmailAdd fromWireResponseAdminEmailAdd(
-    final IdA1ResponseAdminEmailAdd c)
-    throws IdProtocolException, IdPasswordException
-  {
-    return new IdAResponseAdminEmailAdd(
-      fromWireUUID(c.fieldRequestId()),
-      fromWireAdmin(c.fieldAdmin())
-    );
-  }
-
-  public static IdAResponseAdminEmailRemove fromWireResponseAdminEmailRemove(
-    final IdA1ResponseAdminEmailRemove c)
-    throws IdProtocolException, IdPasswordException
-  {
-    return new IdAResponseAdminEmailRemove(
-      fromWireUUID(c.fieldRequestId()),
-      fromWireAdmin(c.fieldAdmin())
-    );
-  }
-
   public static IdAResponseAdminGet fromWireResponseAdminGet(
     final IdA1ResponseAdminGet c)
     throws IdProtocolException, IdPasswordException
@@ -697,26 +633,6 @@ public final class IdACB1ValidationAdmin
       return Optional.of(fromWireAdmin(some.value()));
     }
     return Optional.empty();
-  }
-
-  public static IdAResponseAdminPermissionGrant fromWireResponseAdminPermissionGrant(
-    final IdA1ResponseAdminPermissionGrant c)
-    throws IdProtocolException, IdPasswordException
-  {
-    return new IdAResponseAdminPermissionGrant(
-      fromWireUUID(c.fieldRequestId()),
-      fromWireAdmin(c.fieldAdmin())
-    );
-  }
-
-  public static IdAResponseAdminPermissionRevoke fromWireResponseAdminPermissionRevoke(
-    final IdA1ResponseAdminPermissionRevoke c)
-    throws IdProtocolException, IdPasswordException
-  {
-    return new IdAResponseAdminPermissionRevoke(
-      fromWireUUID(c.fieldRequestId()),
-      fromWireAdmin(c.fieldAdmin())
-    );
   }
 
   public static IdAResponseAdminSearchBegin fromWireResponseAdminSearchBegin(

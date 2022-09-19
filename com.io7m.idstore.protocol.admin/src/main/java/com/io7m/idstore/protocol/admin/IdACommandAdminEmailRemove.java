@@ -31,7 +31,7 @@ import java.util.UUID;
 public record IdACommandAdminEmailRemove(
   UUID admin,
   IdEmail email)
-  implements IdACommandType<IdAResponseAdminEmailRemove>
+  implements IdACommandType<IdAResponseAdminUpdate>
 {
   /**
    * Remove an email address from the given admin.

@@ -31,7 +31,7 @@ import java.util.UUID;
 public record IdACommandAdminPermissionRevoke(
   UUID admin,
   IdAdminPermission permission)
-  implements IdACommandType<IdAResponseAdminPermissionRevoke>
+  implements IdACommandType<IdAResponseAdminUpdate>
 {
   /**
    * Revoke a permission from the given admin.

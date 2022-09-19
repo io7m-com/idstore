@@ -25,105 +25,97 @@ import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdAuditEvent;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
-import com.io7m.idstore.model.IdOptional;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPassword;
-import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
-import com.io7m.idstore.protocol.admin_v1.IdA1AdminPermission;
-import com.io7m.idstore.protocol.admin_v1.IdA1AdminSearchByEmailParameters;
-import com.io7m.idstore.protocol.admin_v1.IdA1AdminSearchParameters;
-import com.io7m.idstore.protocol.admin_v1.IdA1AuditListParameters;
-import com.io7m.idstore.protocol.admin_v1.IdA1Ban;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanCreate;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanDelete;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminBanGet;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminCreate;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminDelete;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailAdd;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminEmailRemove;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGet;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminGetByEmail;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminPermissionGrant;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminPermissionRevoke;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchBegin;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailBegin;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailNext;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchByEmailPrevious;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchNext;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSearchPrevious;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminUpdate;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchBegin;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchNext;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAuditSearchPrevious;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandType;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanCreate;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanDelete;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserBanGet;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserCreate;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserDelete;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailAdd;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserEmailRemove;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGet;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserGetByEmail;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserLoginHistory;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchBegin;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailBegin;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailNext;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchByEmailPrevious;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchNext;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserSearchPrevious;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandUserUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandAdminBanCreate;
+import com.io7m.idstore.protocol.admin.IdACommandAdminBanDelete;
+import com.io7m.idstore.protocol.admin.IdACommandAdminBanGet;
+import com.io7m.idstore.protocol.admin.IdACommandAdminCreate;
+import com.io7m.idstore.protocol.admin.IdACommandAdminDelete;
+import com.io7m.idstore.protocol.admin.IdACommandAdminEmailAdd;
+import com.io7m.idstore.protocol.admin.IdACommandAdminEmailRemove;
+import com.io7m.idstore.protocol.admin.IdACommandAdminGet;
+import com.io7m.idstore.protocol.admin.IdACommandAdminGetByEmail;
+import com.io7m.idstore.protocol.admin.IdACommandAdminPermissionGrant;
+import com.io7m.idstore.protocol.admin.IdACommandAdminPermissionRevoke;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchBegin;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchNext;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
+import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
+import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandLogin;
+import com.io7m.idstore.protocol.admin.IdACommandType;
+import com.io7m.idstore.protocol.admin.IdACommandUserBanCreate;
+import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
+import com.io7m.idstore.protocol.admin.IdACommandUserBanGet;
+import com.io7m.idstore.protocol.admin.IdACommandUserCreate;
+import com.io7m.idstore.protocol.admin.IdACommandUserDelete;
+import com.io7m.idstore.protocol.admin.IdACommandUserEmailAdd;
+import com.io7m.idstore.protocol.admin.IdACommandUserEmailRemove;
+import com.io7m.idstore.protocol.admin.IdACommandUserGet;
+import com.io7m.idstore.protocol.admin.IdACommandUserGetByEmail;
+import com.io7m.idstore.protocol.admin.IdACommandUserLoginHistory;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchBegin;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailNext;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdate;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminBanCreate;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminBanDelete;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminBanGet;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminCreate;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminDelete;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminGet;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchBegin;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchNext;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSelf;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
+import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchBegin;
+import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchNext;
+import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseError;
+import com.io7m.idstore.protocol.admin.IdAResponseLogin;
+import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.protocol.admin.IdAResponseUserBanCreate;
+import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
+import com.io7m.idstore.protocol.admin.IdAResponseUserBanGet;
+import com.io7m.idstore.protocol.admin.IdAResponseUserCreate;
+import com.io7m.idstore.protocol.admin.IdAResponseUserDelete;
+import com.io7m.idstore.protocol.admin.IdAResponseUserGet;
+import com.io7m.idstore.protocol.admin.IdAResponseUserLoginHistory;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchBegin;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailNext;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchNext;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
+import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
 import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
-import com.io7m.idstore.protocol.admin_v1.IdA1Password;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminBanCreate;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminBanDelete;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminBanGet;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminCreate;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminDelete;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminGet;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchBegin;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailBegin;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailNext;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchByEmailPrevious;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchNext;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSearchPrevious;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSelf;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminUpdate;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchBegin;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchNext;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAuditSearchPrevious;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseLogin;
 import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanCreate;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanDelete;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserBanGet;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserCreate;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserDelete;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserGet;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserLoginHistory;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchBegin;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailBegin;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailNext;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchByEmailPrevious;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchNext;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserSearchPrevious;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseUserUpdate;
-import com.io7m.idstore.protocol.admin_v1.IdA1TimeRange;
-import com.io7m.idstore.protocol.admin_v1.IdA1UserSearchByEmailParameters;
-import com.io7m.idstore.protocol.admin_v1.IdA1UserSearchParameters;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,15 +124,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static java.net.http.HttpResponse.BodyHandlers;
 
@@ -156,7 +145,7 @@ public final class IdAClientProtocolHandler1
 
   private final URI commandURI;
   private final URI transactionURI;
-  private final IdA1Messages messages;
+  private final IdACB1Messages messages;
   private final URI loginURI;
 
   /**
@@ -175,7 +164,7 @@ public final class IdAClientProtocolHandler1
     super(inHttpClient, inStrings, inBase);
 
     this.messages =
-      new IdA1Messages();
+      new IdACB1Messages();
 
     this.loginURI =
       inBase.resolve("login")
@@ -195,31 +184,31 @@ public final class IdAClientProtocolHandler1
     final URI base)
     throws IdAClientException, InterruptedException
   {
-    this.sendLogin(new IdA1CommandLogin(admin, password));
+    this.sendLogin(new IdACommandLogin(new IdName(admin), password));
     return this;
   }
 
-  private IdA1ResponseLogin sendLogin(
-    final IdA1CommandLogin message)
+  private IdAResponseLogin sendLogin(
+    final IdACommandLogin message)
     throws InterruptedException, IdAClientException
   {
-    return this.send(this.loginURI, IdA1ResponseLogin.class, message, false)
+    return this.send(this.loginURI, IdAResponseLogin.class, message, false)
       .orElseThrow(() -> new IllegalStateException("send() returned empty"));
   }
 
-  private <T extends IdA1ResponseType> T sendCommand(
+  private <T extends IdAResponseType> T sendCommand(
     final Class<T> responseClass,
-    final IdA1CommandType<T> message)
+    final IdACommandType<T> message)
     throws InterruptedException, IdAClientException
   {
     return this.send(this.commandURI, responseClass, message, false)
       .orElseThrow(() -> new IllegalStateException("send() returned empty"));
   }
 
-  private <T extends IdA1ResponseType> Optional<T> send(
+  private <T extends IdAResponseType> Optional<T> send(
     final URI uri,
     final Class<T> responseClass,
-    final IdA1CommandType<T> message,
+    final IdACommandType<T> message,
     final boolean allowNotFound)
     throws InterruptedException, IdAClientException
   {
@@ -253,7 +242,7 @@ public final class IdAClientProtocolHandler1
         responseHeaders.firstValue("content-type")
           .orElse("application/octet-stream");
 
-      if (!contentType.equals(IdA1Messages.contentType())) {
+      if (!contentType.equals(IdACB1Messages.contentType())) {
         throw new IdAClientException(
           PROTOCOL_ERROR,
           this.strings()
@@ -268,7 +257,7 @@ public final class IdAClientProtocolHandler1
       final var responseMessage =
         this.messages.parse(response.body());
 
-      if (!(responseMessage instanceof IdA1ResponseType)) {
+      if (!(responseMessage instanceof IdAResponseType)) {
         throw new IdAClientException(
           PROTOCOL_ERROR,
           this.strings()
@@ -281,8 +270,8 @@ public final class IdAClientProtocolHandler1
         );
       }
 
-      final var responseActual = (IdA1ResponseType) responseMessage;
-      if (responseActual instanceof IdA1ResponseError error) {
+      final var responseActual = (IdAResponseType) responseMessage;
+      if (responseActual instanceof IdAResponseError error) {
         throw new IdAClientException(
           new IdErrorCode(error.errorCode()),
           this.strings()
@@ -322,13 +311,9 @@ public final class IdAClientProtocolHandler1
     throws IdAClientException, InterruptedException
   {
     final var response =
-      this.sendCommand(IdA1ResponseAdminSelf.class, new IdA1CommandAdminSelf());
+      this.sendCommand(IdAResponseAdminSelf.class, new IdACommandAdminSelf());
 
-    try {
-      return response.admin().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return response.admin();
   }
 
   private static String userAgent()
@@ -348,50 +333,30 @@ public final class IdAClientProtocolHandler1
     final IdUserSearchParameters parameters)
     throws IdAClientException, InterruptedException
   {
-    try {
-      final var a1parameters =
-        IdA1UserSearchParameters.of(parameters);
-
-      final var response =
-        this.sendCommand(
-          IdA1ResponseUserSearchBegin.class,
-          new IdA1CommandUserSearchBegin(a1parameters)
-        );
-
-      return response.page().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserSearchBegin.class,
+      new IdACommandUserSearchBegin(parameters)
+    ).page();
   }
 
   @Override
   public IdPage<IdUserSummary> userSearchNext()
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseUserSearchNext.class,
-          new IdA1CommandUserSearchNext()
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserSearchNext.class,
+      new IdACommandUserSearchNext()
+    ).page();
   }
 
   @Override
   public IdPage<IdUserSummary> userSearchPrevious()
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseUserSearchPrevious.class,
-          new IdA1CommandUserSearchPrevious()
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserSearchPrevious.class,
+      new IdACommandUserSearchPrevious()
+    ).page();
   }
 
   @Override
@@ -399,50 +364,30 @@ public final class IdAClientProtocolHandler1
     final IdUserSearchByEmailParameters parameters)
     throws IdAClientException, InterruptedException
   {
-    try {
-      final var a1parameters =
-        IdA1UserSearchByEmailParameters.of(parameters);
-
-      final var response =
-        this.sendCommand(
-          IdA1ResponseUserSearchByEmailBegin.class,
-          new IdA1CommandUserSearchByEmailBegin(a1parameters)
-        );
-
-      return response.page().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserSearchByEmailBegin.class,
+      new IdACommandUserSearchByEmailBegin(parameters)
+    ).page();
   }
 
   @Override
   public IdPage<IdUserSummary> userSearchByEmailNext()
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseUserSearchByEmailNext.class,
-          new IdA1CommandUserSearchByEmailNext()
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserSearchByEmailNext.class,
+      new IdACommandUserSearchByEmailNext()
+    ).page();
   }
 
   @Override
   public IdPage<IdUserSummary> userSearchByEmailPrevious()
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseUserSearchByEmailPrevious.class,
-          new IdA1CommandUserSearchByEmailPrevious()
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserSearchByEmailPrevious.class,
+      new IdACommandUserSearchByEmailPrevious()
+    ).page();
   }
 
   @Override
@@ -450,19 +395,10 @@ public final class IdAClientProtocolHandler1
     final UUID id)
     throws IdAClientException, InterruptedException
   {
-    try {
-      final var user =
-        this.sendCommand(IdA1ResponseUserGet.class, new IdA1CommandUserGet(id))
-          .user();
-
-      if (user.isPresent()) {
-        return Optional.of(user.get().toUser());
-      }
-
-      return Optional.empty();
-    } catch (final IdPasswordException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserGet.class,
+      new IdACommandUserGet(id)
+    ).user();
   }
 
   @Override
@@ -470,21 +406,10 @@ public final class IdAClientProtocolHandler1
     final IdEmail email)
     throws IdAClientException, InterruptedException
   {
-    try {
-      final var user =
-        this.sendCommand(
-            IdA1ResponseUserGet.class,
-            new IdA1CommandUserGetByEmail(email.value()))
-          .user();
-
-      if (user.isPresent()) {
-        return Optional.of(user.get().toUser());
-      }
-
-      return Optional.empty();
-    } catch (final IdPasswordException e) {
-      throw new IdAClientException(PASSWORD_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserGet.class,
+      new IdACommandUserGetByEmail(email)
+    ).user();
   }
 
   @Override
@@ -495,20 +420,10 @@ public final class IdAClientProtocolHandler1
     final Optional<IdPassword> password)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseUserUpdate.class,
-          new IdA1CommandUserUpdate(
-            user,
-            idName.map(IdName::value),
-            realName.map(IdRealName::value),
-            password.map(IdA1Password::ofPassword)
-          )
-        ).user()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserUpdate.class,
+      new IdACommandUserUpdate(user, idName, realName, password)
+    ).user();
   }
 
   @Override
@@ -517,14 +432,10 @@ public final class IdAClientProtocolHandler1
     final IdEmail email)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-        IdA1ResponseUserUpdate.class,
-        new IdA1CommandUserEmailAdd(id, email.value())
-      ).user().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserUpdate.class,
+      new IdACommandUserEmailAdd(id, email)
+    ).user();
   }
 
   @Override
@@ -533,14 +444,10 @@ public final class IdAClientProtocolHandler1
     final IdEmail email)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-        IdA1ResponseUserUpdate.class,
-        new IdA1CommandUserEmailRemove(id, email.value())
-      ).user().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserUpdate.class,
+      new IdACommandUserEmailRemove(id, email)
+    ).user();
   }
 
   @Override
@@ -552,21 +459,10 @@ public final class IdAClientProtocolHandler1
     final IdPassword password)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseUserCreate.class,
-          new IdA1CommandUserCreate(
-            id,
-            idName.value(),
-            realName.value(),
-            email.value(),
-            IdA1Password.ofPassword(password)
-          )
-        ).user()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserCreate.class,
+      new IdACommandUserCreate(id, idName, realName, email, password)
+    ).user();
   }
 
   @Override
@@ -575,8 +471,8 @@ public final class IdAClientProtocolHandler1
     throws IdAClientException, InterruptedException
   {
     this.sendCommand(
-      IdA1ResponseUserDelete.class,
-      new IdA1CommandUserDelete(id)
+      IdAResponseUserDelete.class,
+      new IdACommandUserDelete(id)
     );
   }
 
@@ -589,53 +485,32 @@ public final class IdAClientProtocolHandler1
     final int pageSize)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseAuditSearchBegin.class,
-          new IdA1CommandAuditSearchBegin(
-            new IdA1AuditListParameters(
-              IdA1TimeRange.of(timeRange),
-              owner,
-              type,
-              message,
-              pageSize
-            )
-          )
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAuditSearchBegin.class,
+      new IdACommandAuditSearchBegin(
+        new IdAuditSearchParameters(timeRange, owner, type, message, pageSize)
+      )
+    ).page();
   }
 
   @Override
   public IdPage<IdAuditEvent> auditSearchNext()
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseAuditSearchNext.class,
-          new IdA1CommandAuditSearchNext()
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAuditSearchNext.class,
+      new IdACommandAuditSearchNext()
+    ).page();
   }
 
   @Override
   public IdPage<IdAuditEvent> auditSearchPrevious()
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseAuditSearchPrevious.class,
-          new IdA1CommandAuditSearchPrevious()
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAuditSearchPrevious.class,
+      new IdACommandAuditSearchPrevious()
+    ).page();
   }
 
   @Override
@@ -643,50 +518,32 @@ public final class IdAClientProtocolHandler1
     final IdAdminSearchParameters parameters)
     throws IdAClientException, InterruptedException
   {
-    try {
-      final var a1parameters =
-        IdA1AdminSearchParameters.of(parameters);
-
-      final var response =
-        this.sendCommand(
-          IdA1ResponseAdminSearchBegin.class,
-          new IdA1CommandAdminSearchBegin(a1parameters)
-        );
-
-      return response.page().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    final var response =
+      this.sendCommand(
+        IdAResponseAdminSearchBegin.class,
+        new IdACommandAdminSearchBegin(parameters)
+      );
+    return response.page();
   }
 
   @Override
   public IdPage<IdAdminSummary> adminSearchNext()
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseAdminSearchNext.class,
-          new IdA1CommandAdminSearchNext()
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminSearchNext.class,
+      new IdACommandAdminSearchNext()
+    ).page();
   }
 
   @Override
   public IdPage<IdAdminSummary> adminSearchPrevious()
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseAdminSearchPrevious.class,
-          new IdA1CommandAdminSearchPrevious()
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminSearchPrevious.class,
+      new IdACommandAdminSearchPrevious()
+    ).page();
   }
 
   @Override
@@ -694,50 +551,30 @@ public final class IdAClientProtocolHandler1
     final IdAdminSearchByEmailParameters parameters)
     throws IdAClientException, InterruptedException
   {
-    try {
-      final var a1parameters =
-        IdA1AdminSearchByEmailParameters.of(parameters);
-
-      final var response =
-        this.sendCommand(
-          IdA1ResponseAdminSearchByEmailBegin.class,
-          new IdA1CommandAdminSearchByEmailBegin(a1parameters)
-        );
-
-      return response.page().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminSearchByEmailBegin.class,
+      new IdACommandAdminSearchByEmailBegin(parameters)
+    ).page();
   }
 
   @Override
   public IdPage<IdAdminSummary> adminSearchByEmailNext()
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseAdminSearchByEmailNext.class,
-          new IdA1CommandAdminSearchByEmailNext()
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminSearchByEmailNext.class,
+      new IdACommandAdminSearchByEmailNext()
+    ).page();
   }
 
   @Override
   public IdPage<IdAdminSummary> adminSearchByEmailPrevious()
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseAdminSearchByEmailPrevious.class,
-          new IdA1CommandAdminSearchByEmailPrevious()
-        ).page()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminSearchByEmailPrevious.class,
+      new IdACommandAdminSearchByEmailPrevious()
+    ).page();
   }
 
   @Override
@@ -745,21 +582,10 @@ public final class IdAClientProtocolHandler1
     final UUID id)
     throws IdAClientException, InterruptedException
   {
-    try {
-      final var admin =
-        this.sendCommand(
-            IdA1ResponseAdminGet.class,
-            new IdA1CommandAdminGet(id))
-          .admin();
-
-      if (admin.isPresent()) {
-        return Optional.of(admin.get().toModel());
-      }
-
-      return Optional.empty();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminGet.class,
+      new IdACommandAdminGet(id)
+    ).admin();
   }
 
   @Override
@@ -767,21 +593,10 @@ public final class IdAClientProtocolHandler1
     final IdEmail email)
     throws IdAClientException, InterruptedException
   {
-    try {
-      final var admin =
-        this.sendCommand(
-            IdA1ResponseAdminGet.class,
-            new IdA1CommandAdminGetByEmail(email.value()))
-          .admin();
-
-      if (admin.isPresent()) {
-        return Optional.of(admin.get().toModel());
-      }
-
-      return Optional.empty();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminGet.class,
+      new IdACommandAdminGetByEmail(email)
+    ).admin();
   }
 
   @Override
@@ -792,20 +607,10 @@ public final class IdAClientProtocolHandler1
     final Optional<IdPassword> password)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseAdminUpdate.class,
-          new IdA1CommandAdminUpdate(
-            admin,
-            idName.map(IdName::value),
-            realName.map(IdRealName::value),
-            password.map(IdA1Password::ofPassword)
-          )
-        ).admin()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminUpdate.class,
+      new IdACommandAdminUpdate(admin, idName, realName, password)
+    ).admin();
   }
 
   @Override
@@ -818,25 +623,17 @@ public final class IdAClientProtocolHandler1
     final IdAdminPermissionSet permissions)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-          IdA1ResponseAdminCreate.class,
-          new IdA1CommandAdminCreate(
-            id,
-            idName.value(),
-            realName.value(),
-            email.value(),
-            IdA1Password.ofPassword(password),
-            permissions.impliedPermissions()
-              .stream()
-              .map(IdA1AdminPermission::ofPermission)
-              .collect(Collectors.toUnmodifiableSet())
-          )
-        ).admin()
-        .toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminCreate.class,
+      new IdACommandAdminCreate(
+        id,
+        idName,
+        realName,
+        email,
+        password,
+        permissions.impliedPermissions()
+      )
+    ).admin();
   }
 
   @Override
@@ -845,8 +642,8 @@ public final class IdAClientProtocolHandler1
     throws IdAClientException, InterruptedException
   {
     this.sendCommand(
-      IdA1ResponseAdminDelete.class,
-      new IdA1CommandAdminDelete(id)
+      IdAResponseAdminDelete.class,
+      new IdACommandAdminDelete(id)
     );
   }
 
@@ -856,14 +653,10 @@ public final class IdAClientProtocolHandler1
     final IdEmail email)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-        IdA1ResponseAdminUpdate.class,
-        new IdA1CommandAdminEmailAdd(id, email.value())
-      ).admin().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminUpdate.class,
+      new IdACommandAdminEmailAdd(id, email)
+    ).admin();
   }
 
   @Override
@@ -872,14 +665,10 @@ public final class IdAClientProtocolHandler1
     final IdEmail email)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-        IdA1ResponseAdminUpdate.class,
-        new IdA1CommandAdminEmailRemove(id, email.value())
-      ).admin().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminUpdate.class,
+      new IdACommandAdminEmailRemove(id, email)
+    ).admin();
   }
 
   @Override
@@ -888,15 +677,10 @@ public final class IdAClientProtocolHandler1
     final IdAdminPermission permission)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-        IdA1ResponseAdminUpdate.class,
-        new IdA1CommandAdminPermissionGrant(
-          id, IdA1AdminPermission.ofPermission(permission))
-      ).admin().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminUpdate.class,
+      new IdACommandAdminPermissionGrant(id, permission)
+    ).admin();
   }
 
   @Override
@@ -905,42 +689,32 @@ public final class IdAClientProtocolHandler1
     final IdAdminPermission permission)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return this.sendCommand(
-        IdA1ResponseAdminUpdate.class,
-        new IdA1CommandAdminPermissionRevoke(
-          id, IdA1AdminPermission.ofPermission(permission))
-      ).admin().toModel();
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminUpdate.class,
+      new IdACommandAdminPermissionRevoke(id, permission)
+    ).admin();
   }
 
   @Override
-  public void adminBanCreate(final IdBan ban)
+  public void adminBanCreate(
+    final IdBan ban)
     throws IdAClientException, InterruptedException
   {
     this.sendCommand(
-      IdA1ResponseAdminBanCreate.class,
-      new IdA1CommandAdminBanCreate(IdA1Ban.ofBan(ban))
+      IdAResponseAdminBanCreate.class,
+      new IdACommandAdminBanCreate(ban)
     );
   }
 
   @Override
-  public Optional<IdBan> adminBanGet(final UUID id)
+  public Optional<IdBan> adminBanGet(
+    final UUID id)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return IdOptional.mapPartial(
-        this.sendCommand(
-          IdA1ResponseAdminBanGet.class,
-          new IdA1CommandAdminBanGet(id)
-        ).ban(),
-        IdA1Ban::toModel
-      );
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseAdminBanGet.class,
+      new IdACommandAdminBanGet(id)
+    ).ban();
   }
 
   @Override
@@ -949,36 +723,31 @@ public final class IdAClientProtocolHandler1
     throws IdAClientException, InterruptedException
   {
     this.sendCommand(
-      IdA1ResponseAdminBanDelete.class,
-      new IdA1CommandAdminBanDelete(ban.user())
+      IdAResponseAdminBanDelete.class,
+      new IdACommandAdminBanDelete(ban.user())
     );
   }
 
   @Override
-  public void userBanCreate(final IdBan ban)
+  public void userBanCreate(
+    final IdBan ban)
     throws IdAClientException, InterruptedException
   {
     this.sendCommand(
-      IdA1ResponseUserBanCreate.class,
-      new IdA1CommandUserBanCreate(IdA1Ban.ofBan(ban))
+      IdAResponseUserBanCreate.class,
+      new IdACommandUserBanCreate(ban)
     );
   }
 
   @Override
-  public Optional<IdBan> userBanGet(final UUID id)
+  public Optional<IdBan> userBanGet(
+    final UUID id)
     throws IdAClientException, InterruptedException
   {
-    try {
-      return IdOptional.mapPartial(
-        this.sendCommand(
-          IdA1ResponseUserBanGet.class,
-          new IdA1CommandUserBanGet(id)
-        ).ban(),
-        IdA1Ban::toModel
-      );
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserBanGet.class,
+      new IdACommandUserBanGet(id)
+    ).ban();
   }
 
   @Override
@@ -986,8 +755,8 @@ public final class IdAClientProtocolHandler1
     throws IdAClientException, InterruptedException
   {
     this.sendCommand(
-      IdA1ResponseUserBanDelete.class,
-      new IdA1CommandUserBanDelete(ban.user())
+      IdAResponseUserBanDelete.class,
+      new IdACommandUserBanDelete(ban.user())
     );
   }
 
@@ -995,20 +764,9 @@ public final class IdAClientProtocolHandler1
   public List<IdLogin> userLoginHistory(final UUID id)
     throws IdAClientException, InterruptedException
   {
-    try {
-      final var records =
-        this.sendCommand(
-        IdA1ResponseUserLoginHistory.class,
-        new IdA1CommandUserLoginHistory(id)
-      ).history();
-
-      final var results = new ArrayList<IdLogin>(records.size());
-      for (final var record : records) {
-        results.add(record.toModel());
-      }
-      return results;
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
-    }
+    return this.sendCommand(
+      IdAResponseUserLoginHistory.class,
+      new IdACommandUserLoginHistory(id)
+    ).history();
   }
 }

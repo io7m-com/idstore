@@ -461,7 +461,7 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
     this.client.adminDelete(id);
 
     final var ex =
-      Assertions.assertThrows(IdAClientException.class, () -> {
+      assertThrows(IdAClientException.class, () -> {
         this.client.adminUpdate(
           admin0.id(),
           Optional.of(admin0.idName()),

@@ -31,7 +31,7 @@ import java.util.UUID;
 public record IdACommandAdminPermissionGrant(
   UUID admin,
   IdAdminPermission permission)
-  implements IdACommandType<IdAResponseAdminPermissionGrant>
+  implements IdACommandType<IdAResponseAdminUpdate>
 {
   /**
    * Grant a permission to the given admin.
