@@ -14,36 +14,16 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.protocol.admin_v1;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import java.util.Objects;
-import java.util.UUID;
+package com.io7m.idstore.documentation;
 
 /**
- * Get the given user's login history.
- *
- * @param user The user ID
+ * Empty documentation marker class.
  */
 
-@JsonDeserialize
-@JsonSerialize
-public record IdA1CommandUserLoginHistory(
-  @JsonProperty(value = "UserID", required = true)
-  UUID user)
-  implements IdA1CommandType<IdA1ResponseUserLoginHistory>
+public final class IdDocumentation
 {
-  /**
-   * Get the given user's login history.
-   */
-
-  @JsonCreator
-  public IdA1CommandUserLoginHistory
+  private IdDocumentation()
   {
-    Objects.requireNonNull(user, "user");
+
   }
 }

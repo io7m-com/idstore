@@ -23,13 +23,5 @@ open module com.io7m.idstore.documentation
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires com.io7m.idstore.protocol.admin_v1;
-
-  requires com.fasterxml.classmate;
-  requires com.fasterxml.jackson.core;
-  requires com.fasterxml.jackson.databind;
-  requires jsonschema.generator;
-  requires jsonschema.module.jackson;
-
   exports com.io7m.idstore.documentation;
 }

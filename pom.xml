@@ -33,7 +33,6 @@
     <module>com.io7m.idstore.model</module>
     <module>com.io7m.idstore.protocol.admin</module>
     <module>com.io7m.idstore.protocol.admin.cb1</module>
-    <module>com.io7m.idstore.protocol.admin_v1</module>
     <module>com.io7m.idstore.protocol.api</module>
     <module>com.io7m.idstore.protocol.user_v1</module>
     <module>com.io7m.idstore.protocol.versions</module>

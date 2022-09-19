@@ -21,11 +21,6 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.protocol.admin_v1</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.protocol.user_v1</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -59,12 +54,6 @@
     <dependency>
       <groupId>net.jqwik</groupId>
       <artifactId>jqwik-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.io7m.idstore</groupId>
-      <artifactId>com.io7m.idstore.protocol.user_v1</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 

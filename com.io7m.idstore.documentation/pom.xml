@@ -26,21 +26,8 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.protocol.admin_v1</artifactId>
+      <artifactId>com.io7m.idstore.protocol.admin.cb1</artifactId>
       <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.victools</groupId>
-      <artifactId>jsonschema-generator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.github.victools</groupId>
-      <artifactId>jsonschema-module-jackson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
     </dependency>
 
     <dependency>

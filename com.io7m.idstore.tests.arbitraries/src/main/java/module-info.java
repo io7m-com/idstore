@@ -14,25 +14,6 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import com.io7m.idstore.tests.arbitraries.IdArbA1AdminColumnOrderingProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1AdminOrderingProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1AdminProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1AdminSearchByEmailParametersProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1AdminSearchParametersProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1AdminSummaryProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1AuditEventProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1AuditListParametersProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1BanProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1LoginProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1MessageProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1PasswordProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1TimeRangeProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1UserColumnOrderingProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1UserOrderingProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1UserProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchByEmailParametersProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1UserSearchParametersProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbA1UserSummaryProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAMessageProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminOrderingProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminPermissionSetProvider;
@@ -78,7 +59,6 @@ module com.io7m.idstore.tests.arbitraries
 
   requires transitive com.io7m.idstore.model;
   requires transitive com.io7m.idstore.protocol.admin;
-  requires transitive com.io7m.idstore.protocol.admin_v1;
   requires transitive com.io7m.idstore.protocol.api;
   requires transitive com.io7m.idstore.protocol.user_v1;
   requires transitive com.io7m.idstore.protocol.versions;
@@ -86,25 +66,6 @@ module com.io7m.idstore.tests.arbitraries
 
   provides ArbitraryProvider
     with
-      IdArbA1AdminColumnOrderingProvider,
-      IdArbA1AdminOrderingProvider,
-      IdArbA1AdminProvider,
-      IdArbA1AdminSearchByEmailParametersProvider,
-      IdArbA1AdminSearchParametersProvider,
-      IdArbA1AdminSummaryProvider,
-      IdArbA1AuditEventProvider,
-      IdArbA1AuditListParametersProvider,
-      IdArbA1BanProvider,
-      IdArbA1LoginProvider,
-      IdArbA1MessageProvider,
-      IdArbA1PasswordProvider,
-      IdArbA1TimeRangeProvider,
-      IdArbA1UserColumnOrderingProvider,
-      IdArbA1UserOrderingProvider,
-      IdArbA1UserProvider,
-      IdArbA1UserSearchByEmailParametersProvider,
-      IdArbA1UserSearchParametersProvider,
-      IdArbA1UserSummaryProvider,
       IdArbAMessageProvider,
       IdArbAdminOrderingProvider,
       IdArbAdminPermissionSetProvider,

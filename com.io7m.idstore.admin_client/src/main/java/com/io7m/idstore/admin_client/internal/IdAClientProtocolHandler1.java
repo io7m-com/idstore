@@ -114,8 +114,6 @@ import com.io7m.idstore.protocol.admin.IdAResponseUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
 import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
-import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -249,7 +247,7 @@ public final class IdAClientProtocolHandler1
             .format(
               "errorContentType",
               commandType,
-              IdA1Messages.contentType(),
+              IdACB1Messages.contentType(),
               contentType)
         );
       }
@@ -265,7 +263,7 @@ public final class IdAClientProtocolHandler1
               "errorResponseType",
               "(unavailable)",
               commandType,
-              IdA1ResponseType.class,
+              IdAResponseType.class,
               responseMessage.getClass())
         );
       }

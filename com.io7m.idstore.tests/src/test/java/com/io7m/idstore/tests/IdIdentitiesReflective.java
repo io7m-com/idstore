@@ -14,23 +14,8 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.tests;
 
-import com.io7m.idstore.protocol.admin_v1.IdA1Admin;
-import com.io7m.idstore.protocol.admin_v1.IdA1AdminPermission;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandAdminSelf;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandType;
-import com.io7m.idstore.protocol.admin_v1.IdA1IdTypeResolver;
-import com.io7m.idstore.protocol.admin_v1.IdA1MessageType;
-import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
-import com.io7m.idstore.protocol.admin_v1.IdA1Password;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseAdminSelf;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseLogin;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
-import com.io7m.idstore.protocol.admin_v1.IdA1User;
 import com.io7m.idstore.protocol.api.IdProtocolFromModel;
 import com.io7m.idstore.protocol.api.IdProtocolToModel;
 import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddBegin;
@@ -75,20 +60,6 @@ public final class IdIdentitiesReflective
     LoggerFactory.getLogger(IdIdentitiesReflective.class);
 
   private static final List<Class<?>> CLASSES = List.of(
-    IdA1Admin.class,
-    IdA1AdminPermission.class,
-    IdA1CommandAdminSelf.class,
-    IdA1CommandLogin.class,
-    IdA1CommandType.class,
-    IdA1IdTypeResolver.class,
-    IdA1MessageType.class,
-    IdA1Messages.class,
-    IdA1Password.class,
-    IdA1ResponseAdminSelf.class,
-    IdA1ResponseError.class,
-    IdA1ResponseLogin.class,
-    IdA1ResponseType.class,
-    IdA1User.class,
     IdU1CommandEmailAddBegin.class,
     IdU1CommandEmailAddDeny.class,
     IdU1CommandEmailRemovePermit.class,
