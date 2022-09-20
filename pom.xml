@@ -477,7 +477,7 @@
       <dependency>
         <groupId>com.io7m.xstructural</groupId>
         <artifactId>com.io7m.xstructural.cmdline</artifactId>
-        <version>1.4.0</version>
+        <version>1.6.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
