@@ -57,7 +57,7 @@
     <jackson.version>2.13.4</jackson.version>
     <jetty.version>11.0.11</jetty.version>
     <jooq.version>3.17.4</jooq.version>
-    <logback.version>1.4.0</logback.version>
+    <logback.version>1.4.1</logback.version>
     <org.apache.james.version>3.7.0</org.apache.james.version>
     <org.javafx.version>18.0.1</org.javafx.version>
     <org.jline.version>3.21.0</org.jline.version>
@@ -142,7 +142,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
