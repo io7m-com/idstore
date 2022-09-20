@@ -57,7 +57,6 @@
     <jackson.version>2.13.4</jackson.version>
     <jetty.version>11.0.11</jetty.version>
     <jooq.version>3.17.4</jooq.version>
-    <jsonschema-generator.version>4.26.0</jsonschema-generator.version>
     <logback.version>1.4.0</logback.version>
     <org.apache.james.version>3.7.0</org.apache.james.version>
     <org.javafx.version>18.0.1</org.javafx.version>
@@ -446,16 +445,6 @@
         <version>${com.io7m.jade.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.github.victools</groupId>
-        <artifactId>jsonschema-generator</artifactId>
-        <version>${jsonschema-generator.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.victools</groupId>
-        <artifactId>jsonschema-module-jackson</artifactId>
-        <version>${jsonschema-generator.version}</version>
-      </dependency>
-      <dependency>
         <groupId>com.io7m.cedarbridge</groupId>
         <artifactId>com.io7m.cedarbridge.cmdline</artifactId>
         <version>${com.io7m.cedarbridge.version}</version>
@@ -479,6 +468,16 @@
         <groupId>com.io7m.jbssio</groupId>
         <artifactId>com.io7m.jbssio.api</artifactId>
         <version>${com.io7m.jbssio.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.primogenitor</groupId>
+        <artifactId>com.io7m.primogenitor.support</artifactId>
+        <version>7.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.xstructural</groupId>
+        <artifactId>com.io7m.xstructural.cmdline</artifactId>
+        <version>1.4.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
