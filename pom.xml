@@ -31,9 +31,11 @@
     <module>com.io7m.idstore.documentation</module>
     <module>com.io7m.idstore.error_codes</module>
     <module>com.io7m.idstore.model</module>
-    <module>com.io7m.idstore.protocol.admin</module>
     <module>com.io7m.idstore.protocol.admin.cb1</module>
+    <module>com.io7m.idstore.protocol.admin</module>
     <module>com.io7m.idstore.protocol.api</module>
+    <module>com.io7m.idstore.protocol.user.cb1</module>
+    <module>com.io7m.idstore.protocol.user</module>
     <module>com.io7m.idstore.protocol.user_v1</module>
     <module>com.io7m.idstore.protocol.versions</module>
     <module>com.io7m.idstore.server.api</module>
@@ -49,7 +51,7 @@
 
   <properties>
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
-    <com.io7m.cedarbridge.version>0.0.3</com.io7m.cedarbridge.version>
+    <com.io7m.cedarbridge.version>0.0.5</com.io7m.cedarbridge.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
     <com.io7m.trasco.version>0.0.4</com.io7m.trasco.version>
@@ -392,7 +394,7 @@
       <dependency>
         <groupId>com.io7m.genevan</groupId>
         <artifactId>com.io7m.genevan.core</artifactId>
-        <version>0.0.1</version>
+        <version>0.0.2</version>
       </dependency>
       <dependency>
         <groupId>com.sanctionco.jmail</groupId>
@@ -477,7 +479,7 @@
       <dependency>
         <groupId>com.io7m.xstructural</groupId>
         <artifactId>com.io7m.xstructural.cmdline</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
