@@ -37,6 +37,7 @@ import com.io7m.idstore.tests.arbitraries.IdArbTokenProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbU1MessageProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbU1PasswordProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbU1UserProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbUMessageProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbURIProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUUIDProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUserOrderingProvider;
@@ -60,8 +61,10 @@ module com.io7m.idstore.tests.arbitraries
   requires transitive com.io7m.idstore.model;
   requires transitive com.io7m.idstore.protocol.admin;
   requires transitive com.io7m.idstore.protocol.api;
+  requires transitive com.io7m.idstore.protocol.user;
   requires transitive com.io7m.idstore.protocol.user_v1;
   requires transitive com.io7m.idstore.protocol.versions;
+
   requires transitive net.jqwik.api;
 
   provides ArbitraryProvider
@@ -97,7 +100,8 @@ module com.io7m.idstore.tests.arbitraries
       IdArbUserSearchParametersProvider,
       IdArbUserSummaryProvider,
       IdArbVMessagesProvider,
-      IdArbVProtocolSupportedProvider
+      IdArbVProtocolSupportedProvider,
+      IdArbUMessageProvider
     ;
 
   exports com.io7m.idstore.tests.arbitraries;
