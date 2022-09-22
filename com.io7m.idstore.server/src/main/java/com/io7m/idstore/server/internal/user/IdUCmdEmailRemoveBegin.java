@@ -19,6 +19,7 @@ package com.io7m.idstore.server.internal.user;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdToken;
@@ -33,22 +34,18 @@ import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerConfigurationService;
 import com.io7m.idstore.server.internal.IdServerMailService;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.internal.freemarker.IdFMEmailVerificationData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecUserActionEmailRemoveBegin;
 import com.io7m.idstore.server.security.IdSecurity;
-import com.io7m.idstore.server.security.IdSecurityException;
-import freemarker.template.TemplateException;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_REMOVE;
 import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
@@ -58,7 +55,7 @@ import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
  */
 
 public final class IdUCmdEmailRemoveBegin
-  implements IdCommandExecutorType<
+  extends IdUCmdAbstract<
   IdUCommandContext, IdUCommandEmailRemoveBegin, IdUResponseType>
 {
   /**
@@ -71,72 +68,61 @@ public final class IdUCmdEmailRemoveBegin
   }
 
   @Override
-  public IdUResponseType execute(
+  protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandEmailRemoveBegin command)
-    throws IdCommandExecutionFailure, IOException, InterruptedException
+    throws IdValidityException, IdException, IdCommandExecutionFailure
   {
-    Objects.requireNonNull(context, "context");
-    Objects.requireNonNull(command, "command");
+    final var services =
+      context.services();
+    final var templateService =
+      services.requireService(IdFMTemplateService.class);
+    final var configurationService =
+      services.requireService(IdServerConfigurationService.class);
+    final var mailService =
+      services.requireService(IdServerMailService.class);
+    final var brandingService =
+      services.requireService(IdServerBrandingService.class);
 
-    try {
-      final var services =
-        context.services();
-      final var templateService =
-        services.requireService(IdFMTemplateService.class);
-      final var configurationService =
-        services.requireService(IdServerConfigurationService.class);
-      final var mailService =
-        services.requireService(IdServerMailService.class);
-      final var brandingService =
-        services.requireService(IdServerBrandingService.class);
+    final var configuration =
+      configurationService.configuration();
+    final var mailConfiguration =
+      configuration.mailConfiguration();
 
-      final var configuration =
-        configurationService.configuration();
-      final var mailConfiguration =
-        configuration.mailConfiguration();
-
-      final var user = context.user();
-      if (IdSecurity.check(new IdSecUserActionEmailRemoveBegin(user))
-        instanceof IdSecPolicyResultDenied denied) {
-        throw context.fail(
-          FORBIDDEN_403,
-          SECURITY_POLICY_DENIED,
-          denied.message()
-        );
-      }
-
-      final var email =
-        command.email();
-      final var transaction =
-        context.transaction();
-      final var emails =
-        transaction.queries(IdDatabaseEmailsQueriesType.class);
-
-      checkPreconditions(context, user, email);
-
-      transaction.userIdSet(user.id());
-      final var verification =
-        createVerification(context, emails, mailConfiguration, user, email);
-
-      sendVerificationMail(
-        context,
-        templateService,
-        configuration,
-        mailService,
-        brandingService,
-        email,
-        verification
+    final var user = context.user();
+    if (IdSecurity.check(new IdSecUserActionEmailRemoveBegin(user))
+      instanceof IdSecPolicyResultDenied denied) {
+      throw context.fail(
+        FORBIDDEN_403,
+        SECURITY_POLICY_DENIED,
+        denied.message()
       );
-
-      return new IdUResponseEmailRemoveBegin(context.requestId());
-    } catch (final IdValidityException e) {
-      throw context.failValidity(e);
-    } catch (final IdSecurityException e) {
-      throw context.failSecurity(e);
-    } catch (final IdDatabaseException e) {
-      throw context.failDatabase(e);
     }
+
+    final var email =
+      command.email();
+    final var transaction =
+      context.transaction();
+    final var emails =
+      transaction.queries(IdDatabaseEmailsQueriesType.class);
+
+    checkPreconditions(context, user, email);
+
+    transaction.userIdSet(user.id());
+    final var verification =
+      createVerification(context, emails, mailConfiguration, user, email);
+
+    sendVerificationMail(
+      context,
+      templateService,
+      configuration,
+      mailService,
+      brandingService,
+      email,
+      verification
+    );
+
+    return new IdUResponseEmailRemoveBegin(context.requestId());
   }
 
   private static void sendVerificationMail(
@@ -147,9 +133,7 @@ public final class IdUCmdEmailRemoveBegin
     final IdServerBrandingService brandingService,
     final IdEmail email,
     final IdEmailVerification verification)
-    throws
-    IOException,
-    IdCommandExecutionFailure
+    throws IdCommandExecutionFailure
   {
     final var template =
       templateService.emailVerificationTemplate();
@@ -179,8 +163,14 @@ public final class IdUCmdEmailRemoveBegin
         ),
         writer
       );
-    } catch (final TemplateException e) {
-      throw new IOException(e);
+    } catch (final Exception e) {
+      throw new IdCommandExecutionFailure(
+        e.getMessage(),
+        e,
+        context.requestId(),
+        500,
+        IO_ERROR
+      );
     }
 
     final var mailHeaders =

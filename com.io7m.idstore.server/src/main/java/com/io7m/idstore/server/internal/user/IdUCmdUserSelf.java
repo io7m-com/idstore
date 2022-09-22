@@ -17,22 +17,20 @@
 
 package com.io7m.idstore.server.internal.user;
 
-import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
+import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserSelf;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
-
-import java.util.Objects;
 
 /**
  * IdUCmdUserSelf
  */
 
 public final class IdUCmdUserSelf
-  implements IdCommandExecutorType<
+  extends IdUCmdAbstract<
   IdUCommandContext, IdUCommandUserSelf, IdUResponseType>
 {
   /**
@@ -45,26 +43,19 @@ public final class IdUCmdUserSelf
   }
 
   @Override
-  public IdUResponseType execute(
+  protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandUserSelf command)
-    throws IdCommandExecutionFailure
+    throws IdValidityException, IdException, IdCommandExecutionFailure
   {
-    Objects.requireNonNull(context, "context");
-    Objects.requireNonNull(command, "command");
+    final var transaction =
+      context.transaction();
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
 
-    try {
-      final var transaction =
-        context.transaction();
-      final var users =
-        transaction.queries(IdDatabaseUsersQueriesType.class);
-
-      final var userId = context.user().id();
-      transaction.userIdSet(userId);
-      final var user = users.userGetRequire(userId);
-      return new IdUResponseUserSelf(context.requestId(), user);
-    } catch (final IdDatabaseException e) {
-      throw context.failDatabase(e);
-    }
+    final var userId = context.user().id();
+    transaction.userIdSet(userId);
+    final var user = users.userGetRequire(userId);
+    return new IdUResponseUserSelf(context.requestId(), user);
   }
 }

@@ -17,7 +17,7 @@
 package com.io7m.idstore.server.internal.user;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
-import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdValidityException;
@@ -25,11 +25,9 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailAddDeny;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddDeny;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecUserActionEmailAddDeny;
 import com.io7m.idstore.server.security.IdSecurity;
-import com.io7m.idstore.server.security.IdSecurityException;
 
 import java.util.Objects;
 
@@ -45,7 +43,7 @@ import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
  */
 
 public final class IdUCmdEmailAddDeny
-  implements IdCommandExecutorType<
+  extends IdUCmdAbstract<
   IdUCommandContext, IdUCommandEmailAddDeny, IdUResponseType>
 {
   /**
@@ -58,62 +56,50 @@ public final class IdUCmdEmailAddDeny
   }
 
   @Override
-  public IdUResponseType execute(
+  protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandEmailAddDeny command)
-    throws IdCommandExecutionFailure
+    throws IdValidityException, IdException, IdCommandExecutionFailure
   {
-    Objects.requireNonNull(context, "context");
-    Objects.requireNonNull(command, "command");
-
-    try {
-      final var token = command.token();
-      final var user = context.user();
-      if (IdSecurity.check(new IdSecUserActionEmailAddDeny(user))
-        instanceof IdSecPolicyResultDenied denied) {
-        throw context.fail(
-          FORBIDDEN_403,
-          SECURITY_POLICY_DENIED,
-          denied.message()
-        );
-      }
-
-      final var transaction =
-        context.transaction();
-      final var emails =
-        transaction.queries(IdDatabaseEmailsQueriesType.class);
-
-      final var verificationOpt =
-        emails.emailVerificationGet(token);
-
-      if (verificationOpt.isEmpty()) {
-        throw context.failFormatted(
-          404,
-          EMAIL_VERIFICATION_NONEXISTENT,
-          "notFound"
-        );
-      }
-
-      final var verification = verificationOpt.get();
-      if (!checkVerification(context, verification, user)) {
-        throw context.failFormatted(
-          400,
-          EMAIL_VERIFICATION_FAILED,
-          "operationNotPermitted"
-        );
-      }
-
-      transaction.userIdSet(user.id());
-      emails.emailVerificationDelete(token, DENIED);
-
-      return new IdUResponseEmailAddDeny(context.requestId());
-    } catch (final IdValidityException e) {
-      throw context.failValidity(e);
-    } catch (final IdSecurityException e) {
-      throw context.failSecurity(e);
-    } catch (final IdDatabaseException e) {
-      throw context.failDatabase(e);
+    final var token = command.token();
+    final var user = context.user();
+    if (IdSecurity.check(new IdSecUserActionEmailAddDeny(user))
+      instanceof IdSecPolicyResultDenied denied) {
+      throw context.fail(
+        FORBIDDEN_403,
+        SECURITY_POLICY_DENIED,
+        denied.message()
+      );
     }
+
+    final var transaction =
+      context.transaction();
+    final var emails =
+      transaction.queries(IdDatabaseEmailsQueriesType.class);
+
+    final var verificationOpt =
+      emails.emailVerificationGet(token);
+
+    if (verificationOpt.isEmpty()) {
+      throw context.failFormatted(
+        404,
+        EMAIL_VERIFICATION_NONEXISTENT,
+        "notFound"
+      );
+    }
+
+    final var verification = verificationOpt.get();
+    if (!checkVerification(context, verification, user)) {
+      throw context.failFormatted(
+        400,
+        EMAIL_VERIFICATION_FAILED,
+        "operationNotPermitted"
+      );
+    }
+
+    transaction.userIdSet(user.id());
+    emails.emailVerificationDelete(token, DENIED);
+    return new IdUResponseEmailAddDeny(context.requestId());
   }
 
   private static boolean checkVerification(

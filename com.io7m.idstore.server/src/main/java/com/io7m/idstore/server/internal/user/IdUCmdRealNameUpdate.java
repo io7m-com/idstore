@@ -16,20 +16,17 @@
 
 package com.io7m.idstore.server.internal.user;
 
-import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
+import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecUserActionRealnameUpdate;
 import com.io7m.idstore.server.security.IdSecurity;
-import com.io7m.idstore.server.security.IdSecurityException;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
@@ -40,7 +37,7 @@ import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
  */
 
 public final class IdUCmdRealNameUpdate
-  implements IdCommandExecutorType<
+  extends IdUCmdAbstract<
   IdUCommandContext, IdUCommandRealnameUpdate, IdUResponseType>
 {
   /**
@@ -53,49 +50,38 @@ public final class IdUCmdRealNameUpdate
   }
 
   @Override
-  public IdUResponseType execute(
+  protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandRealnameUpdate command)
-    throws IdCommandExecutionFailure
+    throws IdValidityException, IdException, IdCommandExecutionFailure
   {
-    Objects.requireNonNull(context, "context");
-    Objects.requireNonNull(command, "command");
-
-    try {
-      final var user = context.user();
-      if (IdSecurity.check(new IdSecUserActionRealnameUpdate(user))
-        instanceof IdSecPolicyResultDenied denied) {
-        throw context.fail(
-          FORBIDDEN_403,
-          SECURITY_POLICY_DENIED,
-          denied.message()
-        );
-      }
-
-      final var transaction =
-        context.transaction();
-
-      final var users =
-        transaction.queries(IdDatabaseUsersQueriesType.class);
-
-      transaction.userIdSet(user.id());
-      users.userUpdate(
-        user.id(),
-        Optional.empty(),
-        Optional.of(command.realName()),
-        Optional.empty()
+    final var user = context.user();
+    if (IdSecurity.check(new IdSecUserActionRealnameUpdate(user))
+      instanceof IdSecPolicyResultDenied denied) {
+      throw context.fail(
+        FORBIDDEN_403,
+        SECURITY_POLICY_DENIED,
+        denied.message()
       );
-
-      return new IdUResponseUserUpdate(
-        context.requestId(),
-        users.userGetRequire(user.id())
-      );
-    } catch (final IdValidityException e) {
-      throw context.failValidity(e);
-    } catch (final IdSecurityException e) {
-      throw context.failSecurity(e);
-    } catch (final IdDatabaseException e) {
-      throw context.failDatabase(e);
     }
+
+    final var transaction =
+      context.transaction();
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    transaction.userIdSet(user.id());
+    users.userUpdate(
+      user.id(),
+      Optional.empty(),
+      Optional.of(command.realName()),
+      Optional.empty()
+    );
+
+    return new IdUResponseUserUpdate(
+      context.requestId(),
+      users.userGetRequire(user.id())
+    );
   }
 }
