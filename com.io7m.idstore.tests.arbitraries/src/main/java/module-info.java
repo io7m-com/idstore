@@ -34,9 +34,6 @@ import com.io7m.idstore.tests.arbitraries.IdArbRealNameProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbSubsetMatchProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbTimeRangeProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbTokenProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbU1MessageProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbU1PasswordProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbU1UserProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUMessageProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbURIProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUUIDProvider;
@@ -62,7 +59,6 @@ module com.io7m.idstore.tests.arbitraries
   requires transitive com.io7m.idstore.protocol.admin;
   requires transitive com.io7m.idstore.protocol.api;
   requires transitive com.io7m.idstore.protocol.user;
-  requires transitive com.io7m.idstore.protocol.user_v1;
   requires transitive com.io7m.idstore.protocol.versions;
 
   requires transitive net.jqwik.api;
@@ -89,9 +85,6 @@ module com.io7m.idstore.tests.arbitraries
       IdArbSubsetMatchProvider,
       IdArbTimeRangeProvider,
       IdArbTokenProvider,
-      IdArbU1MessageProvider,
-      IdArbU1PasswordProvider,
-      IdArbU1UserProvider,
       IdArbURIProvider,
       IdArbUUIDProvider,
       IdArbUserOrderingProvider,

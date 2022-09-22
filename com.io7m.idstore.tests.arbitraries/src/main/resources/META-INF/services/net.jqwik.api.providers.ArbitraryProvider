@@ -18,9 +18,6 @@ com.io7m.idstore.tests.arbitraries.IdArbRealNameProvider
 com.io7m.idstore.tests.arbitraries.IdArbSubsetMatchProvider
 com.io7m.idstore.tests.arbitraries.IdArbTimeRangeProvider
 com.io7m.idstore.tests.arbitraries.IdArbTokenProvider
-com.io7m.idstore.tests.arbitraries.IdArbU1MessageProvider
-com.io7m.idstore.tests.arbitraries.IdArbU1PasswordProvider
-com.io7m.idstore.tests.arbitraries.IdArbU1UserProvider
 com.io7m.idstore.tests.arbitraries.IdArbURIProvider
 com.io7m.idstore.tests.arbitraries.IdArbUUIDProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserOrderingProvider

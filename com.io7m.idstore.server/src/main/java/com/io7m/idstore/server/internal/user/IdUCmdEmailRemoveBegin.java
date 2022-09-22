@@ -15,7 +15,7 @@
  */
 
 
-package com.io7m.idstore.server.internal.user_v1;
+package com.io7m.idstore.server.internal.user;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
@@ -24,9 +24,9 @@ import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdValidityException;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveBegin;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailRemoveBegin;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
+import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
+import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveBegin;
+import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
@@ -54,26 +54,26 @@ import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_REMOVE;
 import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
- * IdU1CmdEmailRemoveBegin
+ * IdUCmdEmailRemoveBegin
  */
 
-public final class IdU1CmdEmailRemoveBegin
+public final class IdUCmdEmailRemoveBegin
   implements IdCommandExecutorType<
-  IdU1CommandContext, IdU1CommandEmailRemoveBegin, IdU1ResponseType>
+  IdUCommandContext, IdUCommandEmailRemoveBegin, IdUResponseType>
 {
   /**
-   * IdU1CmdEmailRemoveBegin
+   * IdUCmdEmailRemoveBegin
    */
 
-  public IdU1CmdEmailRemoveBegin()
+  public IdUCmdEmailRemoveBegin()
   {
 
   }
 
   @Override
-  public IdU1ResponseType execute(
-    final IdU1CommandContext context,
-    final IdU1CommandEmailRemoveBegin command)
+  public IdUResponseType execute(
+    final IdUCommandContext context,
+    final IdUCommandEmailRemoveBegin command)
     throws IdCommandExecutionFailure, IOException, InterruptedException
   {
     Objects.requireNonNull(context, "context");
@@ -107,7 +107,7 @@ public final class IdU1CmdEmailRemoveBegin
       }
 
       final var email =
-        new IdEmail(command.email());
+        command.email();
       final var transaction =
         context.transaction();
       final var emails =
@@ -129,7 +129,7 @@ public final class IdU1CmdEmailRemoveBegin
         verification
       );
 
-      return new IdU1ResponseEmailRemoveBegin(context.requestId());
+      return new IdUResponseEmailRemoveBegin(context.requestId());
     } catch (final IdValidityException e) {
       throw context.failValidity(e);
     } catch (final IdSecurityException e) {
@@ -140,7 +140,7 @@ public final class IdU1CmdEmailRemoveBegin
   }
 
   private static void sendVerificationMail(
-    final IdU1CommandContext context,
+    final IdUCommandContext context,
     final IdFMTemplateService templateService,
     final IdServerConfiguration configuration,
     final IdServerMailService mailService,
@@ -213,7 +213,7 @@ public final class IdU1CmdEmailRemoveBegin
   }
 
   private static IdEmailVerification createVerification(
-    final IdU1CommandContext context,
+    final IdUCommandContext context,
     final IdDatabaseEmailsQueriesType emails,
     final IdServerMailConfiguration mailConfiguration,
     final IdUser user,
@@ -232,7 +232,7 @@ public final class IdU1CmdEmailRemoveBegin
   }
 
   private static void checkPreconditions(
-    final IdU1CommandContext context,
+    final IdUCommandContext context,
     final IdUser user,
     final IdEmail email)
     throws IdCommandExecutionFailure

@@ -19,9 +19,9 @@ package com.io7m.idstore.server.internal.user_v1;
 
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.protocol.user_v1.IdU1MessageType;
-import com.io7m.idstore.protocol.user_v1.IdU1Messages;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseError;
+import com.io7m.idstore.protocol.user.IdUMessageType;
+import com.io7m.idstore.protocol.user.IdUResponseError;
+import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
 import com.io7m.idstore.services.api.IdServiceType;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -33,9 +33,9 @@ import java.util.UUID;
  * Convenient functions to send messages.
  */
 
-public final class IdU1Sends implements IdServiceType
+public final class IdUCB1Sends implements IdServiceType
 {
-  private final IdU1Messages messages;
+  private final IdUCB1Messages messages;
 
   /**
    * Convenient functions to send messages.
@@ -43,8 +43,8 @@ public final class IdU1Sends implements IdServiceType
    * @param inMessages A message codec
    */
 
-  public IdU1Sends(
-    final IdU1Messages inMessages)
+  public IdUCB1Sends(
+    final IdUCB1Messages inMessages)
   {
     this.messages = Objects.requireNonNull(inMessages, "messages");
   }
@@ -72,7 +72,7 @@ public final class IdU1Sends implements IdServiceType
     this.send(
       response,
       statusCode,
-      new IdU1ResponseError(requestId, errorCode.id(), message)
+      new IdUResponseError(requestId, errorCode.id(), message)
     );
   }
 
@@ -89,19 +89,17 @@ public final class IdU1Sends implements IdServiceType
   public void send(
     final HttpServletResponse response,
     final int statusCode,
-    final IdU1MessageType message)
+    final IdUMessageType message)
     throws IOException
   {
     response.setStatus(statusCode);
-    response.setContentType(IdU1Messages.CONTENT_TYPE);
+    response.setContentType(IdUCB1Messages.contentType());
 
     try {
       final var data = this.messages.serialize(message);
-      response.setContentLength(data.length + 2);
+      response.setContentLength(data.length);
       try (var output = response.getOutputStream()) {
         output.write(data);
-        output.write('\r');
-        output.write('\n');
       }
     } catch (final IdProtocolException e) {
       throw new IOException(e);
@@ -117,7 +115,7 @@ public final class IdU1Sends implements IdServiceType
   @Override
   public String toString()
   {
-    return "[IdACB1Sends 0x%s]"
+    return "[IdUCB1Sends 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode()));
   }
 }

@@ -18,6 +18,7 @@ package com.io7m.idstore.tests.arbitraries;
 
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddBegin;
@@ -27,6 +28,7 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
+import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUMessageType;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
@@ -83,6 +85,7 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
       commandEmailRemovePermit(),
       commandLogin(),
       commandUserSelf(),
+      commandUserRealnameUpdate(),
       responseEmailAddBegin(),
       responseEmailAddDeny(),
       responseEmailAddPermit(),
@@ -154,6 +157,16 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
   {
     return Arbitraries.defaultFor(IdToken.class)
       .map(IdUCommandEmailRemoveDeny::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdUCommandRealnameUpdate> commandUserRealnameUpdate()
+  {
+    return Arbitraries.defaultFor(IdRealName.class)
+      .map(IdUCommandRealnameUpdate::new);
   }
 
   /**

@@ -36,7 +36,6 @@
     <module>com.io7m.idstore.protocol.api</module>
     <module>com.io7m.idstore.protocol.user.cb1</module>
     <module>com.io7m.idstore.protocol.user</module>
-    <module>com.io7m.idstore.protocol.user_v1</module>
     <module>com.io7m.idstore.protocol.versions</module>
     <module>com.io7m.idstore.server.api</module>
     <module>com.io7m.idstore.server.security</module>

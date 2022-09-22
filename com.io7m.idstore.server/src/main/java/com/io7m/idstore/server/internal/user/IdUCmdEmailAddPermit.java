@@ -14,21 +14,22 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.internal.user_v1;
+
+package com.io7m.idstore.server.internal.user;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdEmailVerification;
-import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdValidityException;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddDeny;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailAddDeny;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
+import com.io7m.idstore.protocol.user.IdUCommandEmailAddPermit;
+import com.io7m.idstore.protocol.user.IdUResponseEmailAddPermit;
+import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
-import com.io7m.idstore.server.security.IdSecUserActionEmailAddDeny;
+import com.io7m.idstore.server.security.IdSecUserActionEmailRemovePermit;
 import com.io7m.idstore.server.security.IdSecurity;
 import com.io7m.idstore.server.security.IdSecurityException;
 
@@ -38,41 +39,39 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATI
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_ADD;
-import static com.io7m.idstore.model.IdEmailVerificationResolution.DENIED;
+import static com.io7m.idstore.model.IdEmailVerificationResolution.PERMITTED;
 import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
- * IdU1CmdEmailAddDeny
+ * IdUCmdEmailAddPermit
  */
 
-public final class IdU1CmdEmailAddDeny
+public final class IdUCmdEmailAddPermit
   implements IdCommandExecutorType<
-  IdU1CommandContext, IdU1CommandEmailAddDeny, IdU1ResponseType>
+  IdUCommandContext, IdUCommandEmailAddPermit, IdUResponseType>
 {
   /**
-   * IdU1CmdEmailAddDeny
+   * IdUCmdEmailAddPermit
    */
 
-  public IdU1CmdEmailAddDeny()
+  public IdUCmdEmailAddPermit()
   {
 
   }
 
   @Override
-  public IdU1ResponseType execute(
-    final IdU1CommandContext context,
-    final IdU1CommandEmailAddDeny command)
+  public IdUResponseType execute(
+    final IdUCommandContext context,
+    final IdUCommandEmailAddPermit command)
     throws IdCommandExecutionFailure
   {
     Objects.requireNonNull(context, "context");
     Objects.requireNonNull(command, "command");
 
     try {
-      final var token =
-        new IdToken(command.token());
-
+      final var token = command.token();
       final var user = context.user();
-      if (IdSecurity.check(new IdSecUserActionEmailAddDeny(user))
+      if (IdSecurity.check(new IdSecUserActionEmailRemovePermit(user))
         instanceof IdSecPolicyResultDenied denied) {
         throw context.fail(
           FORBIDDEN_403,
@@ -85,6 +84,8 @@ public final class IdU1CmdEmailAddDeny
         context.transaction();
       final var emails =
         transaction.queries(IdDatabaseEmailsQueriesType.class);
+      final var users =
+        transaction.queries(IdDatabaseUsersQueriesType.class);
 
       final var verificationOpt =
         emails.emailVerificationGet(token);
@@ -107,9 +108,10 @@ public final class IdU1CmdEmailAddDeny
       }
 
       transaction.userIdSet(user.id());
-      emails.emailVerificationDelete(token, DENIED);
+      users.userEmailAdd(user.id(), verification.email());
+      emails.emailVerificationDelete(token, PERMITTED);
 
-      return new IdU1ResponseEmailAddDeny(context.requestId());
+      return new IdUResponseEmailAddPermit(context.requestId());
     } catch (final IdValidityException e) {
       throw context.failValidity(e);
     } catch (final IdSecurityException e) {
@@ -120,7 +122,7 @@ public final class IdU1CmdEmailAddDeny
   }
 
   private static boolean checkVerification(
-    final IdU1CommandContext context,
+    final IdUCommandContext context,
     final IdEmailVerification verification,
     final IdUser user)
   {

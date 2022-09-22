@@ -15,13 +15,13 @@
  */
 
 
-package com.io7m.idstore.server.internal.user_v1;
+package com.io7m.idstore.server.internal.user;
 
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseError;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
+import com.io7m.idstore.protocol.user.IdUResponseError;
+import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.IdUserSession;
@@ -41,7 +41,7 @@ import static com.io7m.idstore.server.internal.IdServerRequestDecoration.request
  * The command context for user API commands.
  */
 
-public final class IdU1CommandContext extends IdCommandContext<IdU1ResponseType>
+public final class IdUCommandContext extends IdCommandContext<IdUResponseType>
 {
   private final IdUser user;
 
@@ -69,7 +69,7 @@ public final class IdU1CommandContext extends IdCommandContext<IdU1ResponseType>
    * @param remoteUserAgent The remote user agent
    */
 
-  public IdU1CommandContext(
+  public IdUCommandContext(
     final IdServiceDirectoryType inServices,
     final IdServerStrings inStrings,
     final UUID inRequestId,
@@ -105,14 +105,14 @@ public final class IdU1CommandContext extends IdCommandContext<IdU1ResponseType>
    * @return A context
    */
 
-  public static IdU1CommandContext create(
+  public static IdUCommandContext create(
     final IdServiceDirectoryType services,
     final IdDatabaseTransactionType transaction,
     final HttpServletRequest request,
     final HttpSession session,
     final IdUser user)
   {
-    return new IdU1CommandContext(
+    return new IdUCommandContext(
       services,
       services.requireService(IdServerStrings.class),
       requestIdFor(request),
@@ -127,11 +127,11 @@ public final class IdU1CommandContext extends IdCommandContext<IdU1ResponseType>
   }
 
   @Override
-  protected IdU1ResponseError error(
+  protected IdUResponseError error(
     final UUID id,
     final IdErrorCode errorCode,
     final String message)
   {
-    return new IdU1ResponseError(id, errorCode.id(), message);
+    return new IdUResponseError(id, errorCode.id(), message);
   }
 }

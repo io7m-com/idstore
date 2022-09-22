@@ -14,42 +14,31 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.protocol.user_v1;
+package com.io7m.idstore.protocol.user;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.io7m.idstore.model.IdRealName;
 
 import java.util.Objects;
-import java.util.UUID;
 
 /**
- * A response to {@link IdU1CommandUserSelf}.
+ * A request to change the user's realname.
  *
- * @param requestId The request ID
- * @param user      The user
+ * @param realName The real name
  */
 
-@JsonDeserialize
-@JsonSerialize
-public record IdU1ResponseUserSelf(
-  @JsonProperty(value = "RequestID", required = true)
-  UUID requestId,
-  @JsonProperty(value = "User", required = true)
-  IdU1User user)
-  implements IdU1ResponseType
+
+public record IdUCommandRealnameUpdate(
+  IdRealName realName)
+  implements IdUCommandType<IdUResponseUserUpdate>
 {
   /**
-   * A response to {@link IdU1CommandUserSelf}.
+   * A request to change the user's realname.
    *
-   * @param requestId The request ID
-   * @param user      The user
+   * @param realName The real name
    */
 
-  @JsonCreator
-  public IdU1ResponseUserSelf
+  public IdUCommandRealnameUpdate
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(realName, "realName");
   }
 }

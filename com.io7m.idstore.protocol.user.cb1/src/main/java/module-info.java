@@ -14,38 +14,22 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.protocol.user_v1;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import java.util.Objects;
-import java.util.UUID;
-
 /**
- * A response to {@link IdU1CommandEmailRemoveDeny}.
- *
- * @param requestId The request ID
+ * Identity server (User Protocol v1 [Cedarbridge encoding])
  */
 
-@JsonDeserialize
-@JsonSerialize
-public record IdU1ResponseEmailRemoveDeny(
-  @JsonProperty(value = "RequestID", required = true)
-  UUID requestId)
-  implements IdU1ResponseType
+module com.io7m.idstore.protocol.user.cb1
 {
-  /**
-   * A response to {@link IdU1CommandEmailRemoveDeny}.
-   *
-   * @param requestId The request ID
-   */
+  requires static org.osgi.annotation.bundle;
+  requires static org.osgi.annotation.versioning;
 
-  @JsonCreator
-  public IdU1ResponseEmailRemoveDeny
-  {
-    Objects.requireNonNull(requestId, "requestId");
-  }
+  requires com.io7m.cedarbridge.runtime.bssio;
+  requires com.io7m.jbssio.api;
+  requires com.io7m.jbssio.vanilla;
+  requires transitive com.io7m.cedarbridge.runtime.api;
+  requires transitive com.io7m.idstore.protocol.user;
+  requires transitive com.io7m.idstore.protocol.api;
+  requires transitive com.io7m.idstore.services.api;
+
+  exports com.io7m.idstore.protocol.user.cb1;
 }

@@ -162,7 +162,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
     final UUID requestId,
     final IdACommandType<?> command,
     final IdDatabaseTransactionType transaction)
-    throws IOException, IdDatabaseException
+    throws IOException
   {
     final var admin =
       this.admin();

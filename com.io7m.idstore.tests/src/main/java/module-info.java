@@ -26,7 +26,8 @@ open module com.io7m.idstore.tests
   requires transitive com.io7m.idstore.protocol.admin.cb1;
   requires transitive com.io7m.idstore.protocol.admin;
   requires transitive com.io7m.idstore.protocol.api;
-  requires transitive com.io7m.idstore.protocol.user_v1;
+  requires transitive com.io7m.idstore.protocol.user.cb1;
+  requires transitive com.io7m.idstore.protocol.user;
   requires transitive com.io7m.idstore.protocol.versions;
   requires transitive com.io7m.idstore.user_client.api;
   requires transitive com.io7m.idstore.user_client;
@@ -40,8 +41,11 @@ open module com.io7m.idstore.tests
   requires org.eclipse.jetty.jmx;
   requires org.eclipse.jetty.server;
   requires org.eclipse.jetty.servlet;
-  requires org.junit.jupiter.api;
   requires org.slf4j;
+  requires transitive org.junit.jupiter.api;
+  requires transitive org.junit.jupiter.engine;
+  requires transitive org.junit.platform.commons;
+  requires transitive org.junit.platform.engine;
 
   exports com.io7m.idstore.tests;
 }

@@ -14,15 +14,14 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.internal.user_v1;
+package com.io7m.idstore.server.internal.user;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
-import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdValidityException;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandRealnameUpdate;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseRealnameUpdate;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
+import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
+import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
@@ -37,26 +36,26 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_
 import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
- * IdU1CmdRealNameUpdate
+ * IdUCmdRealNameUpdate
  */
 
-public final class IdU1CmdRealNameUpdate
+public final class IdUCmdRealNameUpdate
   implements IdCommandExecutorType<
-  IdU1CommandContext, IdU1CommandRealnameUpdate, IdU1ResponseType>
+  IdUCommandContext, IdUCommandRealnameUpdate, IdUResponseType>
 {
   /**
-   * IdU1CmdRealNameUpdate
+   * IdUCmdRealNameUpdate
    */
 
-  public IdU1CmdRealNameUpdate()
+  public IdUCmdRealNameUpdate()
   {
 
   }
 
   @Override
-  public IdU1ResponseType execute(
-    final IdU1CommandContext context,
-    final IdU1CommandRealnameUpdate command)
+  public IdUResponseType execute(
+    final IdUCommandContext context,
+    final IdUCommandRealnameUpdate command)
     throws IdCommandExecutionFailure
   {
     Objects.requireNonNull(context, "context");
@@ -83,11 +82,14 @@ public final class IdU1CmdRealNameUpdate
       users.userUpdate(
         user.id(),
         Optional.empty(),
-        Optional.of(new IdRealName(command.realname())),
+        Optional.of(command.realName()),
         Optional.empty()
       );
 
-      return new IdU1ResponseRealnameUpdate(context.requestId());
+      return new IdUResponseUserUpdate(
+        context.requestId(),
+        users.userGetRequire(user.id())
+      );
     } catch (final IdValidityException e) {
       throw context.failValidity(e);
     } catch (final IdSecurityException e) {

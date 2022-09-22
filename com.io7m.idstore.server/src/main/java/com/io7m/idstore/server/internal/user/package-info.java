@@ -15,12 +15,10 @@
  */
 
 /**
- * Identity server (Server protocol v1)
+ * The server implementation (internals [User API]).
  */
 
-@Export
 @Version("1.0.0")
-package com.io7m.idstore.protocol.user_v1;
+package com.io7m.idstore.server.internal.user;
 
-import org.osgi.annotation.bundle.Export;
 import org.osgi.annotation.versioning.Version;

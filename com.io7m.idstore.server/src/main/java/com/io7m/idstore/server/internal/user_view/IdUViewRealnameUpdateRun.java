@@ -17,11 +17,13 @@
 
 package com.io7m.idstore.server.internal.user_view;
 
-import com.io7m.idstore.protocol.user_v1.IdU1CommandRealnameUpdate;
+import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.model.IdValidityException;
+import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.server.internal.IdSessionMessage;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.user_v1.IdU1CmdRealNameUpdate;
-import com.io7m.idstore.server.internal.user_v1.IdU1CommandContext;
+import com.io7m.idstore.server.internal.user.IdUCmdRealNameUpdate;
+import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -99,7 +101,7 @@ public final class IdUViewRealnameUpdateRun extends IdUViewAuthenticatedServlet
       try (var connection = database.openConnection(IDSTORE)) {
         try (var transaction = connection.openTransaction()) {
           final var context =
-            IdU1CommandContext.create(
+            IdUCommandContext.create(
               this.services(),
               transaction,
               request,
@@ -107,8 +109,10 @@ public final class IdUViewRealnameUpdateRun extends IdUViewAuthenticatedServlet
               this.user()
             );
 
-          new IdU1CmdRealNameUpdate()
-            .execute(context, new IdU1CommandRealnameUpdate(realnameParameter));
+          final var command =
+            new IdUCommandRealnameUpdate(new IdRealName(realnameParameter));
+          new IdUCmdRealNameUpdate()
+            .execute(context, command);
 
           transaction.commit();
           servletResponse.sendRedirect("/");
@@ -123,6 +127,18 @@ public final class IdUViewRealnameUpdateRun extends IdUViewAuthenticatedServlet
           strings.format("error"),
           e.getMessage(),
           "/"
+        )
+      );
+      messageServlet.service(request, servletResponse);
+    } catch (final IdValidityException e) {
+      userController.messageCurrentSet(
+        new IdSessionMessage(
+          requestIdFor(request),
+          true,
+          false,
+          strings.format("error"),
+          e.getMessage(),
+          "/realname-update"
         )
       );
       messageServlet.service(request, servletResponse);

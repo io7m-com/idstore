@@ -18,12 +18,11 @@
 package com.io7m.idstore.server.internal.user_view;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
-import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdToken;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddDeny;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveDeny;
+import com.io7m.idstore.protocol.user.IdUCommandEmailAddDeny;
+import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
@@ -31,9 +30,9 @@ import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
-import com.io7m.idstore.server.internal.user_v1.IdU1CmdEmailAddDeny;
-import com.io7m.idstore.server.internal.user_v1.IdU1CmdEmailRemoveDeny;
-import com.io7m.idstore.server.internal.user_v1.IdU1CommandContext;
+import com.io7m.idstore.server.internal.user.IdUCmdEmailAddDeny;
+import com.io7m.idstore.server.internal.user.IdUCmdEmailRemoveDeny;
+import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
@@ -145,7 +144,7 @@ public final class IdUViewEmailVerificationDeny extends HttpServlet
           users.userGetRequire(verification.user());
 
         final var commandContext =
-          IdU1CommandContext.create(
+          IdUCommandContext.create(
             this.services,
             transaction,
             request,
@@ -156,14 +155,14 @@ public final class IdUViewEmailVerificationDeny extends HttpServlet
         switch (verification.operation()) {
           case EMAIL_ADD -> {
             final var command =
-              new IdU1CommandEmailAddDeny(token.value());
-            new IdU1CmdEmailAddDeny()
+              new IdUCommandEmailAddDeny(new IdToken(token.value()));
+            new IdUCmdEmailAddDeny()
               .execute(commandContext, command);
           }
           case EMAIL_REMOVE -> {
             final var command =
-              new IdU1CommandEmailRemoveDeny(token.value());
-            new IdU1CmdEmailRemoveDeny()
+              new IdUCommandEmailRemoveDeny(new IdToken(token.value()));
+            new IdUCmdEmailRemoveDeny()
               .execute(commandContext, command);
           }
         }
@@ -171,19 +170,19 @@ public final class IdUViewEmailVerificationDeny extends HttpServlet
         transaction.commit();
         this.showSuccess(request, servletResponse);
       }
-    } catch (final IdDatabaseException e) {
-      this.showError(
-        request,
-        servletResponse,
-        e.getMessage(),
-        true
-      );
     } catch (final IdCommandExecutionFailure e) {
       this.showError(
         request,
         servletResponse,
         e.getMessage(),
         e.httpStatusCode() >= 500
+      );
+    } catch (final Exception e) {
+      this.showError(
+        request,
+        servletResponse,
+        e.getMessage(),
+        true
       );
     }
   }

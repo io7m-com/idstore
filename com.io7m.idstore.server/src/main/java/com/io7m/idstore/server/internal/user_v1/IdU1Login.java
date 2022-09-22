@@ -20,13 +20,12 @@ package com.io7m.idstore.server.internal.user_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
-import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandLogin;
-import com.io7m.idstore.protocol.user_v1.IdU1Messages;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseLogin;
+import com.io7m.idstore.protocol.user.IdUCommandLogin;
+import com.io7m.idstore.protocol.user.IdUResponseLogin;
+import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdRequestLimits;
 import com.io7m.idstore.server.internal.IdRequests;
@@ -68,10 +67,10 @@ public final class IdU1Login extends HttpServlet
     LoggerFactory.getLogger(IdU1Login.class);
 
   private final IdDatabaseType database;
-  private final IdU1Messages messages;
+  private final IdUCB1Messages messages;
   private final IdServerStrings strings;
   private final IdServerClock clock;
-  private final IdU1Sends errors;
+  private final IdUCB1Sends errors;
   private final IdRequestLimits limits;
   private final IdServerConfigurationService configuration;
 
@@ -89,13 +88,13 @@ public final class IdU1Login extends HttpServlet
     this.database =
       inServices.requireService(IdDatabaseType.class);
     this.messages =
-      inServices.requireService(IdU1Messages.class);
+      inServices.requireService(IdUCB1Messages.class);
     this.strings =
       inServices.requireService(IdServerStrings.class);
     this.clock =
       inServices.requireService(IdServerClock.class);
     this.errors =
-      inServices.requireService(IdU1Sends.class);
+      inServices.requireService(IdUCB1Sends.class);
     this.limits =
       inServices.requireService(IdRequestLimits.class);
     this.configuration =
@@ -211,14 +210,14 @@ public final class IdU1Login extends HttpServlet
     final HttpServletRequest request,
     final HttpServletResponse response,
     final IdDatabaseUsersQueriesType users,
-    final IdU1CommandLogin login)
+    final IdUCommandLogin login)
     throws
     IdHTTPErrorStatusException,
     IdDatabaseException,
     IdPasswordException, IOException
   {
     final var userOpt =
-      users.userGetForName(new IdName(login.userName()));
+      users.userGetForName(login.userName());
 
     if (userOpt.isEmpty()) {
       throw new IdHTTPErrorStatusException(
@@ -266,35 +265,28 @@ public final class IdU1Login extends HttpServlet
     throws IOException
   {
     response.setStatus(200);
-    response.setContentType(IdU1Messages.contentType());
+    response.setContentType(IdUCB1Messages.contentType());
 
     try {
       final var data =
-        this.messages.serialize(
-          new IdU1ResponseLogin(
-            requestIdFor(request),
-            this.clock.now()
-          )
-        );
-      response.setContentLength(data.length + 2);
+        this.messages.serialize(new IdUResponseLogin(requestIdFor(request)));
+      response.setContentLength(data.length);
       try (var output = response.getOutputStream()) {
         output.write(data);
-        output.write('\r');
-        output.write('\n');
       }
     } catch (final IdProtocolException e) {
       throw new IOException(e);
     }
   }
 
-  private IdU1CommandLogin readLoginCommand(
+  private IdUCommandLogin readLoginCommand(
     final HttpServletRequest request)
     throws IdHTTPErrorStatusException, IOException
   {
     try (var input = this.limits.boundedMaximumInput(request, 1024)) {
       final var data = input.readAllBytes();
       final var message = this.messages.parse(data);
-      if (message instanceof IdU1CommandLogin login) {
+      if (message instanceof IdUCommandLogin login) {
         return login;
       }
     } catch (final IdProtocolException e) {

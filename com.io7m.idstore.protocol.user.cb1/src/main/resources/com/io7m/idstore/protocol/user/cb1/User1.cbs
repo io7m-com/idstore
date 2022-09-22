@@ -125,6 +125,12 @@
   [field token cb:String]
 ]
 
+[documentation IdU1CommandRealnameUpdate "A request to update the user's real name."]
+[record IdU1CommandRealnameUpdate
+  [documentation name "The new name."]
+  [field name cb:String]
+]
+
 ;
 ; Responses.
 ;
@@ -211,6 +217,7 @@
     IdU1CommandEmailRemoveDeny
     IdU1CommandEmailRemovePermit
     IdU1CommandLogin
+    IdU1CommandRealnameUpdate
     IdU1CommandUserSelf
     IdU1ResponseEmailAddBegin
     IdU1ResponseEmailAddDeny

@@ -15,7 +15,7 @@
  */
 
 
-package com.io7m.idstore.server.internal.user_v1;
+package com.io7m.idstore.server.internal.user;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
@@ -24,9 +24,9 @@ import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdValidityException;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddBegin;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailAddBegin;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
+import com.io7m.idstore.protocol.user.IdUCommandEmailAddBegin;
+import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
+import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
@@ -54,26 +54,26 @@ import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_ADD;
 import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
- * IdU1CmdEmailAddBegin
+ * IdUCmdEmailAddBegin
  */
 
-public final class IdU1CmdEmailAddBegin
+public final class IdUCmdEmailAddBegin
   implements IdCommandExecutorType<
-  IdU1CommandContext, IdU1CommandEmailAddBegin, IdU1ResponseType>
+  IdUCommandContext, IdUCommandEmailAddBegin, IdUResponseType>
 {
   /**
-   * IdU1CmdEmailAddBegin
+   * IdUCmdEmailAddBegin
    */
 
-  public IdU1CmdEmailAddBegin()
+  public IdUCmdEmailAddBegin()
   {
 
   }
 
   @Override
-  public IdU1ResponseType execute(
-    final IdU1CommandContext context,
-    final IdU1CommandEmailAddBegin command)
+  public IdUResponseType execute(
+    final IdUCommandContext context,
+    final IdUCommandEmailAddBegin command)
     throws IdCommandExecutionFailure, IOException, InterruptedException
   {
     Objects.requireNonNull(context, "context");
@@ -109,7 +109,7 @@ public final class IdU1CmdEmailAddBegin
       }
 
       final var email =
-        new IdEmail(command.email());
+        command.email();
       final var transaction =
         context.transaction();
       final var emails =
@@ -132,7 +132,7 @@ public final class IdU1CmdEmailAddBegin
         verification
       );
 
-      return new IdU1ResponseEmailAddBegin(context.requestId());
+      return new IdUResponseEmailAddBegin(context.requestId());
     } catch (final IdValidityException e) {
       throw context.failValidity(e);
     } catch (final IdSecurityException e) {
@@ -143,7 +143,7 @@ public final class IdU1CmdEmailAddBegin
   }
 
   private static void sendVerificationMail(
-    final IdU1CommandContext context,
+    final IdUCommandContext context,
     final IdFMTemplateService templateService,
     final IdServerConfiguration configuration,
     final IdServerMailService mailService,
@@ -216,7 +216,7 @@ public final class IdU1CmdEmailAddBegin
   }
 
   private static IdEmailVerification createVerification(
-    final IdU1CommandContext context,
+    final IdUCommandContext context,
     final IdDatabaseEmailsQueriesType emails,
     final IdServerMailConfiguration mailConfiguration,
     final IdUser user,
@@ -235,7 +235,7 @@ public final class IdU1CmdEmailAddBegin
   }
 
   private static void checkPreconditions(
-    final IdU1CommandContext context,
+    final IdUCommandContext context,
     final IdDatabaseEmailsQueriesType emails,
     final IdServerStrings strings,
     final IdEmail email)

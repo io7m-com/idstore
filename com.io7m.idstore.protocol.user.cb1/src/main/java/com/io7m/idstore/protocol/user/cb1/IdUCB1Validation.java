@@ -20,6 +20,7 @@ import com.io7m.cedarbridge.runtime.api.CBString;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordException;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageValidatorType;
@@ -30,6 +31,7 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
+import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUMessageType;
@@ -191,12 +193,20 @@ public final class IdUCB1Validation
       return toWireCommandEmailRemovePermit(c);
     } else if (command instanceof IdUCommandEmailRemoveDeny c) {
       return toWireCommandEmailRemoveDeny(c);
+    } else if (command instanceof IdUCommandRealnameUpdate c) {
+      return toWireCommandRealnameUpdate(c);
     }
 
     throw new IdProtocolException(
       PROTOCOL_ERROR,
       "Unrecognized message: %s".formatted(command)
     );
+  }
+
+  private static IdU1CommandRealnameUpdate toWireCommandRealnameUpdate(
+    final IdUCommandRealnameUpdate c)
+  {
+    return new IdU1CommandRealnameUpdate(new CBString(c.realName().value()));
   }
 
   private static IdU1CommandEmailAddBegin toWireCommandEmailAddBegin(
@@ -319,6 +329,8 @@ public final class IdUCB1Validation
         return fromWireCommandEmailRemoveDeny(c);
       } else if (message instanceof IdU1CommandUserSelf c) {
         return fromWireCommandUserSelf(c);
+      } else if (message instanceof IdU1CommandRealnameUpdate c) {
+        return fromWireCommandRealnameUpdate(c);
 
         /*
          * Responses.
@@ -353,6 +365,12 @@ public final class IdUCB1Validation
       PROTOCOL_ERROR,
       "Unrecognized message: %s".formatted(message)
     );
+  }
+
+  private static IdUCommandRealnameUpdate fromWireCommandRealnameUpdate(
+    final IdU1CommandRealnameUpdate c)
+  {
+    return new IdUCommandRealnameUpdate(new IdRealName(c.fieldName().value()));
   }
 
   private static IdUCommandEmailAddBegin fromWireCommandEmailAddBegin(

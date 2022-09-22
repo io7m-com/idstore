@@ -21,7 +21,6 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdPasswordException;
-import com.io7m.idstore.protocol.user_v1.IdU1Messages;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
@@ -55,7 +54,6 @@ public abstract class IdA1AuthenticatedServlet extends HttpServlet
   private final IdACB1Sends sends;
   private final IdServerClock clock;
   private final IdServerStrings strings;
-  private final IdU1Messages messages;
   private final IdDatabaseType database;
   private IdAdmin admin;
 
@@ -71,8 +69,6 @@ public abstract class IdA1AuthenticatedServlet extends HttpServlet
   {
     Objects.requireNonNull(services, "services");
 
-    this.messages =
-      services.requireService(IdU1Messages.class);
     this.strings =
       services.requireService(IdServerStrings.class);
     this.clock =
@@ -110,11 +106,6 @@ public abstract class IdA1AuthenticatedServlet extends HttpServlet
   protected final IdServerStrings strings()
   {
     return this.strings;
-  }
-
-  protected final IdU1Messages messages()
-  {
-    return this.messages;
   }
 
   protected abstract Logger logger();

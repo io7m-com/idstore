@@ -20,13 +20,15 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandType;
-import com.io7m.idstore.protocol.user_v1.IdU1Messages;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseError;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
+import com.io7m.idstore.protocol.user.IdUCommandType;
+import com.io7m.idstore.protocol.user.IdUResponseError;
+import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdRequestLimits;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
+import com.io7m.idstore.server.internal.user.IdUCommandContext;
+import com.io7m.idstore.server.internal.user.IdUCommandExecutor;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -53,8 +55,8 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
 
   private final IdDatabaseType database;
   private final IdRequestLimits limits;
-  private final IdU1Messages messages;
-  private final IdU1CommandExecutor executor;
+  private final IdUCB1Messages messages;
+  private final IdUCommandExecutor executor;
   private final IdServiceDirectoryType services;
 
   /**
@@ -75,9 +77,9 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
     this.limits =
       inServices.requireService(IdRequestLimits.class);
     this.messages =
-      inServices.requireService(IdU1Messages.class);
+      inServices.requireService(IdUCB1Messages.class);
     this.executor =
-      new IdU1CommandExecutor();
+      new IdUCommandExecutor();
   }
 
   @Override
@@ -99,7 +101,7 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
     try (var input = this.limits.boundedMaximumInput(request, 1048576)) {
       final var data = input.readAllBytes();
       final var message = this.messages.parse(data);
-      if (message instanceof IdU1CommandType command) {
+      if (message instanceof IdUCommandType<?> command) {
         this.executeCommand(request, servletResponse, session, command);
         return;
       }
@@ -123,7 +125,7 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
     final HttpServletRequest request,
     final HttpServletResponse servletResponse,
     final HttpSession session,
-    final IdU1CommandType<?> command)
+    final IdUCommandType<?> command)
     throws IdDatabaseException, IOException, InterruptedException
   {
     try (var connection = this.database.openConnection(IDSTORE)) {
@@ -143,12 +145,12 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
     final HttpServletRequest request,
     final HttpServletResponse servletResponse,
     final HttpSession session,
-    final IdU1CommandType<?> command,
+    final IdUCommandType<?> command,
     final IdDatabaseTransactionType transaction)
     throws IOException, IdDatabaseException, InterruptedException
   {
     final var context =
-      IdU1CommandContext.create(
+      IdUCommandContext.create(
         this.services,
         transaction,
         request,
@@ -160,16 +162,16 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
       this.sends();
 
     try {
-      final IdU1ResponseType result = this.executor.execute(context, command);
+      final IdUResponseType result = this.executor.execute(context, command);
       sends.send(servletResponse, 200, result);
-      if (!(result instanceof IdU1ResponseError)) {
+      if (!(result instanceof IdUResponseError)) {
         transaction.commit();
       }
     } catch (final IdCommandExecutionFailure e) {
       sends.send(
         servletResponse,
         e.httpStatusCode(),
-        new IdU1ResponseError(
+        new IdUResponseError(
           e.requestId(),
           e.errorCode().id(),
           e.getMessage()

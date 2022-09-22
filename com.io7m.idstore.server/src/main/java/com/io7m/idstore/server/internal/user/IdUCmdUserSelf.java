@@ -15,40 +15,39 @@
  */
 
 
-package com.io7m.idstore.server.internal.user_v1;
+package com.io7m.idstore.server.internal.user;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandUserSelf;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseUserSelf;
-import com.io7m.idstore.protocol.user_v1.IdU1User;
+import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
+import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.protocol.user.IdUResponseUserSelf;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 
 import java.util.Objects;
 
 /**
- * IdU1CmdUserSelf
+ * IdUCmdUserSelf
  */
 
-public final class IdU1CmdUserSelf
+public final class IdUCmdUserSelf
   implements IdCommandExecutorType<
-  IdU1CommandContext, IdU1CommandUserSelf, IdU1ResponseType>
+  IdUCommandContext, IdUCommandUserSelf, IdUResponseType>
 {
   /**
-   * IdU1CmdUserSelf
+   * IdUCmdUserSelf
    */
 
-  public IdU1CmdUserSelf()
+  public IdUCmdUserSelf()
   {
 
   }
 
   @Override
-  public IdU1ResponseType execute(
-    final IdU1CommandContext context,
-    final IdU1CommandUserSelf command)
+  public IdUResponseType execute(
+    final IdUCommandContext context,
+    final IdUCommandUserSelf command)
     throws IdCommandExecutionFailure
   {
     Objects.requireNonNull(context, "context");
@@ -63,9 +62,7 @@ public final class IdU1CmdUserSelf
       final var userId = context.user().id();
       transaction.userIdSet(userId);
       final var user = users.userGetRequire(userId);
-
-      return new IdU1ResponseUserSelf(context.requestId(), IdU1User.ofUser(user));
-
+      return new IdUResponseUserSelf(context.requestId(), user);
     } catch (final IdDatabaseException e) {
       throw context.failDatabase(e);
     }

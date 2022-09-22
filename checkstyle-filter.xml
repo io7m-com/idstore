@@ -67,6 +67,15 @@
   <suppress files="IdSecPolicyDefault\.java"
             checks="CyclomaticComplexity"/>
 
+  <suppress files="IdUCommandExecutor\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdUCommandExecutor\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdUCommandExecutor\.java"
+            checks="ExecutableStatementCount"/>
+  <suppress files="IdUCommandExecutor\.java"
+            checks="CyclomaticComplexity"/>
+
   <suppress files="IdACB1ValidationAdmin\.java"
             checks="NPathComplexity"/>
   <suppress files="IdACB1ValidationAdmin\.java"

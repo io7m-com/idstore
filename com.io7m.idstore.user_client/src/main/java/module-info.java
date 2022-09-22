@@ -27,7 +27,8 @@ module com.io7m.idstore.user_client
   requires transitive com.io7m.idstore.user_client.api;
 
   requires com.io7m.idstore.protocol.versions;
-  requires com.io7m.idstore.protocol.user_v1;
+  requires com.io7m.idstore.protocol.user;
+  requires com.io7m.idstore.protocol.user.cb1;
 
   requires com.io7m.jxtrand.vanilla;
   requires java.net.http;
