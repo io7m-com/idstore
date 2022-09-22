@@ -24,7 +24,7 @@ import com.io7m.genevan.core.GenProtocolSolved;
 import com.io7m.genevan.core.GenProtocolSolver;
 import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
+import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.versions.IdVMessageType;
 import com.io7m.idstore.protocol.versions.IdVMessages;
@@ -179,15 +179,14 @@ public final class IdAProtocolNegotiation
     LOG.debug("server supports {} protocols", serverProtocols.size());
 
     final var solver =
-      GenProtocolSolver.<IdAClientProtocolHandlerFactoryType, IdAServerEndpoint>create(
-        locale);
+      GenProtocolSolver.<IdAClientProtocolHandlerFactoryType, IdAServerEndpoint>create(locale);
 
     final GenProtocolSolved<IdAClientProtocolHandlerFactoryType, IdAServerEndpoint> solved;
     try {
       solved = solver.solve(
         serverProtocols,
         clientSupports,
-        List.of(IdA1Messages.schemaId())
+        List.of(IdACB1Messages.schemaId())
       );
     } catch (final GenProtocolException e) {
       throw new IdAClientException(NO_SUPPORTED_PROTOCOLS, e.getMessage(), e);

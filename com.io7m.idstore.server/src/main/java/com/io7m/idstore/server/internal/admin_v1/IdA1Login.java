@@ -21,11 +21,10 @@ import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.model.IdAdmin;
-import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordException;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandLogin;
-import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseLogin;
+import com.io7m.idstore.protocol.admin.IdACommandLogin;
+import com.io7m.idstore.protocol.admin.IdAResponseLogin;
+import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdRequestLimits;
@@ -67,10 +66,10 @@ public final class IdA1Login extends HttpServlet
     LoggerFactory.getLogger(IdA1Login.class);
 
   private final IdDatabaseType database;
-  private final IdA1Messages messages;
+  private final IdACB1Messages messages;
   private final IdServerStrings strings;
   private final IdServerClock clock;
-  private final IdA1Sends errors;
+  private final IdACB1Sends errors;
   private final IdRequestLimits limits;
 
   /**
@@ -87,13 +86,13 @@ public final class IdA1Login extends HttpServlet
     this.database =
       inServices.requireService(IdDatabaseType.class);
     this.messages =
-      inServices.requireService(IdA1Messages.class);
+      inServices.requireService(IdACB1Messages.class);
     this.strings =
       inServices.requireService(IdServerStrings.class);
     this.clock =
       inServices.requireService(IdServerClock.class);
     this.errors =
-      inServices.requireService(IdA1Sends.class);
+      inServices.requireService(IdACB1Sends.class);
     this.limits =
       inServices.requireService(IdRequestLimits.class);
   }
@@ -160,14 +159,14 @@ public final class IdA1Login extends HttpServlet
     final HttpServletRequest request,
     final HttpServletResponse response,
     final IdDatabaseAdminsQueriesType admins,
-    final IdA1CommandLogin login)
+    final IdACommandLogin login)
     throws
     IdHTTPErrorStatusException,
     IdDatabaseException,
     IdPasswordException, IOException
   {
     final var adminOpt =
-      admins.adminGetForName(new IdName(login.userName()));
+      admins.adminGetForName(login.userName());
 
     if (adminOpt.isEmpty()) {
       throw new IdHTTPErrorStatusException(
@@ -259,35 +258,29 @@ public final class IdA1Login extends HttpServlet
     throws IOException
   {
     response.setStatus(200);
-    response.setContentType(IdA1Messages.contentType());
+    response.setContentType(IdACB1Messages.contentType());
 
     try {
       final var data =
-        this.messages.serialize(
-          new IdA1ResponseLogin(
-            requestIdFor(request),
-            admin.timeUpdated()
-          )
-        );
-      response.setContentLength(data.length + 2);
+        this.messages.serialize(new IdAResponseLogin(requestIdFor(request)));
+
+      response.setContentLength(data.length);
       try (var output = response.getOutputStream()) {
         output.write(data);
-        output.write('\r');
-        output.write('\n');
       }
     } catch (final IdProtocolException e) {
       throw new IOException(e);
     }
   }
 
-  private IdA1CommandLogin readLoginCommand(
+  private IdACommandLogin readLoginCommand(
     final HttpServletRequest request)
     throws IdHTTPErrorStatusException, IOException
   {
     try (var input = this.limits.boundedMaximumInput(request, 1024)) {
       final var data = input.readAllBytes();
       final var message = this.messages.parse(data);
-      if (message instanceof IdA1CommandLogin login) {
+      if (message instanceof IdACommandLogin login) {
         return login;
       }
     } catch (final IdProtocolException e) {

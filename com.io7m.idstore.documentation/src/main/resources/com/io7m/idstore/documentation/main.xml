@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Document xmlns="urn:com.io7m.structural:8:0"
+          xmlns:dc="http://purl.org/dc/elements/1.1/"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          tableOfContentsDepth="1">
+
+  <Metadata>
+    <dc:date>2022-09-20T08:37:35+00:00</dc:date>
+    <dc:description>User manual for the idstore server..</dc:description>
+    <dc:identifier>6c8e797e-ef6e-4ee6-b1aa-e1be7683c860</dc:identifier>
+    <dc:language>en</dc:language>
+    <dc:source>https://www.io7m.com/software/idstore/</dc:source>
+    <dc:title>Idstore User Manual ${project.version}</dc:title>
+
+    <MetaProperty name="com.io7m.xstructural.epub.colophon">colophon_extra.xml</MetaProperty>
+    <MetaProperty name="com.io7m.xstructural.epub.cover">documentation.jpg</MetaProperty>
+    <MetaProperty name="com.io7m.xstructural.web.branding.header">brand.xml</MetaProperty>
+    <MetaProperty name="com.io7m.xstructural.web.branding.footer">brand.xml</MetaProperty>
+  </Metadata>
+
+  <xi:include href="api.xml"/>
+
+</Document>

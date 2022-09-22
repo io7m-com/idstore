@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.io7m.primogenitor</groupId>
     <artifactId>com.io7m.primogenitor.full</artifactId>
-    <version>7.1.0</version>
+    <version>7.1.1</version>
   </parent>
 
   <groupId>com.io7m.idstore</groupId>
@@ -28,11 +28,14 @@
     <module>com.io7m.idstore.colors</module>
     <module>com.io7m.idstore.database.api</module>
     <module>com.io7m.idstore.database.postgres</module>
+    <module>com.io7m.idstore.documentation</module>
     <module>com.io7m.idstore.error_codes</module>
     <module>com.io7m.idstore.model</module>
-    <module>com.io7m.idstore.protocol.admin_v1</module>
+    <module>com.io7m.idstore.protocol.admin.cb1</module>
+    <module>com.io7m.idstore.protocol.admin</module>
     <module>com.io7m.idstore.protocol.api</module>
-    <module>com.io7m.idstore.protocol.user_v1</module>
+    <module>com.io7m.idstore.protocol.user.cb1</module>
+    <module>com.io7m.idstore.protocol.user</module>
     <module>com.io7m.idstore.protocol.versions</module>
     <module>com.io7m.idstore.server.api</module>
     <module>com.io7m.idstore.server.security</module>
@@ -47,6 +50,7 @@
 
   <properties>
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
+    <com.io7m.cedarbridge.version>0.0.6</com.io7m.cedarbridge.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
     <com.io7m.trasco.version>0.0.4</com.io7m.trasco.version>
@@ -54,11 +58,12 @@
     <jackson.version>2.13.4</jackson.version>
     <jetty.version>11.0.11</jetty.version>
     <jooq.version>3.17.4</jooq.version>
-    <logback.version>1.4.0</logback.version>
-    <org.jline.version>3.21.0</org.jline.version>
-    <testcontainers.version>1.17.3</testcontainers.version>
+    <logback.version>1.4.1</logback.version>
     <org.apache.james.version>3.7.0</org.apache.james.version>
     <org.javafx.version>18.0.1</org.javafx.version>
+    <org.jline.version>3.21.0</org.jline.version>
+    <testcontainers.version>1.17.3</testcontainers.version>
+    <com.io7m.jbssio.version>1.1.1</com.io7m.jbssio.version>
   </properties>
 
   <licenses>
@@ -96,11 +101,11 @@
     </site>
     <repository>
       <id>sonatype-nexus-staging</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
     <snapshotRepository>
       <id>sonatype-nexus-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
     </snapshotRepository>
   </distributionManagement>
 
@@ -138,7 +143,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>2.0.0</version>
+        <version>2.0.1</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
@@ -388,7 +393,7 @@
       <dependency>
         <groupId>com.io7m.genevan</groupId>
         <artifactId>com.io7m.genevan.core</artifactId>
-        <version>0.0.1</version>
+        <version>0.0.2</version>
       </dependency>
       <dependency>
         <groupId>com.sanctionco.jmail</groupId>
@@ -439,6 +444,41 @@
         <groupId>com.io7m.jade</groupId>
         <artifactId>com.io7m.jade.vanilla</artifactId>
         <version>${com.io7m.jade.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.cedarbridge</groupId>
+        <artifactId>com.io7m.cedarbridge.cmdline</artifactId>
+        <version>${com.io7m.cedarbridge.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.cedarbridge</groupId>
+        <artifactId>com.io7m.cedarbridge.runtime.api</artifactId>
+        <version>${com.io7m.cedarbridge.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.cedarbridge</groupId>
+        <artifactId>com.io7m.cedarbridge.runtime.bssio</artifactId>
+        <version>${com.io7m.cedarbridge.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.jbssio</groupId>
+        <artifactId>com.io7m.jbssio.vanilla</artifactId>
+        <version>${com.io7m.jbssio.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.jbssio</groupId>
+        <artifactId>com.io7m.jbssio.api</artifactId>
+        <version>${com.io7m.jbssio.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.primogenitor</groupId>
+        <artifactId>com.io7m.primogenitor.support</artifactId>
+        <version>7.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.xstructural</groupId>
+        <artifactId>com.io7m.xstructural.cmdline</artifactId>
+        <version>1.7.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -19,33 +19,33 @@ package com.io7m.idstore.user_client.internal;
 
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdEmail;
-import com.io7m.idstore.model.IdPasswordException;
+import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddBegin;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddDeny;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddPermit;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveBegin;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemoveDeny;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemovePermit;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandLogin;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandRealnameUpdate;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandType;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandUserSelf;
-import com.io7m.idstore.protocol.user_v1.IdU1Messages;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailAddBegin;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailAddDeny;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailAddPermit;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailRemoveBegin;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailRemoveDeny;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseEmailRemovePermit;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseError;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseLogin;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseRealnameUpdate;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseType;
-import com.io7m.idstore.protocol.user_v1.IdU1ResponseUserSelf;
+import com.io7m.idstore.protocol.user.IdUCommandEmailAddBegin;
+import com.io7m.idstore.protocol.user.IdUCommandEmailAddDeny;
+import com.io7m.idstore.protocol.user.IdUCommandEmailAddPermit;
+import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
+import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
+import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
+import com.io7m.idstore.protocol.user.IdUCommandLogin;
+import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
+import com.io7m.idstore.protocol.user.IdUCommandType;
+import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
+import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
+import com.io7m.idstore.protocol.user.IdUResponseEmailAddDeny;
+import com.io7m.idstore.protocol.user.IdUResponseEmailAddPermit;
+import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveBegin;
+import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveDeny;
+import com.io7m.idstore.protocol.user.IdUResponseEmailRemovePermit;
+import com.io7m.idstore.protocol.user.IdUResponseError;
+import com.io7m.idstore.protocol.user.IdUResponseLogin;
+import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.protocol.user.IdUResponseUserSelf;
+import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
+import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static java.net.http.HttpResponse.BodyHandlers;
 
@@ -74,7 +73,7 @@ public final class IdUClientProtocolHandler1
 
   private final URI commandURI;
   private final URI transactionURI;
-  private final IdU1Messages messages;
+  private final IdUCB1Messages messages;
   private final URI loginURI;
 
   /**
@@ -93,7 +92,7 @@ public final class IdUClientProtocolHandler1
     super(inHttpClient, inStrings, inBase);
 
     this.messages =
-      new IdU1Messages();
+      new IdUCB1Messages();
 
     this.loginURI =
       inBase.resolve("login")
@@ -106,17 +105,6 @@ public final class IdUClientProtocolHandler1
         .normalize();
   }
 
-  private static <A, B, E extends Exception> Optional<B> mapPartial(
-    final Optional<A> o,
-    final FunctionType<A, B, E> f)
-    throws E
-  {
-    if (o.isPresent()) {
-      return Optional.of(f.apply(o.get()));
-    }
-    return Optional.empty();
-  }
-
   @Override
   public IdUClientProtocolHandlerType login(
     final String user,
@@ -124,39 +112,31 @@ public final class IdUClientProtocolHandler1
     final URI base)
     throws IdUClientException, InterruptedException
   {
-    this.sendLogin(new IdU1CommandLogin(user, password));
+    this.sendLogin(new IdUCommandLogin(new IdName(user), password));
     return this;
   }
 
-  private IdU1ResponseLogin sendLogin(
-    final IdU1CommandLogin message)
+  private IdUResponseLogin sendLogin(
+    final IdUCommandLogin message)
     throws InterruptedException, IdUClientException
   {
-    return this.send(this.loginURI, IdU1ResponseLogin.class, message, false)
+    return this.send(this.loginURI, IdUResponseLogin.class, message, false)
       .orElseThrow(() -> new IllegalStateException("send() returned empty"));
   }
 
-  private <T extends IdU1ResponseType> T sendCommand(
+  private <T extends IdUResponseType> T sendCommand(
     final Class<T> responseClass,
-    final IdU1CommandType<T> message)
+    final IdUCommandType<T> message)
     throws InterruptedException, IdUClientException
   {
     return this.send(this.commandURI, responseClass, message, false)
       .orElseThrow(() -> new IllegalStateException("send() returned empty"));
   }
 
-  private <T extends IdU1ResponseType> Optional<T> sendCommandOptional(
-    final Class<T> responseClass,
-    final IdU1CommandType<T> message)
-    throws InterruptedException, IdUClientException
-  {
-    return this.send(this.commandURI, responseClass, message, true);
-  }
-
-  private <T extends IdU1ResponseType> Optional<T> send(
+  private <T extends IdUResponseType> Optional<T> send(
     final URI uri,
     final Class<T> responseClass,
-    final IdU1CommandType<T> message,
+    final IdUCommandType<T> message,
     final boolean allowNotFound)
     throws InterruptedException, IdUClientException
   {
@@ -190,14 +170,14 @@ public final class IdUClientProtocolHandler1
         responseHeaders.firstValue("content-type")
           .orElse("application/octet-stream");
 
-      if (!contentType.equals(IdU1Messages.contentType())) {
+      if (!contentType.equals(IdUCB1Messages.contentType())) {
         throw new IdUClientException(
           PROTOCOL_ERROR,
           this.strings()
             .format(
               "errorContentType",
               commandType,
-              IdU1Messages.contentType(),
+              IdUCB1Messages.contentType(),
               contentType)
         );
       }
@@ -205,7 +185,7 @@ public final class IdUClientProtocolHandler1
       final var responseMessage =
         this.messages.parse(response.body());
 
-      if (!(responseMessage instanceof IdU1ResponseType)) {
+      if (!(responseMessage instanceof IdUResponseType)) {
         throw new IdUClientException(
           PROTOCOL_ERROR,
           this.strings()
@@ -213,13 +193,13 @@ public final class IdUClientProtocolHandler1
               "errorResponseType",
               "(unavailable)",
               commandType,
-              IdU1ResponseType.class,
+              IdUResponseType.class,
               responseMessage.getClass())
         );
       }
 
-      final var responseActual = (IdU1ResponseType) responseMessage;
-      if (responseActual instanceof IdU1ResponseError error) {
+      final var responseActual = (IdUResponseType) responseMessage;
+      if (responseActual instanceof IdUResponseError error) {
         throw new IdUClientException(
           new IdErrorCode(error.errorCode()),
           this.strings()
@@ -258,17 +238,13 @@ public final class IdUClientProtocolHandler1
   public IdUser userSelf()
     throws IdUClientException, InterruptedException
   {
-    try {
-      final var response =
-        this.sendCommand(
-          IdU1ResponseUserSelf.class,
-          new IdU1CommandUserSelf()
-        );
+    final var response =
+      this.sendCommand(
+        IdUResponseUserSelf.class,
+        new IdUCommandUserSelf()
+      );
 
-      return response.user().toUser();
-    } catch (final IdPasswordException e) {
-      throw new IdUClientException(PASSWORD_ERROR, e);
-    }
+    return response.user();
   }
 
   @Override
@@ -276,8 +252,8 @@ public final class IdUClientProtocolHandler1
     throws IdUClientException, InterruptedException
   {
     this.sendCommand(
-      IdU1ResponseEmailAddBegin.class,
-      new IdU1CommandEmailAddBegin(email.value())
+      IdUResponseEmailAddBegin.class,
+      new IdUCommandEmailAddBegin(email)
     );
   }
 
@@ -287,8 +263,8 @@ public final class IdUClientProtocolHandler1
     throws IdUClientException, InterruptedException
   {
     this.sendCommand(
-      IdU1ResponseEmailAddPermit.class,
-      new IdU1CommandEmailAddPermit(token.value())
+      IdUResponseEmailAddPermit.class,
+      new IdUCommandEmailAddPermit(token)
     );
   }
 
@@ -298,8 +274,8 @@ public final class IdUClientProtocolHandler1
     throws IdUClientException, InterruptedException
   {
     this.sendCommand(
-      IdU1ResponseEmailAddDeny.class,
-      new IdU1CommandEmailAddDeny(token.value())
+      IdUResponseEmailAddDeny.class,
+      new IdUCommandEmailAddDeny(token)
     );
   }
 
@@ -309,8 +285,8 @@ public final class IdUClientProtocolHandler1
     throws IdUClientException, InterruptedException
   {
     this.sendCommand(
-      IdU1ResponseEmailRemoveBegin.class,
-      new IdU1CommandEmailRemoveBegin(email.value())
+      IdUResponseEmailRemoveBegin.class,
+      new IdUCommandEmailRemoveBegin(email)
     );
   }
 
@@ -320,8 +296,8 @@ public final class IdUClientProtocolHandler1
     throws IdUClientException, InterruptedException
   {
     this.sendCommand(
-      IdU1ResponseEmailRemovePermit.class,
-      new IdU1CommandEmailRemovePermit(token.value())
+      IdUResponseEmailRemovePermit.class,
+      new IdUCommandEmailRemovePermit(token)
     );
   }
 
@@ -331,8 +307,8 @@ public final class IdUClientProtocolHandler1
     throws IdUClientException, InterruptedException
   {
     this.sendCommand(
-      IdU1ResponseEmailRemoveDeny.class,
-      new IdU1CommandEmailRemoveDeny(token.value())
+      IdUResponseEmailRemoveDeny.class,
+      new IdUCommandEmailRemoveDeny(token)
     );
   }
 
@@ -342,8 +318,8 @@ public final class IdUClientProtocolHandler1
     throws IdUClientException, InterruptedException
   {
     this.sendCommand(
-      IdU1ResponseRealnameUpdate.class,
-      new IdU1CommandRealnameUpdate(realName.value())
+      IdUResponseUserUpdate.class,
+      new IdUCommandRealnameUpdate(realName)
     );
   }
 
@@ -365,11 +341,4 @@ public final class IdUClientProtocolHandler1
       throws E;
   }
 
-  private static final class NotFoundException extends Exception
-  {
-    NotFoundException()
-    {
-
-    }
-  }
 }

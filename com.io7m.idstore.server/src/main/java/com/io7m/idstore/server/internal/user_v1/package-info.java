@@ -15,7 +15,7 @@
  */
 
 /**
- * The server implementation (internals [API v1]).
+ * The server implementation (internals [User API v1]).
  */
 
 @Version("1.0.0")

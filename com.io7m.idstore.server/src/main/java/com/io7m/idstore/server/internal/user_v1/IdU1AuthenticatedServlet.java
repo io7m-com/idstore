@@ -21,7 +21,7 @@ import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.protocol.user_v1.IdU1Messages;
+import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
@@ -54,10 +54,10 @@ import static org.eclipse.jetty.http.HttpStatus.INTERNAL_SERVER_ERROR_500;
 
 public abstract class IdU1AuthenticatedServlet extends HttpServlet
 {
-  private final IdU1Sends sends;
+  private final IdUCB1Sends sends;
   private final IdServerClock clock;
   private final IdServerStrings strings;
-  private final IdU1Messages messages;
+  private final IdUCB1Messages messages;
   private final IdDatabaseType database;
   private IdUser user;
 
@@ -74,13 +74,13 @@ public abstract class IdU1AuthenticatedServlet extends HttpServlet
     Objects.requireNonNull(services, "services");
 
     this.messages =
-      services.requireService(IdU1Messages.class);
+      services.requireService(IdUCB1Messages.class);
     this.strings =
       services.requireService(IdServerStrings.class);
     this.clock =
       services.requireService(IdServerClock.class);
     this.sends =
-      services.requireService(IdU1Sends.class);
+      services.requireService(IdUCB1Sends.class);
     this.database =
       services.requireService(IdDatabaseType.class);
   }
@@ -94,7 +94,7 @@ public abstract class IdU1AuthenticatedServlet extends HttpServlet
     return this.user;
   }
 
-  protected final IdU1Sends sends()
+  protected final IdUCB1Sends sends()
   {
     return this.sends;
   }
@@ -109,7 +109,7 @@ public abstract class IdU1AuthenticatedServlet extends HttpServlet
     return this.strings;
   }
 
-  protected final IdU1Messages messages()
+  protected final IdUCB1Messages messages()
   {
     return this.messages;
   }

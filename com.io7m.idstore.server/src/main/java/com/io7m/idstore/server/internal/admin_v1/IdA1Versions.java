@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.server.internal.admin_v1;
 
-import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
+import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.versions.IdVMessages;
 import com.io7m.idstore.protocol.versions.IdVProtocolSupported;
@@ -60,7 +60,7 @@ public final class IdA1Versions extends HttpServlet
     final var supported = new ArrayList<IdVProtocolSupported>();
     supported.add(
       new IdVProtocolSupported(
-        IdA1Messages.schemaId(),
+        IdACB1Messages.schemaId(),
         BigInteger.ONE,
         BigInteger.ZERO,
         "/admin/1/0/"

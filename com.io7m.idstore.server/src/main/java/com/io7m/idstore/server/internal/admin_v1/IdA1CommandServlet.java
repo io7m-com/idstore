@@ -19,14 +19,16 @@ package com.io7m.idstore.server.internal.admin_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.database.api.IdDatabaseType;
-import com.io7m.idstore.protocol.admin_v1.IdA1CommandType;
-import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseError;
-import com.io7m.idstore.protocol.admin_v1.IdA1ResponseType;
+import com.io7m.idstore.protocol.admin.IdACommandType;
+import com.io7m.idstore.protocol.admin.IdAResponseError;
+import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdRequestLimits;
 import com.io7m.idstore.server.internal.IdUserSessionService;
+import com.io7m.idstore.server.internal.admin.IdACommandContext;
+import com.io7m.idstore.server.internal.admin.IdACommandExecutor;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,8 +59,8 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
 
   private final IdDatabaseType database;
   private final IdRequestLimits limits;
-  private final IdA1Messages messages;
-  private final IdA1CommandExecutor executor;
+  private final IdACB1Messages messages;
+  private final IdACommandExecutor executor;
   private final IdServiceDirectoryType services;
   private final IdUserSessionService sessions;
 
@@ -80,11 +82,11 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
     this.limits =
       inServices.requireService(IdRequestLimits.class);
     this.messages =
-      inServices.requireService(IdA1Messages.class);
+      inServices.requireService(IdACB1Messages.class);
     this.sessions =
       inServices.requireService(IdUserSessionService.class);
     this.executor =
-      new IdA1CommandExecutor();
+      new IdACommandExecutor();
   }
 
   @Override
@@ -106,8 +108,13 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
     try (var input = this.limits.boundedMaximumInput(request, 1048576)) {
       final var data = input.readAllBytes();
       final var message = this.messages.parse(data);
-      if (message instanceof IdA1CommandType command) {
-        this.executeCommand(request, servletResponse, session, requestId, command);
+      if (message instanceof IdACommandType<?> command) {
+        this.executeCommand(
+          request,
+          servletResponse,
+          session,
+          requestId,
+          command);
         return;
       }
     } catch (final IdProtocolException e) {
@@ -131,7 +138,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
     final HttpServletResponse servletResponse,
     final HttpSession session,
     final UUID requestId,
-    final IdA1CommandType<?> command)
+    final IdACommandType<?> command)
     throws IdDatabaseException, IOException
   {
     try (var connection = this.database.openConnection(IDSTORE)) {
@@ -153,9 +160,9 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
     final HttpServletResponse servletResponse,
     final HttpSession session,
     final UUID requestId,
-    final IdA1CommandType<?> command,
+    final IdACommandType<?> command,
     final IdDatabaseTransactionType transaction)
-    throws IOException, IdDatabaseException
+    throws IOException
   {
     final var admin =
       this.admin();
@@ -163,7 +170,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
       this.sessions.createOrGet(admin.id(), session.getId());
 
     final var context =
-      new IdA1CommandContext(
+      new IdACommandContext(
         this.services,
         this.strings(),
         requestId,
@@ -179,29 +186,23 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
     final var sends = this.sends();
 
     try {
-      final IdA1ResponseType result = this.executor.execute(context, command);
+      final IdAResponseType result = this.executor.execute(context, command);
       sends.send(servletResponse, 200, result);
-      if (!(result instanceof IdA1ResponseError)) {
+      if (!(result instanceof IdAResponseError)) {
         transaction.commit();
       }
     } catch (final IdCommandExecutionFailure e) {
       sends.send(
         servletResponse,
         e.httpStatusCode(),
-        new IdA1ResponseError(
-          e.requestId(),
-          e.errorCode().id(),
-          e.getMessage()
-        ));
+        new IdAResponseError(e.requestId(), e.errorCode().id(), e.getMessage())
+      );
     } catch (final Exception e) {
       sends.send(
         servletResponse,
         500,
-        new IdA1ResponseError(
-          requestId,
-          IO_ERROR.id(),
-          e.getMessage()
-        ));
+        new IdAResponseError(requestId, IO_ERROR.id(), e.getMessage())
+      );
     }
   }
 }

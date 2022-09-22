@@ -17,11 +17,13 @@
 
 package com.io7m.idstore.server.internal.user_view;
 
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddBegin;
+import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdValidityException;
+import com.io7m.idstore.protocol.user.IdUCommandEmailAddBegin;
 import com.io7m.idstore.server.internal.IdSessionMessage;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.internal.user_v1.IdU1CmdEmailAddBegin;
-import com.io7m.idstore.server.internal.user_v1.IdU1CommandContext;
+import com.io7m.idstore.server.internal.user.IdUCmdEmailAddBegin;
+import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -97,7 +99,7 @@ public final class IdUViewEmailAddRun extends IdUViewAuthenticatedServlet
       try (var connection = database.openConnection(IDSTORE)) {
         try (var transaction = connection.openTransaction()) {
           final var context =
-            IdU1CommandContext.create(
+            IdUCommandContext.create(
               this.services(),
               transaction,
               request,
@@ -105,8 +107,10 @@ public final class IdUViewEmailAddRun extends IdUViewAuthenticatedServlet
               this.user()
             );
 
-          new IdU1CmdEmailAddBegin()
-            .execute(context, new IdU1CommandEmailAddBegin(emailParameter));
+          final var command =
+            new IdUCommandEmailAddBegin(new IdEmail(emailParameter));
+          new IdUCmdEmailAddBegin()
+            .execute(context, command);
 
           transaction.commit();
 
@@ -133,6 +137,18 @@ public final class IdUViewEmailAddRun extends IdUViewAuthenticatedServlet
           strings.format("error"),
           e.getMessage(),
           "/"
+        )
+      );
+      messageServlet.service(request, servletResponse);
+    } catch (final IdValidityException e) {
+      userController.messageCurrentSet(
+        new IdSessionMessage(
+          requestIdFor(request),
+          true,
+          false,
+          strings.format("error"),
+          e.getMessage(),
+          "/email-add"
         )
       );
       messageServlet.service(request, servletResponse);

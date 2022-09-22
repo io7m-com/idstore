@@ -18,12 +18,11 @@
 package com.io7m.idstore.server.internal.user_view;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
-import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdToken;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailAddPermit;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandEmailRemovePermit;
+import com.io7m.idstore.protocol.user.IdUCommandEmailAddPermit;
+import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
@@ -31,9 +30,9 @@ import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
-import com.io7m.idstore.server.internal.user_v1.IdU1CmdEmailAddPermit;
-import com.io7m.idstore.server.internal.user_v1.IdU1CmdEmailRemovePermit;
-import com.io7m.idstore.server.internal.user_v1.IdU1CommandContext;
+import com.io7m.idstore.server.internal.user.IdUCmdEmailAddPermit;
+import com.io7m.idstore.server.internal.user.IdUCmdEmailRemovePermit;
+import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
@@ -144,7 +143,7 @@ public final class IdUViewEmailVerificationPermit extends HttpServlet
         final var user =
           users.userGetRequire(verification.user());
         final var commandContext =
-          IdU1CommandContext.create(
+          IdUCommandContext.create(
             this.services,
             transaction,
             request,
@@ -155,14 +154,14 @@ public final class IdUViewEmailVerificationPermit extends HttpServlet
         switch (verification.operation()) {
           case EMAIL_ADD -> {
             final var command =
-              new IdU1CommandEmailAddPermit(token.value());
-            new IdU1CmdEmailAddPermit()
+              new IdUCommandEmailAddPermit(new IdToken(token.value()));
+            new IdUCmdEmailAddPermit()
               .execute(commandContext, command);
           }
           case EMAIL_REMOVE -> {
             final var command =
-              new IdU1CommandEmailRemovePermit(token.value());
-            new IdU1CmdEmailRemovePermit()
+              new IdUCommandEmailRemovePermit(new IdToken(token.value()));
+            new IdUCmdEmailRemovePermit()
               .execute(commandContext, command);
           }
         }
@@ -170,19 +169,19 @@ public final class IdUViewEmailVerificationPermit extends HttpServlet
         transaction.commit();
         this.showSuccess(request, servletResponse);
       }
-    } catch (final IdDatabaseException e) {
-      this.showError(
-        request,
-        servletResponse,
-        e.getMessage(),
-        true
-      );
     } catch (final IdCommandExecutionFailure e) {
       this.showError(
         request,
         servletResponse,
         e.getMessage(),
         e.httpStatusCode() >= 500
+      );
+    } catch (final Exception e) {
+      this.showError(
+        request,
+        servletResponse,
+        e.getMessage(),
+        true
       );
     }
   }

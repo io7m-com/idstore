@@ -19,16 +19,17 @@ package com.io7m.idstore.server.internal.user_view;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
-import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.protocol.user_v1.IdU1Messages;
-import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
+import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.IdUserSession;
 import com.io7m.idstore.server.internal.IdUserSessionService;
-import com.io7m.idstore.server.internal.user_v1.IdU1Sends;
+import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
+import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
+import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,12 +43,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static com.io7m.idstore.server.internal.IdServerRequestDecoration.requestIdFor;
 import static com.io7m.idstore.server.logging.IdServerMDCRequestProcessor.mdcForRequest;
-import static org.eclipse.jetty.http.HttpStatus.INTERNAL_SERVER_ERROR_500;
 
 /**
  * A servlet that checks that a user is authenticated before delegating
@@ -56,13 +53,13 @@ import static org.eclipse.jetty.http.HttpStatus.INTERNAL_SERVER_ERROR_500;
 
 public abstract class IdUViewAuthenticatedServlet extends HttpServlet
 {
-  private final IdU1Sends sends;
   private final IdServerClock clock;
   private final IdServerStrings strings;
-  private final IdU1Messages messages;
   private final IdDatabaseType database;
   private final IdServiceDirectoryType services;
   private final IdUserSessionService userControllers;
+  private final IdFMTemplateType<IdFMMessageData> template;
+  private final IdServerBrandingService branding;
   private IdUser user;
   private IdUserSession userController;
 
@@ -79,18 +76,19 @@ public abstract class IdUViewAuthenticatedServlet extends HttpServlet
     this.services =
       Objects.requireNonNull(inServices, "services");
 
-    this.messages =
-      inServices.requireService(IdU1Messages.class);
     this.strings =
       inServices.requireService(IdServerStrings.class);
     this.clock =
       inServices.requireService(IdServerClock.class);
-    this.sends =
-      inServices.requireService(IdU1Sends.class);
     this.database =
       inServices.requireService(IdDatabaseType.class);
     this.userControllers =
       inServices.requireService(IdUserSessionService.class);
+    this.branding =
+      inServices.requireService(IdServerBrandingService.class);
+    this.template =
+      inServices.requireService(IdFMTemplateService.class)
+        .pageMessage();
   }
 
   protected final IdUserSession userController()
@@ -108,11 +106,6 @@ public abstract class IdUViewAuthenticatedServlet extends HttpServlet
     return this.user().id();
   }
 
-  protected final IdU1Sends sends()
-  {
-    return this.sends;
-  }
-
   protected final IdServerClock clock()
   {
     return this.clock;
@@ -121,11 +114,6 @@ public abstract class IdUViewAuthenticatedServlet extends HttpServlet
   protected final IdServerStrings strings()
   {
     return this.strings;
-  }
-
-  protected final IdU1Messages messages()
-  {
-    return this.messages;
   }
 
   protected abstract Logger logger();
@@ -156,44 +144,41 @@ public abstract class IdUViewAuthenticatedServlet extends HttpServlet
 
         servletResponse.setStatus(401);
         new IdUViewLogin(this.services).service(request, servletResponse);
-      } catch (final IdHTTPErrorStatusException e) {
-        this.sends.sendError(
-          servletResponse,
-          requestIdFor(request),
-          e.statusCode(),
-          e.errorCode(),
-          e.getMessage()
-        );
-      } catch (final IdPasswordException e) {
-        this.logger().debug("password: ", e);
-        this.sends.sendError(
-          servletResponse,
-          requestIdFor(request),
-          INTERNAL_SERVER_ERROR_500,
-          PASSWORD_ERROR,
-          e.getMessage()
-        );
-      } catch (final IdDatabaseException e) {
-        this.logger().debug("database: ", e);
-
-        if (Objects.equals(e.errorCode(), USER_NONEXISTENT)) {
-          final var session = request.getSession(false);
-          if (session != null) {
-            session.invalidate();
-          }
-        }
-
-        this.sends.sendError(
-          servletResponse,
-          requestIdFor(request),
-          INTERNAL_SERVER_ERROR_500,
-          SQL_ERROR,
-          e.getMessage()
-        );
       } catch (final Exception e) {
-        this.logger().trace("exception: ", e);
-        throw new IOException(e);
+        this.showError(request, servletResponse, e.getMessage(), true);
       }
+    }
+  }
+
+  private void showError(
+    final HttpServletRequest request,
+    final HttpServletResponse servletResponse,
+    final String message,
+    final boolean isServerError)
+    throws IOException
+  {
+    try (var writer = servletResponse.getWriter()) {
+      if (isServerError) {
+        servletResponse.setStatus(500);
+      } else {
+        servletResponse.setStatus(400);
+      }
+
+      this.template.process(
+        new IdFMMessageData(
+          this.branding.htmlTitle(this.strings.format("error")),
+          this.branding.title(),
+          requestIdFor(request),
+          true,
+          isServerError,
+          this.strings.format("error"),
+          message,
+          "/"
+        ),
+        writer
+      );
+    } catch (final TemplateException e) {
+      throw new IOException(e);
     }
   }
 

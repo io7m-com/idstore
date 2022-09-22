@@ -20,7 +20,7 @@ import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.postgres.internal.tables.records.AuditRecord;
 import com.io7m.idstore.model.IdAuditEvent;
-import com.io7m.idstore.model.IdAuditListParameters;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 import org.jooq.Condition;
 import org.jooq.SelectForUpdateStep;
 import org.jooq.exception.DataAccessException;
@@ -59,7 +59,7 @@ final class IdDatabaseAuditQueries
 
   @Override
   public List<IdAuditEvent> auditEvents(
-    final IdAuditListParameters parameters,
+    final IdAuditSearchParameters parameters,
     final OptionalLong seek)
     throws IdDatabaseException
   {
@@ -175,7 +175,7 @@ final class IdDatabaseAuditQueries
 
   @Override
   public long auditCount(
-    final IdAuditListParameters parameters)
+    final IdAuditSearchParameters parameters)
     throws IdDatabaseException
   {
     Objects.requireNonNull(parameters, "parameters");

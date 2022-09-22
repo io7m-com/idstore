@@ -19,7 +19,7 @@ package com.io7m.idstore.admin_client.internal;
 
 import com.io7m.genevan.core.GenProtocolIdentifier;
 import com.io7m.genevan.core.GenProtocolVersion;
-import com.io7m.idstore.protocol.admin_v1.IdA1Messages;
+import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -56,7 +56,7 @@ public final class IdAClientProtocolHandlers1
   public GenProtocolIdentifier supported()
   {
     return new GenProtocolIdentifier(
-      IdA1Messages.schemaId(),
+      IdACB1Messages.schemaId(),
       new GenProtocolVersion(ONE, ZERO)
     );
   }

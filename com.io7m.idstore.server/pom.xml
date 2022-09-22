@@ -41,12 +41,12 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.protocol.admin_v1</artifactId>
+      <artifactId>com.io7m.idstore.protocol.admin</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.protocol.user_v1</artifactId>
+      <artifactId>com.io7m.idstore.protocol.admin.cb1</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -72,6 +72,16 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.xbutton</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.protocol.user</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.protocol.user.cb1</artifactId>
       <version>${project.version}</version>
     </dependency>
 

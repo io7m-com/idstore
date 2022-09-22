@@ -28,7 +28,7 @@ import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchPagingType;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
-import com.io7m.idstore.model.IdAuditListParameters;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 
@@ -49,7 +49,7 @@ public final class IdUserSession
   private IdUserSearchByEmailParameters userSearchByEmailParameters;
   private IdDatabaseUserSearchByEmailPagingType userSearchByEmailPaging;
   private Optional<IdSessionMessage> message;
-  private IdAuditListParameters auditListParameters;
+  private IdAuditSearchParameters auditListParameters;
   private IdDatabaseAuditListPagingType auditPaging;
   private IdAdminSearchParameters adminSearchParameters;
   private IdDatabaseAdminSearchPagingType adminSearchPaging;
@@ -83,7 +83,7 @@ public final class IdUserSession
       IdDatabaseUserSearchByEmailPaging.create(this.userSearchByEmailParameters);
 
     this.auditListParameters =
-      IdAuditListParameters.defaults();
+      IdAuditSearchParameters.defaults();
     this.auditPaging =
       IdDatabaseAuditListPaging.create(this.auditListParameters);
 
@@ -198,7 +198,7 @@ public final class IdUserSession
    */
 
   public void setAuditListParameters(
-    final IdAuditListParameters auditParameters)
+    final IdAuditSearchParameters auditParameters)
   {
     this.auditListParameters =
       Objects.requireNonNull(auditParameters, "auditParameters");
@@ -213,7 +213,7 @@ public final class IdUserSession
    * @return The most recent audit list parameters
    */
 
-  public IdAuditListParameters auditListParameters()
+  public IdAuditSearchParameters auditListParameters()
   {
     return this.auditListParameters;
   }

@@ -16,11 +16,13 @@
 
 package com.io7m.idstore.tests;
 
+import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandLogin;
-import com.io7m.idstore.protocol.user_v1.IdU1CommandUserSelf;
-import com.io7m.idstore.protocol.user_v1.IdU1MessageType;
-import com.io7m.idstore.protocol.user_v1.IdU1Messages;
+import com.io7m.idstore.protocol.user.IdUCommandLogin;
+import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
+import com.io7m.idstore.protocol.user.IdUMessageType;
+import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
 import net.jqwik.api.Arbitraries;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,12 +46,12 @@ public final class IdServerUserErrorsTest extends IdWithServerContract
   private static final Logger LOG =
     LoggerFactory.getLogger(IdServerUserErrorsTest.class);
 
-  private IdU1Messages message;
+  private IdUCB1Messages message;
 
   @BeforeEach
   public void setup()
   {
-    this.message = new IdU1Messages();
+    this.message = new IdUCB1Messages();
   }
 
   /**
@@ -68,7 +70,7 @@ public final class IdServerUserErrorsTest extends IdWithServerContract
       HttpClient.newHttpClient();
 
     final var arb =
-      Arbitraries.defaultFor(IdU1MessageType.class);
+      Arbitraries.defaultFor(IdUMessageType.class);
 
     for (int index = 0; index < 1000; ++index) {
       final var message = arb.sample();
@@ -104,7 +106,7 @@ public final class IdServerUserErrorsTest extends IdWithServerContract
       HttpClient.newHttpClient();
 
     final var arb =
-      Arbitraries.defaultFor(IdU1MessageType.class);
+      Arbitraries.defaultFor(IdUMessageType.class);
 
     for (int index = 0; index < 1000; ++index) {
       final var message = arb.sample();
@@ -147,9 +149,10 @@ public final class IdServerUserErrorsTest extends IdWithServerContract
     this.doLogin(client);
 
     final var arb =
-      Arbitraries.defaultFor(IdU1MessageType.class);
+      Arbitraries.defaultFor(IdUMessageType.class)
+        .filter(u -> u instanceof IdUResponseType);
 
-    final var succeeded = new ArrayList<IdU1MessageType>();
+    final var succeeded = new ArrayList<IdUMessageType>();
     for (int index = 0; index < 1000; ++index) {
       final var message = arb.sample();
       LOG.debug("send: {}", message);
@@ -169,7 +172,7 @@ public final class IdServerUserErrorsTest extends IdWithServerContract
       }
     }
 
-    succeeded.removeIf(m -> m instanceof IdU1CommandUserSelf);
+    succeeded.removeIf(m -> m instanceof IdUCommandUserSelf);
     assertTrue(succeeded.isEmpty());
   }
 
@@ -181,7 +184,7 @@ public final class IdServerUserErrorsTest extends IdWithServerContract
           URI.create(this.serverUserAPIURL() + "user/1/0/login")
         ).POST(ofByteArray(
           this.message.serialize(
-            new IdU1CommandLogin("someone", "12345678"))))
+            new IdUCommandLogin(new IdName("someone"), "12345678"))))
         .build();
 
     final var response =

@@ -21,7 +21,6 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdPasswordException;
-import com.io7m.idstore.protocol.user_v1.IdU1Messages;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
@@ -41,8 +40,6 @@ import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.server.internal.IdServerRequestDecoration.requestIdFor;
 import static com.io7m.idstore.server.logging.IdServerMDCRequestProcessor.mdcForRequest;
 import static org.eclipse.jetty.http.HttpStatus.INTERNAL_SERVER_ERROR_500;
@@ -54,10 +51,9 @@ import static org.eclipse.jetty.http.HttpStatus.INTERNAL_SERVER_ERROR_500;
 
 public abstract class IdA1AuthenticatedServlet extends HttpServlet
 {
-  private final IdA1Sends sends;
+  private final IdACB1Sends sends;
   private final IdServerClock clock;
   private final IdServerStrings strings;
-  private final IdU1Messages messages;
   private final IdDatabaseType database;
   private IdAdmin admin;
 
@@ -73,14 +69,12 @@ public abstract class IdA1AuthenticatedServlet extends HttpServlet
   {
     Objects.requireNonNull(services, "services");
 
-    this.messages =
-      services.requireService(IdU1Messages.class);
     this.strings =
       services.requireService(IdServerStrings.class);
     this.clock =
       services.requireService(IdServerClock.class);
     this.sends =
-      services.requireService(IdA1Sends.class);
+      services.requireService(IdACB1Sends.class);
     this.database =
       services.requireService(IdDatabaseType.class);
   }
@@ -99,7 +93,7 @@ public abstract class IdA1AuthenticatedServlet extends HttpServlet
     return this.admin().id();
   }
 
-  protected final IdA1Sends sends()
+  protected final IdACB1Sends sends()
   {
     return this.sends;
   }
@@ -112,11 +106,6 @@ public abstract class IdA1AuthenticatedServlet extends HttpServlet
   protected final IdServerStrings strings()
   {
     return this.strings;
-  }
-
-  protected final IdU1Messages messages()
-  {
-    return this.messages;
   }
 
   protected abstract Logger logger();
@@ -166,7 +155,7 @@ public abstract class IdA1AuthenticatedServlet extends HttpServlet
           servletResponse,
           requestIdFor(request),
           INTERNAL_SERVER_ERROR_500,
-          PASSWORD_ERROR,
+          e.errorCode(),
           e.getMessage()
         );
       } catch (final IdDatabaseException e) {
@@ -175,7 +164,7 @@ public abstract class IdA1AuthenticatedServlet extends HttpServlet
           servletResponse,
           requestIdFor(request),
           INTERNAL_SERVER_ERROR_500,
-          SQL_ERROR,
+          e.errorCode(),
           e.getMessage()
         );
       } catch (final Exception e) {

@@ -27,7 +27,7 @@ import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.postgres.IdDatabases;
 import com.io7m.idstore.model.IdAuditEvent;
-import com.io7m.idstore.model.IdAuditListParameters;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
@@ -177,7 +177,7 @@ public final class IdDatabaseAuditTest
     transaction.commit();
 
     final var parameters =
-      new IdAuditListParameters(
+      new IdAuditSearchParameters(
         new IdTimeRange(then, then.plusDays(1L)),
         empty(),
         empty(),
@@ -242,7 +242,7 @@ public final class IdDatabaseAuditTest
     transaction.commit();
 
     final var parameters =
-      new IdAuditListParameters(
+      new IdAuditSearchParameters(
         new IdTimeRange(then, then.plusDays(1L)),
         empty(),
         Optional.of("ET_0"),
@@ -299,7 +299,7 @@ public final class IdDatabaseAuditTest
     transaction.commit();
 
     final var parameters =
-      new IdAuditListParameters(
+      new IdAuditSearchParameters(
         new IdTimeRange(then, then.plusDays(1L)),
         empty(),
         empty(),
@@ -355,7 +355,7 @@ public final class IdDatabaseAuditTest
     transaction.commit();
 
     final var parameters =
-      new IdAuditListParameters(
+      new IdAuditSearchParameters(
         new IdTimeRange(then, then.plusDays(1L)),
         empty(),
         empty(),
