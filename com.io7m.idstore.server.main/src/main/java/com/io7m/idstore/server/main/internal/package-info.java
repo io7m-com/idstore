@@ -15,27 +15,10 @@
  */
 
 /**
- * The server API.
+ * The server main distribution [internals].
  */
 
-module com.io7m.idstore.server.api
-{
-  requires static org.osgi.annotation.bundle;
-  requires static org.osgi.annotation.versioning;
+@Version("1.0.0")
+package com.io7m.idstore.server.main.internal;
 
-  requires transitive com.io7m.idstore.xbutton;
-  requires transitive com.io7m.idstore.colors;
-  requires transitive com.io7m.idstore.database.api;
-
-  requires com.fasterxml.jackson.databind;
-  requires com.fasterxml.jackson.datatype.jsr310;
-  requires com.fasterxml.jackson.datatype.jdk8;
-
-  uses com.io7m.idstore.database.api.IdDatabaseFactoryType;
-
-  opens com.io7m.idstore.server.api
-    to com.fasterxml.jackson.databind;
-
-  exports com.io7m.idstore.server.api;
-  exports com.io7m.idstore.server.api.events;
-}
+import org.osgi.annotation.versioning.Version;

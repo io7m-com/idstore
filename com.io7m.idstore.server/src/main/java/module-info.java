@@ -14,6 +14,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+import com.io7m.idstore.server.IdServers;
+import com.io7m.idstore.server.api.IdServerFactoryType;
+
 /**
  * The server implementation.
  */
@@ -48,25 +51,24 @@ module com.io7m.idstore.server
   requires com.fasterxml.jackson.databind;
   requires com.io7m.jaffirm.core;
   requires com.io7m.jmulticlose.core;
-  requires com.io7m.junreachable.core;
   requires com.io7m.jxtrand.vanilla;
   requires freemarker;
+  requires jakarta.mail;
   requires java.desktop;
   requires java.management;
   requires org.apache.commons.io;
   requires org.eclipse.jetty.jmx;
   requires org.eclipse.jetty.server;
   requires org.eclipse.jetty.servlet;
-  requires org.simplejavamail.core;
-  requires org.simplejavamail;
   requires org.slf4j;
 
   opens com.io7m.idstore.server.internal
+    to com.io7m.jxtrand.vanilla;
+  opens com.io7m.idstore.server.logging
     to com.io7m.jxtrand.vanilla;
 
   exports com.io7m.idstore.server;
   exports com.io7m.idstore.server.logging;
 
-  opens com.io7m.idstore.server.logging
-    to com.io7m.jxtrand.vanilla;
+  provides IdServerFactoryType with IdServers;
 }

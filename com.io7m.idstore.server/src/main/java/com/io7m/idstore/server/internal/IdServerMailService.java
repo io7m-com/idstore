@@ -22,54 +22,51 @@ import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTPS;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP_TLS;
-import com.io7m.idstore.server.api.events.IdServerEventMailServiceFailure;
 import com.io7m.idstore.services.api.IdServiceType;
-import com.io7m.junreachable.UnreachableCodeException;
-import org.simplejavamail.api.mailer.Mailer;
-import org.simplejavamail.email.EmailBuilder;
-import org.simplejavamail.mailer.MailerBuilder;
-import org.simplejavamail.mailer.internal.MailerRegularBuilderImpl;
+import jakarta.mail.Message;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
 import java.time.Clock;
-import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-import static org.simplejavamail.api.mailer.config.TransportStrategy.SMTP;
-import static org.simplejavamail.api.mailer.config.TransportStrategy.SMTPS;
-import static org.simplejavamail.api.mailer.config.TransportStrategy.SMTP_TLS;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A mail service.
  */
 
-public final class IdServerMailService implements IdServiceType
+public final class IdServerMailService implements IdServiceType, AutoCloseable
 {
   private final Clock clock;
   private final IdServerMailConfiguration configuration;
-  private final IdServerEventBusService events;
   private final IdServerTelemetryService telemetry;
-  private final Mailer mailer;
+  private final Session session;
+  private final ExecutorService executor;
 
   private IdServerMailService(
     final Clock inClock,
     final IdServerMailConfiguration inConfiguration,
-    final IdServerEventBusService inEvents,
     final IdServerTelemetryService inTelemetry,
-    final Mailer inMailer)
+    final Session inSession,
+    final ExecutorService inExecutor)
   {
     this.clock =
       Objects.requireNonNull(inClock, "clock");
     this.configuration =
       Objects.requireNonNull(inConfiguration, "configuration");
-    this.events =
-      Objects.requireNonNull(inEvents, "events");
     this.telemetry =
       Objects.requireNonNull(inTelemetry, "telemetry");
-    this.mailer =
-      Objects.requireNonNull(inMailer, "mailer");
+    this.session =
+      Objects.requireNonNull(inSession, "session");
+    this.executor =
+      Objects.requireNonNull(inExecutor, "executor");
   }
 
   /**
@@ -94,43 +91,62 @@ public final class IdServerMailService implements IdServiceType
     Objects.requireNonNull(events, "events");
     Objects.requireNonNull(configuration, "configuration");
 
-    MailerRegularBuilderImpl mailerBuilder;
+    final var executor =
+      Executors.newFixedThreadPool(1, r -> {
+        final var thread = new Thread(r);
+        thread.setName(
+          "com.io7m.idstore.server.internal.IdServerMailService[%d]"
+            .formatted(thread.getId()));
+        thread.setDaemon(true);
+        return thread;
+      });
 
     final var authOpt =
       configuration.authenticationConfiguration();
     final var transport =
       configuration.transportConfiguration();
 
-    if (authOpt.isPresent()) {
-      mailerBuilder = MailerBuilder.withSMTPServer(
-        transport.host(),
-        Integer.valueOf(transport.port()),
-        authOpt.get().userName(),
-        authOpt.get().password()
-      );
-    } else {
-      mailerBuilder = MailerBuilder.withSMTPServer(
-        transport.host(),
-        Integer.valueOf(transport.port())
-      );
+    final var props = new Properties();
+    if (transport instanceof IdServerMailTransportSMTP smtp) {
+      props.put("mail.transport.protocol", "smtp");
+      props.put("mail.smtp.host", transport.host());
+      props.put("mail.smtp.port", Integer.toUnsignedString(transport.port()));
+      props.put("mail.smtp.starttls.enable", "true");
+      props.put("mail.smtp.starttls.required", "false");
+      authOpt.ifPresent(auth -> {
+        props.put("mail.smtp.username", auth.userName());
+        props.put("mail.smtp.password", auth.password());
+      });
+    } else if (transport instanceof IdServerMailTransportSMTP_TLS smtpTls) {
+      props.put("mail.transport.protocol", "smtp");
+      props.put("mail.smtp.host", transport.host());
+      props.put("mail.smtp.port", Integer.toUnsignedString(transport.port()));
+      props.put("mail.smtp.starttls.enable", "true");
+      props.put("mail.smtp.starttls.required", "true");
+      authOpt.ifPresent(auth -> {
+        props.put("mail.smtp.username", auth.userName());
+        props.put("mail.smtp.password", auth.password());
+      });
+    } else if (transport instanceof IdServerMailTransportSMTPS smtps) {
+      props.put("mail.transport.protocol", "smtps");
+      props.put("mail.smtps.quitwait", "false");
+      props.put("mail.smtps.host", transport.host());
+      props.put("mail.smtps.port", Integer.toUnsignedString(transport.port()));
+      authOpt.ifPresent(auth -> {
+        props.put("mail.smtps.username", auth.userName());
+        props.put("mail.smtps.password", auth.password());
+      });
     }
 
-    if (transport instanceof IdServerMailTransportSMTP) {
-      mailerBuilder = mailerBuilder.withTransportStrategy(SMTP);
-    } else if (transport instanceof IdServerMailTransportSMTPS) {
-      mailerBuilder = mailerBuilder.withTransportStrategy(SMTPS);
-    } else if (transport instanceof IdServerMailTransportSMTP_TLS) {
-      mailerBuilder = mailerBuilder.withTransportStrategy(SMTP_TLS);
-    } else {
-      throw new UnreachableCodeException();
-    }
+    final var session = Session.getDefaultInstance(props, null);
+    session.setDebug(false);
 
     return new IdServerMailService(
       clock,
       configuration,
-      events,
       telemetry,
-      mailerBuilder.buildMailer()
+      session,
+      executor
     );
   }
 
@@ -159,50 +175,51 @@ public final class IdServerMailService implements IdServiceType
     Objects.requireNonNull(headers, "headers");
     Objects.requireNonNull(text, "text");
 
-    final var transport =
-      this.configuration.transportConfiguration();
+    final var future = new CompletableFuture<Void>();
+    this.executor.execute(() -> {
 
-    final var span =
-      this.telemetry.tracer()
-        .spanBuilder("IdServerMailService.sendMail")
-        .setAttribute("smtp.source_request", requestId.toString())
-        .setAttribute("smtp.to", to.value())
-        .setAttribute("smtp.subject", subject)
-        .setAttribute("smtp.from", this.configuration.senderAddress())
-        .setAttribute("smtp.host", transport.host())
-        .setAttribute("smtp.port", transport.port())
-        .startSpan();
+      final var transport =
+        this.configuration.transportConfiguration();
 
-    try {
-      final var emailBuilder =
-        EmailBuilder.startingBlank();
+      final var span =
+        this.telemetry.tracer()
+          .spanBuilder("IdServerMailService.sendMail")
+          .setAttribute("smtp.source_request", requestId.toString())
+          .setAttribute("smtp.to", to.value())
+          .setAttribute("smtp.subject", subject)
+          .setAttribute("smtp.from", this.configuration.senderAddress())
+          .setAttribute("smtp.host", transport.host())
+          .setAttribute("smtp.port", transport.port())
+          .startSpan();
 
-      for (final var entry : headers.entrySet()) {
-        emailBuilder.withHeader(entry.getKey(), entry.getValue());
+      try {
+        final Message message =
+          new MimeMessage(this.session);
+        final var addressFrom =
+          new InternetAddress(this.configuration.senderAddress());
+        message.setFrom(addressFrom);
+
+        final var addressTo = new InternetAddress[1];
+        addressTo[0] = new InternetAddress(to.value());
+        message.setRecipients(Message.RecipientType.TO, addressTo);
+
+        for (final var e : headers.entrySet()) {
+          message.addHeader(e.getKey(), e.getValue());
+        }
+
+        message.setSubject(subject);
+        message.setContent(text, "text/plain");
+        Transport.send(message);
+
+        future.complete(null);
+      } catch (final Exception e) {
+        span.recordException(e);
+        future.completeExceptionally(e);
+      } finally {
+        span.end();
       }
-
-      final var email =
-        emailBuilder
-          .to(to.value())
-          .from(this.configuration.senderAddress())
-          .withSubject(subject)
-          .appendText(text)
-          .buildEmail();
-
-      return this.mailer.sendMail(email);
-    } catch (final Exception e) {
-      span.recordException(e);
-      this.events.publish(
-        new IdServerEventMailServiceFailure(
-          OffsetDateTime.now(this.clock),
-          requestId,
-          e.getMessage()
-        )
-      );
-      throw e;
-    } finally {
-      span.end();
-    }
+    });
+    return future;
   }
 
   @Override
@@ -216,5 +233,12 @@ public final class IdServerMailService implements IdServiceType
   {
     return "[IdServerMailService 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode()));
+  }
+
+  @Override
+  public void close()
+    throws Exception
+  {
+    this.executor.shutdown();
   }
 }

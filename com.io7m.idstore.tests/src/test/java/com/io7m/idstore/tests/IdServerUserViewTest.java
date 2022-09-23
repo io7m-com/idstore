@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.tests;
 
+import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -800,14 +801,11 @@ public final class IdServerUserViewTest extends IdWithServerContract
   }
 
   private void permitEmailChallenge(final String x)
-    throws IOException, InterruptedException
+    throws IOException, InterruptedException, MessagingException
   {
     final var email = this.emailsReceived().poll();
     final var token =
-      email.getHeaders()
-        .get("X-IDStore-Verification-Token")
-        .iterator()
-        .next();
+      email.getHeader("X-IDStore-Verification-Token")[0];
 
     final var req =
       HttpRequest.newBuilder(

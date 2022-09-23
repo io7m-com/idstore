@@ -29,6 +29,9 @@ module com.io7m.idstore.xbutton
   requires com.fasterxml.jackson.annotation;
   requires com.fasterxml.jackson.databind;
 
+  opens com.io7m.idstore.xbutton
+    to com.fasterxml.jackson.databind;
+
   exports com.io7m.idstore.xbutton;
   exports com.io7m.idstore.xbutton.internal;
 }

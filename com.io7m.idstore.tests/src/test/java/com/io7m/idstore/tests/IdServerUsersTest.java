@@ -22,6 +22,7 @@ import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.user_client.IdUClients;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.idstore.user_client.api.IdUClientType;
+import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -159,10 +160,7 @@ public final class IdServerUsersTest extends IdWithServerContract
         .poll();
 
     final var token =
-      email.getHeaders()
-        .get("X-IDStore-Verification-Token")
-        .iterator()
-        .next();
+      email.getHeader("X-IDStore-Verification-Token")[0];
 
     this.client.userEmailAddPermit(new IdToken(token));
 
@@ -207,10 +205,7 @@ public final class IdServerUsersTest extends IdWithServerContract
         .poll();
 
     final var token =
-      email.getHeaders()
-        .get("X-IDStore-Verification-Token")
-        .iterator()
-        .next();
+      email.getHeader("X-IDStore-Verification-Token")[0];
 
     this.clock().setTime(Instant.ofEpochSecond(86400L * 30L));
 
@@ -286,10 +281,7 @@ public final class IdServerUsersTest extends IdWithServerContract
         .poll();
 
     final var token =
-      email.getHeaders()
-        .get("X-IDStore-Verification-Token")
-        .iterator()
-        .next();
+      email.getHeader("X-IDStore-Verification-Token")[0];
 
     this.client.login("someone2", "12345678", this.serverUserAPIURL());
 
@@ -327,10 +319,7 @@ public final class IdServerUsersTest extends IdWithServerContract
         .poll();
 
     final var token =
-      email.getHeaders()
-        .get("X-IDStore-Verification-Token")
-        .iterator()
-        .next();
+      email.getHeader("X-IDStore-Verification-Token")[0];
 
     this.client.userEmailAddDeny(new IdToken(token));
 
@@ -375,10 +364,7 @@ public final class IdServerUsersTest extends IdWithServerContract
           .poll();
 
       final var token =
-        email.getHeaders()
-          .get("X-IDStore-Verification-Token")
-          .iterator()
-          .next();
+        email.getHeader("X-IDStore-Verification-Token")[0];
 
       this.client.userEmailRemovePermit(new IdToken(token));
     }
@@ -393,7 +379,7 @@ public final class IdServerUsersTest extends IdWithServerContract
 
   private void requestEmailAddition(
     final IdEmail newMail)
-    throws IdUClientException, InterruptedException
+    throws IdUClientException, InterruptedException, MessagingException
   {
     this.client.userEmailAddBegin(newMail);
 
@@ -402,10 +388,7 @@ public final class IdServerUsersTest extends IdWithServerContract
         .poll();
 
     final var token =
-      email.getHeaders()
-        .get("X-IDStore-Verification-Token")
-        .iterator()
-        .next();
+      email.getHeader("X-IDStore-Verification-Token")[0];
 
     this.client.userEmailAddPermit(new IdToken(token));
   }
@@ -440,10 +423,7 @@ public final class IdServerUsersTest extends IdWithServerContract
         .poll();
 
     final var token =
-      email.getHeaders()
-        .get("X-IDStore-Verification-Token")
-        .iterator()
-        .next();
+      email.getHeader("X-IDStore-Verification-Token")[0];
 
     this.clock().setTime(Instant.ofEpochSecond(86400L * 30L));
 
@@ -492,10 +472,7 @@ public final class IdServerUsersTest extends IdWithServerContract
         .poll();
 
     final var token =
-      email.getHeaders()
-        .get("X-IDStore-Verification-Token")
-        .iterator()
-        .next();
+      email.getHeader("X-IDStore-Verification-Token")[0];
 
     this.client.login("someone2", "12345678", this.serverUserAPIURL());
 
@@ -541,20 +518,14 @@ public final class IdServerUsersTest extends IdWithServerContract
     {
       final var email = this.emailsReceived().poll();
       final var token =
-        email.getHeaders()
-          .get("X-IDStore-Verification-Token")
-          .iterator()
-          .next();
+        email.getHeader("X-IDStore-Verification-Token")[0];
       this.client.userEmailRemovePermit(new IdToken(token));
     }
 
     {
       final var email = this.emailsReceived().poll();
       final var token =
-        email.getHeaders()
-          .get("X-IDStore-Verification-Token")
-          .iterator()
-          .next();
+        email.getHeader("X-IDStore-Verification-Token")[0];
 
       assertThrows(IdUClientException.class, () -> {
         this.client.userEmailRemovePermit(new IdToken(token));
@@ -612,10 +583,7 @@ public final class IdServerUsersTest extends IdWithServerContract
         .poll();
 
     final var token =
-      email.getHeaders()
-        .get("X-IDStore-Verification-Token")
-        .iterator()
-        .next();
+      email.getHeader("X-IDStore-Verification-Token")[0];
 
     assertThrows(IdUClientException.class, () -> {
       this.client.userEmailRemovePermit(new IdToken(token));
@@ -660,10 +628,7 @@ public final class IdServerUsersTest extends IdWithServerContract
         .poll();
 
     final var token =
-      email.getHeaders()
-        .get("X-IDStore-Verification-Token")
-        .iterator()
-        .next();
+      email.getHeader("X-IDStore-Verification-Token")[0];
 
     assertThrows(IdUClientException.class, () -> {
       this.client.userEmailAddPermit(new IdToken(token));

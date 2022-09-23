@@ -38,11 +38,11 @@ import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerType;
-import io.opentelemetry.api.OpenTelemetry;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.simplejavamail.api.email.Email;
-import org.simplejavamail.converter.EmailConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.subethamail.smtp.server.SMTPServer;
@@ -50,6 +50,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.time.Clock;
@@ -59,6 +60,7 @@ import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeoutException;
@@ -67,7 +69,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.io7m.idstore.database.api.IdDatabaseCreate.CREATE_DATABASE;
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.database.api.IdDatabaseUpgrade.UPGRADE_DATABASE;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Testcontainers(disabledWithoutDocker = true)
 public abstract class IdWithServerContract
@@ -88,7 +89,7 @@ public abstract class IdWithServerContract
   private Path directory;
   private AtomicBoolean started;
   private SMTPServer smtp;
-  private ConcurrentLinkedQueue<Email> emailsReceived;
+  private ConcurrentLinkedQueue<MimeMessage> emailsReceived;
   private IdFakeClock clock;
 
   protected final IdFakeClock clock()
@@ -147,7 +148,7 @@ public abstract class IdWithServerContract
     return this.server;
   }
 
-  protected final ConcurrentLinkedQueue<Email> emailsReceived()
+  protected final ConcurrentLinkedQueue<MimeMessage> emailsReceived()
   {
     return this.emailsReceived;
   }
@@ -184,9 +185,17 @@ public abstract class IdWithServerContract
             Integer.valueOf(data.length)
           );
 
-          this.emailsReceived.add(
-            EmailConverter.emlToEmail(new String(data, UTF_8))
-          );
+          try {
+            final var message =
+              new MimeMessage(
+                Session.getDefaultInstance(new Properties()),
+                new ByteArrayInputStream(data)
+              );
+
+            this.emailsReceived.add(message);
+          } catch (final MessagingException e) {
+            throw new IllegalStateException(e);
+          }
         })
         .build();
     this.smtp.start();

@@ -162,10 +162,6 @@
       <artifactId>jqwik-engine</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.simplejavamail</groupId>
-      <artifactId>simple-java-mail</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.github.davidmoten</groupId>
       <artifactId>subethasmtp</artifactId>
     </dependency>

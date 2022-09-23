@@ -38,6 +38,7 @@
     <module>com.io7m.idstore.protocol.user</module>
     <module>com.io7m.idstore.protocol.versions</module>
     <module>com.io7m.idstore.server.api</module>
+    <module>com.io7m.idstore.server.main</module>
     <module>com.io7m.idstore.server.security</module>
     <module>com.io7m.idstore.server</module>
     <module>com.io7m.idstore.services.api</module>
@@ -53,7 +54,7 @@
     <com.io7m.cedarbridge.version>0.0.6</com.io7m.cedarbridge.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
-    <com.io7m.trasco.version>0.0.4</com.io7m.trasco.version>
+    <com.io7m.trasco.version>0.0.5</com.io7m.trasco.version>
     <io7m.api.previousVersion>0.0.1-SNAPSHOT</io7m.api.previousVersion>
     <jackson.version>2.13.4</jackson.version>
     <jetty.version>11.0.11</jetty.version>
@@ -403,14 +404,9 @@
         <version>1.4.1</version>
       </dependency>
       <dependency>
-        <groupId>org.simplejavamail</groupId>
-        <artifactId>simple-java-mail</artifactId>
-        <version>7.5.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.simplejavamail</groupId>
-        <artifactId>core-module</artifactId>
-        <version>7.5.0</version>
+        <groupId>com.sun.mail</groupId>
+        <artifactId>jakarta.mail</artifactId>
+        <version>2.0.1</version>
       </dependency>
       <dependency>
         <groupId>com.github.davidmoten</groupId>
@@ -487,6 +483,11 @@
         <artifactId>jul-to-slf4j</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.io7m.claypot</groupId>
+        <artifactId>com.io7m.claypot.core</artifactId>
+        <version>0.0.8</version>
+      </dependency>
 
       <dependency>
         <groupId>io.opentelemetry</groupId>
@@ -500,7 +501,11 @@
         <artifactId>opentelemetry-semconv</artifactId>
         <version>1.18.0-alpha</version>
       </dependency>
-
+      <dependency>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-stdlib</artifactId>
+        <version>1.7.10</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

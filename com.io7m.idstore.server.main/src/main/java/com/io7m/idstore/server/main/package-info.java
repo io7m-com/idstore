@@ -14,36 +14,13 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.tests;
+/**
+ * The server main distribution.
+ */
 
-import org.simplejavamail.email.EmailBuilder;
-import org.simplejavamail.mailer.MailerBuilder;
+@Export
+@Version("1.0.0")
+package com.io7m.idstore.server.main;
 
-public final class IdMailTest
-{
-  private IdMailTest()
-  {
-
-  }
-
-  public static void main(
-    final String[] args)
-  {
-    final var mailer =
-      MailerBuilder.withSMTPServer("mail.int.arc7.info", 25)
-        .buildMailer();
-
-    final var email =
-      EmailBuilder.startingBlank()
-        .from("someone@mail.int.arc7.info")
-        .to("rm@mail.int.arc7.info")
-        .withSubject("Test")
-        .appendText("Test")
-        .buildEmail();
-
-    mailer.validate(email);
-
-    mailer.sendMail(email)
-      .join();
-  }
-}
+import org.osgi.annotation.bundle.Export;
+import org.osgi.annotation.versioning.Version;
