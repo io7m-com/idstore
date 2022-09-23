@@ -38,7 +38,7 @@ import java.util.Objects;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 
 /**
- * The protocol messages for Admin v1 Cedarbridge.
+ * The protocol messages for User v1 Cedarbridge.
  */
 
 public final class IdUCB1Messages
@@ -156,5 +156,12 @@ public final class IdUCB1Messages
   public String description()
   {
     return "User v1 Cedarbridge message service.";
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[IdUCB1Messages 0x%s]"
+      .formatted(Long.toUnsignedString(this.hashCode()));
   }
 }

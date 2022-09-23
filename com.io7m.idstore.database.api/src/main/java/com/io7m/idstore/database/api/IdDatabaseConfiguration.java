@@ -22,14 +22,14 @@ import java.util.Objects;
 /**
  * The server database configuration.
  *
- * @param user         The username with which to connect
- * @param password     The password with which to connect
- * @param port         The database TCP/IP port
- * @param upgrade      The upgrade specification
- * @param create       The creation specification
- * @param address      The database address
- * @param databaseName The database name
- * @param clock        A clock for time retrievals
+ * @param user          The username with which to connect
+ * @param password      The password with which to connect
+ * @param port          The database TCP/IP port
+ * @param upgrade       The upgrade specification
+ * @param create        The creation specification
+ * @param address       The database address
+ * @param databaseName  The database name
+ * @param clock         A clock for time retrievals
  */
 
 public record IdDatabaseConfiguration(
@@ -45,14 +45,14 @@ public record IdDatabaseConfiguration(
   /**
    * The server database configuration.
    *
-   * @param user         The username with which to connect
-   * @param password     The password with which to connect
-   * @param port         The database TCP/IP port
-   * @param upgrade      The upgrade specification
-   * @param create       The creation specification
-   * @param address      The database address
-   * @param databaseName The database name
-   * @param clock        A clock for time retrievals
+   * @param user          The username with which to connect
+   * @param password      The password with which to connect
+   * @param port          The database TCP/IP port
+   * @param upgrade       The upgrade specification
+   * @param create        The creation specification
+   * @param address       The database address
+   * @param databaseName  The database name
+   * @param clock         A clock for time retrievals
    */
 
   public IdDatabaseConfiguration

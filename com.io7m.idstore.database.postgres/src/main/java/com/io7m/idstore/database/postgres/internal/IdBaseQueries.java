@@ -16,6 +16,8 @@
 
 package com.io7m.idstore.database.postgres.internal;
 
+import io.opentelemetry.api.trace.Span;
+
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
@@ -32,6 +34,11 @@ abstract class IdBaseQueries
   {
     this.transaction =
       Objects.requireNonNull(inTransaction, "transaction");
+  }
+
+  protected final Span transactionSpan()
+  {
+    return this.transaction.span();
   }
 
   protected final IdDatabaseTransaction transaction()

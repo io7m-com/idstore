@@ -31,8 +31,8 @@ import com.io7m.idstore.server.internal.IdRequestLimits;
 import com.io7m.idstore.server.internal.IdRequests;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -60,7 +60,7 @@ import static org.eclipse.jetty.http.HttpStatus.UNAUTHORIZED_401;
  * A servlet that handles admin logins.
  */
 
-public final class IdA1Login extends HttpServlet
+public final class IdA1Login extends IdCommonInstrumentedServlet
 {
   private static final Logger LOG =
     LoggerFactory.getLogger(IdA1Login.class);
@@ -81,7 +81,7 @@ public final class IdA1Login extends HttpServlet
   public IdA1Login(
     final IdServiceDirectoryType inServices)
   {
-    Objects.requireNonNull(inServices, "inServices");
+    super(Objects.requireNonNull(inServices, "services"));
 
     this.database =
       inServices.requireService(IdDatabaseType.class);

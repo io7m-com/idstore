@@ -20,6 +20,8 @@ import com.io7m.idstore.database.api.IdDatabaseConnectionType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseRole;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Context;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,24 +31,34 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 record IdDatabaseConnection(
   IdDatabase database,
   Connection connection,
-  IdDatabaseRole role)
+  IdDatabaseRole role,
+  Span connectionSpan)
   implements IdDatabaseConnectionType
 {
   @Override
   public IdDatabaseTransactionType openTransaction()
     throws IdDatabaseException
   {
+    final var transactionSpan =
+      this.database.tracer()
+        .spanBuilder("IdDatabaseTransaction")
+        .setParent(Context.current().with(this.connectionSpan))
+        .startSpan();
+
     try {
       final var t =
         new IdDatabaseTransaction(
           this,
-          this.database.clock().instant()
+          this.database.clock().instant(),
+          transactionSpan
         );
 
       t.setRole(this.role);
       t.commit();
       return t;
     } catch (final SQLException e) {
+      transactionSpan.recordException(e);
+      transactionSpan.end();
       throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
     }
   }
@@ -60,7 +72,10 @@ record IdDatabaseConnection(
         this.connection.close();
       }
     } catch (final SQLException e) {
+      this.connectionSpan.recordException(e);
       throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
+    } finally {
+      this.connectionSpan.end();
     }
   }
 }

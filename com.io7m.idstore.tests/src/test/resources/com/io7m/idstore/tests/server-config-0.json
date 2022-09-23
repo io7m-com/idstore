@@ -105,5 +105,10 @@
     "Name": "postgres",
     "Create": true,
     "Upgrade": true
+  },
+
+  "OpenTelemetry": {
+    "LogicalServiceName": "idstore",
+    "OTELCollectorAddress": "http://127.0.0.1:4317"
   }
 }

@@ -60,6 +60,8 @@ public final class IdDatabaseMaintenanceQueries
       this.transaction();
     final var context =
       transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseMaintenanceQueries.runExpireEmailVerifications");
 
     try {
       final var deleted =
@@ -69,7 +71,10 @@ public final class IdDatabaseMaintenanceQueries
 
       LOG.debug("deleted {} expired email verifications", valueOf(deleted));
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -80,6 +85,8 @@ public final class IdDatabaseMaintenanceQueries
       this.transaction();
     final var context =
       transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseMaintenanceQueries.runExpireBans");
 
     try {
       final var deleted =
@@ -89,7 +96,10 @@ public final class IdDatabaseMaintenanceQueries
 
       LOG.debug("deleted {} expired bans", valueOf(deleted));
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 }

@@ -25,6 +25,9 @@ import com.io7m.idstore.database.api.IdDatabaseQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseRole;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -46,24 +49,59 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNSUPPORTED_QUERY_CLASS;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_UNSET;
+import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.DB_SYSTEM;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.DbSystemValues.POSTGRESQL;
 import static org.jooq.SQLDialect.POSTGRES;
 
 final class IdDatabaseTransaction
   implements IdDatabaseTransactionType
 {
   private final IdDatabaseConnection connection;
+  private final Span transactionSpan;
   private Instant timeStart;
   private UUID currentUserId;
   private UUID currentAdminId;
 
+  /**
+   * @return The transaction span for metrics
+   */
+
+  public Span span()
+  {
+    return this.transactionSpan;
+  }
+
+  /**
+   * Create a new query span for measuring query times.
+   *
+   * @param name The query name
+   *
+   * @return The query span
+   */
+
+  public Span createQuerySpan(
+    final String name)
+  {
+    return this.tracer()
+      .spanBuilder(name)
+      .setParent(Context.current().with(this.transactionSpan))
+      .setAttribute(DB_SYSTEM, POSTGRESQL)
+      .setSpanKind(INTERNAL)
+      .startSpan();
+  }
+
   IdDatabaseTransaction(
     final IdDatabaseConnection inConnection,
-    final Instant inTimeStart)
+    final Instant inTimeStart,
+    final Span inTransactionScope)
   {
     this.connection =
       Objects.requireNonNull(inConnection, "connection");
     this.timeStart =
       Objects.requireNonNull(inTimeStart, "timeStart");
+    this.transactionSpan =
+      Objects.requireNonNull(inTransactionScope, "inMetricsScope");
   }
 
   void setRole(
@@ -179,7 +217,14 @@ final class IdDatabaseTransaction
   public void close()
     throws IdDatabaseException
   {
-    this.rollback();
+    try {
+      this.rollback();
+    } catch (final Exception e) {
+      this.transactionSpan.recordException(e);
+      throw e;
+    } finally {
+      this.transactionSpan.end();
+    }
   }
 
   @Override
@@ -280,5 +325,14 @@ final class IdDatabaseTransaction
           ADMIN_OR_USER_UNSET
         );
       });
+  }
+
+  /**
+   * @return The metrics tracer
+   */
+
+  public Tracer tracer()
+  {
+    return this.connection.database().tracer();
   }
 }

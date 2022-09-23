@@ -39,6 +39,10 @@ module com.io7m.idstore.database.postgres
   requires org.postgresql.jdbc;
   requires org.slf4j;
 
+  requires io.opentelemetry.api;
+  requires io.opentelemetry.context;
+  requires io.opentelemetry.semconv;
+
   opens com.io7m.idstore.database.postgres.internal to java.management;
 
   exports com.io7m.idstore.database.postgres;

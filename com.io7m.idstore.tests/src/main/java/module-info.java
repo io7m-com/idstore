@@ -41,7 +41,9 @@ open module com.io7m.idstore.tests
   requires org.eclipse.jetty.jmx;
   requires org.eclipse.jetty.server;
   requires org.eclipse.jetty.servlet;
+  requires jul.to.slf4j;
   requires org.slf4j;
+
   requires transitive org.junit.jupiter.api;
   requires transitive org.junit.jupiter.engine;
   requires transitive org.junit.platform.commons;

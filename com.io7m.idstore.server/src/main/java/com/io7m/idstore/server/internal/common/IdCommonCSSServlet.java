@@ -19,7 +19,6 @@ package com.io7m.idstore.server.internal.common;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -31,7 +30,7 @@ import java.util.regex.Pattern;
  * The CSS servlet.
  */
 
-public final class IdCommonCSSServlet extends HttpServlet
+public final class IdCommonCSSServlet extends IdCommonInstrumentedServlet
 {
   private static final Pattern LEADING_SLASHES =
     Pattern.compile("^/+");
@@ -47,7 +46,7 @@ public final class IdCommonCSSServlet extends HttpServlet
   public IdCommonCSSServlet(
     final IdServiceDirectoryType inServices)
   {
-    Objects.requireNonNull(inServices, "inServices");
+    super(Objects.requireNonNull(inServices, "services"));
 
     this.branding =
       inServices.requireService(IdServerBrandingService.class);

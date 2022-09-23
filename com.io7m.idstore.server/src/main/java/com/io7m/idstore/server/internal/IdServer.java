@@ -53,6 +53,8 @@ import com.io7m.idstore.services.api.IdServiceDirectory;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.SpanKind;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.StatisticsHandler;
@@ -88,6 +90,7 @@ public final class IdServer implements IdServerType
   private final AtomicBoolean closed;
   private IdDatabaseType database;
   private final SubmissionPublisher<IdServerEventType> events;
+  private IdServerTelemetryService telemetry;
 
   /**
    * The main server implementation.
@@ -124,10 +127,21 @@ public final class IdServer implements IdServerType
       throw new IllegalStateException("Server is closed!");
     }
 
-    try {
-      this.database = this.resources.add(this.createDatabase());
+    this.telemetry =
+      IdServerTelemetryService.create(this.configuration);
 
-      final var services = this.createServiceDirectory(this.database);
+    final var startupSpan =
+      this.telemetry.tracer()
+        .spanBuilder("IdServer.start")
+        .setSpanKind(SpanKind.INTERNAL)
+        .startSpan();
+
+    try {
+      this.database =
+        this.resources.add(this.createDatabase(this.telemetry.openTelemetry()));
+
+      final var services =
+        this.createServiceDirectory(this.database, this.telemetry);
       this.resources.add(services);
 
       final var userAPIServer = this.createUserAPIServer(services);
@@ -141,6 +155,8 @@ public final class IdServer implements IdServerType
 
       this.events.submit(new IdServerEventReady(this.configuration.now()));
     } catch (final IdDatabaseException e) {
+      startupSpan.recordException(e);
+
       try {
         this.close();
       } catch (final IdServerException ex) {
@@ -148,12 +164,16 @@ public final class IdServer implements IdServerType
       }
       throw new IdServerException(new IdErrorCode("database"), e.getMessage(), e);
     } catch (final Exception e) {
+      startupSpan.recordException(e);
+
       try {
         this.close();
       } catch (final IdServerException ex) {
         e.addSuppressed(ex);
       }
       throw new IdServerException(new IdErrorCode("startup"), e.getMessage(), e);
+    } finally {
+      startupSpan.end();
     }
   }
 
@@ -173,10 +193,12 @@ public final class IdServer implements IdServerType
   }
 
   private IdServiceDirectory createServiceDirectory(
-    final IdDatabaseType inDatabase)
+    final IdDatabaseType inDatabase,
+    final IdServerTelemetryService inTelemetry)
     throws IOException
   {
     final var services = new IdServiceDirectory();
+    services.register(IdServerTelemetryService.class, inTelemetry);
     services.register(IdDatabaseType.class, inDatabase);
 
     final var eventBus = new IdServerEventBusService(this.events);
@@ -189,6 +211,7 @@ public final class IdServer implements IdServerType
       IdServerMailService.class,
       IdServerMailService.create(
         this.configuration.clock(),
+        inTelemetry,
         eventBus,
         this.configuration.mailConfiguration())
     );
@@ -611,12 +634,14 @@ public final class IdServer implements IdServerType
     return server;
   }
 
-  private IdDatabaseType createDatabase()
+  private IdDatabaseType createDatabase(
+    final OpenTelemetry openTelemetry)
     throws IdDatabaseException
   {
     return this.configuration.databases()
       .open(
         this.configuration.databaseConfiguration(),
+        openTelemetry,
         event -> {
 
         });

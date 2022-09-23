@@ -23,6 +23,7 @@ import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * The configuration for a server.
@@ -39,6 +40,7 @@ import java.util.Objects;
  * @param mailConfiguration     The mail server configuration
  * @param branding              The branding configuration
  * @param history               The history configuration
+ * @param openTelemetry         The OpenTelemetry configuration
  */
 
 public record IdServerConfiguration(
@@ -52,7 +54,8 @@ public record IdServerConfiguration(
   IdServerHTTPServiceConfiguration adminApiAddress,
   IdServerHTTPServiceConfiguration adminViewAddress,
   IdServerBrandingConfiguration branding,
-  IdServerHistoryConfiguration history)
+  IdServerHistoryConfiguration history,
+  Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
 {
   /**
    * The configuration for a server.
@@ -69,6 +72,7 @@ public record IdServerConfiguration(
    * @param mailConfiguration     The mail server configuration
    * @param branding              The branding configuration
    * @param history               The history configuration
+   * @param openTelemetry         The OpenTelemetry configuration
    */
 
   public IdServerConfiguration
@@ -84,6 +88,7 @@ public record IdServerConfiguration(
     Objects.requireNonNull(userViewAddress, "userViewAddress");
     Objects.requireNonNull(branding, "branding");
     Objects.requireNonNull(history, "history");
+    Objects.requireNonNull(openTelemetry, "openTelemetry");
   }
 
   /**

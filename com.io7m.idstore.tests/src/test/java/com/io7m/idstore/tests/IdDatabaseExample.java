@@ -24,6 +24,7 @@ import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.jmulticlose.core.CloseableCollection;
+import io.opentelemetry.api.OpenTelemetry;
 
 import java.security.SecureRandom;
 import java.time.Clock;
@@ -69,7 +70,7 @@ public final class IdDatabaseExample
 
     try (var resources = CloseableCollection.create()) {
       final var database =
-        resources.add(databases.open(configuration, message -> {
+        resources.add(databases.open(configuration, OpenTelemetry.noop(), message -> {
 
         }));
       final var c =

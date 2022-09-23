@@ -34,6 +34,15 @@ module com.io7m.idstore.server
   requires com.io7m.idstore.server.security;
   requires com.io7m.idstore.services.api;
 
+  requires io.opentelemetry.api;
+  requires io.opentelemetry.context;
+  requires io.opentelemetry.exporter.otlp;
+  requires io.opentelemetry.sdk.common;
+  requires io.opentelemetry.sdk.metrics;
+  requires io.opentelemetry.sdk.trace;
+  requires io.opentelemetry.sdk;
+  requires io.opentelemetry.semconv;
+
   requires ch.qos.logback.classic;
   requires ch.qos.logback.core;
   requires com.fasterxml.jackson.databind;
@@ -50,6 +59,7 @@ module com.io7m.idstore.server
   requires org.eclipse.jetty.servlet;
   requires org.simplejavamail.core;
   requires org.simplejavamail;
+  requires org.slf4j;
 
   opens com.io7m.idstore.server.internal
     to com.io7m.jxtrand.vanilla;

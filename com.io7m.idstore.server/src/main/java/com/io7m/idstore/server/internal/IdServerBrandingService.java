@@ -225,4 +225,11 @@ public final class IdServerBrandingService implements IdServiceType
   {
     return this.loginExtraText;
   }
+
+  @Override
+  public String toString()
+  {
+    return "[IdServerBrandingService 0x%s]"
+      .formatted(Long.toUnsignedString(this.hashCode()));
+  }
 }

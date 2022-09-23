@@ -78,9 +78,9 @@ public final class IdServerConfigurations
   /**
    * Read a server configuration from the given file.
    *
-   * @param locale The locale
-   * @param clock  The clock
-   * @param file   The file
+   * @param locale        The locale
+   * @param clock         The clock
+   * @param file          The file
    *
    * @return A server configuration
    */
@@ -127,7 +127,8 @@ public final class IdServerConfigurations
       file.httpConfiguration().adminAPIService(),
       file.httpConfiguration().adminViewService(),
       file.brandingConfiguration(),
-      file.historyConfiguration()
+      file.historyConfiguration(),
+      file.openTelemetry()
     );
   }
 

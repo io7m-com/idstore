@@ -157,4 +157,11 @@ public final class IdACB1Messages
   {
     return "Admin v1 Cedarbridge message service.";
   }
+
+  @Override
+  public String toString()
+  {
+    return "[IdACB1Messages 0x%s]"
+      .formatted(Long.toUnsignedString(this.hashCode()));
+  }
 }

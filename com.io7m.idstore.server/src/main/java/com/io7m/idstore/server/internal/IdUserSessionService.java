@@ -125,4 +125,11 @@ public final class IdUserSessionService
       Integer.valueOf(this.controllers.size())
     );
   }
+
+  @Override
+  public String toString()
+  {
+    return "[IdUserSessionService 0x%s]"
+      .formatted(Long.toUnsignedString(this.hashCode()));
+  }
 }

@@ -138,4 +138,11 @@ public final class IdServerMaintenanceService
   {
     this.executor.shutdown();
   }
+
+  @Override
+  public String toString()
+  {
+    return "[IdServerMaintenanceService 0x%s]"
+      .formatted(Long.toUnsignedString(this.hashCode()));
+  }
 }

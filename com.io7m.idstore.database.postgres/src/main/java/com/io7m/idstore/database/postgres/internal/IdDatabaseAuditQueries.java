@@ -18,7 +18,6 @@ package com.io7m.idstore.database.postgres.internal;
 
 import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
-import com.io7m.idstore.database.postgres.internal.tables.records.AuditRecord;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 import org.jooq.Condition;
@@ -45,18 +44,6 @@ final class IdDatabaseAuditQueries
     super(inTransaction);
   }
 
-  private static IdAuditEvent toAuditEvent(
-    final AuditRecord record)
-  {
-    return new IdAuditEvent(
-      record.getId().longValue(),
-      record.getUserId(),
-      record.getTime(),
-      record.getType(),
-      record.getMessage()
-    );
-  }
-
   @Override
   public List<IdAuditEvent> auditEvents(
     final IdAuditSearchParameters parameters,
@@ -66,8 +53,12 @@ final class IdDatabaseAuditQueries
     Objects.requireNonNull(parameters, "parameters");
     Objects.requireNonNull(seek, "seek");
 
-    final var transaction = this.transaction();
-    final var context = transaction.createContext();
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAuditQueries.auditEvents");
 
     try {
       final var baseSelection =
@@ -141,7 +132,10 @@ final class IdDatabaseAuditQueries
         });
 
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -158,8 +152,11 @@ final class IdDatabaseAuditQueries
     Objects.requireNonNull(type, "type");
     Objects.requireNonNull(message, "message");
 
-    final var context =
-      this.transaction().createContext();
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAuditQueries.auditPut");
 
     try {
       context.insertInto(AUDIT)
@@ -169,7 +166,10 @@ final class IdDatabaseAuditQueries
         .set(AUDIT.MESSAGE, message)
         .execute();
     } catch (final DataAccessException e) {
-      throw handleDatabaseException(this.transaction(), e);
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -182,6 +182,9 @@ final class IdDatabaseAuditQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
+
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAuditQueries.auditCount");
 
     try {
       /*
@@ -232,7 +235,10 @@ final class IdDatabaseAuditQueries
         .longValue();
 
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
     }
   }
 }

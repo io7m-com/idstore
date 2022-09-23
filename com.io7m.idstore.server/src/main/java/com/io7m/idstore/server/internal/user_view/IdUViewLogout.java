@@ -17,19 +17,20 @@
 
 package com.io7m.idstore.server.internal.user_view;
 
+import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Log out.
  */
 
-public final class IdUViewLogout extends HttpServlet
+public final class IdUViewLogout extends IdCommonInstrumentedServlet
 {
   /**
    * Log out.
@@ -40,7 +41,7 @@ public final class IdUViewLogout extends HttpServlet
   public IdUViewLogout(
     final IdServiceDirectoryType inServices)
   {
-
+    super(Objects.requireNonNull(inServices, "services"));
   }
 
   @Override

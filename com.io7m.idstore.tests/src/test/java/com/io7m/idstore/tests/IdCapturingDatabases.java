@@ -20,6 +20,7 @@ import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseFactoryType;
 import com.io7m.idstore.database.api.IdDatabaseType;
+import io.opentelemetry.api.OpenTelemetry;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -46,11 +47,12 @@ final class IdCapturingDatabases
   @Override
   public IdDatabaseType open(
     final IdDatabaseConfiguration configuration,
+    final OpenTelemetry openTelemetry,
     final Consumer<String> startupMessages)
     throws IdDatabaseException
   {
     final var database =
-      this.delegate.open(configuration, startupMessages);
+      this.delegate.open(configuration, openTelemetry, startupMessages);
     this.mostRecent = database;
     return database;
   }

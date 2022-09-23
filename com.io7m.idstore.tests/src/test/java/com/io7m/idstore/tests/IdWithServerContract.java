@@ -38,6 +38,7 @@ import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerType;
+import io.opentelemetry.api.OpenTelemetry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.simplejavamail.api.email.Email;
@@ -297,7 +298,8 @@ public abstract class IdWithServerContract
         adminApiService,
         adminViewService,
         branding,
-        history
+        history,
+        Optional.empty()
       )
     );
   }

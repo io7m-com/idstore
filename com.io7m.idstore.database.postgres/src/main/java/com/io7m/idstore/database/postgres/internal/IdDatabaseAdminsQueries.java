@@ -204,8 +204,10 @@ final class IdDatabaseAdminsQueries
     Objects.requireNonNull(created, "created");
     Objects.requireNonNull(password, "password");
 
-    final var context =
-      this.transaction().createContext();
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminCreateInitial");
 
     try {
       final var existing =
@@ -259,7 +261,10 @@ final class IdDatabaseAdminsQueries
       audit.execute();
       return this.adminGet(id).orElseThrow();
     } catch (final DataAccessException e) {
-      throw handleDatabaseException(this.transaction(), e);
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -286,6 +291,9 @@ final class IdDatabaseAdminsQueries
     final var transaction = this.transaction();
     final var context = transaction.createContext();
     final var executor = transaction.adminId();
+
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminCreate");
 
     try {
       {
@@ -359,7 +367,10 @@ final class IdDatabaseAdminsQueries
 
       return this.adminGet(id).orElseThrow();
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -370,7 +381,13 @@ final class IdDatabaseAdminsQueries
   {
     Objects.requireNonNull(id, "id");
 
-    final var context = this.transaction().createContext();
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminGet");
+
     try {
       final var adminRecordOpt =
         context.selectFrom(ADMINS)
@@ -391,9 +408,13 @@ final class IdDatabaseAdminsQueries
 
       return Optional.of(adminMap(adminRecord, emails));
     } catch (final DataAccessException e) {
-      throw handleDatabaseException(this.transaction(), e);
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
     } catch (final IdPasswordException e) {
+      querySpan.recordException(e);
       throw handlePasswordException(e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -404,7 +425,13 @@ final class IdDatabaseAdminsQueries
   {
     Objects.requireNonNull(name, "name");
 
-    final var context = this.transaction().createContext();
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminGetForName");
+
     try {
       final var adminRecordOpt =
         context.selectFrom(ADMINS)
@@ -425,9 +452,13 @@ final class IdDatabaseAdminsQueries
 
       return Optional.of(adminMap(adminRecord, emails));
     } catch (final DataAccessException e) {
-      throw handleDatabaseException(this.transaction(), e);
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
     } catch (final IdPasswordException e) {
+      querySpan.recordException(e);
       throw handlePasswordException(e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -447,7 +478,13 @@ final class IdDatabaseAdminsQueries
   {
     Objects.requireNonNull(email, "email");
 
-    final var context = this.transaction().createContext();
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminGetForEmail");
+
     try {
       final var emailOpt =
         context.selectFrom(EMAILS)
@@ -465,7 +502,10 @@ final class IdDatabaseAdminsQueries
 
       return this.adminGet(emailRecord.getAdminId());
     } catch (final DataAccessException e) {
-      throw handleDatabaseException(this.transaction(), e);
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -480,8 +520,12 @@ final class IdDatabaseAdminsQueries
     Objects.requireNonNull(userAgent, "userAgent");
     Objects.requireNonNull(host, "host");
 
+    final var transaction =
+      this.transaction();
     final var context =
-      this.transaction().createContext();
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminLogin");
 
     try {
       final var time = this.currentTime();
@@ -514,7 +558,10 @@ final class IdDatabaseAdminsQueries
 
       audit.execute();
     } catch (final DataAccessException e) {
-      throw handleDatabaseException(this.transaction(), e);
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -529,6 +576,8 @@ final class IdDatabaseAdminsQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminSearchByEmail");
 
     try {
       final var baseSelection =
@@ -604,7 +653,10 @@ final class IdDatabaseAdminsQueries
       }
       return results;
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -615,8 +667,12 @@ final class IdDatabaseAdminsQueries
   {
     Objects.requireNonNull(parameters, "parameters");
 
-    final var transaction = this.transaction();
-    final var context = transaction.createContext();
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminSearchByEmailCount");
 
     try {
       /*
@@ -660,7 +716,10 @@ final class IdDatabaseAdminsQueries
 
       return query.longValue();
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -673,8 +732,12 @@ final class IdDatabaseAdminsQueries
     Objects.requireNonNull(parameters, "parameters");
     Objects.requireNonNull(seek, "seek");
 
-    final var transaction = this.transaction();
-    final var context = transaction.createContext();
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminSearch");
 
     try {
       final var baseSelection =
@@ -748,7 +811,10 @@ final class IdDatabaseAdminsQueries
           );
         });
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -759,8 +825,12 @@ final class IdDatabaseAdminsQueries
   {
     Objects.requireNonNull(parameters, "parameters");
 
-    final var transaction = this.transaction();
-    final var context = transaction.createContext();
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminSearchCount");
 
     try {
 
@@ -810,7 +880,10 @@ final class IdDatabaseAdminsQueries
         .getValue(0))
         .longValue();
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -840,6 +913,8 @@ final class IdDatabaseAdminsQueries
     final var transaction = this.transaction();
     final var context = transaction.createContext();
     final var executor = transaction.adminId();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminUpdate");
 
     try {
       final var record = context.fetchOne(ADMINS, ADMINS.ID.eq(id));
@@ -903,7 +978,10 @@ final class IdDatabaseAdminsQueries
 
       record.store();
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -919,6 +997,8 @@ final class IdDatabaseAdminsQueries
     final var transaction = this.transaction();
     final var context = transaction.createContext();
     final var executor = transaction.adminId();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminEmailAdd");
 
     try {
       context.fetchOptional(ADMINS, ADMINS.ID.eq(id))
@@ -937,7 +1017,10 @@ final class IdDatabaseAdminsQueries
         .execute();
 
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -953,6 +1036,8 @@ final class IdDatabaseAdminsQueries
     final var transaction = this.transaction();
     final var context = transaction.createContext();
     final var executor = transaction.adminId();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminEmailRemove");
 
     try {
       context.fetchOptional(ADMINS, ADMINS.ID.eq(id))
@@ -985,7 +1070,10 @@ final class IdDatabaseAdminsQueries
         .execute();
 
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -999,6 +1087,8 @@ final class IdDatabaseAdminsQueries
     final var transaction = this.transaction();
     final var context = transaction.createContext();
     final var executor = transaction.adminId();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminDelete");
 
     try {
       final var admin = this.adminGetRequire(id);
@@ -1024,7 +1114,10 @@ final class IdDatabaseAdminsQueries
         .execute();
 
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -1038,6 +1131,8 @@ final class IdDatabaseAdminsQueries
     final var transaction = this.transaction();
     final var context = transaction.createContext();
     final var executor = transaction.adminId();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminBanCreate");
 
     try {
       final var user =
@@ -1062,7 +1157,10 @@ final class IdDatabaseAdminsQueries
         .execute();
 
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -1075,6 +1173,8 @@ final class IdDatabaseAdminsQueries
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminBanGet");
 
     try {
       final var user =
@@ -1094,7 +1194,10 @@ final class IdDatabaseAdminsQueries
         )
       );
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -1108,6 +1211,8 @@ final class IdDatabaseAdminsQueries
     final var transaction = this.transaction();
     final var context = transaction.createContext();
     final var executor = transaction.adminId();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminBanDelete");
 
     try {
       final var user =
@@ -1129,7 +1234,10 @@ final class IdDatabaseAdminsQueries
         .execute();
 
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 }

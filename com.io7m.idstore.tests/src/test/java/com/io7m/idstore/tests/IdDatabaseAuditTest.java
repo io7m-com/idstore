@@ -37,6 +37,7 @@ import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.jmulticlose.core.ClosingResourceFailedException;
+import io.opentelemetry.api.OpenTelemetry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,6 +95,7 @@ public final class IdDatabaseAuditTest
           UPGRADE_DATABASE,
           Clock.systemUTC()
         ),
+        OpenTelemetry.noop(),
         message -> {
 
         }

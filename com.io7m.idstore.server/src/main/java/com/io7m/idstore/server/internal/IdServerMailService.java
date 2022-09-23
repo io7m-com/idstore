@@ -50,12 +50,14 @@ public final class IdServerMailService implements IdServiceType
   private final Clock clock;
   private final IdServerMailConfiguration configuration;
   private final IdServerEventBusService events;
+  private final IdServerTelemetryService telemetry;
   private final Mailer mailer;
 
   private IdServerMailService(
     final Clock inClock,
     final IdServerMailConfiguration inConfiguration,
     final IdServerEventBusService inEvents,
+    final IdServerTelemetryService inTelemetry,
     final Mailer inMailer)
   {
     this.clock =
@@ -64,6 +66,8 @@ public final class IdServerMailService implements IdServiceType
       Objects.requireNonNull(inConfiguration, "configuration");
     this.events =
       Objects.requireNonNull(inEvents, "events");
+    this.telemetry =
+      Objects.requireNonNull(inTelemetry, "telemetry");
     this.mailer =
       Objects.requireNonNull(inMailer, "mailer");
   }
@@ -72,6 +76,7 @@ public final class IdServerMailService implements IdServiceType
    * Create a new mail service.
    *
    * @param clock         The clock
+   * @param telemetry     The telemetry service
    * @param events        The event bus service
    * @param configuration The mail configuration
    *
@@ -80,10 +85,12 @@ public final class IdServerMailService implements IdServiceType
 
   public static IdServerMailService create(
     final Clock clock,
+    final IdServerTelemetryService telemetry,
     final IdServerEventBusService events,
     final IdServerMailConfiguration configuration)
   {
     Objects.requireNonNull(clock, "clock");
+    Objects.requireNonNull(telemetry, "telemetry");
     Objects.requireNonNull(events, "events");
     Objects.requireNonNull(configuration, "configuration");
 
@@ -122,6 +129,7 @@ public final class IdServerMailService implements IdServiceType
       clock,
       configuration,
       events,
+      telemetry,
       mailerBuilder.buildMailer()
     );
   }
@@ -145,13 +153,27 @@ public final class IdServerMailService implements IdServiceType
     final String subject,
     final String text)
   {
-    try {
-      Objects.requireNonNull(requestId, "requestId");
-      Objects.requireNonNull(to, "to");
-      Objects.requireNonNull(subject, "subject");
-      Objects.requireNonNull(headers, "headers");
-      Objects.requireNonNull(text, "text");
+    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(to, "to");
+    Objects.requireNonNull(subject, "subject");
+    Objects.requireNonNull(headers, "headers");
+    Objects.requireNonNull(text, "text");
 
+    final var transport =
+      this.configuration.transportConfiguration();
+
+    final var span =
+      this.telemetry.tracer()
+        .spanBuilder("IdServerMailService.sendMail")
+        .setAttribute("smtp.source_request", requestId.toString())
+        .setAttribute("smtp.to", to.value())
+        .setAttribute("smtp.subject", subject)
+        .setAttribute("smtp.from", this.configuration.senderAddress())
+        .setAttribute("smtp.host", transport.host())
+        .setAttribute("smtp.port", transport.port())
+        .startSpan();
+
+    try {
       final var emailBuilder =
         EmailBuilder.startingBlank();
 
@@ -169,6 +191,7 @@ public final class IdServerMailService implements IdServiceType
 
       return this.mailer.sendMail(email);
     } catch (final Exception e) {
+      span.recordException(e);
       this.events.publish(
         new IdServerEventMailServiceFailure(
           OffsetDateTime.now(this.clock),
@@ -177,6 +200,8 @@ public final class IdServerMailService implements IdServiceType
         )
       );
       throw e;
+    } finally {
+      span.end();
     }
   }
 
@@ -184,5 +209,12 @@ public final class IdServerMailService implements IdServiceType
   public String description()
   {
     return "Mail service.";
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[IdServerMailService 0x%s]"
+      .formatted(Long.toUnsignedString(this.hashCode()));
   }
 }

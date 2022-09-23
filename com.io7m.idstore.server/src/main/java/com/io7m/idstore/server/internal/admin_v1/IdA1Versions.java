@@ -21,8 +21,8 @@ import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.versions.IdVMessages;
 import com.io7m.idstore.protocol.versions.IdVProtocolSupported;
 import com.io7m.idstore.protocol.versions.IdVProtocols;
+import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -30,12 +30,13 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A versioning servlet.
  */
 
-public final class IdA1Versions extends HttpServlet
+public final class IdA1Versions extends IdCommonInstrumentedServlet
 {
   private static final IdVProtocols PROTOCOLS =
     createProtocols();
@@ -51,6 +52,8 @@ public final class IdA1Versions extends HttpServlet
   public IdA1Versions(
     final IdServiceDirectoryType inServices)
   {
+    super(Objects.requireNonNull(inServices, "services"));
+
     this.messages =
       inServices.requireService(IdVMessages.class);
   }

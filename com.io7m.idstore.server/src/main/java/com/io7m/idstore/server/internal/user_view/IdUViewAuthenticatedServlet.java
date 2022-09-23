@@ -25,13 +25,13 @@ import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.IdUserSession;
 import com.io7m.idstore.server.internal.IdUserSessionService;
+import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -51,7 +51,8 @@ import static com.io7m.idstore.server.logging.IdServerMDCRequestProcessor.mdcFor
  * execution to a subclass.
  */
 
-public abstract class IdUViewAuthenticatedServlet extends HttpServlet
+public abstract class IdUViewAuthenticatedServlet
+  extends IdCommonInstrumentedServlet
 {
   private final IdServerClock clock;
   private final IdServerStrings strings;
@@ -73,9 +74,10 @@ public abstract class IdUViewAuthenticatedServlet extends HttpServlet
   protected IdUViewAuthenticatedServlet(
     final IdServiceDirectoryType inServices)
   {
-    this.services =
-      Objects.requireNonNull(inServices, "services");
+    super(Objects.requireNonNull(inServices, "inServices"));
 
+    this.services =
+      inServices;
     this.strings =
       inServices.requireService(IdServerStrings.class);
     this.clock =

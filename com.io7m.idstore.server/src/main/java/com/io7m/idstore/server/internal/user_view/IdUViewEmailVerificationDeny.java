@@ -27,6 +27,7 @@ import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
+import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
@@ -36,7 +37,6 @@ import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -50,7 +50,8 @@ import static com.io7m.idstore.server.internal.IdServerRequestDecoration.request
  * The endpoint that allows for completing email verification challenges.
  */
 
-public final class IdUViewEmailVerificationDeny extends HttpServlet
+public final class IdUViewEmailVerificationDeny
+  extends IdCommonInstrumentedServlet
 {
   private final IdDatabaseType database;
   private final IdServerStrings strings;
@@ -68,7 +69,7 @@ public final class IdUViewEmailVerificationDeny extends HttpServlet
   public IdUViewEmailVerificationDeny(
     final IdServiceDirectoryType inServices)
   {
-    Objects.requireNonNull(inServices, "inServices");
+    super(Objects.requireNonNull(inServices, "services"));
 
     this.services =
       Objects.requireNonNull(inServices, "inServices");

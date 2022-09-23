@@ -89,6 +89,26 @@ public final class IdACommandExecutor
     final IdACommandType<? extends IdAResponseType> command)
     throws IdCommandExecutionFailure, IOException, InterruptedException
   {
+    final var span =
+      context.tracer()
+        .spanBuilder(command.getClass().getSimpleName())
+        .startSpan();
+
+    try (var ignored = span.makeCurrent()) {
+      return executeCommand(context, command);
+    } catch (final Throwable e) {
+      span.recordException(e);
+      throw e;
+    } finally {
+      span.end();
+    }
+  }
+
+  private static IdAResponseType executeCommand(
+    final IdACommandContext context,
+    final IdACommandType<? extends IdAResponseType> command)
+    throws IdCommandExecutionFailure, IOException, InterruptedException
+  {
     if (command instanceof IdACommandAdminSelf c) {
       return new IdACmdAdminSelf().execute(context, c);
     }

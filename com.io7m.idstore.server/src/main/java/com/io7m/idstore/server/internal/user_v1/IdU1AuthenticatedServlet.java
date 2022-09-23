@@ -25,9 +25,9 @@ import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -52,7 +52,8 @@ import static org.eclipse.jetty.http.HttpStatus.INTERNAL_SERVER_ERROR_500;
  * execution to a subclass.
  */
 
-public abstract class IdU1AuthenticatedServlet extends HttpServlet
+public abstract class IdU1AuthenticatedServlet
+  extends IdCommonInstrumentedServlet
 {
   private final IdUCB1Sends sends;
   private final IdServerClock clock;
@@ -71,7 +72,7 @@ public abstract class IdU1AuthenticatedServlet extends HttpServlet
   protected IdU1AuthenticatedServlet(
     final IdServiceDirectoryType services)
   {
-    Objects.requireNonNull(services, "services");
+    super(Objects.requireNonNull(services, "services"));
 
     this.messages =
       services.requireService(IdUCB1Messages.class);

@@ -55,8 +55,12 @@ final class IdDatabaseEmailsQueries
   {
     Objects.requireNonNull(email, "email");
 
+    final var transaction =
+      this.transaction();
     final var context =
-      this.transaction().createContext();
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseEmailsQueries.emailExists");
 
     try {
       final var emailRecordOpt =
@@ -87,7 +91,10 @@ final class IdDatabaseEmailsQueries
         )
       );
     } catch (final DataAccessException e) {
-      throw handleDatabaseException(this.transaction(), e);
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -101,6 +108,9 @@ final class IdDatabaseEmailsQueries
     final var transaction = this.transaction();
     final var context = transaction.createContext();
     final var executor = transaction.userId();
+
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseEmailsQueries.emailVerificationCreate");
 
     try {
       context.selectFrom(USER_IDS)
@@ -138,7 +148,10 @@ final class IdDatabaseEmailsQueries
         .execute();
 
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -149,8 +162,12 @@ final class IdDatabaseEmailsQueries
   {
     Objects.requireNonNull(token, "token");
 
+    final var transaction =
+      this.transaction();
     final var context =
-      this.transaction().createContext();
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseEmailsQueries.emailVerificationGet");
 
     try {
       return context.selectFrom(EMAIL_VERIFICATIONS)
@@ -158,7 +175,10 @@ final class IdDatabaseEmailsQueries
         .fetchOptional()
         .map(IdDatabaseEmailsQueries::mapVerification);
     } catch (final DataAccessException e) {
-      throw handleDatabaseException(this.transaction(), e);
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 
@@ -183,9 +203,14 @@ final class IdDatabaseEmailsQueries
     Objects.requireNonNull(token, "token");
     Objects.requireNonNull(resolution, "resolution");
 
-    final var transaction = this.transaction();
-    final var context = transaction.createContext();
-    final var executor = transaction.userId();
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var executor =
+      transaction.userId();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseEmailsQueries.emailVerificationDelete");
 
     try {
       context.deleteFrom(EMAIL_VERIFICATIONS)
@@ -200,7 +225,10 @@ final class IdDatabaseEmailsQueries
         .execute();
 
     } catch (final DataAccessException e) {
+      querySpan.recordException(e);
       throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
     }
   }
 }

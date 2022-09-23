@@ -17,11 +17,13 @@
 package com.io7m.idstore.server.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * The server configuration file.
@@ -31,6 +33,7 @@ import java.util.Objects;
  * @param httpConfiguration     The HTTP configuration
  * @param databaseConfiguration The database configuration
  * @param historyConfiguration  The history configuration
+ * @param openTelemetry         The OpenTelemetry configuration
  */
 
 @JsonDeserialize
@@ -45,7 +48,10 @@ public record IdServerConfigurationFile(
   @JsonProperty(value = "Database", required = true)
   IdServerDatabaseConfiguration databaseConfiguration,
   @JsonProperty(value = "History", required = true)
-  IdServerHistoryConfiguration historyConfiguration)
+  IdServerHistoryConfiguration historyConfiguration,
+  @JsonInclude(JsonInclude.Include.NON_ABSENT)
+  @JsonProperty(value = "OpenTelemetry")
+  Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
   implements IdServerJSONConfigurationElementType
 {
   /**
@@ -56,6 +62,7 @@ public record IdServerConfigurationFile(
    * @param httpConfiguration     The HTTP configuration
    * @param databaseConfiguration The database configuration
    * @param historyConfiguration  The history configuration
+   * @param openTelemetry         The OpenTelemetry configuration
    */
 
   @JsonCreator
@@ -66,5 +73,6 @@ public record IdServerConfigurationFile(
     Objects.requireNonNull(httpConfiguration, "httpConfiguration");
     Objects.requireNonNull(databaseConfiguration, "databaseConfiguration");
     Objects.requireNonNull(historyConfiguration, "historyConfiguration");
+    Objects.requireNonNull(openTelemetry, "openTelemetry");
   }
 }

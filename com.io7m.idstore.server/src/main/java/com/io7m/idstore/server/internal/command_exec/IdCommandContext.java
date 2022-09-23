@@ -27,12 +27,14 @@ import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.IdServerTelemetryService;
 import com.io7m.idstore.server.internal.IdUserSession;
 import com.io7m.idstore.server.security.IdSecActionType;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecurity;
 import com.io7m.idstore.server.security.IdSecurityException;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import io.opentelemetry.api.trace.Tracer;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
@@ -62,6 +64,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
   private final IdUserSession userSession;
   private final String remoteHost;
   private final String remoteUserAgent;
+  private final Tracer tracer;
 
   /**
    * The context for execution of a command (or set of commands in a
@@ -103,6 +106,9 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
       Objects.requireNonNull(inRemoteHost, "remoteHost");
     this.remoteUserAgent =
       Objects.requireNonNull(inRemoteUserAgent, "remoteUserAgent");
+    this.tracer =
+      inServices.requireService(IdServerTelemetryService.class)
+        .tracer();
   }
 
   /**
@@ -157,6 +163,15 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
   public final IdDatabaseTransactionType transaction()
   {
     return this.transaction;
+  }
+
+  /**
+   * @return The OpenTelemetry tracer
+   */
+
+  public final Tracer tracer()
+  {
+    return this.tracer;
   }
 
   /**

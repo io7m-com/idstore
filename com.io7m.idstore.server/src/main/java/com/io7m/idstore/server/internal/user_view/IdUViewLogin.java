@@ -30,13 +30,13 @@ import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerConfigurationService;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.internal.freemarker.IdFMLoginData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -56,7 +56,7 @@ import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
  * The login form.
  */
 
-public final class IdUViewLogin extends HttpServlet
+public final class IdUViewLogin extends IdCommonInstrumentedServlet
 {
   private static final Logger LOG =
     LoggerFactory.getLogger(IdUViewLogin.class);
@@ -77,7 +77,7 @@ public final class IdUViewLogin extends HttpServlet
   public IdUViewLogin(
     final IdServiceDirectoryType inServices)
   {
-    Objects.requireNonNull(inServices, "inServices");
+    super(Objects.requireNonNull(inServices, "inServices"));
 
     this.database =
       inServices.requireService(IdDatabaseType.class);

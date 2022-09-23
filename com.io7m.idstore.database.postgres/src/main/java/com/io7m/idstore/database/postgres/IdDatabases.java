@@ -33,6 +33,7 @@ import com.io7m.trasco.vanilla.TrExecutors;
 import com.io7m.trasco.vanilla.TrSchemaRevisionSetParsers;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.opentelemetry.api.OpenTelemetry;
 import org.postgresql.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,10 +139,12 @@ public final class IdDatabases implements IdDatabaseFactoryType
   @Override
   public IdDatabaseType open(
     final IdDatabaseConfiguration configuration,
+    final OpenTelemetry openTelemetry,
     final Consumer<String> startupMessages)
     throws IdDatabaseException
   {
     Objects.requireNonNull(configuration, "configuration");
+    Objects.requireNonNull(openTelemetry, "openTelemetry");
     Objects.requireNonNull(startupMessages, "startupMessages");
 
     try {
@@ -191,6 +194,7 @@ public final class IdDatabases implements IdDatabaseFactoryType
       setupMetrics(metrics);
 
       return new IdDatabase(
+        openTelemetry,
         configuration.clock(),
         dataSource,
         metrics

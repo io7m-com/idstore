@@ -35,11 +35,13 @@ import com.io7m.idstore.server.api.IdServerHTTPServiceConfiguration;
 import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
+import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration;
 import com.io7m.idstore.server.api.IdServerType;
 import com.io7m.idstore.server.api.events.IdServerEventReady;
 import com.io7m.idstore.server.api.events.IdServerEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.subethamail.smtp.server.SMTPServer;
 
 import java.io.IOException;
@@ -75,6 +77,9 @@ public final class IdServerDemo
     System.setProperty("org.jooq.no-tips", "true");
     System.setProperty("org.jooq.no-logo", "true");
 
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+
     final var tmpDirectory =
       IdTestDirectories.createTempDirectory();
 
@@ -83,6 +88,12 @@ public final class IdServerDemo
         IdServerDemo.class,
         tmpDirectory,
         "loginExtra.xhtml"
+      );
+
+    final var openTelemetry =
+      new IdServerOpenTelemetryConfiguration(
+        "idstore",
+        URI.create("http://127.0.0.1:4317")
       );
 
     final var databaseConfiguration =
@@ -163,7 +174,8 @@ public final class IdServerDemo
         adminApiService,
         adminViewService,
         branding,
-        history
+        history,
+        Optional.of(openTelemetry)
       );
 
     final var smtp =
