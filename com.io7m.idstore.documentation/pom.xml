@@ -238,6 +238,38 @@
           </execution>
 
           <execution>
+            <id>unpack-config-schemas</id>
+            <phase>package</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <excludes>module-info.java</excludes>
+              <includeGroupIds>${project.groupId}</includeGroupIds>
+              <includes>**/*.schema.json</includes>
+              <classifier>sources</classifier>
+              <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+              <outputDirectory>${project.build.directory}/documentation</outputDirectory>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>unpack-config-schemas-epub</id>
+            <phase>package</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <excludes>module-info.java</excludes>
+              <includeGroupIds>${project.groupId}</includeGroupIds>
+              <includes>**/*.schema.json</includes>
+              <classifier>sources</classifier>
+              <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+              <outputDirectory>${project.build.directory}/epub</outputDirectory>
+            </configuration>
+          </execution>
+
+          <execution>
             <id>unpack-cedarbridge-schemas</id>
             <phase>package</phase>
             <goals>
