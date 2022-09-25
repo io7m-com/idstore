@@ -46,6 +46,10 @@ import com.io7m.idstore.server.internal.user_view.IdUViewEmailVerificationPermit
 import com.io7m.idstore.server.internal.user_view.IdUViewLogin;
 import com.io7m.idstore.server.internal.user_view.IdUViewLogout;
 import com.io7m.idstore.server.internal.user_view.IdUViewMain;
+import com.io7m.idstore.server.internal.user_view.IdUViewPasswordReset;
+import com.io7m.idstore.server.internal.user_view.IdUViewPasswordResetConfirm;
+import com.io7m.idstore.server.internal.user_view.IdUViewPasswordResetConfirmRun;
+import com.io7m.idstore.server.internal.user_view.IdUViewPasswordResetRun;
 import com.io7m.idstore.server.internal.user_view.IdUViewRealnameUpdate;
 import com.io7m.idstore.server.internal.user_view.IdUViewRealnameUpdateRun;
 import com.io7m.idstore.server.logging.IdServerRequestLog;
@@ -75,6 +79,8 @@ import java.util.Optional;
 import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * The main server implementation.
@@ -140,8 +146,7 @@ public final class IdServer implements IdServerType
       this.database =
         this.resources.add(this.createDatabase(this.telemetry.openTelemetry()));
 
-      final var services =
-        this.createServiceDirectory(this.database, this.telemetry);
+      final var services = this.createServiceDirectory(this.database);
       this.resources.add(services);
 
       final var userAPIServer = this.createUserAPIServer(services);
@@ -162,7 +167,10 @@ public final class IdServer implements IdServerType
       } catch (final IdServerException ex) {
         e.addSuppressed(ex);
       }
-      throw new IdServerException(new IdErrorCode("database"), e.getMessage(), e);
+      throw new IdServerException(
+        new IdErrorCode("database"),
+        e.getMessage(),
+        e);
     } catch (final Exception e) {
       startupSpan.recordException(e);
 
@@ -171,7 +179,11 @@ public final class IdServer implements IdServerType
       } catch (final IdServerException ex) {
         e.addSuppressed(ex);
       }
-      throw new IdServerException(new IdErrorCode("startup"), e.getMessage(), e);
+      throw new IdServerException(
+        new IdErrorCode("startup"),
+        e.getMessage(),
+        e
+      );
     } finally {
       startupSpan.end();
     }
@@ -193,12 +205,11 @@ public final class IdServer implements IdServerType
   }
 
   private IdServiceDirectory createServiceDirectory(
-    final IdDatabaseType inDatabase,
-    final IdServerTelemetryService inTelemetry)
+    final IdDatabaseType inDatabase)
     throws IOException
   {
     final var services = new IdServiceDirectory();
-    services.register(IdServerTelemetryService.class, inTelemetry);
+    services.register(IdServerTelemetryService.class, this.telemetry);
     services.register(IdDatabaseType.class, inDatabase);
 
     final var eventBus = new IdServerEventBusService(this.events);
@@ -207,14 +218,14 @@ public final class IdServer implements IdServerType
     final var strings = new IdServerStrings(this.configuration.locale());
     services.register(IdServerStrings.class, strings);
 
-    services.register(
-      IdServerMailService.class,
+    final var mailService =
       IdServerMailService.create(
         this.configuration.clock(),
-        inTelemetry,
+        this.telemetry,
         eventBus,
-        this.configuration.mailConfiguration())
-    );
+        this.configuration.mailConfiguration()
+      );
+    services.register(IdServerMailService.class, mailService);
 
     services.register(
       IdUserSessionService.class,
@@ -224,11 +235,10 @@ public final class IdServer implements IdServerType
     final var templates = IdFMTemplateService.create();
     services.register(IdFMTemplateService.class, templates);
 
-    services.register(
-      IdServerBrandingService.class,
+    final var brandingService =
       IdServerBrandingService.create(
-        strings, templates, this.configuration.branding())
-    );
+        strings, templates, this.configuration.branding());
+    services.register(IdServerBrandingService.class, brandingService);
 
     final var versionMessages = new IdVMessages();
     services.register(IdVMessages.class, versionMessages);
@@ -250,6 +260,31 @@ public final class IdServer implements IdServerType
     final var maintenance =
       IdServerMaintenanceService.create(clock, inDatabase);
     services.register(IdServerMaintenanceService.class, maintenance);
+
+    final var userPasswordRateLimitService =
+      IdRateLimitPasswordResetService.create(this.telemetry, 10L, MINUTES);
+
+    services.register(
+      IdRateLimitPasswordResetService.class,
+      userPasswordRateLimitService
+    );
+
+    final var userPasswordResetService =
+      IdUserPasswordResetService.create(
+        this.telemetry,
+        brandingService,
+        templates,
+        mailService,
+        this.configuration,
+        clock,
+        this.database,
+        strings,
+        userPasswordRateLimitService
+      );
+    services.register(
+      IdUserPasswordResetService.class,
+      userPasswordResetService
+    );
 
     services.register(IdRequestLimits.class, new IdRequestLimits(strings));
     return services;
@@ -279,6 +314,65 @@ public final class IdServer implements IdServerType
     final var servlets =
       new ServletContextHandler();
 
+    createUserViewServerServlets(servletHolders, servlets);
+
+    /*
+     * Set up a session handler that allows for Servlets to have sessions
+     * that can survive server restarts.
+     */
+
+    final var sessionIds = new DefaultSessionIdManager(server);
+    server.setSessionIdManager(sessionIds);
+
+    final var sessionHandler = new SessionHandler();
+    sessionHandler.setSessionCookie("IDSTORE_USER_VIEW_SESSION");
+
+    final var sessionStore = new FileSessionDataStore();
+    sessionStore.setStoreDir(httpConfig.sessionDirectory().toFile());
+
+    final var sessionCache = new DefaultSessionCache(sessionHandler);
+    sessionCache.setSessionDataStore(sessionStore);
+
+    sessionHandler.setSessionCache(sessionCache);
+    sessionHandler.setSessionIdManager(sessionIds);
+    sessionHandler.setHandler(servlets);
+
+    /*
+     * Set up an MBean container so that the statistics handler can export
+     * statistics to JMX.
+     */
+
+    final var mbeanContainer =
+      new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
+    server.addBean(mbeanContainer);
+
+    /*
+     * Set up a statistics handler that wraps everything.
+     */
+
+    final var statsHandler = new StatisticsHandler();
+    statsHandler.setHandler(sessionHandler);
+
+    /*
+     * Add a connector listener that adds unique identifiers to all requests.
+     */
+
+    Arrays.stream(server.getConnectors()).forEach(
+      connector -> connector.addBean(new IdServerRequestDecoration(services))
+    );
+
+    server.setErrorHandler(new IdErrorHandler());
+    server.setRequestLog(new IdServerRequestLog(services, "user_view"));
+    server.setHandler(statsHandler);
+    server.start();
+    LOG.info("[{}] User view server started", address);
+    return server;
+  }
+
+  private static void createUserViewServerServlets(
+    final IdServletHolders servletHolders,
+    final ServletContextHandler servlets)
+  {
     servlets.addServlet(
       servletHolders.create(IdUViewMain.class, IdUViewMain::new),
       "/"
@@ -401,57 +495,57 @@ public final class IdServer implements IdServerType
       "/realname-update-run/*"
     );
 
-    /*
-     * Set up a session handler that allows for Servlets to have sessions
-     * that can survive server restarts.
-     */
-
-    final var sessionIds = new DefaultSessionIdManager(server);
-    server.setSessionIdManager(sessionIds);
-
-    final var sessionHandler = new SessionHandler();
-    sessionHandler.setSessionCookie("IDSTORE_USER_VIEW_SESSION");
-
-    final var sessionStore = new FileSessionDataStore();
-    sessionStore.setStoreDir(httpConfig.sessionDirectory().toFile());
-
-    final var sessionCache = new DefaultSessionCache(sessionHandler);
-    sessionCache.setSessionDataStore(sessionStore);
-
-    sessionHandler.setSessionCache(sessionCache);
-    sessionHandler.setSessionIdManager(sessionIds);
-    sessionHandler.setHandler(servlets);
-
-    /*
-     * Set up an MBean container so that the statistics handler can export
-     * statistics to JMX.
-     */
-
-    final var mbeanContainer =
-      new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-    server.addBean(mbeanContainer);
-
-    /*
-     * Set up a statistics handler that wraps everything.
-     */
-
-    final var statsHandler = new StatisticsHandler();
-    statsHandler.setHandler(sessionHandler);
-
-    /*
-     * Add a connector listener that adds unique identifiers to all requests.
-     */
-
-    Arrays.stream(server.getConnectors()).forEach(
-      connector -> connector.addBean(new IdServerRequestDecoration(services))
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordReset.class,
+        IdUViewPasswordReset::new),
+      "/password-reset"
+    );
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordReset.class,
+        IdUViewPasswordReset::new),
+      "/password-reset/*"
     );
 
-    server.setErrorHandler(new IdErrorHandler());
-    server.setRequestLog(new IdServerRequestLog(services, "user_view"));
-    server.setHandler(statsHandler);
-    server.start();
-    LOG.info("[{}] User view server started", address);
-    return server;
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordResetRun.class,
+        IdUViewPasswordResetRun::new),
+      "/password-reset-run"
+    );
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordResetRun.class,
+        IdUViewPasswordResetRun::new),
+      "/password-reset-run/*"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordResetConfirm.class,
+        IdUViewPasswordResetConfirm::new),
+      "/password-reset-confirm"
+    );
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordResetConfirm.class,
+        IdUViewPasswordResetConfirm::new),
+      "/password-reset-confirm/*"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordResetConfirmRun.class,
+        IdUViewPasswordResetConfirmRun::new),
+      "/password-reset-confirm-run"
+    );
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordResetConfirmRun.class,
+        IdUViewPasswordResetConfirmRun::new),
+      "/password-reset-confirm-run/*"
+    );
   }
 
   private Server createUserAPIServer(

@@ -43,6 +43,8 @@
       </div>
       [/#if]
 
+      <p><a href="/password-reset">Forgot password...</a></p>
+
       [#if loginExtraText??]${loginExtraText?no_esc}[/#if]
     </div>
   </div>

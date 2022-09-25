@@ -22,16 +22,10 @@
       "ListenPort": 51000,
       "ExternalAddress": "http://localhost:51000/"
     },
-    "AdminViewService": {
-      "SessionDirectory": "/tmp/idstore-session-admin-view",
-      "ListenAddress": "localhost",
-      "ListenPort": 51000,
-      "ExternalAddress": "http://localhost:51001/"
-    },
     "UserAPIService": {
       "SessionDirectory": "/tmp/idstore-session-user-api",
       "ListenAddress": "localhost",
-      "ListenPort": 50000,
+      "ListenPort": 51000,
       "ExternalAddress": "http://localhost:50000/"
     },
     "UserViewService": {

@@ -273,13 +273,6 @@ public abstract class IdWithServerContract
         51000,
         URI.create("http://localhost:51000/")
       );
-    final var adminViewService =
-      new IdServerHTTPServiceConfiguration(
-        this.directory.resolve("admin-view"),
-        "localhost",
-        51001,
-        URI.create("http://localhost:51001/")
-      );
 
     final var branding =
       new IdServerBrandingConfiguration(
@@ -305,7 +298,6 @@ public abstract class IdWithServerContract
         userApiService,
         userViewService,
         adminApiService,
-        adminViewService,
         branding,
         history,
         Optional.empty()

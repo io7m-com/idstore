@@ -225,6 +225,23 @@ create table bans (
 ]]></Statement>
 
     <Statement>grant insert, select, update, delete on bans to idstore</Statement>
+
+    <Comment>
+      The user_password_resets table records the password reset operations in process. A verification
+      has an associated user, verification token, and expiration date.
+    </Comment>
+
+    <Statement><![CDATA[
+create table user_password_resets (
+  user_id     uuid                      not null,
+  token       varchar(1000000)          not null unique,
+  expires     timestamp with time zone  not null,
+
+  foreign key (user_id) references users (id)
+)
+]]></Statement>
+
+    <Statement>grant insert, select, delete on user_password_resets to idstore</Statement>
   </Schema>
 
 </Schemas>

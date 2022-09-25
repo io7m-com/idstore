@@ -19,6 +19,7 @@ package com.io7m.idstore.database.postgres.internal;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseMaintenanceQueriesType;
+import com.io7m.jdeferthrow.core.ExceptionTracker;
 import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
 import static com.io7m.idstore.database.postgres.internal.Tables.BANS;
 import static com.io7m.idstore.database.postgres.internal.Tables.EMAIL_VERIFICATIONS;
+import static com.io7m.idstore.database.postgres.internal.Tables.USER_PASSWORD_RESETS;
 import static java.lang.Integer.valueOf;
 
 /**
@@ -49,8 +51,53 @@ public final class IdDatabaseMaintenanceQueries
   public void runMaintenance()
     throws IdDatabaseException
   {
-    this.runExpireEmailVerifications();
-    this.runExpireBans();
+    final var exceptions =
+      new ExceptionTracker<IdDatabaseException>();
+
+    try {
+      this.runExpireEmailVerifications();
+    } catch (final IdDatabaseException e) {
+      exceptions.addException(e);
+    }
+
+    try {
+      this.runExpireBans();
+    } catch (final IdDatabaseException e) {
+      exceptions.addException(e);
+    }
+
+    try {
+      this.runExpirePasswordResets();
+    } catch (final IdDatabaseException e) {
+      exceptions.addException(e);
+    }
+
+    exceptions.throwIfNecessary();
+  }
+
+  private void runExpirePasswordResets()
+    throws IdDatabaseException
+  {
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseMaintenanceQueries.runExpirePasswordResets");
+
+    try {
+      final var deleted =
+        context.deleteFrom(USER_PASSWORD_RESETS)
+          .where(USER_PASSWORD_RESETS.EXPIRES.lt(this.currentTime()))
+          .execute();
+
+      LOG.debug("deleted {} expired password resets", valueOf(deleted));
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
+    }
   }
 
   private void runExpireEmailVerifications()

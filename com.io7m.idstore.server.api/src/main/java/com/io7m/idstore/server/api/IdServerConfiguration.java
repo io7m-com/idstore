@@ -29,7 +29,6 @@ import java.util.Optional;
  * The configuration for a server.
  *
  * @param adminApiAddress       The admin API address
- * @param adminViewAddress      The admin view address
  * @param clock                 The clock
  * @param databaseConfiguration The database configuration for the server
  * @param databases             The factory of databases that will be used for
@@ -52,7 +51,6 @@ public record IdServerConfiguration(
   IdServerHTTPServiceConfiguration userApiAddress,
   IdServerHTTPServiceConfiguration userViewAddress,
   IdServerHTTPServiceConfiguration adminApiAddress,
-  IdServerHTTPServiceConfiguration adminViewAddress,
   IdServerBrandingConfiguration branding,
   IdServerHistoryConfiguration history,
   Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
@@ -61,7 +59,6 @@ public record IdServerConfiguration(
    * The configuration for a server.
    *
    * @param adminApiAddress       The admin API address
-   * @param adminViewAddress      The admin view address
    * @param clock                 The clock
    * @param databaseConfiguration The database configuration for the server
    * @param databases             The factory of databases that will be used for
@@ -78,7 +75,6 @@ public record IdServerConfiguration(
   public IdServerConfiguration
   {
     Objects.requireNonNull(adminApiAddress, "adminApiAddress");
-    Objects.requireNonNull(adminViewAddress, "adminViewAddress");
     Objects.requireNonNull(clock, "clock");
     Objects.requireNonNull(databaseConfiguration, "databaseConfiguration");
     Objects.requireNonNull(databases, "databases");

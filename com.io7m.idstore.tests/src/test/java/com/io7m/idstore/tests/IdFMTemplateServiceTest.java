@@ -32,6 +32,7 @@ import com.io7m.idstore.server.api.IdServerColorScheme;
 import com.io7m.idstore.server.internal.freemarker.IdFMCSSData;
 import com.io7m.idstore.server.internal.freemarker.IdFMEmailVerificationData;
 import com.io7m.idstore.server.internal.freemarker.IdFMLoginData;
+import com.io7m.idstore.server.internal.freemarker.IdFMPasswordResetData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMUserSelfData;
 import freemarker.template.TemplateException;
@@ -272,6 +273,30 @@ public final class IdFMTemplateServiceTest
 
     template.process(
       new IdFMCSSData(IdServerColorScheme.defaults()),
+      writer
+    );
+
+    writer.flush();
+  }
+
+  @Test
+  public void testPasswordReset()
+    throws IOException, TemplateException
+  {
+    final var service =
+      IdFMTemplateService.create();
+
+    final var template =
+      service.pagePasswordResetTemplate();
+
+    final var writer =
+      new BufferedWriter(new OutputStreamWriter(System.out, UTF_8));
+
+    template.process(
+      new IdFMPasswordResetData(
+        "idstore",
+        "Header"
+      ),
       writer
     );
 

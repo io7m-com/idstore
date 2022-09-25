@@ -27,7 +27,6 @@ import java.util.Set;
  * Configuration for the parts of the server that serve over HTTP.
  *
  * @param adminAPIService  The admin API service
- * @param adminViewService The admin view service
  * @param userAPIService   The user API service
  * @param userViewService  The user view service
  */
@@ -37,8 +36,6 @@ import java.util.Set;
 public record IdServerHTTPConfiguration(
   @JsonProperty(value = "AdminAPIService", required = true)
   IdServerHTTPServiceConfiguration adminAPIService,
-  @JsonProperty(value = "AdminViewService", required = true)
-  IdServerHTTPServiceConfiguration adminViewService,
   @JsonProperty(value = "UserAPIService", required = true)
   IdServerHTTPServiceConfiguration userAPIService,
   @JsonProperty(value = "UserViewService", required = true)
@@ -49,7 +46,6 @@ public record IdServerHTTPConfiguration(
    * Configuration for the parts of the server that serve over HTTP.
    *
    * @param adminAPIService  The admin API service
-   * @param adminViewService The admin view service
    * @param userAPIService   The user API service
    * @param userViewService  The user view service
    */
@@ -57,18 +53,16 @@ public record IdServerHTTPConfiguration(
   public IdServerHTTPConfiguration
   {
     Objects.requireNonNull(adminAPIService, "adminAPIService");
-    Objects.requireNonNull(adminViewService, "adminViewService");
     Objects.requireNonNull(userAPIService, "userAPIService");
     Objects.requireNonNull(userViewService, "userViewService");
 
     try {
       Set.of(
         Integer.valueOf(adminAPIService.listenPort()),
-        Integer.valueOf(adminViewService.listenPort()),
         Integer.valueOf(userAPIService.listenPort()),
         Integer.valueOf(userViewService.listenPort())
       );
-    } catch (IllegalArgumentException e) {
+    } catch (final IllegalArgumentException e) {
       throw new IllegalArgumentException(
         "All HTTP services must be configured to listen on different ports: %s"
           .formatted(e.getMessage()),

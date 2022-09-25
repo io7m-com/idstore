@@ -91,6 +91,17 @@ public final class IdFMTemplateService implements IdServiceType
     );
   }
 
+  /**
+   * @return The email password reset template
+   */
+
+  public IdFMTemplateType<IdFMEmailPasswordResetData> emailPasswordResetTemplate()
+  {
+    return new IdGenericTemplate<>(
+      this.findTemplate("emailPasswordReset")
+    );
+  }
+
   private Template findTemplate(
     final String name)
   {
@@ -160,35 +171,24 @@ public final class IdFMTemplateService implements IdServiceType
   }
 
   /**
-   * @return The admin main template
+   * @return The password reset page template
    */
 
-  public IdFMTemplateType<IdFMAdminMainData> pageAdminMainTemplate()
+  public IdFMTemplateType<IdFMPasswordResetData> pagePasswordResetTemplate()
   {
     return new IdGenericTemplate<>(
-      this.findTemplate("pageAdminMain")
+      this.findTemplate("pagePasswordReset")
     );
   }
 
   /**
-   * @return The admin user list template
+   * @return The password reset form page template
    */
 
-  public IdFMTemplateType<IdFMAdminUsersData> pageAdminUsersTemplate()
+  public IdFMTemplateType<IdFMPasswordResetConfirmData> pagePasswordResetConfirmTemplate()
   {
     return new IdGenericTemplate<>(
-      this.findTemplate("pageAdminUsers")
-    );
-  }
-
-  /**
-   * @return The admin user page template
-   */
-
-  public IdFMTemplateType<IdFMAdminUserData> pageAdminUserTemplate()
-  {
-    return new IdGenericTemplate<>(
-      this.findTemplate("pageAdminUser")
+      this.findTemplate("pagePasswordResetConfirm")
     );
   }
 

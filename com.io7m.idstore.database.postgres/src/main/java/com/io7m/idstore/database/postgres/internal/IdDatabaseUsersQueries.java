@@ -21,6 +21,7 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.database.postgres.internal.tables.records.EmailsRecord;
 import com.io7m.idstore.database.postgres.internal.tables.records.LoginHistoryRecord;
+import com.io7m.idstore.database.postgres.internal.tables.records.UserPasswordResetsRecord;
 import com.io7m.idstore.database.postgres.internal.tables.records.UsersRecord;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
@@ -31,8 +32,10 @@ import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdPasswordAlgorithms;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserOrdering;
+import com.io7m.idstore.model.IdUserPasswordReset;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
@@ -62,6 +65,7 @@ import static com.io7m.idstore.database.postgres.internal.Tables.EMAIL_VERIFICAT
 import static com.io7m.idstore.database.postgres.internal.Tables.LOGIN_HISTORY;
 import static com.io7m.idstore.database.postgres.internal.Tables.USERS;
 import static com.io7m.idstore.database.postgres.internal.Tables.USER_IDS;
+import static com.io7m.idstore.database.postgres.internal.Tables.USER_PASSWORD_RESETS;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_EMAIL;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
@@ -739,7 +743,8 @@ final class IdDatabaseUsersQueries
     final var context =
       transaction.createContext();
     final var querySpan =
-      transaction.createQuerySpan("IdDatabaseUsersQueries.userSearchByEmailCount");
+      transaction.createQuerySpan(
+        "IdDatabaseUsersQueries.userSearchByEmailCount");
 
     try {
       /*
@@ -1262,6 +1267,143 @@ final class IdDatabaseUsersQueries
     } finally {
       querySpan.end();
     }
+  }
+
+  @Override
+  public void userPasswordResetCreate(
+    final IdUserPasswordReset reset)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(reset, "reset");
+
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan(
+        "IdDatabaseUsersQueries.userPasswordResetCreate");
+
+    try {
+      final var user =
+        this.userGetRequire(reset.user());
+
+      context.insertInto(USER_PASSWORD_RESETS)
+        .set(USER_PASSWORD_RESETS.USER_ID, user.id())
+        .set(USER_PASSWORD_RESETS.EXPIRES, reset.expires())
+        .set(USER_PASSWORD_RESETS.TOKEN, reset.token().value())
+        .execute();
+
+      context.insertInto(AUDIT)
+        .set(AUDIT.USER_ID, user.id())
+        .set(AUDIT.MESSAGE, "%s|%s".formatted(reset.token(), reset.expires()))
+        .set(AUDIT.TYPE, "USER_PASSWORD_RESET_CREATED")
+        .set(AUDIT.TIME, this.currentTime())
+        .execute();
+
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
+    }
+  }
+
+  @Override
+  public List<IdUserPasswordReset> userPasswordResetGet(
+    final UUID userId)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(userId, "userId");
+
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan("IdDatabaseUsersQueries.userPasswordResetGet");
+
+    try {
+      this.userGetRequire(userId);
+
+      return context.selectFrom(USER_PASSWORD_RESETS)
+        .where(USER_PASSWORD_RESETS.USER_ID.eq(userId))
+        .stream()
+        .map(IdDatabaseUsersQueries::mapPasswordReset)
+        .toList();
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
+    }
+  }
+
+  @Override
+  public Optional<IdUserPasswordReset> userPasswordResetGetForToken(
+    final IdToken token)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(token, "token");
+
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan(
+        "IdDatabaseUsersQueries.userPasswordResetGetForToken");
+
+    try {
+      return context.selectFrom(USER_PASSWORD_RESETS)
+        .where(USER_PASSWORD_RESETS.TOKEN.eq(token.value()))
+        .stream()
+        .map(IdDatabaseUsersQueries::mapPasswordReset)
+        .findFirst();
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
+    }
+  }
+
+  @Override
+  public void userPasswordResetDelete(
+    final IdUserPasswordReset reset)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(reset, "reset");
+
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan(
+        "IdDatabaseUsersQueries.userPasswordResetDelete");
+
+    try {
+      context.deleteFrom(USER_PASSWORD_RESETS)
+        .where(USER_PASSWORD_RESETS.USER_ID.eq(reset.user())
+                 .and(USER_PASSWORD_RESETS.TOKEN.eq(reset.token().value())))
+        .execute();
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
+    }
+  }
+
+  private static IdUserPasswordReset mapPasswordReset(
+    final UserPasswordResetsRecord rec)
+  {
+    return new IdUserPasswordReset(
+      rec.getUserId(),
+      new IdToken(rec.getToken()),
+      rec.getExpires()
+    );
   }
 
   private static IdLogin mapLogin(

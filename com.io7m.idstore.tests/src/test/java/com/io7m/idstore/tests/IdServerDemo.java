@@ -140,13 +140,6 @@ public final class IdServerDemo
         51000,
         URI.create("http://localhost:51000/")
       );
-    final var adminViewService =
-      new IdServerHTTPServiceConfiguration(
-        directory.resolve("admin-view"),
-        "localhost",
-        51001,
-        URI.create("http://localhost:51001/")
-      );
 
     final var branding =
       new IdServerBrandingConfiguration(
@@ -172,7 +165,6 @@ public final class IdServerDemo
         userApiService,
         userViewService,
         adminApiService,
-        adminViewService,
         branding,
         history,
         Optional.of(openTelemetry)

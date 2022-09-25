@@ -70,4 +70,11 @@ public final class IdServerEventBusService
   {
     this.subject.close();
   }
+
+  @Override
+  public String toString()
+  {
+    return "[IdServerEventBusService 0x%s]"
+      .formatted(Long.toUnsignedString(this.hashCode()));
+  }
 }

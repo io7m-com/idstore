@@ -31,4 +31,17 @@
 ]]></entry>
   <entry key="banned"><![CDATA[You have been temporarily banned for the following reason: {0}. Your ban will expire on {1}.]]></entry>
   <entry key="bannedNoExpire"><![CDATA[You have been permanently banned for the following reason: {0}.]]></entry>
+
+  <entry key="userNonexistent">No such user.</entry>
+  <entry key="passwordResetNonexistent">No such password reset token.</entry>
+  <entry key="passwordResetMismatch">The password confirmation does not match the password you entered.</entry>
+
+  <entry key="emailPasswordResetSuccessTitle">Password Reset</entry>
+  <entry key="emailPasswordResetSuccess">Password reset successfully.</entry>
+  <entry key="emailPasswordResetFailed">Password reset failed.</entry>
+  <entry key="emailPasswordResetTitle">Password Reset</entry>
+  <entry key="emailPasswordResetSent">A password reset link was sent. Please follow the link in the email to confirm the reset.</entry>
+
+  <entry key="pwResetRateLimited">Password resets are rate-limited. Please try again later!</entry>
+  <entry key="pwResetRequireParameters">You must at least specify an email address or username.</entry>
 </properties>

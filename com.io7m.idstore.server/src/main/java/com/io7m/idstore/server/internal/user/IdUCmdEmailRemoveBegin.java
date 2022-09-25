@@ -39,6 +39,7 @@ import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecUserActionEmailRemoveBegin;
 import com.io7m.idstore.server.security.IdSecurity;
+import io.opentelemetry.api.trace.Span;
 
 import java.io.StringWriter;
 import java.util.Map;
@@ -191,10 +192,11 @@ public final class IdUCmdEmailRemoveBegin
 
     try {
       mailService.sendMail(
+        Span.current(),
         context.requestId(),
         email,
         mailHeaders,
-        "[idstore] Email verification request",
+        brandingService.emailSubject("Email verification request"),
         writer.toString()
       ).get();
     } catch (final Exception e) {

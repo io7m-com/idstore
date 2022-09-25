@@ -63,6 +63,19 @@ public final class IdServerTelemetryService
   }
 
   /**
+   * @return A completely no-op service
+   */
+
+  public static IdServerTelemetryService noop()
+  {
+    final var noop = OpenTelemetry.noop();
+    return new IdServerTelemetryService(
+      noop,
+      noop.getTracer("noop")
+    );
+  }
+
+  /**
    * @return The main tracer
    */
 
@@ -82,6 +95,7 @@ public final class IdServerTelemetryService
 
   /**
    * Create a telemetry service.
+   *
    * @param configuration The server configuration
    *
    * @return The service
@@ -116,7 +130,9 @@ public final class IdServerTelemetryService
     final var resource =
       Resource.getDefault()
         .merge(Resource.create(
-          Attributes.of(SERVICE_NAME, telemetryConfiguration.logicalServiceName()))
+          Attributes.of(
+            SERVICE_NAME,
+            telemetryConfiguration.logicalServiceName()))
         );
 
     final var spanExporter =
@@ -162,7 +178,10 @@ public final class IdServerTelemetryService
     final var tracer =
       openTelemetry.getTracer(scopeName, version());
 
-    return new IdServerTelemetryService(openTelemetry, tracer);
+    return new IdServerTelemetryService(
+      openTelemetry,
+      tracer
+    );
   }
 
   private static String version()

@@ -125,7 +125,6 @@ public final class IdServerConfigurations
       file.httpConfiguration().userAPIService(),
       file.httpConfiguration().userViewService(),
       file.httpConfiguration().adminAPIService(),
-      file.httpConfiguration().adminViewService(),
       file.brandingConfiguration(),
       file.historyConfiguration(),
       file.openTelemetry()

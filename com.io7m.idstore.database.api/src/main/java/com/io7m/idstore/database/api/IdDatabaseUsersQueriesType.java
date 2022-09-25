@@ -23,7 +23,9 @@ import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdUserPasswordReset;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
@@ -373,5 +375,57 @@ public non-sealed interface IdDatabaseUsersQueriesType
 
   @IdDatabaseRequiresAdmin
   void userBanDelete(IdBan ban)
+    throws IdDatabaseException;
+
+  /**
+   * Create a password reset request.
+   *
+   * @param reset The request
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  void userPasswordResetCreate(
+    IdUserPasswordReset reset)
+    throws IdDatabaseException;
+
+  /**
+   * List the password reset requests for the given user.
+   *
+   * @param user The user
+   *
+   * @return A list of requests, if any
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  List<IdUserPasswordReset> userPasswordResetGet(
+    UUID user)
+    throws IdDatabaseException;
+
+  /**
+   * List the password reset request for the given token.
+   *
+   * @param token The token
+   *
+   * @return A request, if any
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  Optional<IdUserPasswordReset> userPasswordResetGetForToken(
+    IdToken token)
+    throws IdDatabaseException;
+
+  /**
+   * Delete a password reset request.
+   *
+   * @param reset The request
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  void userPasswordResetDelete(
+    IdUserPasswordReset reset)
     throws IdDatabaseException;
 }

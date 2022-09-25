@@ -642,3 +642,71 @@ table.ids_adminUserProfile_loginHistory > tr > td:first-child
 {
   width: 16em;
 }
+
+/*
+ * Password reset form.
+ */
+
+.ids_pwResetForm
+{
+  display: grid;
+  grid-template-columns: 8em 32em;
+  grid-template-rows:    3em;
+  grid-gap:              16px;
+  margin-top:            4em;
+}
+
+.ids_pwResetForm_usernameLabel { grid-column: 1; grid-row: 1; }
+.ids_pwResetForm_usernameField { grid-column: 2; grid-row: 1; }
+.ids_pwResetForm_emailLabel    { grid-column: 1; grid-row: 2; }
+.ids_pwResetForm_emailField    { grid-column: 2; grid-row: 2; }
+.ids_pwResetForm_submit        { grid-column: 2; grid-row: 3; }
+
+.ids_pwResetForm_emailLabel,
+.ids_pwResetForm_usernameLabel
+{
+  display: flex;
+  align-items: center;
+  height: 3em;
+}
+
+.ids_pwResetForm_emailField,
+.ids_pwResetForm_usernameField
+{
+  display: flex;
+  align-items: center;
+  padding: 0;
+  padding-left: 1em;
+  height: 3em;
+}
+
+.ids_pwResetForm_submit
+{
+  margin:  2px;
+  padding: 0em;
+  height: 3em;
+}
+
+.ids_pwResetForm_password0Label { grid-column: 1; grid-row: 1; }
+.ids_pwResetForm_password0Field { grid-column: 2; grid-row: 1; }
+.ids_pwResetForm_password1Label { grid-column: 1; grid-row: 2; }
+.ids_pwResetForm_password1Field { grid-column: 2; grid-row: 2; }
+.ids_pwResetForm_submit         { grid-column: 2; grid-row: 3; }
+
+.ids_pwResetForm_password1Label,
+.ids_pwResetForm_password0Label
+{
+  display: flex;
+  align-items: center;
+  height: 3em;
+}
+
+.ids_pwResetForm_password1Field,
+.ids_pwResetForm_password0Field
+{
+  display: flex;
+  align-items: center;
+  padding: 0;
+  padding-left: 1em;
+  height: 3em;
+}

@@ -62,7 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Testcontainers(disabledWithoutDocker = true)
 public abstract class IdWithDatabaseContract
 {
-  private static final IdDatabases DATABASES =
+  protected static final IdDatabases DATABASES =
     new IdDatabases();
 
   @Container
@@ -74,19 +74,7 @@ public abstract class IdWithDatabaseContract
 
   private CloseableCollectionType<ClosingResourceFailedException> resources;
   private IdDatabaseType database;
-
-  @BeforeEach
-  public final void withDatabaseSetup()
-  {
-    this.resources = CloseableCollection.create();
-  }
-
-  @AfterEach
-  public final void withDatabaseTearDown()
-    throws ClosingResourceFailedException
-  {
-    this.resources.close();
-  }
+  private IdDatabaseConfiguration configuration;
 
   protected static void checkAuditLog(
     final IdDatabaseTransactionType transaction,
@@ -162,6 +150,24 @@ public abstract class IdWithDatabaseContract
       .createHashed("abcdefgh");
   }
 
+  @BeforeEach
+  public final void withDatabaseSetup()
+  {
+    this.resources = CloseableCollection.create();
+  }
+
+  @AfterEach
+  public final void withDatabaseTearDown()
+    throws ClosingResourceFailedException
+  {
+    this.resources.close();
+  }
+
+  public final IdDatabaseType database()
+  {
+    return this.database;
+  }
+
   protected final boolean containerIsRunning()
   {
     return this.container.isRunning();
@@ -171,18 +177,21 @@ public abstract class IdWithDatabaseContract
     final PostgreSQLContainer<?> container)
     throws IdDatabaseException
   {
+    this.configuration =
+      new IdDatabaseConfiguration(
+      "postgres",
+      "12345678",
+      container.getContainerIpAddress(),
+      container.getFirstMappedPort().intValue(),
+      "postgres",
+      CREATE_DATABASE,
+      UPGRADE_DATABASE,
+      Clock.systemUTC()
+    );
+
     return this.resources.add(
       DATABASES.open(
-        new IdDatabaseConfiguration(
-          "postgres",
-          "12345678",
-          container.getContainerIpAddress(),
-          container.getFirstMappedPort().intValue(),
-          "postgres",
-          CREATE_DATABASE,
-          UPGRADE_DATABASE,
-          Clock.systemUTC()
-        ),
+        this.configuration,
         OpenTelemetry.noop(),
         message -> {
 
@@ -233,7 +242,7 @@ public abstract class IdWithDatabaseContract
         id,
         new IdName(user),
         new IdRealName(user),
-        new IdEmail(UUID.randomUUID() + "@example.com"),
+        new IdEmail(id + "@example.com"),
         now(),
         password
       );
@@ -267,6 +276,11 @@ public abstract class IdWithDatabaseContract
       t.commit();
       return id;
     }
+  }
+
+  protected final IdDatabaseConfiguration databaseConfiguration()
+  {
+    return this.configuration;
   }
 
   protected record ExpectedEvent(

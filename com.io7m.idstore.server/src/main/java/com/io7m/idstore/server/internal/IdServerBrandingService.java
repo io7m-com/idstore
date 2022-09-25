@@ -232,4 +232,18 @@ public final class IdServerBrandingService implements IdServiceType
     return "[IdServerBrandingService 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode()));
   }
+
+  /**
+   * The branded email subject.
+   *
+   * @param subject The subject txt
+   *
+   * @return The branded string
+   */
+
+  public String emailSubject(
+    final String subject)
+  {
+    return "[idstore] %s".formatted(subject);
+  }
 }

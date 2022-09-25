@@ -76,6 +76,7 @@ public final class IdFMTemplateLoader implements TemplateLoader
   }
 
   private static final Set<String> TEMPLATES = Set.of(
+    "emailPasswordReset",
     "emailVerification",
     "mainCss",
     "pageAdminMain",
@@ -84,6 +85,8 @@ public final class IdFMTemplateLoader implements TemplateLoader
     "pageEmailAdd",
     "pageLogin",
     "pageMessage",
+    "pagePasswordReset",
+    "pagePasswordResetConfirm",
     "pageRealNameUpdate",
     "pageUserSelf"
   );

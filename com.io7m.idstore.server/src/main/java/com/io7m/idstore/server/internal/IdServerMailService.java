@@ -23,6 +23,8 @@ import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTPS;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP_TLS;
 import com.io7m.idstore.services.api.IdServiceType;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.context.Context;
 import jakarta.mail.Message;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
@@ -153,22 +155,25 @@ public final class IdServerMailService implements IdServiceType, AutoCloseable
   /**
    * Send a message to the given target address.
    *
-   * @param requestId The request ID
-   * @param to        The target address
-   * @param subject   The message subject
-   * @param text      The message text
-   * @param headers   Extra message headers
+   * @param parentSpan The parent span for metrics
+   * @param requestId  The request ID
+   * @param to         The target address
+   * @param subject    The message subject
+   * @param text       The message text
+   * @param headers    Extra message headers
    *
    * @return The send in progress
    */
 
   public CompletableFuture<Void> sendMail(
+    final Span parentSpan,
     final UUID requestId,
     final IdEmail to,
     final Map<String, String> headers,
     final String subject,
     final String text)
   {
+    Objects.requireNonNull(parentSpan, "span");
     Objects.requireNonNull(requestId, "requestId");
     Objects.requireNonNull(to, "to");
     Objects.requireNonNull(subject, "subject");
@@ -190,6 +195,7 @@ public final class IdServerMailService implements IdServiceType, AutoCloseable
           .setAttribute("smtp.from", this.configuration.senderAddress())
           .setAttribute("smtp.host", transport.host())
           .setAttribute("smtp.port", transport.port())
+          .setParent(Context.current().with(parentSpan))
           .startSpan();
 
       try {
