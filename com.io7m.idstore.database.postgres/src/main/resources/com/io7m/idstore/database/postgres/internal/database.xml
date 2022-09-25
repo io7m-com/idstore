@@ -65,6 +65,7 @@ create table admins (
   password_salt    varchar(1000000)         not null,
   permissions      varchar(1000000)         not null,
   deleting         boolean                  not null,
+  initial          boolean                  not null,
 
   foreign key (id) references user_ids (id)
 )

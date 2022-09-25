@@ -242,7 +242,8 @@ final class IdDatabaseAdminsQueries
           .set(ADMINS.PASSWORD_HASH, password.hash())
           .set(ADMINS.PASSWORD_SALT, password.salt())
           .set(ADMINS.PERMISSIONS, permissionString)
-          .set(ADMINS.DELETING, FALSE);
+          .set(ADMINS.DELETING, FALSE)
+          .set(ADMINS.INITIAL, TRUE);
 
       adminCreate.execute();
 
@@ -352,6 +353,7 @@ final class IdDatabaseAdminsQueries
         .set(ADMINS.PASSWORD_SALT, password.salt())
         .set(ADMINS.PERMISSIONS, permissionString)
         .set(ADMINS.DELETING, FALSE)
+        .set(ADMINS.INITIAL, FALSE)
         .execute();
 
       context.insertInto(EMAILS)
