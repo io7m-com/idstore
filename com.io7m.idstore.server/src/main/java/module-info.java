@@ -69,6 +69,13 @@ module com.io7m.idstore.server
   opens com.io7m.idstore.server.logging
     to com.io7m.jxtrand.vanilla;
 
+  exports com.io7m.idstore.server.internal
+    to com.io7m.idstore.tests;
+  exports com.io7m.idstore.server.internal.freemarker
+    to com.io7m.idstore.tests;
+  exports com.io7m.idstore.server.internal.command_exec
+    to com.io7m.idstore.tests;
+
   exports com.io7m.idstore.server;
   exports com.io7m.idstore.server.logging;
 
