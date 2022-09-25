@@ -108,4 +108,22 @@ public final class IdServerMainTest
     });
     assertEquals(0, r);
   }
+
+  @Test
+  public void testHelpServer()
+  {
+    final var r = IdServerMain.mainExitless(new String[]{
+      "help", "server"
+    });
+    assertEquals(0, r);
+  }
+
+  @Test
+  public void testHelpInitialize()
+  {
+    final var r = IdServerMain.mainExitless(new String[]{
+      "help", "initialize"
+    });
+    assertEquals(0, r);
+  }
 }

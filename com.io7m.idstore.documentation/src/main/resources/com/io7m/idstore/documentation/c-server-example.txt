@@ -1,0 +1,4 @@
+$ idstore server --configuration server.conf
+info: [localhost/<unresolved>:50000] User API server started
+info: [localhost/<unresolved>:50001] User view server started
+info: [localhost/<unresolved>:51000] Admin API server started

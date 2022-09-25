@@ -7,8 +7,8 @@
 
   <Metadata>
     <dc:date>2022-09-20T08:37:35+00:00</dc:date>
-    <dc:description>User manual for the idstore server..</dc:description>
-    <dc:identifier>6c8e797e-ef6e-4ee6-b1aa-e1be7683c860</dc:identifier>
+    <dc:description>User manual for the idstore server.</dc:description>
+    <dc:identifier>24c8402e-36b8-4d2b-ab1e-b501050e9611</dc:identifier>
     <dc:language>en</dc:language>
     <dc:source>https://www.io7m.com/software/idstore/</dc:source>
     <dc:title>Idstore User Manual ${project.version}</dc:title>
@@ -19,6 +19,7 @@
     <MetaProperty name="com.io7m.xstructural.web.branding.footer">brand.xml</MetaProperty>
   </Metadata>
 
+  <xi:include href="cmdline.xml"/>
   <xi:include href="api.xml"/>
 
 </Document>

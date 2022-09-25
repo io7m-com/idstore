@@ -25,6 +25,7 @@ open module com.io7m.idstore.server.main
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
+  requires com.io7m.idstore.model;
   requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server;
 
@@ -34,6 +35,9 @@ open module com.io7m.idstore.server.main
   requires jcommander;
 
   uses IdServerFactoryType;
+
+  exports com.io7m.idstore.server.main.internal
+    to com.io7m.idstore.documentation;
 
   exports com.io7m.idstore.server.main;
 }

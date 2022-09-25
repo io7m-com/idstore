@@ -1,0 +1,6 @@
+$ idstore initialize \
+  --admin-email 'someone@example.com' \
+  --admin-realname 'Someone Else' \
+  --admin-username 'someone' \
+  --admin-password 12345678 \
+  --configuration server.conf

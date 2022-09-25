@@ -23,5 +23,28 @@ open module com.io7m.idstore.documentation
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
+  requires com.io7m.idstore.admin_client.api;
+  requires com.io7m.idstore.admin_client;
+  requires com.io7m.idstore.colors;
+  requires com.io7m.idstore.database.api;
+  requires com.io7m.idstore.database.postgres;
+  requires com.io7m.idstore.error_codes;
+  requires com.io7m.idstore.model;
+  requires com.io7m.idstore.protocol.admin.cb1;
+  requires com.io7m.idstore.protocol.admin;
+  requires com.io7m.idstore.protocol.api;
+  requires com.io7m.idstore.protocol.user.cb1;
+  requires com.io7m.idstore.protocol.user;
+  requires com.io7m.idstore.protocol.versions;
+  requires com.io7m.idstore.server.api;
+  requires com.io7m.idstore.server.main;
+  requires com.io7m.idstore.server.security;
+  requires com.io7m.idstore.server;
+  requires com.io7m.idstore.services.api;
+
+  requires com.io7m.claypot.core;
+  requires java.xml;
+  requires jcommander;
+
   exports com.io7m.idstore.documentation;
 }

@@ -21,6 +21,7 @@ import com.io7m.claypot.core.CLPCommandConstructorType;
 import com.io7m.claypot.core.CLPCommandType;
 import com.io7m.claypot.core.Claypot;
 import com.io7m.claypot.core.ClaypotType;
+import com.io7m.idstore.server.main.internal.IdSCmdInitialize;
 import com.io7m.idstore.server.main.internal.IdSCmdServer;
 import com.io7m.idstore.server.main.internal.IdSCmdVersion;
 import org.slf4j.Logger;
@@ -58,6 +59,7 @@ public final class IdServerMain implements Runnable
 
     final List<CLPCommandConstructorType> commands =
       List.of(
+        IdSCmdInitialize::new,
         IdSCmdServer::new,
         IdSCmdVersion::new
       );

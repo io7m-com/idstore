@@ -16,9 +16,18 @@
 
 package com.io7m.idstore.server.internal;
 
+import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
+import com.io7m.idstore.database.api.IdDatabaseConfiguration;
+import com.io7m.idstore.database.api.IdDatabaseCreate;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
+import com.io7m.idstore.database.api.IdDatabaseUpgrade;
 import com.io7m.idstore.error_codes.IdErrorCode;
+import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
+import com.io7m.idstore.model.IdPasswordException;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
 import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
 import com.io7m.idstore.protocol.versions.IdVMessages;
@@ -73,13 +82,16 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.Flow;
 import java.util.concurrent.SubmissionPublisher;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
@@ -91,12 +103,12 @@ public final class IdServer implements IdServerType
   private static final Logger LOG =
     LoggerFactory.getLogger(IdServer.class);
 
-  private final IdServerConfiguration configuration;
-  private final CloseableCollectionType<IdServerException> resources;
-  private final AtomicBoolean closed;
+  private CloseableCollectionType<IdServerException> resources;
   private IdDatabaseType database;
-  private final SubmissionPublisher<IdServerEventType> events;
   private IdServerTelemetryService telemetry;
+  private final AtomicBoolean closed;
+  private final IdServerConfiguration configuration;
+  private final SubmissionPublisher<IdServerEventType> events;
 
   /**
    * The main server implementation.
@@ -110,28 +122,31 @@ public final class IdServer implements IdServerType
     this.configuration =
       Objects.requireNonNull(inConfiguration, "configuration");
     this.resources =
-      CloseableCollection.create(
-        () -> {
-          return new IdServerException(
-            new IdErrorCode("server-creation"),
-            "Server creation failed."
-          );
-        }
-      );
-
+      createResourceCollection();
     this.events =
       new SubmissionPublisher<>();
     this.closed =
       new AtomicBoolean(false);
   }
 
+  private static CloseableCollectionType<IdServerException> createResourceCollection()
+  {
+    return CloseableCollection.create(
+      () -> {
+        return new IdServerException(
+          new IdErrorCode("server-creation"),
+          "Server creation failed."
+        );
+      }
+    );
+  }
+
   @Override
   public void start()
     throws IdServerException
   {
-    if (this.closed.get()) {
-      throw new IllegalStateException("Server is closed!");
-    }
+    this.closed.set(false);
+    this.resources = createResourceCollection();
 
     this.telemetry =
       IdServerTelemetryService.create(this.configuration);
@@ -747,6 +762,77 @@ public final class IdServer implements IdServerType
   {
     if (this.closed.compareAndSet(false, true)) {
       this.resources.close();
+    }
+  }
+
+  @Override
+  public void setup(
+    final Optional<UUID> adminId,
+    final IdName adminName,
+    final IdEmail adminEmail,
+    final IdRealName adminRealName,
+    final String adminPassword)
+    throws IdServerException
+  {
+    Objects.requireNonNull(adminId, "adminId");
+    Objects.requireNonNull(adminName, "adminName");
+    Objects.requireNonNull(adminEmail, "adminEmail");
+    Objects.requireNonNull(adminRealName, "adminRealName");
+    Objects.requireNonNull(adminPassword, "adminPassword");
+
+    try {
+      this.closed.set(false);
+      this.resources = createResourceCollection();
+
+      this.telemetry =
+        IdServerTelemetryService.create(this.configuration);
+
+      final var baseConfiguration =
+        this.configuration.databaseConfiguration();
+
+      final var setupConfiguration =
+        new IdDatabaseConfiguration(
+          baseConfiguration.user(),
+          baseConfiguration.password(),
+          baseConfiguration.address(),
+          baseConfiguration.port(),
+          baseConfiguration.databaseName(),
+          IdDatabaseCreate.CREATE_DATABASE,
+          IdDatabaseUpgrade.UPGRADE_DATABASE,
+          baseConfiguration.clock()
+        );
+
+      final var db =
+        this.resources.add(
+          this.configuration.databases()
+            .open(
+              setupConfiguration,
+              this.telemetry.openTelemetry(),
+              event -> {
+              }));
+
+      final var password =
+        IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+          .createHashed(adminPassword);
+
+      try (var connection = db.openConnection(IDSTORE)) {
+        try (var transaction = connection.openTransaction()) {
+          final var admins =
+            transaction.queries(IdDatabaseAdminsQueriesType.class);
+
+          admins.adminCreateInitial(
+            adminId.orElse(UUID.randomUUID()),
+            adminName,
+            adminRealName,
+            adminEmail,
+            OffsetDateTime.now(baseConfiguration.clock()),
+            password
+          );
+          transaction.commit();
+        }
+      }
+    } catch (final IdDatabaseException | IdPasswordException e) {
+      throw new IdServerException(e.errorCode(), e.getMessage(), e);
     }
   }
 }

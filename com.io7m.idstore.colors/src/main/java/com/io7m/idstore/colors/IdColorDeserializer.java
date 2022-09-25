@@ -37,8 +37,6 @@ public final class IdColorDeserializer
 
   /**
    * A deserializer for color values.
-   *
-   * @inheritDoc
    */
 
   public IdColorDeserializer()
@@ -48,8 +46,6 @@ public final class IdColorDeserializer
 
   /**
    * A deserializer for color values.
-   *
-   * @inheritDoc
    *
    * @param t The deserialized class
    */

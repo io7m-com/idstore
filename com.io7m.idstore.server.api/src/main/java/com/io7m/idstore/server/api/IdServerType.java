@@ -17,8 +17,13 @@
 package com.io7m.idstore.server.api;
 
 import com.io7m.idstore.database.api.IdDatabaseType;
+import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.server.api.events.IdServerEventType;
 
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.Flow;
 
 /**
@@ -50,5 +55,26 @@ public interface IdServerType extends AutoCloseable
 
   @Override
   void close()
+    throws IdServerException;
+
+  /**
+   * Do the work necessary to set up a server instance (such as initializing
+   * and/or upgrading the database) but do not actually start the instance.
+   *
+   * @param adminId       The admin ID, if a specific one is required
+   * @param adminName     The initial administrator to create
+   * @param adminEmail    The admin email
+   * @param adminRealName The admin's real name
+   * @param adminPassword The password for the initial administrator
+   *
+   * @throws IdServerException On errors
+   */
+
+  void setup(
+    Optional<UUID> adminId,
+    IdName adminName,
+    IdEmail adminEmail,
+    IdRealName adminRealName,
+    String adminPassword)
     throws IdServerException;
 }

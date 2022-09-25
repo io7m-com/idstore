@@ -1,0 +1,21 @@
+Usage: initialize [options]
+
+  Options:
+  * --admin-email
+      The email address of the initial administrator.
+    --admin-id
+      The ID of the initial administrator
+  * --admin-password
+      The password of the initial administrator.
+  * --admin-realname
+      The real name of the initial administrator.
+  * --admin-username
+      The initial administrator to create.
+  * --configuration
+      The configuration file
+    --verbose
+      Set the minimum logging verbosity level.
+      Default: info
+      Possible Values: [trace, debug, info, warn, error]
+
+

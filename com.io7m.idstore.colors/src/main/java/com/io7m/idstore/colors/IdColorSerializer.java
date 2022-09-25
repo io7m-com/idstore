@@ -32,8 +32,6 @@ public final class IdColorSerializer
 {
   /**
    * A serializer for color values.
-   *
-   * @inheritDoc
    */
 
   public IdColorSerializer()
@@ -44,8 +42,6 @@ public final class IdColorSerializer
 
   /**
    * A serializer for color values.
-   *
-   * @inheritDoc
    *
    * @param t The serialized class
    */

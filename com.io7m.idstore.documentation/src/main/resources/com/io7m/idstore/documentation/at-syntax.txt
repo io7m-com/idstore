@@ -1,0 +1,9 @@
+$ idstore server --configuration server.conf
+
+$ (cat <<EOF
+--configuration
+server.conf
+EOF
+) > args.txt
+
+$ idstore @args.txt
