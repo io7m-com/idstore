@@ -24,7 +24,7 @@
       named <Term type="command">idstore</Term> that acts as the main entrypoint to all of the server's functionality.
       The
       <Term type="command">idstore</Term>
-      command expect environment variables named
+      command expects environment variables named
       <Term type="variable">IDSTORE_SERVER_HOME</Term>
       and
       <Term type="variable">IDSTORE_SERVER_LOG_DIRECTORY</Term>

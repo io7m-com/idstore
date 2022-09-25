@@ -20,7 +20,7 @@
   </Metadata>
 
   <xi:include href="intro.xml"/>
-  <xi:include href="server_install.xml"/>
+  <xi:include href="install.xml"/>
   <xi:include href="configuration.xml"/>
   <xi:include href="cmdline.xml"/>
   <xi:include href="api.xml"/>

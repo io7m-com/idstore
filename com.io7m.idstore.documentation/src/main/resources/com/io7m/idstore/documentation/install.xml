@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         id="79cef67f-7c8e-4d49-86f1-e8bd9e25f884"
+         title="Installation">
+
+  <xi:include href="server_install.xml"/>
+  <xi:include href="admin_client_install.xml"/>
+
+</Section>
