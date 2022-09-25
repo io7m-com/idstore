@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         id="41978b89-ae3f-4719-9004-bbdb79e0dba1"
+         title="Introduction">
+
+  <Paragraph>
+    The <Term type="package">idstore</Term> package provides a server and client for managing user accounts.
+  </Paragraph>
+
+  <FormalItem title="Features">
+    <ListUnordered>
+      <Item>
+        A small, easily auditable codebase with a heavy use of modularity for correctness.
+      </Item>
+      <Item>
+        An extensive automated test suite with high coverage.
+      </Item>
+      <Item>
+        Platform independence. No platform-dependent code is included in any form, and installations can largely be
+        carried between platforms without changes.
+      </Item>
+      <Item>
+        <LinkExternal target="https://www.osgi.org/">OSGi</LinkExternal>-ready
+      </Item>
+      <Item>
+        <LinkExternal target="https://en.wikipedia.org/wiki/Java_Platform_Module_System">JPMS</LinkExternal>-ready
+      </Item>
+      <Item>
+        ISC license
+      </Item>
+    </ListUnordered>
+  </FormalItem>
+
+</Section>

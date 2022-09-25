@@ -34,7 +34,8 @@
 .language,
 .parameter,
 .statement,
-.type
+.type,
+.variable
 {
   font-family: monospace;
 }

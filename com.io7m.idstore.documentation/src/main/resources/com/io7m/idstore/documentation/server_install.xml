@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         id="335a95e1-b716-4daf-85ee-87ed4a13b948"
+         title="Server Installation">
+
+  <Subsection title="Overview">
+    <Paragraph>
+      The <Term type="package">idstore</Term> server package is available from several sources:
+    </Paragraph>
+    <FormalItem title="Sources">
+      <ListUnordered>
+        <Item>
+          <Link target="f9b4e43e-a420-42fb-9632-f480372e5b51">Podman / Docker</Link>
+        </Item>
+        <Item>
+          <Link target="bfd06f1f-c785-4780-83c4-23a0c12f3010">Maven Central</Link>
+        </Item>
+      </ListUnordered>
+    </FormalItem>
+    <Paragraph>
+      Regardless of the distribution method, the <Term type="package">idstore</Term> package will contain a command
+      named <Term type="command">idstore</Term> that acts as the main entrypoint to all of the server's functionality.
+      The
+      <Term type="command">idstore</Term>
+      command expect environment variables named
+      <Term type="variable">IDSTORE_SERVER_HOME</Term>
+      and
+      <Term type="variable">IDSTORE_SERVER_LOG_DIRECTORY</Term>
+      to be defined that point to the installation directory and log directory, respectively. See the documentation for
+      the installation methods below for details.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="PostgreSQL"
+              id="c19831a6-1d7b-44c5-8145-af542e97e39a">
+    <Paragraph>
+      The <Term type="package">idstore</Term> server requires a
+      <LinkExternal target="https://www.postgresql.org/">PostgreSQL</LinkExternal>
+      server. The <Term type="package">idstore</Term> server will create the required tables and database objects on
+      first startup, given the name of a running PostgreSQL database, and a PostgreSQL role and password.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Podman/Docker"
+              id="f9b4e43e-a420-42fb-9632-f480372e5b51">
+    <Paragraph>
+      The <Term type="package">idstore</Term> package can be installed from
+      <LinkExternal target="https://hub.docker.com/r/io7m/idstore">Docker Hub</LinkExternal>
+      using <Term type="command">docker</Term> or <Term type="command">podman</Term>.
+    </Paragraph>
+    <FormalItem title="Docker/Podman Pull">
+      <Verbatim><![CDATA[$ docker pull docker.io/io7m/idstore:${project.version}
+
+$ podman pull docker.io/io7m/idstore:${project.version}
+]]>
+      </Verbatim>
+    </FormalItem>
+    <Paragraph>
+      The image is configured such that <Term type="variable">IDSTORE_SERVER_HOME=/idstore</Term>, with the
+      <Term type="command">idstore</Term>
+      command existing at
+      <Term type="expression">/idstore/bin/idstore</Term>, and
+      <Term type="variable">IDSTORE_SERVER_LOG_DIRECTORY=/idstore/log</Term>. The image is configured with the
+      expectation that users will mount a volume at
+      <Term type="expression">/idstore/etc</Term>
+      containing a configuration file, and a volume at
+      <Term type="expression">/idstore/log</Term>
+      that will contain log files. The container can otherwise be run without any privileges, and with a read-only root
+      filesystem.
+    </Paragraph>
+    <FormalItem title="Run">
+      <Verbatim><![CDATA[$ podman run \
+--read-only \
+--volume /x/y/a:/idstore/etc:Z \
+--volume /x/y/b:/idstore/log:Z \
+-i \
+-t \
+docker.io/io7m/idstore:${project.version} idstore
+info: Usage: idstore [options] [command] [command options]
+...
+]]></Verbatim>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="Maven Central"
+              id="bfd06f1f-c785-4780-83c4-23a0c12f3010">
+    <Paragraph>
+      A distribution package can be found at
+      <LinkExternal target="https://repo1.maven.org/maven2/com/io7m/idstore/com.io7m.idstore.server.main/${project.version}/com.io7m.idstore.server.main-${project.version}-distribution.zip">
+        Maven Central</LinkExternal>.
+    </Paragraph>
+    <Paragraph>
+      The <Term type="command">idstore</Term> command requires that a Java 17+ compatible JVM be accessible
+      via <Term type="command">/usr/bin/env java</Term>.
+    </Paragraph>
+    <Paragraph>
+      Verify the integrity of the distribution zip file:
+    </Paragraph>
+    <FormalItem title="Verify">
+      <Verbatim><![CDATA[
+$ gpg --verify com.io7m.idstore.server.main-${project.version}-distribution.zip.asc
+gpg: assuming signed data in 'com.io7m.idstore.server.main-${project.version}-distribution.zip.asc'
+gpg: Signature made Tue 28 Jun 2022 15:01:56 GMT
+gpg:                using RSA key 3CCE59428B30462D10459909C5607DA146E128B8
+gpg:                issuer "contact@io7m.com"
+gpg: using pgp trust model
+gpg: Good signature from "io7m.com (2022 maven-rsa-key) <contact@io7m.com>" [unknown]
+]]></Verbatim>
+    </FormalItem>
+    <Paragraph>
+      Unzip the zip file, and set up the environment appropriately:
+    </Paragraph>
+    <FormalItem title="Extract">
+      <Verbatim><![CDATA[
+$ unzip com.io7m.idstore.server.main-${project.version}-distribution.zip
+$ export IDSTORE_SERVER_HOME=$(realpath idstore)
+$ export IDSTORE_SERVER_LOG_DIRECTORY=/var/log/idstore
+$ ./idstore/bin/idstore
+info: Usage: idstore [options] [command] [command options]
+...
+]]></Verbatim>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="Initialization">
+    <Paragraph>
+      Given an appropriate
+      <Link target="c99d5d5d-769c-4616-8847-926b5d085270">configuration file</Link>
+      in <Term type="expression">server.conf</Term>, it's necessary to tell
+      <Term type="command">idstore</Term>
+      to configure the database and create an initial administrator user:
+    </Paragraph>
+    <FormalItem title="Initialize">
+      <Verbatim>
+        <xi:include href="c-initialize-example.txt"
+                    parse="text"/>
+      </Verbatim>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="Running">
+    <Paragraph>
+      The server can now be run with <Term type="command">idstore server</Term>:
+    </Paragraph>
+    <FormalItem title="Run">
+      <Verbatim>
+        <xi:include href="c-server-example.txt"
+                    parse="text"/>
+      </Verbatim>
+    </FormalItem>
+    <Paragraph>
+      The server <Term type="emphasis">does not</Term> fork into the background and is designed to be run under process
+      supervision.
+    </Paragraph>
+  </Subsection>
+
+</Section>
