@@ -86,6 +86,7 @@
   [field agent cb:String]
 ]
 
+[documentation IdA1AdminPermission "An admin permission."]
 [variant IdA1AdminPermission
   [documentation AdminBan "A permission that allows for banning admins."]
   [case AdminBan]
@@ -113,6 +114,7 @@
   [case UserBan]
 ]
 
+[documentation IdA1AdminColumn "A column to use for sorting admins."]
 [variant IdA1AdminColumn
   [documentation ByID "Order by admin ID."]
   [case ByID]
@@ -126,6 +128,7 @@
   [case ByTimeUpdated]
 ]
 
+[documentation IdA1AdminColumnOrdering "A column ordering spec."]
 [record IdA1AdminColumnOrdering
   [documentation column "The admin column."]
   [field column IdA1AdminColumn]
@@ -133,34 +136,55 @@
   [field ascending cb:Boolean]
 ]
 
+[documentation IdA1AdminOrdering "A set of column ordering specs."]
 [record IdA1AdminOrdering
+  [documentation columns "The column orders."]
   [field columns [cb:List IdA1AdminColumnOrdering]]
 ]
 
+[documentation IdA1AdminSearchParameters "Search parameters for admins."]
 [record IdA1AdminSearchParameters
+  [documentation timeCreatedRange "The range of creation times for returned admins."]
   [field timeCreatedRange IdA1TimeRange]
+  [documentation timeUpdatedRange "The range of update times for returned admins."]
   [field timeUpdatedRange IdA1TimeRange]
+  [documentation search "The search query text."]
   [field search [cb:Option cb:String]]
+  [documentation ordering "The result ordering."]
   [field ordering IdA1AdminOrdering]
+  [documentation limit "The limit on the number of results."]
   [field limit cb:IntegerUnsigned16]
 ]
 
+[documentation IdA1AdminSearchByEmailParameters "Search parameters for admins (by email)."]
 [record IdA1AdminSearchByEmailParameters
+  [documentation timeCreatedRange "The range of creation times for returned admins."]
   [field timeCreatedRange IdA1TimeRange]
+  [documentation timeUpdatedRange "The range of update times for returned admins."]
   [field timeUpdatedRange IdA1TimeRange]
+  [documentation search "The search query text."]
   [field search cb:String]
+  [documentation ordering "The result ordering."]
   [field ordering IdA1AdminOrdering]
+  [documentation limit "The limit on the number of results."]
   [field limit cb:IntegerUnsigned16]
 ]
 
+[documentation IdA1AuditSearchParameters "Search parameters for audit records."]
 [record IdA1AuditSearchParameters
+  [documentation timeRange "The range of time to include."]
   [field timeRange IdA1TimeRange]
+  [documentation owner "All records contain this owner, if specified."]
   [field owner [cb:Option cb:String]]
+  [documentation message "All records contain this message, if specified."]
   [field message [cb:Option cb:String]]
+  [documentation type "All records contain this type, if specified."]
   [field type [cb:Option cb:String]]
+  [documentation limit "The limit on the number of results."]
   [field limit cb:IntegerUnsigned16]
 ]
 
+[documentation IdA1UserColumn "A column to use for sorting users."]
 [variant IdA1UserColumn
   [documentation ByID "Order by user ID."]
   [case ByID]
@@ -174,6 +198,7 @@
   [case ByTimeUpdated]
 ]
 
+[documentation IdA1UserColumnOrdering "A column ordering spec."]
 [record IdA1UserColumnOrdering
   [documentation column "The user column."]
   [field column IdA1UserColumn]
@@ -181,75 +206,130 @@
   [field ascending cb:Boolean]
 ]
 
+[documentation IdA1UserOrdering "A set of column ordering specs."]
 [record IdA1UserOrdering
+  [documentation columns "The column orders."]
   [field columns [cb:List IdA1UserColumnOrdering]]
 ]
 
+[documentation IdA1UserSearchParameters "Search parameters for users."]
 [record IdA1UserSearchParameters
+  [documentation timeCreatedRange "The range of creation times for returned users."]
   [field timeCreatedRange IdA1TimeRange]
+  [documentation timeUpdatedRange "The range of update times for returned users."]
   [field timeUpdatedRange IdA1TimeRange]
+  [documentation search "The search query text."]
   [field search [cb:Option cb:String]]
+  [documentation ordering "The result ordering."]
   [field ordering IdA1UserOrdering]
+  [documentation limit "The limit on the number of results."]
   [field limit cb:IntegerUnsigned16]
 ]
 
+[documentation IdA1UserSearchByEmailParameters "Search parameters for users (by email)."]
 [record IdA1UserSearchByEmailParameters
+  [documentation timeCreatedRange "The range of creation times for returned users."]
   [field timeCreatedRange IdA1TimeRange]
+  [documentation timeUpdatedRange "The range of update times for returned users."]
   [field timeUpdatedRange IdA1TimeRange]
+  [documentation search "The search query text."]
   [field search cb:String]
+  [documentation ordering "The result ordering."]
   [field ordering IdA1UserOrdering]
+  [documentation limit "The limit on the number of results."]
   [field limit cb:IntegerUnsigned16]
 ]
 
+[documentation IdA1Admin "An administrator."]
 [record IdA1Admin
+  [documentation id "The admin ID."]
   [field id IdA1UUID]
+  [documentation idName "The admin ID name."]
   [field idName cb:String]
+  [documentation realName "The admin real name."]
   [field realName cb:String]
+  [documentation emails "The admin emails."]
   [field emails [cb:List cb:String]]
+  [documentation timeCreated "The time the admin was created."]
   [field timeCreated IdA1TimestampUTC]
+  [documentation timeUpdated "The time the admin was last updated."]
   [field timeUpdated IdA1TimestampUTC]
+  [documentation password "The hashed admin password."]
   [field password IdA1Password]
+  [documentation permissions "The admin permissions."]
   [field permissions [cb:List IdA1AdminPermission]]
 ]
 
+[documentation IdA1Page "A page of results."]
 [record IdA1Page
+  [documentation T "The type of result values."]
   [parameter T]
+  [documentation items "The list of results."]
   [field items [cb:List T]]
+  [documentation pageIndex "The page index."]
   [field pageIndex cb:IntegerUnsigned32]
+  [documentation pageCount "The page count."]
   [field pageCount cb:IntegerUnsigned32]
+  [documentation pageFirstOffset "The offset of the first item in the page."]
   [field pageFirstOffset cb:IntegerUnsigned64]]
 
+[documentation IdA1AdminSummary "An admin summary."]
 [record IdA1AdminSummary
+  [documentation id "The admin ID."]
   [field id IdA1UUID]
+  [documentation idName "The admin ID name."]
   [field idName cb:String]
+  [documentation realName "The admin real name."]
   [field realName cb:String]
+  [documentation timeCreated "The time the admin was created."]
   [field timeCreated IdA1TimestampUTC]
+  [documentation timeUpdated "The time the admin was last updated."]
   [field timeUpdated IdA1TimestampUTC]
 ]
 
+[documentation IdA1AuditEvent "An audit event."]
 [record IdA1AuditEvent
+  [documentation id "The audit event ID."]
   [field id cb:IntegerUnsigned64]
+  [documentation owner "The audit event owner."]
   [field owner IdA1UUID]
+  [documentation time "The audit event time."]
   [field time IdA1TimestampUTC]
+  [documentation type "The audit event type."]
   [field type cb:String]
+  [documentation message "The audit event message."]
   [field message cb:String]
 ]
 
+[documentation IdA1User "A user."]
 [record IdA1User
+  [documentation id "The user ID."]
   [field id IdA1UUID]
+  [documentation idName "The user ID name."]
   [field idName cb:String]
+  [documentation realName "The user real name."]
   [field realName cb:String]
+  [documentation emails "The user emails."]
   [field emails [cb:List cb:String]]
+  [documentation timeCreated "The time the user was created."]
   [field timeCreated IdA1TimestampUTC]
+  [documentation timeUpdated "The time the user was last updated."]
   [field timeUpdated IdA1TimestampUTC]
+  [documentation password "The hashed user password."]
   [field password IdA1Password]
 ]
 
+[documentation IdA1UserSummary "A user summary."]
 [record IdA1UserSummary
+  [documentation id "The user ID."]
   [field id IdA1UUID]
+  [documentation idName "The user ID name."]
   [field idName cb:String]
+  [documentation realName "The user real name."]
   [field realName cb:String]
+  [documentation timeCreated "The time the user was created."]
   [field timeCreated IdA1TimestampUTC]
+  [documentation timeUpdated "The time the user was last updated."]
   [field timeUpdated IdA1TimestampUTC]
 ]
 
@@ -783,78 +863,80 @@
 [documentation IdA1 "The Admin v1 protocol."]
 [protocol IdA1
   [version 1
-    IdA1CommandAdminBanCreate
-    IdA1CommandAdminBanDelete
-    IdA1CommandAdminBanGet
-    IdA1CommandAdminCreate
-    IdA1CommandAdminDelete
-    IdA1CommandAdminEmailAdd
-    IdA1CommandAdminEmailRemove
-    IdA1CommandAdminGet
-    IdA1CommandAdminGetByEmail
-    IdA1CommandAdminPermissionGrant
-    IdA1CommandAdminPermissionRevoke
-    IdA1CommandAdminSearchBegin
-    IdA1CommandAdminSearchByEmailBegin
-    IdA1CommandAdminSearchByEmailNext
-    IdA1CommandAdminSearchByEmailPrevious
-    IdA1CommandAdminSearchNext
-    IdA1CommandAdminSearchPrevious
-    IdA1CommandAdminSelf
-    IdA1CommandAdminUpdate
-    IdA1CommandAuditSearchBegin
-    IdA1CommandAuditSearchNext
-    IdA1CommandAuditSearchPrevious
-    IdA1CommandLogin
-    IdA1CommandUserBanCreate
-    IdA1CommandUserBanDelete
-    IdA1CommandUserBanGet
-    IdA1CommandUserCreate
-    IdA1CommandUserDelete
-    IdA1CommandUserEmailAdd
-    IdA1CommandUserEmailRemove
-    IdA1CommandUserGet
-    IdA1CommandUserGetByEmail
-    IdA1CommandUserLoginHistory
-    IdA1CommandUserSearchBegin
-    IdA1CommandUserSearchByEmailBegin
-    IdA1CommandUserSearchByEmailNext
-    IdA1CommandUserSearchByEmailPrevious
-    IdA1CommandUserSearchNext
-    IdA1CommandUserSearchPrevious
-    IdA1CommandUserUpdate
-    IdA1ResponseAdminBanCreate
-    IdA1ResponseAdminBanDelete
-    IdA1ResponseAdminBanGet
-    IdA1ResponseAdminCreate
-    IdA1ResponseAdminDelete
-    IdA1ResponseAdminGet
-    IdA1ResponseAdminSearchBegin
-    IdA1ResponseAdminSearchByEmailBegin
-    IdA1ResponseAdminSearchByEmailNext
-    IdA1ResponseAdminSearchByEmailPrevious
-    IdA1ResponseAdminSearchNext
-    IdA1ResponseAdminSearchPrevious
-    IdA1ResponseAdminSelf
-    IdA1ResponseAdminUpdate
-    IdA1ResponseAuditSearchBegin
-    IdA1ResponseAuditSearchNext
-    IdA1ResponseAuditSearchPrevious
-    IdA1ResponseError
-    IdA1ResponseLogin
-    IdA1ResponseUserBanCreate
-    IdA1ResponseUserBanDelete
-    IdA1ResponseUserBanGet
-    IdA1ResponseUserCreate
-    IdA1ResponseUserDelete
-    IdA1ResponseUserGet
-    IdA1ResponseUserLoginHistory
-    IdA1ResponseUserSearchBegin
-    IdA1ResponseUserSearchByEmailBegin
-    IdA1ResponseUserSearchByEmailNext
-    IdA1ResponseUserSearchByEmailPrevious
-    IdA1ResponseUserSearchNext
-    IdA1ResponseUserSearchPrevious
-    IdA1ResponseUserUpdate
+    [types-added
+      IdA1CommandAdminBanCreate
+      IdA1CommandAdminBanDelete
+      IdA1CommandAdminBanGet
+      IdA1CommandAdminCreate
+      IdA1CommandAdminDelete
+      IdA1CommandAdminEmailAdd
+      IdA1CommandAdminEmailRemove
+      IdA1CommandAdminGet
+      IdA1CommandAdminGetByEmail
+      IdA1CommandAdminPermissionGrant
+      IdA1CommandAdminPermissionRevoke
+      IdA1CommandAdminSearchBegin
+      IdA1CommandAdminSearchByEmailBegin
+      IdA1CommandAdminSearchByEmailNext
+      IdA1CommandAdminSearchByEmailPrevious
+      IdA1CommandAdminSearchNext
+      IdA1CommandAdminSearchPrevious
+      IdA1CommandAdminSelf
+      IdA1CommandAdminUpdate
+      IdA1CommandAuditSearchBegin
+      IdA1CommandAuditSearchNext
+      IdA1CommandAuditSearchPrevious
+      IdA1CommandLogin
+      IdA1CommandUserBanCreate
+      IdA1CommandUserBanDelete
+      IdA1CommandUserBanGet
+      IdA1CommandUserCreate
+      IdA1CommandUserDelete
+      IdA1CommandUserEmailAdd
+      IdA1CommandUserEmailRemove
+      IdA1CommandUserGet
+      IdA1CommandUserGetByEmail
+      IdA1CommandUserLoginHistory
+      IdA1CommandUserSearchBegin
+      IdA1CommandUserSearchByEmailBegin
+      IdA1CommandUserSearchByEmailNext
+      IdA1CommandUserSearchByEmailPrevious
+      IdA1CommandUserSearchNext
+      IdA1CommandUserSearchPrevious
+      IdA1CommandUserUpdate
+      IdA1ResponseAdminBanCreate
+      IdA1ResponseAdminBanDelete
+      IdA1ResponseAdminBanGet
+      IdA1ResponseAdminCreate
+      IdA1ResponseAdminDelete
+      IdA1ResponseAdminGet
+      IdA1ResponseAdminSearchBegin
+      IdA1ResponseAdminSearchByEmailBegin
+      IdA1ResponseAdminSearchByEmailNext
+      IdA1ResponseAdminSearchByEmailPrevious
+      IdA1ResponseAdminSearchNext
+      IdA1ResponseAdminSearchPrevious
+      IdA1ResponseAdminSelf
+      IdA1ResponseAdminUpdate
+      IdA1ResponseAuditSearchBegin
+      IdA1ResponseAuditSearchNext
+      IdA1ResponseAuditSearchPrevious
+      IdA1ResponseError
+      IdA1ResponseLogin
+      IdA1ResponseUserBanCreate
+      IdA1ResponseUserBanDelete
+      IdA1ResponseUserBanGet
+      IdA1ResponseUserCreate
+      IdA1ResponseUserDelete
+      IdA1ResponseUserGet
+      IdA1ResponseUserLoginHistory
+      IdA1ResponseUserSearchBegin
+      IdA1ResponseUserSearchByEmailBegin
+      IdA1ResponseUserSearchByEmailNext
+      IdA1ResponseUserSearchByEmailPrevious
+      IdA1ResponseUserSearchNext
+      IdA1ResponseUserSearchPrevious
+      IdA1ResponseUserUpdate
+    ]
   ]
 ]

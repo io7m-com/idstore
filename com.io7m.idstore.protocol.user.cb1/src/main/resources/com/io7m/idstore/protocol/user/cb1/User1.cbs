@@ -210,24 +210,26 @@
 [documentation IdU1 "The User v1 protocol."]
 [protocol IdU1
   [version 1
-    IdU1CommandEmailAddBegin
-    IdU1CommandEmailAddDeny
-    IdU1CommandEmailAddPermit
-    IdU1CommandEmailRemoveBegin
-    IdU1CommandEmailRemoveDeny
-    IdU1CommandEmailRemovePermit
-    IdU1CommandLogin
-    IdU1CommandRealnameUpdate
-    IdU1CommandUserSelf
-    IdU1ResponseEmailAddBegin
-    IdU1ResponseEmailAddDeny
-    IdU1ResponseEmailAddPermit
-    IdU1ResponseEmailRemoveBegin
-    IdU1ResponseEmailRemoveDeny
-    IdU1ResponseEmailRemovePermit
-    IdU1ResponseError
-    IdU1ResponseLogin
-    IdU1ResponseUserSelf
-    IdU1ResponseUserUpdate
+    [types-added
+      IdU1CommandEmailAddBegin
+      IdU1CommandEmailAddDeny
+      IdU1CommandEmailAddPermit
+      IdU1CommandEmailRemoveBegin
+      IdU1CommandEmailRemoveDeny
+      IdU1CommandEmailRemovePermit
+      IdU1CommandLogin
+      IdU1CommandRealnameUpdate
+      IdU1CommandUserSelf
+      IdU1ResponseEmailAddBegin
+      IdU1ResponseEmailAddDeny
+      IdU1ResponseEmailAddPermit
+      IdU1ResponseEmailRemoveBegin
+      IdU1ResponseEmailRemoveDeny
+      IdU1ResponseEmailRemovePermit
+      IdU1ResponseError
+      IdU1ResponseLogin
+      IdU1ResponseUserSelf
+      IdU1ResponseUserUpdate
+    ]
   ]
 ]

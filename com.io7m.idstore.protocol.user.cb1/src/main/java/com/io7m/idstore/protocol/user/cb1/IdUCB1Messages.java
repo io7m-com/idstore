@@ -17,10 +17,7 @@
 
 package com.io7m.idstore.protocol.user.cb1;
 
-import com.io7m.cedarbridge.runtime.api.CBCoreSerializers;
-import com.io7m.cedarbridge.runtime.api.CBProtocolSerializerCollectionType;
-import com.io7m.cedarbridge.runtime.api.CBProtocolSerializerType;
-import com.io7m.cedarbridge.runtime.api.CBSerializerDirectoryMutable;
+import com.io7m.cedarbridge.runtime.api.CBProtocolMessageVersionedSerializerType;
 import com.io7m.cedarbridge.runtime.bssio.CBSerializationContextBSSIO;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessagesType;
@@ -60,10 +57,9 @@ public final class IdUCB1Messages
 
   private final BSSReaderProviderType readers;
   private final BSSWriterProviderType writers;
-  private final CBProtocolSerializerCollectionType<ProtocolIdU1Type> protocols;
-  private final CBSerializerDirectoryMutable serializers;
+  private final ProtocolIdU1 protocols;
   private final IdUCB1Validation validator;
-  private final CBProtocolSerializerType<ProtocolIdU1Type> serializer;
+  private final CBProtocolMessageVersionedSerializerType<ProtocolIdU1Type> serializer;
 
   /**
    * The protocol messages for Admin v1 Cedarbridge.
@@ -82,13 +78,12 @@ public final class IdUCB1Messages
       Objects.requireNonNull(inWriters, "writers");
 
     this.validator = new IdUCB1Validation();
-    this.protocols = ProtocolIdU1.factories();
-    this.serializers = new CBSerializerDirectoryMutable();
-    this.serializers.addCollection(CBCoreSerializers.get());
-    this.serializers.addCollection(Serializers.get());
+    this.protocols = new ProtocolIdU1();
     this.serializer =
-      this.protocols.findOrThrow(1L)
-        .create(this.serializers);
+      this.protocols.serializerForProtocolVersion(1L)
+        .orElseThrow(() -> {
+          return new IllegalStateException("No support for version 1");
+        });
   }
 
   /**
