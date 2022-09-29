@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section title="JavaDoc" xmlns="urn:com.io7m.structural:8:0">
+  <Paragraph>
+    The server and clients expose Java APIs that are documented in the included
+    <LinkExternal target="apidocs/index.html">JavaDoc</LinkExternal>.
+  </Paragraph>
+</Section>

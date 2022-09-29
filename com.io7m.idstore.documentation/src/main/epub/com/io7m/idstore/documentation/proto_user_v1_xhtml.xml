@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Subsection xmlns="urn:com.io7m.structural:8:0"
+            title="Generated Documentation">
+  <Paragraph>
+    Generated documentation for the <Term type="package">Cedarbridge</Term> schemas is available:
+  </Paragraph>
+  <FormalItem title="Schema Documentation">
+    <ListUnordered>
+      <Item>
+        <LinkExternal target="https://www.io7m.com/software/idstore/documentation/com.io7m.cedarbridge.xhtml">com.io7m.cedarbridge</LinkExternal>
+      </Item>
+      <Item>
+        <LinkExternal target="https://www.io7m.com/software/idstore/documentation/com.io7m.idstore.protocol.user.cb1.xhtml">com.io7m.idstore.protocol.user.cb1</LinkExternal>
+      </Item>
+    </ListUnordered>
+  </FormalItem>
+</Subsection>

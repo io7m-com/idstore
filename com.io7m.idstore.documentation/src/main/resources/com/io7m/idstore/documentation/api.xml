@@ -6,12 +6,6 @@
 
   <xi:include href="proto_admin_v1.xml"/>
   <xi:include href="proto_user_v1.xml"/>
-
-  <Section title="JavaDoc">
-    <Paragraph>
-      The server and clients expose Java APIs that are documented in the included <LinkExternal
-      target="https://www.io7m.com/software/idstore/documentation/apidocs/index.html">JavaDoc</LinkExternal>.
-    </Paragraph>
-  </Section>
+  <xi:include href="javadoc.xml"/>
 
 </Section>

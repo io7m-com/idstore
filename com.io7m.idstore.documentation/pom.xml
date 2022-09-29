@@ -180,6 +180,23 @@
           </execution>
 
           <execution>
+            <id>copy-documentation-xml</id>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/documentation/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/xhtml/com/io7m/idstore/documentation/</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+
+          <execution>
             <id>copy-documentation-resources-epub</id>
             <goals>
               <goal>copy-resources</goal>
@@ -191,6 +208,23 @@
                 <resource>
                   <directory>src/main/resources/com/io7m/idstore/documentation/</directory>
                   <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>copy-documentation-xml-epub</id>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/epub/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/epub/com/io7m/idstore/documentation/</directory>
+                  <filtering>false</filtering>
                 </resource>
               </resources>
             </configuration>
@@ -329,9 +363,56 @@
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
           </dependency>
+          <dependency>
+            <groupId>com.io7m.cedarbridge</groupId>
+            <artifactId>com.io7m.cedarbridge.cmdline</artifactId>
+            <version>${com.io7m.cedarbridge.version}</version>
+          </dependency>
         </dependencies>
 
         <executions>
+          <execution>
+            <id>generate-cedarbridge-documentation-admin</id>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <includePluginDependencies>true</includePluginDependencies>
+              <mainClass>com.io7m.cedarbridge.cmdline.MainExitless</mainClass>
+              <arguments>
+                <argument>document</argument>
+                <argument>--output-directory</argument>
+                <argument>${project.build.directory}/documentation</argument>
+                <argument>--language</argument>
+                <argument>xhtml</argument>
+                <argument>--file</argument>
+                <argument>${project.build.directory}/documentation/com/io7m/idstore/protocol/admin/cb1/Admin1.cbs</argument>
+              </arguments>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>generate-cedarbridge-documentation-user</id>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <includePluginDependencies>true</includePluginDependencies>
+              <mainClass>com.io7m.cedarbridge.cmdline.MainExitless</mainClass>
+              <arguments>
+                <argument>document</argument>
+                <argument>--output-directory</argument>
+                <argument>${project.build.directory}/documentation</argument>
+                <argument>--language</argument>
+                <argument>xhtml</argument>
+                <argument>--file</argument>
+                <argument>${project.build.directory}/documentation/com/io7m/idstore/protocol/user/cb1/User1.cbs</argument>
+              </arguments>
+            </configuration>
+          </execution>
+
           <execution>
             <id>xhtml-single</id>
             <goals>
@@ -387,7 +468,7 @@
               <arguments>
                 <argument>epub</argument>
                 <argument>--sourceFile</argument>
-                <argument>${project.build.directory}/documentation/main.xml</argument>
+                <argument>${project.build.directory}/epub/main.xml</argument>
                 <argument>--outputDirectory</argument>
                 <argument>${project.build.directory}/epub</argument>
                 <argument>--outputFileName</argument>
