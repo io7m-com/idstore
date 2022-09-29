@@ -32,6 +32,7 @@ import java.time.Instant;
 import java.util.Locale;
 import java.util.Objects;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -667,4 +668,37 @@ public final class IdServerUsersTest extends IdWithServerContract
     final var userNow = this.client.userSelf();
     assertEquals("A New Name", userNow.realName().value());
   }
+
+  /**
+   * Email verifications are rate-limited.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testEmailVerificationRateLimited()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    this.serverCreateUser(admin, "someone");
+
+    this.client.login("someone", "12345678", this.serverUserAPIURL());
+
+    final var newMail = new IdEmail("gauss@example.com");
+    this.client.userEmailAddBegin(newMail);
+
+    final var email0 =
+      this.emailsReceived().poll();
+
+    final var ex =
+      assertThrows(IdUClientException.class, () -> {
+        this.client.userEmailAddBegin(newMail);
+      });
+
+    assertEquals(RATE_LIMIT_EXCEEDED, ex.errorCode());
+  }
+
 }

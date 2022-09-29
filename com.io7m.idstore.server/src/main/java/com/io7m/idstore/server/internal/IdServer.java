@@ -277,11 +277,27 @@ public final class IdServer implements IdServerType
     services.register(IdServerMaintenanceService.class, maintenance);
 
     final var userPasswordRateLimitService =
-      IdRateLimitPasswordResetService.create(this.telemetry, 10L, MINUTES);
+      IdRateLimitPasswordResetService.create(
+        this.telemetry,
+        10L,
+        MINUTES
+      );
 
     services.register(
       IdRateLimitPasswordResetService.class,
       userPasswordRateLimitService
+    );
+
+    final var emailVerificationRateLimitService =
+      IdRateLimitEmailVerificationService.create(
+        this.telemetry,
+        10L,
+        MINUTES
+      );
+
+    services.register(
+      IdRateLimitEmailVerificationService.class,
+      emailVerificationRateLimitService
     );
 
     final var userPasswordResetService =

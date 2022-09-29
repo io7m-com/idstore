@@ -30,6 +30,7 @@ import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
+import com.io7m.idstore.server.internal.IdRateLimitEmailVerificationService;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerConfigurationService;
 import com.io7m.idstore.server.internal.IdServerMailService;
@@ -47,6 +48,7 @@ import java.util.Map;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_ADD;
 import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
@@ -86,6 +88,8 @@ public final class IdUCmdEmailAddBegin
       services.requireService(IdServerStrings.class);
     final var brandingService =
       services.requireService(IdServerBrandingService.class);
+    final var rateLimitService =
+      services.requireService(IdRateLimitEmailVerificationService.class);
 
     final var configuration =
       configurationService.configuration();
@@ -99,6 +103,14 @@ public final class IdUCmdEmailAddBegin
         FORBIDDEN_403,
         SECURITY_POLICY_DENIED,
         denied.message()
+      );
+    }
+
+    if (!rateLimitService.isAllowedByRateLimit(user.id())) {
+      throw context.fail(
+        400,
+        RATE_LIMIT_EXCEEDED,
+        strings.format("emailVerificationRateLimited")
       );
     }
 
