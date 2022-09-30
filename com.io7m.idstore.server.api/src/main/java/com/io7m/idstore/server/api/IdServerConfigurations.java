@@ -127,6 +127,7 @@ public final class IdServerConfigurations
       file.httpConfiguration().adminAPIService(),
       file.brandingConfiguration(),
       file.historyConfiguration(),
+      file.rateLimit(),
       file.openTelemetry()
     );
   }

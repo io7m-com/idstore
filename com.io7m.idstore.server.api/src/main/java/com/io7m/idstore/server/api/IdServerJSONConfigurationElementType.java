@@ -35,7 +35,8 @@ public sealed interface IdServerJSONConfigurationElementType
   IdServerHistoryConfiguration,
   IdServerMailAuthenticationConfiguration,
   IdServerMailConfiguration,
-  IdServerMailTransportConfigurationType
+  IdServerMailTransportConfigurationType,
+  IdServerRateLimitConfiguration
 {
   /**
    * @return The schema identifier

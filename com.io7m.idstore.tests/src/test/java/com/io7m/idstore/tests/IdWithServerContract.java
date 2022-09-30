@@ -37,6 +37,7 @@ import com.io7m.idstore.server.api.IdServerHTTPServiceConfiguration;
 import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
+import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerType;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
@@ -57,6 +58,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Optional;
@@ -288,6 +290,12 @@ public abstract class IdWithServerContract
         100
       );
 
+    final var rateLimit =
+      new IdServerRateLimitConfiguration(
+        Duration.of(10L, ChronoUnit.MINUTES),
+        Duration.of(10L, ChronoUnit.MINUTES)
+      );
+
     return this.servers.createServer(
       new IdServerConfiguration(
         Locale.getDefault(),
@@ -300,6 +308,7 @@ public abstract class IdWithServerContract
         adminApiService,
         branding,
         history,
+        rateLimit,
         Optional.empty()
       )
     );

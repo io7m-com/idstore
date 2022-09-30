@@ -214,6 +214,41 @@
     </Subsection>
   </Subsection>
 
+  <Subsection title="RateLimiting">
+    <Subsection title="Overview">
+      <Paragraph>
+        The <Term type="expression">RateLimiting</Term> section of the configuration file configures
+        rate limiting for various server operations. Primarily, rate limiting is currently useful to limit any
+        outgoing email that the server might send; unauthenticated clients could, for example, attempt to
+        spam users with password reset emails. Setting a rate limit such that only one password reset email can
+        be sent every ten minutes for a given client can reduce the possible damage.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="expression">EmailVerificationRateLimit</Term> property specifies the minimum duration that
+        must elapse between any two email verification requests for a given user. The property must be specified
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="expression">PasswordResetRateLimit</Term> property specifies the minimum duration that
+        must elapse between any two password reset requests from a single IP address. The property must be specified
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Example">
+      <Paragraph>
+        An example rate limit configuration:
+      </Paragraph>
+      <FormalItem title="Example">
+        <Verbatim><![CDATA[
+"RateLimiting": {
+    "EmailVerificationRateLimit": "PT10M",
+    "PasswordResetRateLimit": "PT10M"
+}
+]]></Verbatim>
+      </FormalItem>
+    </Subsection>
+  </Subsection>
+
   <Subsection title="OpenTelemetry">
     <Subsection title="Overview">
       <Paragraph>

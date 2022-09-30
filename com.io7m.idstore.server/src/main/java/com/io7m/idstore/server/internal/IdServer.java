@@ -92,7 +92,7 @@ import java.util.concurrent.SubmissionPublisher;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * The main server implementation.
@@ -279,8 +279,10 @@ public final class IdServer implements IdServerType
     final var userPasswordRateLimitService =
       IdRateLimitPasswordResetService.create(
         this.telemetry,
-        10L,
-        MINUTES
+        this.configuration.rateLimit()
+          .passwordResetRateLimit()
+          .toSeconds(),
+        SECONDS
       );
 
     services.register(
@@ -291,8 +293,10 @@ public final class IdServer implements IdServerType
     final var emailVerificationRateLimitService =
       IdRateLimitEmailVerificationService.create(
         this.telemetry,
-        10L,
-        MINUTES
+        this.configuration.rateLimit()
+          .emailVerificationRateLimit()
+          .toSeconds(),
+        SECONDS
       );
 
     services.register(

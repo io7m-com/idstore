@@ -34,6 +34,7 @@ import java.util.Optional;
  * @param databaseConfiguration The database configuration
  * @param historyConfiguration  The history configuration
  * @param openTelemetry         The OpenTelemetry configuration
+ * @param rateLimit             The rate limiting configuration
  */
 
 @JsonDeserialize
@@ -49,6 +50,8 @@ public record IdServerConfigurationFile(
   IdServerDatabaseConfiguration databaseConfiguration,
   @JsonProperty(value = "History", required = true)
   IdServerHistoryConfiguration historyConfiguration,
+  @JsonProperty(value = "RateLimiting", required = true)
+  IdServerRateLimitConfiguration rateLimit,
   @JsonInclude(JsonInclude.Include.NON_ABSENT)
   @JsonProperty(value = "OpenTelemetry")
   Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
@@ -63,6 +66,7 @@ public record IdServerConfigurationFile(
    * @param databaseConfiguration The database configuration
    * @param historyConfiguration  The history configuration
    * @param openTelemetry         The OpenTelemetry configuration
+   * @param rateLimit             The rate limiting configuration
    */
 
   @JsonCreator
@@ -73,6 +77,7 @@ public record IdServerConfigurationFile(
     Objects.requireNonNull(httpConfiguration, "httpConfiguration");
     Objects.requireNonNull(databaseConfiguration, "databaseConfiguration");
     Objects.requireNonNull(historyConfiguration, "historyConfiguration");
+    Objects.requireNonNull(rateLimit, "rateLimit");
     Objects.requireNonNull(openTelemetry, "openTelemetry");
   }
 }

@@ -41,6 +41,11 @@
     "AdminLoginHistoryLimit": 10000
   },
 
+  "RateLimiting": {
+    "EmailVerificationRateLimit": "PT10M",
+    "PasswordResetRateLimit": "PT10M"
+  },
+
   "Database": {
     "Kind": "POSTGRESQL",
     "User": "postgres",

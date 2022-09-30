@@ -40,6 +40,7 @@ import java.util.Optional;
  * @param branding              The branding configuration
  * @param history               The history configuration
  * @param openTelemetry         The OpenTelemetry configuration
+ * @param rateLimit             The rate limiting configuration
  */
 
 public record IdServerConfiguration(
@@ -53,6 +54,7 @@ public record IdServerConfiguration(
   IdServerHTTPServiceConfiguration adminApiAddress,
   IdServerBrandingConfiguration branding,
   IdServerHistoryConfiguration history,
+  IdServerRateLimitConfiguration rateLimit,
   Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
 {
   /**
@@ -70,6 +72,7 @@ public record IdServerConfiguration(
    * @param branding              The branding configuration
    * @param history               The history configuration
    * @param openTelemetry         The OpenTelemetry configuration
+   * @param rateLimit             The rate limiting configuration
    */
 
   public IdServerConfiguration
@@ -85,6 +88,7 @@ public record IdServerConfiguration(
     Objects.requireNonNull(branding, "branding");
     Objects.requireNonNull(history, "history");
     Objects.requireNonNull(openTelemetry, "openTelemetry");
+    Objects.requireNonNull(rateLimit, "rateLimit");
   }
 
   /**

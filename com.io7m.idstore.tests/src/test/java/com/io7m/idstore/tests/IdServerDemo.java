@@ -36,6 +36,7 @@ import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration;
+import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerType;
 import com.io7m.idstore.server.api.events.IdServerEventReady;
 import com.io7m.idstore.server.api.events.IdServerEventType;
@@ -51,6 +52,7 @@ import java.nio.file.Paths;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -155,6 +157,12 @@ public final class IdServerDemo
         100
       );
 
+    final var rateLimit =
+      new IdServerRateLimitConfiguration(
+        Duration.of(10L, ChronoUnit.MINUTES),
+        Duration.of(10L, ChronoUnit.MINUTES)
+      );
+
     final var serverConfiguration =
       new IdServerConfiguration(
         Locale.getDefault(),
@@ -167,6 +175,7 @@ public final class IdServerDemo
         adminApiService,
         branding,
         history,
+        rateLimit,
         Optional.of(openTelemetry)
       );
 

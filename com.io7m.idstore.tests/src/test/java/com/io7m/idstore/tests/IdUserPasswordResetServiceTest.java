@@ -26,6 +26,7 @@ import com.io7m.idstore.server.api.IdServerHTTPServiceConfiguration;
 import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
+import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.internal.IdRateLimitPasswordResetService;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerClock;
@@ -192,6 +193,10 @@ public final class IdUserPasswordResetServiceTest
           Optional.empty()
         ),
         new IdServerHistoryConfiguration(1000, 1000),
+        new IdServerRateLimitConfiguration(
+          Duration.of(10L, ChronoUnit.MINUTES),
+          Duration.of(10L, ChronoUnit.MINUTES)
+        ),
         Optional.empty()
       );
 

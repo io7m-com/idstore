@@ -101,6 +101,11 @@
     "Upgrade": true
   },
 
+  "RateLimiting": {
+    "EmailVerificationRateLimit": "PT10M",
+    "PasswordResetRateLimit": "PT10M"
+  },
+
   "OpenTelemetry": {
     "LogicalServiceName": "idstore",
     "OTELCollectorAddress": "http://127.0.0.1:4317"
