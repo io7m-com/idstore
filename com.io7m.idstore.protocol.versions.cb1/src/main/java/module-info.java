@@ -14,33 +14,24 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.protocol.admin;
-
-import com.io7m.idstore.model.IdPage;
-import com.io7m.idstore.model.IdUserSummary;
-
-import java.util.Objects;
-import java.util.UUID;
-
 /**
- * A response to {@link IdACommandUserSearchByEmailPrevious}.
- *
- * @param requestId The request ID
- * @param page      The previous page of results
+ * Identity server (Versions Protocol v1 [Cedarbridge encoding])
  */
 
-public record IdAResponseUserSearchByEmailPrevious(
-  UUID requestId,
-  IdPage<IdUserSummary> page)
-  implements IdAResponseType
+module com.io7m.idstore.protocol.versions.cb1
 {
-  /**
-   * A response to {@link IdACommandUserSearchByEmailPrevious}.
-   */
+  requires static org.osgi.annotation.bundle;
+  requires static org.osgi.annotation.versioning;
 
-  public IdAResponseUserSearchByEmailPrevious
-  {
-    Objects.requireNonNull(requestId, "requestId");
-    Objects.requireNonNull(page, "page");
-  }
+  requires com.io7m.cedarbridge.runtime.bssio;
+  requires com.io7m.jbssio.api;
+  requires com.io7m.jbssio.vanilla;
+
+  requires transitive com.io7m.cedarbridge.runtime.api;
+  requires transitive com.io7m.idstore.error_codes;
+  requires transitive com.io7m.idstore.protocol.api;
+  requires transitive com.io7m.idstore.protocol.versions;
+  requires transitive com.io7m.idstore.services.api;
+
+  exports com.io7m.idstore.protocol.versions.cb1;
 }

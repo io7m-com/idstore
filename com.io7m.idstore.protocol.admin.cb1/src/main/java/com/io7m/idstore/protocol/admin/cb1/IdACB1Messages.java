@@ -31,6 +31,7 @@ import com.io7m.jbssio.vanilla.BSSWriters;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 
@@ -41,12 +42,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 public final class IdACB1Messages
   implements IdProtocolMessagesType<IdAMessageType>, IdServiceType
 {
-  /**
-   * The schema identifier for the protocol.
-   */
-
-  public static final String SCHEMA_ID =
-    "https://www.io7m.com/idstore/Admin1.cbs";
+  private static final ProtocolIdA1 PROTOCOL = new ProtocolIdA1();
 
   /**
    * The content type for the protocol.
@@ -57,7 +53,6 @@ public final class IdACB1Messages
 
   private final BSSReaderProviderType readers;
   private final BSSWriterProviderType writers;
-  private final ProtocolIdA1 protocols;
   private final IdACB1Validation validator;
   private final CBProtocolMessageVersionedSerializerType<ProtocolIdA1Type> serializer;
 
@@ -78,12 +73,11 @@ public final class IdACB1Messages
       Objects.requireNonNull(inWriters, "writers");
 
     this.validator = new IdACB1Validation();
-    this.protocols = new ProtocolIdA1();
     this.serializer =
-      this.protocols.serializerForProtocolVersion(1L)
-      .orElseThrow(() -> {
-        return new IllegalStateException("No support for version 1");
-      });
+      PROTOCOL.serializerForProtocolVersion(1L)
+        .orElseThrow(() -> {
+          return new IllegalStateException("No support for version 1");
+        });
   }
 
   /**
@@ -105,12 +99,12 @@ public final class IdACB1Messages
   }
 
   /**
-   * @return The schema identifier
+   * @return The protocol identifier
    */
 
-  public static String schemaId()
+  public static UUID protocolId()
   {
-    return SCHEMA_ID;
+    return PROTOCOL.protocolId();
   }
 
   @Override

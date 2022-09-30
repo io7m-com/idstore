@@ -18,7 +18,7 @@ package com.io7m.idstore.tests.arbitraries;
 
 import com.io7m.idstore.protocol.versions.IdVMessageType;
 import com.io7m.idstore.protocol.versions.IdVProtocolSupported;
-import com.io7m.idstore.protocol.versions.IdVProtocols;
+import com.io7m.idstore.protocol.versions.IdVProtocolsSupported;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.providers.TypeUsage;
@@ -57,10 +57,10 @@ public final class IdArbVMessagesProvider extends IdArbAbstractProvider
     );
   }
 
-  private static Arbitrary<IdVProtocols> protocols()
+  private static Arbitrary<IdVProtocolsSupported> protocols()
   {
     return Arbitraries.defaultFor(IdVProtocolSupported.class)
       .list()
-      .map(IdVProtocols::new);
+      .map(IdVProtocolsSupported::new);
   }
 }

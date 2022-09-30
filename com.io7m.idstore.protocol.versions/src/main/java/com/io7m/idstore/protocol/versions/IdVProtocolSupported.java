@@ -16,13 +16,10 @@
 
 package com.io7m.idstore.protocol.versions;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A supported protocol.
@@ -33,16 +30,10 @@ import java.util.Objects;
  * @param versionMinor The minor version
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdVProtocolSupported(
-  @JsonProperty(value = "ID", required = true)
-  String id,
-  @JsonProperty(value = "VersionMajor", required = true)
+  UUID id,
   BigInteger versionMajor,
-  @JsonProperty(value = "VersionMinor", required = true)
   BigInteger versionMinor,
-  @JsonProperty(value = "EndpointPath", required = true)
   String endpointPath)
   implements Comparable<IdVProtocolSupported>
 {
@@ -61,6 +52,13 @@ public record IdVProtocolSupported(
     Objects.requireNonNull(versionMinor, "versionMinor");
     Objects.requireNonNull(id, "id");
     Objects.requireNonNull(endpointPath, "endpointPath");
+
+    if (versionMajor.compareTo(BigInteger.ZERO) < 0) {
+      throw new IllegalArgumentException("Version must be non-negative");
+    }
+    if (versionMinor.compareTo(BigInteger.ZERO) < 0) {
+      throw new IllegalArgumentException("Version must be non-negative");
+    }
   }
 
   @Override

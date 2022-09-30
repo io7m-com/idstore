@@ -18,7 +18,7 @@ package com.io7m.idstore.tests;
 
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.versions.IdVMessageType;
-import com.io7m.idstore.protocol.versions.IdVMessages;
+import com.io7m.idstore.protocol.versions.cb1.IdVCB1Messages;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.CannotFindArbitraryException;
@@ -44,7 +44,7 @@ public final class IdVMessagesTest
   private static final Logger LOG =
     LoggerFactory.getLogger(IdVMessagesTest.class);
 
-  private IdVMessages messages;
+  private IdVCB1Messages messages;
 
   private static <T> Set<Class<? extends T>> enumerateSubclasses(
     final Class<? extends T> clazz)
@@ -102,7 +102,7 @@ public final class IdVMessagesTest
   @BeforeEach
   public void setup()
   {
-    this.messages = new IdVMessages();
+    this.messages = new IdVCB1Messages();
   }
 
   /**

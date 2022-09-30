@@ -19,8 +19,8 @@ package com.io7m.idstore.user_client.internal;
 
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.versions.IdVMessageType;
-import com.io7m.idstore.protocol.versions.IdVMessages;
-import com.io7m.idstore.protocol.versions.IdVProtocols;
+import com.io7m.idstore.protocol.versions.IdVProtocolsSupported;
+import com.io7m.idstore.protocol.versions.cb1.IdVCB1Messages;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public final class IdUProtocolNegotiation
   private static IdUClientException noProtocolsInCommon(
     final Map<BigInteger, IdUClientProtocolHandlerFactoryType> handlers,
     final IdUStrings strings,
-    final IdVProtocols protocols)
+    final IdVProtocolsSupported protocols)
   {
     final var lineSeparator = System.lineSeparator();
     final var text = new StringBuilder(128);
@@ -98,7 +98,7 @@ public final class IdUProtocolNegotiation
     return new IdUClientException(NO_SUPPORTED_PROTOCOLS, text.toString());
   }
 
-  private static IdVProtocols fetchSupportedVersions(
+  private static IdVProtocolsSupported fetchSupportedVersions(
     final URI base,
     final HttpClient httpClient,
     final IdUStrings strings)
@@ -107,7 +107,7 @@ public final class IdUProtocolNegotiation
     LOG.debug("retrieving supported server protocols");
 
     final var vMessages =
-      new IdVMessages();
+      new IdVCB1Messages();
 
     final var request =
       HttpRequest.newBuilder(base)
@@ -137,14 +137,14 @@ public final class IdUProtocolNegotiation
       throw new IdUClientException(PROTOCOL_ERROR, e);
     }
 
-    if (message instanceof IdVProtocols protocols) {
+    if (message instanceof IdVProtocolsSupported protocols) {
       return protocols;
     }
 
     throw new IdUClientException(
       PROTOCOL_ERROR,
       strings.format(
-        "unexpectedMessage", "IdVProtocols", message.getClass())
+        "unexpectedMessage", "IdVProtocolsSupported", message.getClass())
     );
   }
 

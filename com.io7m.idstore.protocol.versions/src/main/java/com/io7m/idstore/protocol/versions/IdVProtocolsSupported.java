@@ -16,10 +16,6 @@
 
 package com.io7m.idstore.protocol.versions;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -29,10 +25,7 @@ import java.util.Objects;
  * @param protocols The protocols
  */
 
-@JsonDeserialize
-@JsonSerialize
-public record IdVProtocols(
-  @JsonProperty(value = "Protocols", required = true)
+public record IdVProtocolsSupported(
   List<IdVProtocolSupported> protocols)
   implements IdVMessageType
 {
@@ -42,7 +35,7 @@ public record IdVProtocols(
    * @param protocols The protocols
    */
 
-  public IdVProtocols
+  public IdVProtocolsSupported
   {
     Objects.requireNonNull(protocols, "protocols");
   }

@@ -27,8 +27,8 @@ import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.versions.IdVMessageType;
-import com.io7m.idstore.protocol.versions.IdVMessages;
-import com.io7m.idstore.protocol.versions.IdVProtocols;
+import com.io7m.idstore.protocol.versions.IdVProtocolsSupported;
+import com.io7m.idstore.protocol.versions.cb1.IdVCB1Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public final class IdAProtocolNegotiation
     LOG.debug("retrieving supported server protocols");
 
     final var vMessages =
-      new IdVMessages();
+      new IdVCB1Messages();
 
     final var request =
       HttpRequest.newBuilder(base)
@@ -100,13 +100,13 @@ public final class IdAProtocolNegotiation
       throw new IdAClientException(e.errorCode(), e);
     }
 
-    if (message instanceof IdVProtocols protocols) {
+    if (message instanceof IdVProtocolsSupported protocols) {
       return protocols.protocols()
         .stream()
         .map(v -> {
           return new IdAServerEndpoint(
             new GenProtocolIdentifier(
-              v.id(),
+              v.id().toString(),
               new GenProtocolVersion(
                 v.versionMajor(),
                 v.versionMinor()
@@ -120,7 +120,7 @@ public final class IdAProtocolNegotiation
     throw new IdAClientException(
       PROTOCOL_ERROR,
       strings.format(
-        "unexpectedMessage", "IdVProtocols", message.getClass())
+        "unexpectedMessage", "IdVProtocolsSupported", message.getClass())
     );
   }
 
@@ -186,7 +186,7 @@ public final class IdAProtocolNegotiation
       solved = solver.solve(
         serverProtocols,
         clientSupports,
-        List.of(IdACB1Messages.schemaId())
+        List.of(IdACB1Messages.protocolId().toString())
       );
     } catch (final GenProtocolException e) {
       throw new IdAClientException(NO_SUPPORTED_PROTOCOLS, e.getMessage(), e);

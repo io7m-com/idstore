@@ -34,6 +34,7 @@ module com.io7m.idstore.server
   requires com.io7m.idstore.protocol.user.cb1;
   requires com.io7m.idstore.protocol.user;
   requires com.io7m.idstore.protocol.versions;
+  requires com.io7m.idstore.protocol.versions.cb1;
   requires com.io7m.idstore.server.security;
   requires com.io7m.idstore.services.api;
 

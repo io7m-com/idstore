@@ -27,6 +27,7 @@ module com.io7m.idstore.admin_client
   requires transitive com.io7m.idstore.admin_client.api;
 
   requires com.io7m.idstore.protocol.versions;
+  requires com.io7m.idstore.protocol.versions.cb1;
   requires com.io7m.idstore.protocol.admin;
   requires com.io7m.idstore.protocol.admin.cb1;
 

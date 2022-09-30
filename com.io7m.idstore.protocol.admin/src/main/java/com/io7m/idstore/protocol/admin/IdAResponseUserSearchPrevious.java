@@ -16,8 +16,8 @@
 
 package com.io7m.idstore.protocol.admin;
 
-import com.io7m.idstore.model.IdUserSummary;
 import com.io7m.idstore.model.IdPage;
+import com.io7m.idstore.model.IdUserSummary;
 
 import java.util.Objects;
 import java.util.UUID;

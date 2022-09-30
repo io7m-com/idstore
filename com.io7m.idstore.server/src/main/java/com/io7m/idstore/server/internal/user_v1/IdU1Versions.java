@@ -18,9 +18,9 @@ package com.io7m.idstore.server.internal.user_v1;
 
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
-import com.io7m.idstore.protocol.versions.IdVMessages;
 import com.io7m.idstore.protocol.versions.IdVProtocolSupported;
-import com.io7m.idstore.protocol.versions.IdVProtocols;
+import com.io7m.idstore.protocol.versions.IdVProtocolsSupported;
+import com.io7m.idstore.protocol.versions.cb1.IdVCB1Messages;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,10 +37,10 @@ import java.util.List;
 
 public final class IdU1Versions extends HttpServlet
 {
-  private static final IdVProtocols PROTOCOLS =
+  private static final IdVProtocolsSupported PROTOCOLS =
     createProtocols();
 
-  private final IdVMessages messages;
+  private final IdVCB1Messages messages;
 
   /**
    * A versioning servlet.
@@ -52,21 +52,21 @@ public final class IdU1Versions extends HttpServlet
     final IdServiceDirectoryType inServices)
   {
     this.messages =
-      inServices.requireService(IdVMessages.class);
+      inServices.requireService(IdVCB1Messages.class);
   }
 
-  private static IdVProtocols createProtocols()
+  private static IdVProtocolsSupported createProtocols()
   {
     final var supported = new ArrayList<IdVProtocolSupported>();
     supported.add(
       new IdVProtocolSupported(
-        IdUCB1Messages.schemaId(),
+        IdUCB1Messages.protocolId(),
         BigInteger.ONE,
         BigInteger.ZERO,
         "/user/1/0/"
       )
     );
-    return new IdVProtocols(List.copyOf(supported));
+    return new IdVProtocolsSupported(List.copyOf(supported));
   }
 
   @Override
@@ -76,16 +76,14 @@ public final class IdU1Versions extends HttpServlet
     throws IOException
   {
     try {
-      response.setContentType(IdVMessages.contentType());
+      response.setContentType(IdVCB1Messages.contentType());
       response.setStatus(200);
 
       final var data = this.messages.serialize(PROTOCOLS);
-      response.setContentLength(data.length + 2);
+      response.setContentLength(data.length);
 
       try (var output = response.getOutputStream()) {
         output.write(data);
-        output.write('\r');
-        output.write('\n');
       }
     } catch (final IdProtocolException e) {
       throw new IOException(e);

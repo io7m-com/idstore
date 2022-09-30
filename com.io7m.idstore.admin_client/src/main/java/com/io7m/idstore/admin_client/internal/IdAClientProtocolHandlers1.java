@@ -56,7 +56,7 @@ public final class IdAClientProtocolHandlers1
   public GenProtocolIdentifier supported()
   {
     return new GenProtocolIdentifier(
-      IdACB1Messages.schemaId(),
+      IdACB1Messages.protocolId().toString(),
       new GenProtocolVersion(ONE, ZERO)
     );
   }

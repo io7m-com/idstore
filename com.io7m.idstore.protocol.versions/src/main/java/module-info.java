@@ -24,12 +24,6 @@ module com.io7m.idstore.protocol.versions
   requires static org.osgi.annotation.versioning;
 
   requires transitive com.io7m.idstore.protocol.api;
-  requires transitive com.io7m.idstore.services.api;
-
-  requires com.io7m.dixmont.core;
-
-  opens com.io7m.idstore.protocol.versions
-    to com.io7m.dixmont.core, com.fasterxml.jackson.databind;
 
   exports com.io7m.idstore.protocol.versions;
 }
