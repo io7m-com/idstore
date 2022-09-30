@@ -21,6 +21,7 @@ import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.providers.TypeUsage;
 
+import java.math.BigInteger;
 import java.util.Set;
 import java.util.UUID;
 
@@ -61,10 +62,10 @@ public final class IdArbVProtocolSupportedProvider extends IdArbAbstractProvider
     return Arbitraries.defaultFor(UUID.class).flatMap(s -> {
       return Arbitraries.strings().flatMap(p -> {
         return Arbitraries.bigIntegers()
-          .greaterOrEqual(ZERO)
+          .between(ZERO, BigInteger.valueOf(4294967295L))
           .flatMap(maj -> {
           return Arbitraries.bigIntegers()
-            .greaterOrEqual(ZERO)
+            .between(ZERO, BigInteger.valueOf(4294967295L))
             .map(min -> {
             return new IdVProtocolSupported(s, maj, min, p);
           });

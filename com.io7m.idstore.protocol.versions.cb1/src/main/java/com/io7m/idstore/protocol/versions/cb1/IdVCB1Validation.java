@@ -29,7 +29,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
-import static com.io7m.cedarbridge.runtime.api.CBCore.unsigned64;
+import static com.io7m.cedarbridge.runtime.api.CBCore.unsigned32;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 
 /**
@@ -65,8 +65,8 @@ public final class IdVCB1Validation
   {
     return new IdV1ProtocolSupported(
       toWireUUID(p.id()),
-      unsigned64(Long.parseUnsignedLong(p.versionMajor().toString())),
-      unsigned64(Long.parseUnsignedLong(p.versionMinor().toString())),
+      unsigned32(Long.parseUnsignedLong(p.versionMajor().toString())),
+      unsigned32(Long.parseUnsignedLong(p.versionMinor().toString())),
       new CBString(p.endpointPath())
     );
   }
