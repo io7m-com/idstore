@@ -167,7 +167,7 @@ final class IdDatabaseAdminsQueries
     return IdAdminPermissionSet.parse(adminRecord.getPermissions());
   }
 
-  private static String permissionsSerialize(
+  static String permissionsSerialize(
     final Set<IdAdminPermission> permissions)
   {
     return permissions.stream()

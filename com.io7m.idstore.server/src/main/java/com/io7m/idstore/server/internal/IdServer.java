@@ -273,7 +273,7 @@ public final class IdServer implements IdServerType
     services.register(IdServerConfigurationService.class, config);
 
     final var maintenance =
-      IdServerMaintenanceService.create(clock, inDatabase);
+      IdServerMaintenanceService.create(clock, this.telemetry, inDatabase);
     services.register(IdServerMaintenanceService.class, maintenance);
 
     final var userPasswordRateLimitService =

@@ -16,10 +16,10 @@
 
 package com.io7m.idstore.server.internal;
 
-import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseMaintenanceQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.services.api.IdServiceType;
+import io.opentelemetry.api.trace.SpanKind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,14 +43,18 @@ public final class IdServerMaintenanceService
     LoggerFactory.getLogger(IdServerMaintenanceService.class);
 
   private final ScheduledExecutorService executor;
+  private final IdServerTelemetryService telemetry;
   private final IdDatabaseType database;
 
   private IdServerMaintenanceService(
     final ScheduledExecutorService inExecutor,
+    final IdServerTelemetryService inTelemetry,
     final IdDatabaseType inDatabase)
   {
     this.executor =
       Objects.requireNonNull(inExecutor, "executor");
+    this.telemetry =
+      Objects.requireNonNull(inTelemetry, "telemetry");
     this.database =
       Objects.requireNonNull(inDatabase, "database");
   }
@@ -58,16 +62,22 @@ public final class IdServerMaintenanceService
   /**
    * A service that performs nightly database maintenance.
    *
-   * @param clock    The clock
-   * @param database The database
+   * @param clock     The clock
+   * @param telemetry The telemetry service
+   * @param database  The database
    *
    * @return The service
    */
 
   public static IdServerMaintenanceService create(
     final IdServerClock clock,
+    final IdServerTelemetryService telemetry,
     final IdDatabaseType database)
   {
+    Objects.requireNonNull(clock, "clock");
+    Objects.requireNonNull(telemetry, "telemetry");
+    Objects.requireNonNull(database, "database");
+
     final var executor =
       Executors.newSingleThreadScheduledExecutor(r -> {
         final var thread = new Thread(r);
@@ -79,7 +89,7 @@ public final class IdServerMaintenanceService
       });
 
     final var maintenanceService =
-      new IdServerMaintenanceService(executor, database);
+      new IdServerMaintenanceService(executor, telemetry, database);
 
     final var timeNow =
       clock.now();
@@ -90,13 +100,21 @@ public final class IdServerMaintenanceService
         .plusDays(1L);
 
     final var initialDelay =
-      Duration.between(
-        timeNow,
-        timeNextMidnight).toSeconds();
+      Duration.between(timeNow, timeNextMidnight).toSeconds();
 
     final var period =
       Duration.of(1L, ChronoUnit.DAYS)
         .toSeconds();
+
+    /*
+     * Run maintenance as soon as the service starts.
+     */
+
+    executor.submit(maintenanceService::runMaintenance);
+
+    /*
+     * Schedule maintenance to run at each midnight.
+     */
 
     executor.scheduleAtFixedRate(
       maintenanceService::runMaintenance,
@@ -110,19 +128,31 @@ public final class IdServerMaintenanceService
 
   private void runMaintenance()
   {
-    LOG.info("maintenance starting");
-    try (var connection =
-           this.database.openConnection(IDSTORE)) {
-      try (var transaction =
-             connection.openTransaction()) {
-        final var queries =
-          transaction.queries(IdDatabaseMaintenanceQueriesType.class);
-        queries.runMaintenance();
-        transaction.commit();
-        LOG.info("maintenance completed");
+    LOG.info("maintenance task starting");
+
+    final var span =
+      this.telemetry.tracer()
+        .spanBuilder("Maintenance")
+        .setSpanKind(SpanKind.INTERNAL)
+        .startSpan();
+
+    try (var ignored = span.makeCurrent()) {
+      try (var connection =
+             this.database.openConnection(IDSTORE)) {
+        try (var transaction =
+               connection.openTransaction()) {
+          final var queries =
+            transaction.queries(IdDatabaseMaintenanceQueriesType.class);
+          queries.runMaintenance();
+          transaction.commit();
+          LOG.info("maintenance task completed successfully");
+        }
       }
-    } catch (final IdDatabaseException e) {
-      LOG.error("maintenance failed: ", e);
+    } catch (final Exception e) {
+      LOG.error("maintenance task failed: ", e);
+      span.recordException(e);
+    } finally {
+      span.end();
     }
   }
 

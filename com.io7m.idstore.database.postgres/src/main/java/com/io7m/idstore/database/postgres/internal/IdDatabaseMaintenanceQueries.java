@@ -19,12 +19,18 @@ package com.io7m.idstore.database.postgres.internal;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseMaintenanceQueriesType;
+import com.io7m.idstore.model.IdAdminPermission;
+import com.io7m.jaffirm.core.Invariants;
 import com.io7m.jdeferthrow.core.ExceptionTracker;
 import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.EnumSet;
+
+import static com.io7m.idstore.database.postgres.internal.IdDatabaseAdminsQueries.permissionsSerialize;
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
+import static com.io7m.idstore.database.postgres.internal.Tables.ADMINS;
 import static com.io7m.idstore.database.postgres.internal.Tables.BANS;
 import static com.io7m.idstore.database.postgres.internal.Tables.EMAIL_VERIFICATIONS;
 import static com.io7m.idstore.database.postgres.internal.Tables.USER_PASSWORD_RESETS;
@@ -72,7 +78,48 @@ public final class IdDatabaseMaintenanceQueries
       exceptions.addException(e);
     }
 
+    try {
+      this.runUpdateInitialAdminPermissions();
+    } catch (final IdDatabaseException e) {
+      exceptions.addException(e);
+    }
+
     exceptions.throwIfNecessary();
+  }
+
+  private void runUpdateInitialAdminPermissions()
+    throws IdDatabaseException
+  {
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan(
+        "IdDatabaseMaintenanceQueries.runUpdateInitialAdminPermissions");
+
+    try {
+      final var updated =
+        context.update(ADMINS)
+          .set(
+            ADMINS.PERMISSIONS,
+            permissionsSerialize(EnumSet.allOf(IdAdminPermission.class)))
+          .where(ADMINS.INITIAL.eq(Boolean.TRUE))
+          .execute();
+
+      Invariants.checkInvariantI(
+        updated,
+        updated <= 1,
+        x -> "At most one administrator must have been updated."
+      );
+
+      LOG.debug("updated permissions for {} initial admins", valueOf(updated));
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e);
+    } finally {
+      querySpan.end();
+    }
   }
 
   private void runExpirePasswordResets()
@@ -83,7 +130,8 @@ public final class IdDatabaseMaintenanceQueries
     final var context =
       transaction.createContext();
     final var querySpan =
-      transaction.createQuerySpan("IdDatabaseMaintenanceQueries.runExpirePasswordResets");
+      transaction.createQuerySpan(
+        "IdDatabaseMaintenanceQueries.runExpirePasswordResets");
 
     try {
       final var deleted =
@@ -108,13 +156,14 @@ public final class IdDatabaseMaintenanceQueries
     final var context =
       transaction.createContext();
     final var querySpan =
-      transaction.createQuerySpan("IdDatabaseMaintenanceQueries.runExpireEmailVerifications");
+      transaction.createQuerySpan(
+        "IdDatabaseMaintenanceQueries.runExpireEmailVerifications");
 
     try {
       final var deleted =
-      context.deleteFrom(EMAIL_VERIFICATIONS)
-        .where(EMAIL_VERIFICATIONS.EXPIRES.lt(this.currentTime()))
-        .execute();
+        context.deleteFrom(EMAIL_VERIFICATIONS)
+          .where(EMAIL_VERIFICATIONS.EXPIRES.lt(this.currentTime()))
+          .execute();
 
       LOG.debug("deleted {} expired email verifications", valueOf(deleted));
     } catch (final DataAccessException e) {
