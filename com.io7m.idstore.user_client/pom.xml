@@ -36,7 +36,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.protocol.user.cb1</artifactId>
+      <artifactId>com.io7m.idstore.protocol.user.cb</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -46,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.protocol.versions.cb1</artifactId>
+      <artifactId>com.io7m.idstore.protocol.versions.cb</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

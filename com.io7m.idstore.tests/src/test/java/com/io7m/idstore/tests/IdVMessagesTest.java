@@ -18,7 +18,7 @@ package com.io7m.idstore.tests;
 
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.versions.IdVMessageType;
-import com.io7m.idstore.protocol.versions.cb1.IdVCB1Messages;
+import com.io7m.idstore.protocol.versions.cb.IdVCB1Messages;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.CannotFindArbitraryException;

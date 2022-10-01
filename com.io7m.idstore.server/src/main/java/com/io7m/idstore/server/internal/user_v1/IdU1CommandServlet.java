@@ -23,7 +23,7 @@ import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseType;
-import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
+import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdRequestLimits;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;

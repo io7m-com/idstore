@@ -20,7 +20,7 @@ import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
+import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import net.jqwik.api.Arbitraries;
 import org.junit.jupiter.api.BeforeEach;

@@ -31,7 +31,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.protocol.user.cb1</artifactId>
+      <artifactId>com.io7m.idstore.protocol.user.cb</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -41,7 +41,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.protocol.admin.cb1</artifactId>
+      <artifactId>com.io7m.idstore.protocol.admin.cb</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -387,7 +387,7 @@
                 <argument>--language</argument>
                 <argument>xhtml</argument>
                 <argument>--file</argument>
-                <argument>${project.build.directory}/documentation/com/io7m/idstore/protocol/admin/cb1/Admin1.cbs</argument>
+                <argument>${project.build.directory}/documentation/com/io7m/idstore/protocol/admin/cb/Admin.cbs</argument>
               </arguments>
             </configuration>
           </execution>
@@ -408,7 +408,7 @@
                 <argument>--language</argument>
                 <argument>xhtml</argument>
                 <argument>--file</argument>
-                <argument>${project.build.directory}/documentation/com/io7m/idstore/protocol/user/cb1/User1.cbs</argument>
+                <argument>${project.build.directory}/documentation/com/io7m/idstore/protocol/user/cb/User.cbs</argument>
               </arguments>
             </configuration>
           </execution>

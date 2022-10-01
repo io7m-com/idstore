@@ -22,7 +22,7 @@ import com.io7m.idstore.protocol.user.IdUCommandLogin;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUMessageType;
 import com.io7m.idstore.protocol.user.IdUResponseType;
-import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
+import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import net.jqwik.api.Arbitraries;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

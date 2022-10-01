@@ -113,7 +113,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
-import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
+import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

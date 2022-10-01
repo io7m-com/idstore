@@ -11,7 +11,7 @@
         <LinkExternal target="com.io7m.cedarbridge.xhtml">com.io7m.cedarbridge</LinkExternal>
       </Item>
       <Item>
-        <LinkExternal target="com.io7m.idstore.protocol.admin.cb1.xhtml">com.io7m.idstore.protocol.admin.cb1</LinkExternal>
+        <LinkExternal target="com.io7m.idstore.protocol.admin.cb.xhtml">com.io7m.idstore.protocol.admin.cb</LinkExternal>
       </Item>
     </ListUnordered>
   </FormalItem>

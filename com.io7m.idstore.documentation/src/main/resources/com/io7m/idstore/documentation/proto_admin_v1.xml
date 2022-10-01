@@ -32,7 +32,7 @@
 
   <Subsection title="Schemas">
     <FormalItem title="Schemas">
-      <Verbatim><xi:include href="com/io7m/idstore/protocol/admin/cb1/Admin1.cbs" parse="text"/></Verbatim>
+      <Verbatim><xi:include href="com/io7m/idstore/protocol/admin/cb/Admin.cbs" parse="text"/></Verbatim>
     </FormalItem>
   </Subsection>
 

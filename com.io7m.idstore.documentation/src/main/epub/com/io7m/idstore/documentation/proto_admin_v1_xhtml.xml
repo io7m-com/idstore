@@ -11,7 +11,7 @@
         <LinkExternal target="https://www.io7m.com/software/idstore/documentation/com.io7m.cedarbridge.xhtml">com.io7m.cedarbridge</LinkExternal>
       </Item>
       <Item>
-        <LinkExternal target="https://www.io7m.com/software/idstore/documentation/com.io7m.idstore.protocol.admin.cb1.xhtml">com.io7m.idstore.protocol.admin.cb1</LinkExternal>
+        <LinkExternal target="https://www.io7m.com/software/idstore/documentation/com.io7m.idstore.protocol.admin.cb.xhtml">com.io7m.idstore.protocol.admin.cb</LinkExternal>
       </Item>
     </ListUnordered>
   </FormalItem>

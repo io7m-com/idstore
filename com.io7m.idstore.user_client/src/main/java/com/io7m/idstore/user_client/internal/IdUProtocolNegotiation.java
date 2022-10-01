@@ -20,7 +20,7 @@ package com.io7m.idstore.user_client.internal;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.versions.IdVMessageType;
 import com.io7m.idstore.protocol.versions.IdVProtocolsSupported;
-import com.io7m.idstore.protocol.versions.cb1.IdVCB1Messages;
+import com.io7m.idstore.protocol.versions.cb.IdVCB1Messages;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

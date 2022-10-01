@@ -30,10 +30,10 @@ open module com.io7m.idstore.documentation
   requires com.io7m.idstore.database.postgres;
   requires com.io7m.idstore.error_codes;
   requires com.io7m.idstore.model;
-  requires com.io7m.idstore.protocol.admin.cb1;
+  requires com.io7m.idstore.protocol.admin.cb;
   requires com.io7m.idstore.protocol.admin;
   requires com.io7m.idstore.protocol.api;
-  requires com.io7m.idstore.protocol.user.cb1;
+  requires com.io7m.idstore.protocol.user.cb;
   requires com.io7m.idstore.protocol.user;
   requires com.io7m.idstore.protocol.versions;
   requires com.io7m.idstore.server.api;

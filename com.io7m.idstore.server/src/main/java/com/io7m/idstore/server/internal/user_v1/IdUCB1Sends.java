@@ -21,7 +21,7 @@ import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.IdUMessageType;
 import com.io7m.idstore.protocol.user.IdUResponseError;
-import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
+import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.services.api.IdServiceType;
 import jakarta.servlet.http.HttpServletResponse;
 

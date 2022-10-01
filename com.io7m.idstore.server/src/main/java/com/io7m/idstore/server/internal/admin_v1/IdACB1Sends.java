@@ -20,7 +20,7 @@ package com.io7m.idstore.server.internal.admin_v1;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
-import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
+import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.services.api.IdServiceType;
 import jakarta.servlet.http.HttpServletResponse;

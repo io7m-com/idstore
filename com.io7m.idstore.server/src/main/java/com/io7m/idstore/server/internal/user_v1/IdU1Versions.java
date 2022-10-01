@@ -17,10 +17,10 @@
 package com.io7m.idstore.server.internal.user_v1;
 
 import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
+import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.protocol.versions.IdVProtocolSupported;
 import com.io7m.idstore.protocol.versions.IdVProtocolsSupported;
-import com.io7m.idstore.protocol.versions.cb1.IdVCB1Messages;
+import com.io7m.idstore.protocol.versions.cb.IdVCB1Messages;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

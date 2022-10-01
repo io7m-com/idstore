@@ -45,7 +45,7 @@ import com.io7m.idstore.protocol.user.IdUResponseLogin;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserSelf;
 import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
-import com.io7m.idstore.protocol.user.cb1.IdUCB1Messages;
+import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

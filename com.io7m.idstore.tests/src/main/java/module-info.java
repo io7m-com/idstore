@@ -23,12 +23,12 @@ open module com.io7m.idstore.tests
   requires transitive com.io7m.idstore.database.postgres;
   requires transitive com.io7m.idstore.error_codes;
   requires transitive com.io7m.idstore.model;
-  requires transitive com.io7m.idstore.protocol.admin.cb1;
+  requires transitive com.io7m.idstore.protocol.admin.cb;
   requires transitive com.io7m.idstore.protocol.admin;
   requires transitive com.io7m.idstore.protocol.api;
-  requires transitive com.io7m.idstore.protocol.user.cb1;
+  requires transitive com.io7m.idstore.protocol.user.cb;
   requires transitive com.io7m.idstore.protocol.user;
-  requires transitive com.io7m.idstore.protocol.versions.cb1;
+  requires transitive com.io7m.idstore.protocol.versions.cb;
   requires transitive com.io7m.idstore.protocol.versions;
   requires transitive com.io7m.idstore.server.api;
   requires transitive com.io7m.idstore.server.main;

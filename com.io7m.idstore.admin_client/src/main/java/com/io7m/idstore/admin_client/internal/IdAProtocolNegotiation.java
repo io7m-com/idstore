@@ -24,11 +24,11 @@ import com.io7m.genevan.core.GenProtocolSolved;
 import com.io7m.genevan.core.GenProtocolSolver;
 import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.protocol.admin.cb1.IdACB1Messages;
+import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.versions.IdVMessageType;
 import com.io7m.idstore.protocol.versions.IdVProtocolsSupported;
-import com.io7m.idstore.protocol.versions.cb1.IdVCB1Messages;
+import com.io7m.idstore.protocol.versions.cb.IdVCB1Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
