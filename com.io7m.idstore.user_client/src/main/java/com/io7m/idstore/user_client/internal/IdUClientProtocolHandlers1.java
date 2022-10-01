@@ -17,9 +17,15 @@
 
 package com.io7m.idstore.user_client.internal;
 
-import java.math.BigInteger;
+import com.io7m.genevan.core.GenProtocolIdentifier;
+import com.io7m.genevan.core.GenProtocolVersion;
+import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
+
 import java.net.URI;
 import java.net.http.HttpClient;
+
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
 
 /**
  * The factory of version 1 protocol handlers.
@@ -38,23 +44,20 @@ public final class IdUClientProtocolHandlers1
   }
 
   @Override
-  public String id()
-  {
-    return "com.io7m.idstore";
-  }
-
-  @Override
-  public BigInteger versionMajor()
-  {
-    return BigInteger.ONE;
-  }
-
-  @Override
   public IdUClientProtocolHandlerType createHandler(
     final HttpClient inHttpClient,
     final IdUStrings inStrings,
     final URI inBase)
   {
     return new IdUClientProtocolHandler1(inHttpClient, inStrings, inBase);
+  }
+
+  @Override
+  public GenProtocolIdentifier supported()
+  {
+    return new GenProtocolIdentifier(
+      IdUCB1Messages.protocolId().toString(),
+      new GenProtocolVersion(ONE, ZERO)
+    );
   }
 }

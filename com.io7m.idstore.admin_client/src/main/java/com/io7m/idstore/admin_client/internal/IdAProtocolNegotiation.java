@@ -25,14 +25,14 @@ import com.io7m.genevan.core.GenProtocolSolver;
 import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
-import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.protocol.versions.IdVMessageType;
-import com.io7m.idstore.protocol.versions.IdVProtocolsSupported;
-import com.io7m.idstore.protocol.versions.cb.IdVCB1Messages;
+import com.io7m.verdant.core.VProtocolException;
+import com.io7m.verdant.core.VProtocols;
+import com.io7m.verdant.core.cb.VProtocolMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -69,9 +69,6 @@ public final class IdAProtocolNegotiation
   {
     LOG.debug("retrieving supported server protocols");
 
-    final var vMessages =
-      new IdVCB1Messages();
-
     final var request =
       HttpRequest.newBuilder(base)
         .GET()
@@ -93,35 +90,30 @@ public final class IdAProtocolNegotiation
       );
     }
 
-    final IdVMessageType message;
+    final var protocols =
+      VProtocolMessages.create();
+
+    final VProtocols message;
     try {
-      message = vMessages.parse(response.body());
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(e.errorCode(), e);
+      message = protocols.parse(base, response.body());
+    } catch (final VProtocolException e) {
+      throw new IdAClientException(PROTOCOL_ERROR, e);
     }
 
-    if (message instanceof IdVProtocolsSupported protocols) {
-      return protocols.protocols()
-        .stream()
-        .map(v -> {
-          return new IdAServerEndpoint(
-            new GenProtocolIdentifier(
-              v.id().toString(),
-              new GenProtocolVersion(
-                v.versionMajor(),
-                v.versionMinor()
-              )
-            ),
-            v.endpointPath()
-          );
-        }).toList();
-    }
-
-    throw new IdAClientException(
-      PROTOCOL_ERROR,
-      strings.format(
-        "unexpectedMessage", "IdVProtocolsSupported", message.getClass())
-    );
+    return message.protocols()
+      .stream()
+      .map(v -> {
+        return new IdAServerEndpoint(
+          new GenProtocolIdentifier(
+            v.id().toString(),
+            new GenProtocolVersion(
+              new BigInteger(Long.toUnsignedString(v.versionMajor())),
+              new BigInteger(Long.toUnsignedString(v.versionMinor()))
+            )
+          ),
+          v.endpointPath()
+        );
+      }).toList();
   }
 
   private record IdAServerEndpoint(
@@ -142,8 +134,6 @@ public final class IdAProtocolNegotiation
    * @param locale     The locale
    * @param httpClient The HTTP client
    * @param strings    The string resources
-   * @param admin      The admin
-   * @param password   The password
    * @param base       The base URI
    *
    * @return The protocol handler
@@ -156,16 +146,12 @@ public final class IdAProtocolNegotiation
     final Locale locale,
     final HttpClient httpClient,
     final IdAStrings strings,
-    final String admin,
-    final String password,
     final URI base)
     throws IdAClientException, InterruptedException
   {
     Objects.requireNonNull(locale, "locale");
     Objects.requireNonNull(httpClient, "httpClient");
     Objects.requireNonNull(strings, "strings");
-    Objects.requireNonNull(admin, "admin");
-    Objects.requireNonNull(password, "password");
     Objects.requireNonNull(base, "base");
 
     final var clientSupports =
@@ -179,7 +165,8 @@ public final class IdAProtocolNegotiation
     LOG.debug("server supports {} protocols", serverProtocols.size());
 
     final var solver =
-      GenProtocolSolver.<IdAClientProtocolHandlerFactoryType, IdAServerEndpoint>create(locale);
+      GenProtocolSolver.<IdAClientProtocolHandlerFactoryType, IdAServerEndpoint>create(
+        locale);
 
     final GenProtocolSolved<IdAClientProtocolHandlerFactoryType, IdAServerEndpoint> solved;
     try {

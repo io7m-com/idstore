@@ -30,7 +30,6 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
-import com.io7m.idstore.protocol.versions.cb.IdVCB1Messages;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerException;
 import com.io7m.idstore.server.api.IdServerType;
@@ -255,8 +254,8 @@ public final class IdServer implements IdServerType
         strings, templates, this.configuration.branding());
     services.register(IdServerBrandingService.class, brandingService);
 
-    final var versionMessages = new IdVCB1Messages();
-    services.register(IdVCB1Messages.class, versionMessages);
+    final var vMessages = new IdVerdantMessages();
+    services.register(IdVerdantMessages.class, vMessages);
 
     final var idA1Messages = new IdACB1Messages();
     services.register(IdACB1Messages.class, idA1Messages);

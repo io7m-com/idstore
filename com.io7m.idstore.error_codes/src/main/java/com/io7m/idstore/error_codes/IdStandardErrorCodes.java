@@ -131,6 +131,7 @@ public final class IdStandardErrorCodes
 
   public static final IdErrorCode HTTP_SIZE_LIMIT =
     new IdErrorCode("error-http-size-limit");
+
   /**
    * The server returned an error code for an HTTP request.
    */
@@ -275,6 +276,7 @@ public final class IdStandardErrorCodes
 
   public static final IdErrorCode MAIL_SYSTEM_FAILURE =
     new IdErrorCode("mail-system-failure");
+
   /**
    * The client and server have no supported protocols in common.
    */

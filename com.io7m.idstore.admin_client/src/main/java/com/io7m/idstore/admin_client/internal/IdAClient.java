@@ -191,8 +191,6 @@ public final class IdAClient implements IdAClientType
         this.locale,
         this.httpClient,
         this.strings,
-        admin,
-        password,
         base
       );
 

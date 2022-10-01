@@ -17,17 +17,16 @@
 package com.io7m.idstore.server.internal.admin_v1;
 
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
-import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.protocol.versions.IdVProtocolSupported;
-import com.io7m.idstore.protocol.versions.IdVProtocolsSupported;
-import com.io7m.idstore.protocol.versions.cb.IdVCB1Messages;
+import com.io7m.idstore.server.internal.IdVerdantMessages;
 import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.verdant.core.VProtocolException;
+import com.io7m.verdant.core.VProtocolSupported;
+import com.io7m.verdant.core.VProtocols;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,10 +37,10 @@ import java.util.Objects;
 
 public final class IdA1Versions extends IdCommonInstrumentedServlet
 {
-  private static final IdVProtocolsSupported PROTOCOLS =
+  private static final VProtocols PROTOCOLS =
     createProtocols();
 
-  private final IdVCB1Messages messages;
+  private final IdVerdantMessages messages;
 
   /**
    * A versioning servlet.
@@ -55,21 +54,21 @@ public final class IdA1Versions extends IdCommonInstrumentedServlet
     super(Objects.requireNonNull(inServices, "services"));
 
     this.messages =
-      inServices.requireService(IdVCB1Messages.class);
+      inServices.requireService(IdVerdantMessages.class);
   }
 
-  private static IdVProtocolsSupported createProtocols()
+  private static VProtocols createProtocols()
   {
-    final var supported = new ArrayList<IdVProtocolSupported>();
+    final var supported = new ArrayList<VProtocolSupported>();
     supported.add(
-      new IdVProtocolSupported(
+      new VProtocolSupported(
         IdACB1Messages.protocolId(),
-        BigInteger.ONE,
-        BigInteger.ZERO,
+        1L,
+        0L,
         "/admin/1/0/"
       )
     );
-    return new IdVProtocolsSupported(List.copyOf(supported));
+    return new VProtocols(List.copyOf(supported));
   }
 
   @Override
@@ -79,16 +78,16 @@ public final class IdA1Versions extends IdCommonInstrumentedServlet
     throws IOException
   {
     try {
-      response.setContentType(IdVCB1Messages.contentType());
+      response.setContentType(IdVerdantMessages.contentType());
       response.setStatus(200);
 
-      final var data = this.messages.serialize(PROTOCOLS);
+      final var data = this.messages.serialize(PROTOCOLS, 1);
       response.setContentLength(data.length);
 
       try (var output = response.getOutputStream()) {
         output.write(data);
       }
-    } catch (final IdProtocolException e) {
+    } catch (final VProtocolException e) {
       throw new IOException(e);
     }
   }

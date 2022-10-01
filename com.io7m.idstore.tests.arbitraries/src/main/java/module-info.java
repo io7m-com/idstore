@@ -42,8 +42,6 @@ import com.io7m.idstore.tests.arbitraries.IdArbUserProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUserSearchByEmailParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUserSearchParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUserSummaryProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbVMessagesProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbVProtocolSupportedProvider;
 import net.jqwik.api.providers.ArbitraryProvider;
 
 /**
@@ -59,7 +57,6 @@ module com.io7m.idstore.tests.arbitraries
   requires transitive com.io7m.idstore.protocol.admin;
   requires transitive com.io7m.idstore.protocol.api;
   requires transitive com.io7m.idstore.protocol.user;
-  requires transitive com.io7m.idstore.protocol.versions;
 
   requires transitive net.jqwik.api;
 
@@ -92,8 +89,6 @@ module com.io7m.idstore.tests.arbitraries
       IdArbUserSearchByEmailParametersProvider,
       IdArbUserSearchParametersProvider,
       IdArbUserSummaryProvider,
-      IdArbVMessagesProvider,
-      IdArbVProtocolSupportedProvider,
       IdArbUMessageProvider
     ;
 

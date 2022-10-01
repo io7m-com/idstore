@@ -24,6 +24,7 @@ import com.io7m.idstore.user_client.api.IdUClientException;
 
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.util.Locale;
 import java.util.Objects;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NOT_LOGGED_IN;
@@ -35,20 +36,25 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NOT_LOGGED_IN;
 public final class IdUClientProtocolHandlerDisconnected
   implements IdUClientProtocolHandlerType
 {
+  private final Locale locale;
   private final HttpClient httpClient;
   private final IdUStrings strings;
 
   /**
    * The "disconnected" protocol handler.
    *
+   * @param inLocale     The locale
    * @param inStrings    The string resources
    * @param inHttpClient The HTTP client
    */
 
   public IdUClientProtocolHandlerDisconnected(
+    final Locale inLocale,
     final IdUStrings inStrings,
     final HttpClient inHttpClient)
   {
+    this.locale =
+      Objects.requireNonNull(inLocale, "locale");
     this.strings =
       Objects.requireNonNull(inStrings, "strings");
     this.httpClient =
@@ -64,10 +70,9 @@ public final class IdUClientProtocolHandlerDisconnected
   {
     final var handler =
       IdUProtocolNegotiation.negotiateProtocolHandler(
+        this.locale,
         this.httpClient,
         this.strings,
-        user,
-        password,
         base
       );
 

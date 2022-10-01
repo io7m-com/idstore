@@ -33,8 +33,6 @@ module com.io7m.idstore.server
   requires com.io7m.idstore.protocol.api;
   requires com.io7m.idstore.protocol.user.cb;
   requires com.io7m.idstore.protocol.user;
-  requires com.io7m.idstore.protocol.versions;
-  requires com.io7m.idstore.protocol.versions.cb;
   requires com.io7m.idstore.server.security;
   requires com.io7m.idstore.services.api;
 
@@ -55,6 +53,8 @@ module com.io7m.idstore.server
   requires com.io7m.jdeferthrow.core;
   requires com.io7m.jmulticlose.core;
   requires com.io7m.jxtrand.vanilla;
+  requires com.io7m.verdant.core.cb;
+  requires com.io7m.verdant.core;
   requires freemarker;
   requires jakarta.mail;
   requires java.desktop;

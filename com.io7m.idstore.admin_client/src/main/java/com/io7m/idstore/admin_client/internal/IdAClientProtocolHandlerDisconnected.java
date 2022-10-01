@@ -91,8 +91,6 @@ public final class IdAClientProtocolHandlerDisconnected
         this.locale,
         this.httpClient,
         this.strings,
-        admin,
-        password,
         base
       );
 

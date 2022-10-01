@@ -16,7 +16,8 @@
 
 package com.io7m.idstore.user_client.internal;
 
-import java.math.BigInteger;
+import com.io7m.genevan.core.GenProtocolClientHandlerType;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 
@@ -25,19 +26,8 @@ import java.net.http.HttpClient;
  */
 
 public interface IdUClientProtocolHandlerFactoryType
+  extends GenProtocolClientHandlerType
 {
-  /**
-   * @return The supported protocol ID
-   */
-
-  String id();
-
-  /**
-   * @return The supported protocol major version
-   */
-
-  BigInteger versionMajor();
-
   /**
    * Create a new handler.
    *

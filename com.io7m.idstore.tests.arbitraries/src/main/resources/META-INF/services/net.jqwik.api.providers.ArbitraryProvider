@@ -25,6 +25,4 @@ com.io7m.idstore.tests.arbitraries.IdArbUserProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserSearchByEmailParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserSearchParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserSummaryProvider
-com.io7m.idstore.tests.arbitraries.IdArbVMessagesProvider
-com.io7m.idstore.tests.arbitraries.IdArbVProtocolSupportedProvider
 com.io7m.idstore.tests.arbitraries.IdArbUMessageProvider

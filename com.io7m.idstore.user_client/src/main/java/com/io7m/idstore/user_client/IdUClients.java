@@ -62,9 +62,10 @@ public final class IdUClients implements IdUClientFactoryType
         .build();
 
     return new IdUClient(
+      locale,
       strings,
       httpClient,
-      new IdUClientProtocolHandlerDisconnected(strings, httpClient)
+      new IdUClientProtocolHandlerDisconnected(locale, strings, httpClient)
     );
   }
 }

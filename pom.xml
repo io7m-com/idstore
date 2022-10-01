@@ -36,8 +36,6 @@
     <module>com.io7m.idstore.protocol.api</module>
     <module>com.io7m.idstore.protocol.user.cb</module>
     <module>com.io7m.idstore.protocol.user</module>
-    <module>com.io7m.idstore.protocol.versions.cb</module>
-    <module>com.io7m.idstore.protocol.versions</module>
     <module>com.io7m.idstore.server.api</module>
     <module>com.io7m.idstore.server.main</module>
     <module>com.io7m.idstore.server.security</module>
@@ -57,13 +55,13 @@
     <com.io7m.jbssio.version>1.1.1</com.io7m.jbssio.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
     <com.io7m.trasco.version>0.0.5</com.io7m.trasco.version>
+    <com.io7m.verdant.version>0.0.1</com.io7m.verdant.version>
     <io7m.api.previousVersion>0.0.1-SNAPSHOT</io7m.api.previousVersion>
     <jackson.version>2.13.4</jackson.version>
     <jetty.version>11.0.11</jetty.version>
     <jooq.version>3.17.4</jooq.version>
     <logback.version>1.4.1</logback.version>
     <opentelemetry.version>1.18.0</opentelemetry.version>
-    <org.apache.james.version>3.7.0</org.apache.james.version>
     <org.javafx.version>18.0.1</org.javafx.version>
     <org.jline.version>3.21.0</org.jline.version>
     <slf4j.version>2.0.1</slf4j.version>
@@ -494,7 +492,6 @@
         <artifactId>caffeine</artifactId>
         <version>3.0.6</version>
       </dependency>
-
       <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-bom</artifactId>
@@ -511,6 +508,16 @@
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
         <version>1.7.10</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.verdant</groupId>
+        <artifactId>com.io7m.verdant.core</artifactId>
+        <version>${com.io7m.verdant.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.verdant</groupId>
+        <artifactId>com.io7m.verdant.core.cb</artifactId>
+        <version>${com.io7m.verdant.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -26,6 +26,7 @@ import com.io7m.idstore.user_client.api.IdUClientType;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -36,21 +37,26 @@ public final class IdUClient implements IdUClientType
 {
   private final IdUStrings strings;
   private final HttpClient httpClient;
+  private final Locale locale;
   private volatile IdUClientProtocolHandlerType handler;
 
   /**
    * The default client implementation.
    *
+   * @param inLocale     The locale
    * @param inStrings    The string resources
    * @param inHttpClient The HTTP client
    * @param inHandler    The versioned handler
    */
 
   public IdUClient(
+    final Locale inLocale,
     final IdUStrings inStrings,
     final HttpClient inHttpClient,
     final IdUClientProtocolHandlerType inHandler)
   {
+    this.locale =
+      Objects.requireNonNull(inLocale, "locale");
     this.strings =
       Objects.requireNonNull(inStrings, "strings");
     this.httpClient =
@@ -75,10 +81,9 @@ public final class IdUClient implements IdUClientType
   {
     final var newHandler =
       IdUProtocolNegotiation.negotiateProtocolHandler(
+        this.locale,
         this.httpClient,
         this.strings,
-        user,
-        password,
         base
       );
 

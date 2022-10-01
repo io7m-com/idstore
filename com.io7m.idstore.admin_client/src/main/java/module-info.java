@@ -26,13 +26,13 @@ module com.io7m.idstore.admin_client
   requires transitive com.io7m.idstore.model;
   requires transitive com.io7m.idstore.admin_client.api;
 
-  requires com.io7m.idstore.protocol.versions;
-  requires com.io7m.idstore.protocol.versions.cb;
   requires com.io7m.idstore.protocol.admin;
   requires com.io7m.idstore.protocol.admin.cb;
 
   requires com.io7m.genevan.core;
   requires com.io7m.jxtrand.vanilla;
+  requires com.io7m.verdant.core.cb;
+  requires com.io7m.verdant.core;
   requires java.net.http;
   requires org.slf4j;
 

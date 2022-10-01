@@ -35,7 +35,6 @@ open module com.io7m.idstore.documentation
   requires com.io7m.idstore.protocol.api;
   requires com.io7m.idstore.protocol.user.cb;
   requires com.io7m.idstore.protocol.user;
-  requires com.io7m.idstore.protocol.versions;
   requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server.main;
   requires com.io7m.idstore.server.security;

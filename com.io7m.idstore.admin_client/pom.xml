@@ -36,16 +36,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.protocol.versions</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.protocol.versions.cb</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.protocol.api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -60,6 +50,14 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.io7m.verdant</groupId>
+      <artifactId>com.io7m.verdant.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.verdant</groupId>
+      <artifactId>com.io7m.verdant.core.cb</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.io7m.jxtrand</groupId>
       <artifactId>com.io7m.jxtrand.vanilla</artifactId>
