@@ -16,6 +16,8 @@
 
 package com.io7m.idstore.admin_client.api;
 
+import com.io7m.idstore.model.IdAdmin;
+
 import java.io.Closeable;
 import java.net.URI;
 
@@ -33,11 +35,13 @@ public interface IdAClientType
    * @param password The password
    * @param base     The base URI
    *
+   * @return The logged in admin profile
+   *
    * @throws IdAClientException   On errors
    * @throws InterruptedException On interruption
    */
 
-  void login(
+  IdAdmin login(
     String user,
     String password,
     URI base)

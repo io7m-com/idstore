@@ -16,6 +16,8 @@
 
 package com.io7m.idstore.protocol.admin;
 
+import com.io7m.idstore.model.IdAdmin;
+
 import java.util.Objects;
 import java.util.UUID;
 
@@ -23,16 +25,19 @@ import java.util.UUID;
  * A response to {@link IdACommandLogin}.
  *
  * @param requestId The request ID
+ * @param admin     The admin
  */
 
 public record IdAResponseLogin(
-  UUID requestId)
+  UUID requestId,
+  IdAdmin admin)
   implements IdAResponseType
 {
   /**
    * A response to {@link IdACommandLogin}.
    *
    * @param requestId The request ID
+   * @param admin     The admin
    */
 
   public IdAResponseLogin

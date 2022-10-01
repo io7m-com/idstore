@@ -61,7 +61,7 @@ public final class IdACmdAdminGet
 
     final var result =
       admins.adminGet(command.admin())
-        .map(IdAdmin::redactPassword);
+        .map(IdAdmin::withRedactedPassword);
 
     return new IdAResponseAdminGet(context.requestId(), result);
   }

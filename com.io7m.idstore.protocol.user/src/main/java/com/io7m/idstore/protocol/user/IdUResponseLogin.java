@@ -16,6 +16,8 @@
 
 package com.io7m.idstore.protocol.user;
 
+import com.io7m.idstore.model.IdUser;
+
 import java.util.Objects;
 import java.util.UUID;
 
@@ -23,16 +25,19 @@ import java.util.UUID;
  * A response to {@link IdUCommandLogin}.
  *
  * @param requestId The request ID
+ * @param user      The user
  */
 
 public record IdUResponseLogin(
-  UUID requestId)
+  UUID requestId,
+  IdUser user)
   implements IdUResponseType
 {
   /**
    * A response to {@link IdUCommandLogin}.
    *
    * @param requestId The request ID
+   * @param user      The user
    */
 
   public IdUResponseLogin

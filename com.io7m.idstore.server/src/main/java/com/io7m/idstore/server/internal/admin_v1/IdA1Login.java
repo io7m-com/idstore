@@ -262,7 +262,9 @@ public final class IdA1Login extends IdCommonInstrumentedServlet
 
     try {
       final var data =
-        this.messages.serialize(new IdAResponseLogin(requestIdFor(request)));
+        this.messages.serialize(
+          new IdAResponseLogin(requestIdFor(request), admin.withRedactedPassword())
+        );
 
       response.setContentLength(data.length);
       try (var output = response.getOutputStream()) {

@@ -277,7 +277,7 @@ public final class IdACB1ValidationAdmin
     );
   }
 
-  private static IdA1Admin toWireAdmin(
+  public static IdA1Admin toWireAdmin(
     final IdAdmin admin)
   {
     return new IdA1Admin(
@@ -995,7 +995,7 @@ public final class IdACB1ValidationAdmin
     );
   }
 
-  private static IdAdmin fromWireAdmin(
+  public static IdAdmin fromWireAdmin(
     final IdA1Admin fieldAdmin)
     throws IdPasswordException, IdProtocolException
   {

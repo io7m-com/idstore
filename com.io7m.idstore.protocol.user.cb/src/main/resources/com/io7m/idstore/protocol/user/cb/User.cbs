@@ -149,6 +149,8 @@
 [record IdU1ResponseLogin
   [documentation requestId "The ID of the request that yielded this response."]
   [field requestId IdU1UUID]
+  [documentation user "The user."]
+  [field user IdU1User]
 ]
 
 [documentation IdU1ResponseUserSelf "A response to IdU1CommandUserSelf."]

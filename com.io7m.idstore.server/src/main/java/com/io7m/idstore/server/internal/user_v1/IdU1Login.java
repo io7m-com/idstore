@@ -269,7 +269,9 @@ public final class IdU1Login extends IdCommonInstrumentedServlet
 
     try {
       final var data =
-        this.messages.serialize(new IdUResponseLogin(requestIdFor(request)));
+        this.messages.serialize(
+          new IdUResponseLogin(requestIdFor(request), user.withRedactedPassword())
+        );
       response.setContentLength(data.length);
       try (var output = response.getOutputStream()) {
         output.write(data);

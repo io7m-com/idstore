@@ -281,8 +281,10 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
   {
     final var id =
       Arbitraries.defaultFor(UUID.class);
+    final var users =
+      Arbitraries.defaultFor(IdUser.class);
 
-    return id.map(IdUResponseLogin::new);
+    return Combinators.combine(id, users).as(IdUResponseLogin::new);
   }
 
   /**

@@ -67,7 +67,7 @@ public final class IdUClient implements IdUClientType
   }
 
   @Override
-  public void login(
+  public IdUser login(
     final String user,
     final String password,
     final URI base)
@@ -82,7 +82,11 @@ public final class IdUClient implements IdUClientType
         base
       );
 
-    this.handler = newHandler.login(user, password, base);
+    final var result =
+      newHandler.login(user, password, base);
+
+    this.handler = result.handler();
+    return result.userLoggedIn();
   }
 
   @Override

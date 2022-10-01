@@ -104,7 +104,7 @@ public final class IdACmdAdminUpdate
 
     final var afterAdmin =
       admins.adminGetRequire(newAdmin)
-        .redactPassword();
+        .withRedactedPassword();
 
     return new IdAResponseAdminUpdate(context.requestId(), afterAdmin);
   }

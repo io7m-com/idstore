@@ -170,7 +170,10 @@ public final class IdUCB1Validation
   private static IdU1ResponseLogin toWireResponseLogin(
     final IdUResponseLogin login)
   {
-    return new IdU1ResponseLogin(toWireUUID(login.requestId()));
+    return new IdU1ResponseLogin(
+      toWireUUID(login.requestId()),
+      toWireUser(login.user())
+    );
   }
 
   private static ProtocolIdU1v1Type convertToWireCommand(
@@ -272,8 +275,12 @@ public final class IdUCB1Validation
 
   private static IdUResponseLogin fromWireResponseLogin(
     final IdU1ResponseLogin login)
+    throws IdProtocolException, IdPasswordException
   {
-    return new IdUResponseLogin(fromWireUUID(login.fieldRequestId()));
+    return new IdUResponseLogin(
+      fromWireUUID(login.fieldRequestId()),
+      fromWireUser(login.fieldUser())
+    );
   }
 
   private static IdUCommandLogin fromWireCommandLogin(

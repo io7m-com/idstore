@@ -14,35 +14,33 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.user_client.api;
+package com.io7m.idstore.admin_client.internal;
 
-import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdAdmin;
 
-import java.io.Closeable;
-import java.net.URI;
+import java.util.Objects;
 
 /**
- * The type of clients.
+ * A newly negotiated protocol handler.
+ *
+ * @param adminLoggedIn The admin that logged in
+ * @param handler       The protocol handler
  */
 
-public interface IdUClientType
-  extends Closeable, IdUClientUsersType
+public record IdANewHandler(
+  IdAdmin adminLoggedIn,
+  IdAClientProtocolHandlerType handler)
 {
   /**
-   * Log in.
+   * A newly negotiated protocol handler.
    *
-   * @param user     The admin username
-   * @param password The password
-   * @param base     The base URI
-   *
-   * @return The logged-in user
-   * @throws IdUClientException    On errors
-   * @throws InterruptedException On interruption
+   * @param adminLoggedIn The admin that logged in
+   * @param handler       The protocol handler
    */
 
-  IdUser login(
-    String user,
-    String password,
-    URI base)
-    throws IdUClientException, InterruptedException;
+  public IdANewHandler
+  {
+    Objects.requireNonNull(adminLoggedIn, "adminLoggedIn");
+    Objects.requireNonNull(handler, "handler");
+  }
 }

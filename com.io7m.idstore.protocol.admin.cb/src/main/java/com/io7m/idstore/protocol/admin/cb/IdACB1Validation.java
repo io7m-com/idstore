@@ -21,6 +21,7 @@ import com.io7m.cedarbridge.runtime.api.CBList;
 import com.io7m.cedarbridge.runtime.api.CBString;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.protocol.admin.IdACommandAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdACommandAdminBanDelete;
 import com.io7m.idstore.protocol.admin.IdACommandAdminBanGet;
@@ -103,6 +104,7 @@ import com.io7m.idstore.protocol.api.IdProtocolMessageValidatorType;
 
 import static com.io7m.cedarbridge.runtime.api.CBOptionType.fromOptional;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireAdmin;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireCommandAdminBanCreate;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireCommandAdminBanDelete;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireCommandAdminBanGet;
@@ -136,6 +138,7 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireResponseAdminSearchPrevious;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireResponseAdminSelf;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireResponseAdminUpdate;
+import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireAdmin;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireCommandAdminBanCreate;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireCommandAdminBanDelete;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireCommandAdminBanGet;
@@ -393,7 +396,10 @@ public final class IdACB1Validation
   private static IdA1ResponseLogin toWireResponseLogin(
     final IdAResponseLogin login)
   {
-    return new IdA1ResponseLogin(toWireUUID(login.requestId()));
+    return new IdA1ResponseLogin(
+      toWireUUID(login.requestId()),
+      toWireAdmin(login.admin())
+    );
   }
 
   private static ProtocolIdA1v1Type convertToWireCommand(
@@ -559,8 +565,12 @@ public final class IdACB1Validation
 
   private static IdAResponseLogin fromWireResponseLogin(
     final IdA1ResponseLogin login)
+    throws IdProtocolException, IdPasswordException
   {
-    return new IdAResponseLogin(fromWireUUID(login.fieldRequestId()));
+    return new IdAResponseLogin(
+      fromWireUUID(login.fieldRequestId()),
+      fromWireAdmin(login.fieldAdmin())
+    );
   }
 
   private static IdACommandLogin fromWireCommandLogin(

@@ -191,9 +191,11 @@ public final class IdAGClientService implements IdServiceType, Closeable
    * @param https    {@code true} if https is required
    * @param username The username
    * @param password The password
+   *
+   * @return The future representing the login in process
    */
 
-  public void login(
+  public CompletableFuture<IdAdmin> login(
     final String host,
     final int port,
     final boolean https,
@@ -217,22 +219,28 @@ public final class IdAGClientService implements IdServiceType, Closeable
 
     this.publishEvent(eventConnecting);
 
+    final var future = new CompletableFuture<IdAdmin>();
     this.executor.submit(() -> {
       final var task =
         TRTask.create(LOG, eventConnecting.message());
 
       try {
-        this.client.login(username, password, this.serverLatest);
+        future.complete(this.client.login(
+          username,
+          password,
+          this.serverLatest));
         task.setSucceeded();
         this.publishEvent(eventConnectionOK);
         this.publishEvent(eventConnected);
       } catch (final Exception e) {
+        future.completeExceptionally(e);
         final var text =
           this.strings.format("client.connectionFailed", e.getMessage());
         task.setFailed(text, e);
         this.publishEvent(new IdAGClientEventConnectionFailed(task, text));
       }
     });
+    return future;
   }
 
   private void publishEvent(

@@ -145,6 +145,7 @@ public final class IdAClientProtocolHandler1
   private final URI transactionURI;
   private final IdACB1Messages messages;
   private final URI loginURI;
+  private IdAdmin receivedOnLogin;
 
   /**
    * The version 1 protocol handler.
@@ -176,14 +177,17 @@ public final class IdAClientProtocolHandler1
   }
 
   @Override
-  public IdAClientProtocolHandlerType login(
+  public IdANewHandler login(
     final String admin,
     final String password,
     final URI base)
     throws IdAClientException, InterruptedException
   {
-    this.sendLogin(new IdACommandLogin(new IdName(admin), password));
-    return this;
+    final var result =
+      this.sendLogin(new IdACommandLogin(new IdName(admin), password))
+        .admin();
+
+    return new IdANewHandler(result, this);
   }
 
   private IdAResponseLogin sendLogin(

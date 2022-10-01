@@ -41,7 +41,7 @@ public interface IdUClientProtocolHandlerType
    * @throws InterruptedException On interruption
    */
 
-  IdUClientProtocolHandlerType login(
+  IdUNewHandler login(
     String user,
     String password,
     URI base)

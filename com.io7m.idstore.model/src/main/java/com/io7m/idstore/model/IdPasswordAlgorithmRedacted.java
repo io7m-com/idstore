@@ -35,8 +35,6 @@ public final class IdPasswordAlgorithmRedacted
 
   }
 
-
-
   /**
    * Create an algorithm with the given iteration count and key length.
    *

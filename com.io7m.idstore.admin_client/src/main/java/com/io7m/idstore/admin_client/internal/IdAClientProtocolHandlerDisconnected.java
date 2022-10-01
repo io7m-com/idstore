@@ -80,20 +80,23 @@ public final class IdAClientProtocolHandlerDisconnected
   }
 
   @Override
-  public IdAClientProtocolHandlerType login(
+  public IdANewHandler login(
     final String admin,
     final String password,
     final URI base)
     throws IdAClientException, InterruptedException
   {
-    return IdAProtocolNegotiation.negotiateProtocolHandler(
-      this.locale,
-      this.httpClient,
-      this.strings,
-      admin,
-      password,
-      base
-    );
+    final var handler =
+      IdAProtocolNegotiation.negotiateProtocolHandler(
+        this.locale,
+        this.httpClient,
+        this.strings,
+        admin,
+        password,
+        base
+      );
+
+    return handler.login(admin, password, base);
   }
 
   private IdAClientException notLoggedIn()

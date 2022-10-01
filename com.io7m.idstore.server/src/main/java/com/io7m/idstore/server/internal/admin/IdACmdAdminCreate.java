@@ -85,7 +85,7 @@ public final class IdACmdAdminCreate
         context.now(),
         password,
         targetPermissions
-      ).redactPassword();
+      ).withRedactedPassword();
 
     return new IdAResponseAdminCreate(context.requestId(), newAdmin);
   }

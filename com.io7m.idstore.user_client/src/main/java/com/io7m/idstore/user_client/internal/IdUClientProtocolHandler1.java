@@ -106,14 +106,15 @@ public final class IdUClientProtocolHandler1
   }
 
   @Override
-  public IdUClientProtocolHandlerType login(
+  public IdUNewHandler login(
     final String user,
     final String password,
     final URI base)
     throws IdUClientException, InterruptedException
   {
-    this.sendLogin(new IdUCommandLogin(new IdName(user), password));
-    return this;
+    final var response =
+      this.sendLogin(new IdUCommandLogin(new IdName(user), password));
+    return new IdUNewHandler(response.user(), this);
   }
 
   private IdUResponseLogin sendLogin(

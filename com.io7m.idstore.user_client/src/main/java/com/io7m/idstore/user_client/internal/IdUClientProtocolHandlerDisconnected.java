@@ -56,19 +56,22 @@ public final class IdUClientProtocolHandlerDisconnected
   }
 
   @Override
-  public IdUClientProtocolHandlerType login(
+  public IdUNewHandler login(
     final String user,
     final String password,
     final URI base)
     throws IdUClientException, InterruptedException
   {
-    return IdUProtocolNegotiation.negotiateProtocolHandler(
-      this.httpClient,
-      this.strings,
-      user,
-      password,
-      base
-    );
+    final var handler =
+      IdUProtocolNegotiation.negotiateProtocolHandler(
+        this.httpClient,
+        this.strings,
+        user,
+        password,
+        base
+      );
+
+    return handler.login(user, password, base);
   }
 
   private IdUClientException notLoggedIn()

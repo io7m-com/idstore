@@ -69,21 +69,22 @@ public record IdAdmin(
   }
 
   /**
-   * @return This admin with the password redacted
+   * @return This admin with a redacted password hash
    */
 
-  public IdAdmin redactPassword()
+  public IdAdmin withRedactedPassword()
   {
     try {
       return new IdAdmin(
-        this.id(),
-        this.idName(),
-        this.realName(),
-        this.emails(),
-        this.timeCreated(),
-        this.timeUpdated(),
-        IdPasswordAlgorithmRedacted.create().createHashed(""),
-        this.permissions()
+        this.id,
+        this.idName,
+        this.realName,
+        this.emails,
+        this.timeCreated,
+        this.timeUpdated,
+        IdPasswordAlgorithmRedacted.create()
+          .createHashed("", new byte[0]),
+        this.permissions
       );
     } catch (final IdPasswordException e) {
       throw new IllegalStateException(e);

@@ -43,7 +43,7 @@ public interface IdAClientProtocolHandlerType
    * @throws InterruptedException On interruption
    */
 
-  IdAClientProtocolHandlerType login(
+  IdANewHandler login(
     String admin,
     String password,
     URI base)

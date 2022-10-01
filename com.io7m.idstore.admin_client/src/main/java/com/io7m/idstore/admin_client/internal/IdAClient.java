@@ -180,7 +180,7 @@ public final class IdAClient implements IdAClientType
   }
 
   @Override
-  public void login(
+  public IdAdmin login(
     final String admin,
     final String password,
     final URI base)
@@ -196,7 +196,9 @@ public final class IdAClient implements IdAClientType
         base
       );
 
-    this.handler = newHandler.login(admin, password, base);
+    final var result = newHandler.login(admin, password, base);
+    this.handler = result.handler();
+    return result.adminLoggedIn();
   }
 
   @Override

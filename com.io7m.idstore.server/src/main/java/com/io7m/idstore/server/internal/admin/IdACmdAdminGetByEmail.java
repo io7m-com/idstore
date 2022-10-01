@@ -60,7 +60,7 @@ public final class IdACmdAdminGetByEmail
       transaction.queries(IdDatabaseAdminsQueriesType.class);
     final var result =
       admins.adminGetForEmail(command.email())
-        .map(IdAdmin::redactPassword);
+        .map(IdAdmin::withRedactedPassword);
 
     return new IdAResponseAdminGet(context.requestId(), result);
   }

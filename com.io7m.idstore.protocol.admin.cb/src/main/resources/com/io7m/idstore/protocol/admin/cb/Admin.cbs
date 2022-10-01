@@ -858,6 +858,8 @@
 [record IdA1ResponseLogin
   [documentation requestId "The ID of the request that yielded this response."]
   [field requestId IdA1UUID]
+  [documentation admin "The admin."]
+  [field admin IdA1Admin]
 ]
 
 [documentation IdA1 "The Admin v1 protocol."]
