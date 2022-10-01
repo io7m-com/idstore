@@ -74,6 +74,37 @@ create table admins (
     <Statement>grant select, insert, update, delete on admins to idstore</Statement>
     <Statement>grant select (id) on admins to idstore_none</Statement>
 
+    <Statement><![CDATA[
+create function admin_initial_check() returns trigger as $$
+  declare
+    count integer;
+  begin
+    if old.initial = false and new.initial = true then
+      select count(*) into count from admins a where a.initial = true;
+      if count >= 1 then
+        raise sqlstate 'ID002' using message = 'Only one admin can be the initial admin.';
+        return null;
+      end if;
+    end if;
+    return old;
+  end;
+$$ language plpgsql;
+]]></Statement>
+
+    <Statement><![CDATA[
+create trigger admin_initial_check_insert
+  before insert on admins
+    for each statement
+      execute function admin_initial_check();
+]]></Statement>
+
+    <Statement><![CDATA[
+create trigger admin_initial_check_update
+  before update on admins
+    for each statement
+      execute function admin_initial_check();
+]]></Statement>
+
     <Comment>
       The users table stores the current set of users.
     </Comment>
