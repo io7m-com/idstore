@@ -18,7 +18,6 @@ open module com.io7m.idstore.tests
 {
   requires transitive com.io7m.idstore.admin_client.api;
   requires transitive com.io7m.idstore.admin_client;
-  requires transitive com.io7m.idstore.colors;
   requires transitive com.io7m.idstore.database.api;
   requires transitive com.io7m.idstore.database.postgres;
   requires transitive com.io7m.idstore.error_codes;
@@ -36,6 +35,8 @@ open module com.io7m.idstore.tests
 
   requires com.fasterxml.jackson.core;
   requires com.fasterxml.jackson.databind;
+  requires com.io7m.cxbutton.core;
+  requires com.io7m.dixmont.colors;
   requires com.io7m.jmulticlose.core;
   requires jakarta.mail;
   requires java.net.http;

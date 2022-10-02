@@ -25,7 +25,6 @@ open module com.io7m.idstore.documentation
 
   requires com.io7m.idstore.admin_client.api;
   requires com.io7m.idstore.admin_client;
-  requires com.io7m.idstore.colors;
   requires com.io7m.idstore.database.api;
   requires com.io7m.idstore.database.postgres;
   requires com.io7m.idstore.error_codes;
