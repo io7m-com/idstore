@@ -32,14 +32,14 @@
         <p>Request ID: ${requestId}</p>
         [/#if]
 
-        <div><a href="${returnTo}" class="ids_xbutton">Return</a></div>
+        <div><a href="${returnTo}" class="cxbutton">Return</a></div>
       </div>
       [#else]
       <div class="ids_message">
         <h3>${messageTitle}</h3>
         <p>${message}</p>
 
-        <div><a href="${returnTo}" class="ids_xbutton">Return</a></div>
+        <div><a href="${returnTo}" class="cxbutton">Return</a></div>
       </div>
       [/#if]
     </div>

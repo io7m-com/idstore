@@ -23,9 +23,10 @@ module com.io7m.idstore.server.api
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires transitive com.io7m.idstore.xbutton;
-  requires transitive com.io7m.idstore.colors;
   requires transitive com.io7m.idstore.database.api;
+
+  requires com.io7m.dixmont.colors;
+  requires com.io7m.cxbutton.core;
 
   requires com.fasterxml.jackson.databind;
   requires com.fasterxml.jackson.datatype.jsr310;

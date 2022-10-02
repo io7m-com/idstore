@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.internal;
 
+import com.io7m.cxbutton.core.CxButtonCSS;
 import com.io7m.idstore.model.IdOptional;
 import com.io7m.idstore.server.api.IdServerBrandingConfiguration;
 import com.io7m.idstore.server.api.IdServerColorScheme;
@@ -24,7 +25,6 @@ import com.io7m.idstore.server.internal.freemarker.IdFMCSSData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceType;
-import com.io7m.idstore.xbutton.IdXButtonCSS;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -125,8 +125,8 @@ public final class IdServerBrandingService implements IdServiceType
     final IdServerColorScheme schemeParams =
       scheme.orElseGet(IdServerColorScheme::defaults);
 
-    return IdXButtonCSS.create()
-      .cssOf(schemeParams.buttonColors());
+    return CxButtonCSS.create()
+      .cssOf(Optional.empty(), true, schemeParams.buttonColors());
   }
 
   private static String loadMainCSS(

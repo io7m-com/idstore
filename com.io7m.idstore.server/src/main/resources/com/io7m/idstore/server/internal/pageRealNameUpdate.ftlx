@@ -29,7 +29,7 @@
         <input class="ids_realnameUpdateForm_existingField" type="text" id="existing" name="existing" readonly="true" value="${existingName}"/>
         <label class="ids_realnameUpdateForm_realnameLabel" for="realname">New Name</label>
         <input class="ids_realnameUpdateForm_realnameField" type="text" id="realname" name="realname"/>
-        <input class="ids_realnameUpdateForm_submit ids_xbutton" type="submit" value="Update"/>
+        <input class="ids_realnameUpdateForm_submit cxbutton" type="submit" value="Update"/>
       </form>
     </div>
   </div>

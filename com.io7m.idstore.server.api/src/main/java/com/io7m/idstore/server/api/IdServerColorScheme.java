@@ -19,9 +19,9 @@ package com.io7m.idstore.server.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.io7m.idstore.colors.IdColor;
-import com.io7m.idstore.xbutton.IdXButtonColors;
-import com.io7m.idstore.xbutton.IdXButtonStateColors;
+import com.io7m.cxbutton.core.CxButtonCSS;
+import com.io7m.cxbutton.core.CxButtonColors;
+import com.io7m.dixmont.colors.DmColor;
 
 import java.util.Objects;
 
@@ -44,25 +44,25 @@ import java.util.Objects;
 @JsonDeserialize
 public record IdServerColorScheme(
   @JsonProperty(value = "ButtonColors", required = true)
-  IdXButtonColors buttonColors,
+  CxButtonColors buttonColors,
   @JsonProperty(value = "ErrorBorderColor", required = true)
-  IdColor errorBorderColor,
+  DmColor errorBorderColor,
   @JsonProperty(value = "HeaderBackgroundColor", required = true)
-  IdColor headerBackgroundColor,
+  DmColor headerBackgroundColor,
   @JsonProperty(value = "HeaderLinkColor", required = true)
-  IdColor headerLinkColor,
+  DmColor headerLinkColor,
   @JsonProperty(value = "HeaderTextColor", required = true)
-  IdColor headerTextColor,
+  DmColor headerTextColor,
   @JsonProperty(value = "MainBackgroundColor", required = true)
-  IdColor mainBackgroundColor,
+  DmColor mainBackgroundColor,
   @JsonProperty(value = "MainLinkColor", required = true)
-  IdColor mainLinkColor,
+  DmColor mainLinkColor,
   @JsonProperty(value = "MainMessageBorderColor", required = true)
-  IdColor mainMessageBorderColor,
+  DmColor mainMessageBorderColor,
   @JsonProperty(value = "MainTableBorderColor", required = true)
-  IdColor mainTableBorderColor,
+  DmColor mainTableBorderColor,
   @JsonProperty(value = "MainTextColor", required = true)
-  IdColor mainTextColor
+  DmColor mainTextColor
 )
 {
   /**
@@ -106,8 +106,8 @@ public record IdServerColorScheme(
    * An ocean blue colour.
    */
 
-  public static final IdColor OCEAN_BLUE =
-    new IdColor(0.105, 0.313, 0.454);
+  public static final DmColor OCEAN_BLUE =
+    new DmColor(0.105, 0.313, 0.454);
 
   /**
    * @return The default color scheme
@@ -115,116 +115,17 @@ public record IdServerColorScheme(
 
   public static IdServerColorScheme defaults()
   {
-    final var buttonEnabledTextColor =
-      new IdColor(0.0, 0.0, 0.0);
-    final var buttonEnabledBorderColor =
-      new IdColor(0.0, 0.0, 0.0);
-    final var buttonEnabledBodyColor =
-      new IdColor(0.86, 0.86, 0.86);
-    final var buttonEnabledEmbossNColor =
-      new IdColor(1.0, 1.0, 1.0);
-    final var buttonEnabledEmbossEColor =
-      new IdColor(1.0, 1.0, 1.0);
-    final var buttonEnabledEmbossSColor =
-      new IdColor(0.66, 0.66, 0.66);
-    final var buttonEnabledEmbossWColor =
-      new IdColor(0.66, 0.66, 0.66);
-
-    final var buttonHoverTextColor =
-      new IdColor(0.0, 0.0, 0.0);
-    final var buttonHoverBorderColor =
-      new IdColor(0.0, 0.0, 0.0);
-    final var buttonHoverBodyColor =
-      new IdColor(0.93, 0.93, 0.93);
-    final var buttonHoverEmbossNColor =
-      new IdColor(1.0, 1.0, 1.0);
-    final var buttonHoverEmbossEColor =
-      new IdColor(1.0, 1.0, 1.0);
-    final var buttonHoverEmbossSColor =
-      new IdColor(0.66, 0.66, 0.66);
-    final var buttonHoverEmbossWColor =
-      new IdColor(0.66, 0.66, 0.66);
-
-    final var buttonPressedTextColor =
-      new IdColor(0.0, 0.0, 0.0);
-    final var buttonPressedBorderColor =
-      new IdColor(0.0, 0.0, 0.0);
-    final var buttonPressedBodyColor =
-      new IdColor(0.86, 0.86, 0.86);
-    final var buttonPressedEmbossNColor =
-      new IdColor(0.66, 0.66, 0.66);
-    final var buttonPressedEmbossEColor =
-      new IdColor(0.66, 0.66, 0.66);
-    final var buttonPressedEmbossSColor =
-      new IdColor(0.8, 0.8, 0.8);
-    final var buttonPressedEmbossWColor =
-      new IdColor(0.8, 0.8, 0.8);
-
-    final var buttonDisabledBorderColor =
-      new IdColor(0.0, 0.0, 0.0);
-    final var buttonDisabledBodyColor =
-      new IdColor(0.86, 0.86, 0.86);
-    final var buttonDisabledTextColor =
-      buttonDisabledBodyColor.darker(0.2);
-    final var buttonDisabledEmbossNColor =
-      buttonDisabledBodyColor;
-    final var buttonDisabledEmbossEColor =
-      buttonDisabledBodyColor;
-    final var buttonDisabledEmbossSColor =
-      buttonDisabledBodyColor;
-    final var buttonDisabledEmbossWColor =
-      buttonDisabledBodyColor;
-
-    final var buttonColors = new IdXButtonColors(
-      new IdXButtonStateColors(
-        buttonEnabledTextColor,
-        buttonEnabledBodyColor,
-        buttonEnabledBorderColor,
-        buttonEnabledEmbossEColor,
-        buttonEnabledEmbossNColor,
-        buttonEnabledEmbossSColor,
-        buttonEnabledEmbossWColor
-      ),
-      new IdXButtonStateColors(
-        buttonDisabledTextColor,
-        buttonDisabledBodyColor,
-        buttonDisabledBorderColor,
-        buttonDisabledEmbossEColor,
-        buttonDisabledEmbossNColor,
-        buttonDisabledEmbossSColor,
-        buttonDisabledEmbossWColor
-      ),
-      new IdXButtonStateColors(
-        buttonPressedTextColor,
-        buttonPressedBodyColor,
-        buttonPressedBorderColor,
-        buttonPressedEmbossEColor,
-        buttonPressedEmbossNColor,
-        buttonPressedEmbossSColor,
-        buttonPressedEmbossWColor
-      ),
-      new IdXButtonStateColors(
-        buttonHoverTextColor,
-        buttonHoverBodyColor,
-        buttonHoverBorderColor,
-        buttonHoverEmbossEColor,
-        buttonHoverEmbossNColor,
-        buttonHoverEmbossSColor,
-        buttonHoverEmbossWColor
-      )
-    );
-
     return new IdServerColorScheme(
-      buttonColors,
-      new IdColor(1.0, 0.0, 0.0),
-      new IdColor(0.2, 0.2, 0.2),
-      new IdColor(1.0, 0.596, 0.2),
-      new IdColor(1.0, 1.0, 1.0),
-      new IdColor(1.0, 1.0, 1.0),
-      new IdColor(0.0, 0.0, 1.0),
-      new IdColor(0.8, 0.8, 0.8),
-      new IdColor(0.5, 0.5, 0.5),
-      new IdColor(0.0, 0.0, 0.0)
+      CxButtonCSS.defaultColors(),
+      new DmColor(1.0, 0.0, 0.0),
+      new DmColor(0.2, 0.2, 0.2),
+      new DmColor(1.0, 0.596, 0.2),
+      new DmColor(1.0, 1.0, 1.0),
+      new DmColor(1.0, 1.0, 1.0),
+      new DmColor(0.0, 0.0, 1.0),
+      new DmColor(0.8, 0.8, 0.8),
+      new DmColor(0.5, 0.5, 0.5),
+      new DmColor(0.0, 0.0, 0.0)
     );
   }
 }

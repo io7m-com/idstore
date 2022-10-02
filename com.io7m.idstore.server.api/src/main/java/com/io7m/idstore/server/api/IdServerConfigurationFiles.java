@@ -17,12 +17,9 @@
 package com.io7m.idstore.server.api;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.io7m.idstore.colors.IdColor;
-import com.io7m.idstore.colors.IdColorDeserializer;
-import com.io7m.idstore.colors.IdColorSerializer;
+import com.io7m.dixmont.colors.DmColorModule;
 import com.io7m.idstore.services.api.IdServiceType;
 
 import java.io.IOException;
@@ -72,17 +69,7 @@ public final class IdServerConfigurationFiles
         .disable(WRITE_DATES_AS_TIMESTAMPS)
         .build();
 
-    final var simpleModule = new SimpleModule();
-    simpleModule.addDeserializer(
-      IdColor.class,
-      new IdColorDeserializer()
-    );
-    simpleModule.addSerializer(
-      IdColor.class,
-      new IdColorSerializer()
-    );
-
-    this.mapper.registerModule(simpleModule);
+    this.mapper.registerModule(DmColorModule.create());
     this.mapper.registerModule(new JavaTimeModule());
     this.mapper.registerModule(new Jdk8Module());
   }

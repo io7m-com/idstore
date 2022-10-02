@@ -49,6 +49,8 @@ module com.io7m.idstore.server
   requires ch.qos.logback.core;
   requires com.fasterxml.jackson.databind;
   requires com.github.benmanes.caffeine;
+  requires com.io7m.cxbutton.core;
+  requires com.io7m.dixmont.colors;
   requires com.io7m.jaffirm.core;
   requires com.io7m.jdeferthrow.core;
   requires com.io7m.jmulticlose.core;

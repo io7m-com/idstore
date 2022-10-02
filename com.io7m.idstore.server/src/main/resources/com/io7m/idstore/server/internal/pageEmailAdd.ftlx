@@ -27,7 +27,7 @@
       <form action="/email-add-run" method="post" class="ids_emailAddForm">
         <label class="ids_emailAddForm_emailLabel" for="email">Email</label>
         <input class="ids_emailAddForm_emailField" type="text" id="email" name="email"/>
-        <input class="ids_emailAddForm_submit ids_xbutton" type="submit" value="Add"/>
+        <input class="ids_emailAddForm_submit cxbutton" type="submit" value="Add"/>
       </form>
     </div>
   </div>
