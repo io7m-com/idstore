@@ -18,27 +18,31 @@ package com.io7m.idstore.server.internal.user;
 
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdValidityException;
-import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
+import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.security.IdSecUserActionRealnameUpdate;
+import com.io7m.idstore.server.security.IdSecUserActionPasswordUpdate;
 
+import java.util.Objects;
 import java.util.Optional;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_MISMATCH;
+
 /**
- * IdUCmdRealNameUpdate
+ * IdUCmdPasswordUpdate
  */
 
-public final class IdUCmdRealNameUpdate
-  extends IdUCmdAbstract<IdUCommandRealnameUpdate>
+public final class IdUCmdPasswordUpdate
+  extends IdUCmdAbstract<IdUCommandPasswordUpdate>
 {
   /**
-   * IdUCmdRealNameUpdate
+   * IdUCmdPasswordUpdate
    */
 
-  public IdUCmdRealNameUpdate()
+  public IdUCmdPasswordUpdate()
   {
 
   }
@@ -46,14 +50,22 @@ public final class IdUCmdRealNameUpdate
   @Override
   protected IdUResponseType executeActual(
     final IdUCommandContext context,
-    final IdUCommandRealnameUpdate command)
+    final IdUCommandPasswordUpdate command)
     throws IdValidityException, IdException, IdCommandExecutionFailure
   {
     final var user = context.user();
-    context.securityCheck(new IdSecUserActionRealnameUpdate(user));
+    context.securityCheck(new IdSecUserActionPasswordUpdate(user));
 
     final var transaction =
       context.transaction();
+
+    if (!Objects.equals(command.password(), command.passwordConfirm())) {
+      throw context.failFormatted(
+        400,
+        PASSWORD_RESET_MISMATCH,
+        "passwordResetMismatch"
+      );
+    }
 
     final var users =
       transaction.queries(IdDatabaseUsersQueriesType.class);
@@ -62,8 +74,11 @@ public final class IdUCmdRealNameUpdate
     users.userUpdate(
       user.id(),
       Optional.empty(),
-      Optional.of(command.realName()),
-      Optional.empty()
+      Optional.empty(),
+      Optional.of(
+        IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+          .createHashed(command.password())
+      )
     );
 
     return new IdUResponseUserUpdate(

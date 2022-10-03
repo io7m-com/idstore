@@ -31,6 +31,7 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
+import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
@@ -198,6 +199,8 @@ public final class IdUCB1Validation
       return toWireCommandEmailRemoveDeny(c);
     } else if (command instanceof IdUCommandRealnameUpdate c) {
       return toWireCommandRealnameUpdate(c);
+    } else if (command instanceof IdUCommandPasswordUpdate c) {
+      return toWireCommandPasswordUpdate(c);
     }
 
     throw new IdProtocolException(
@@ -210,6 +213,15 @@ public final class IdUCB1Validation
     final IdUCommandRealnameUpdate c)
   {
     return new IdU1CommandRealnameUpdate(new CBString(c.realName().value()));
+  }
+
+  private static IdU1CommandPasswordUpdate toWireCommandPasswordUpdate(
+    final IdUCommandPasswordUpdate c)
+  {
+    return new IdU1CommandPasswordUpdate(
+      new CBString(c.password()),
+      new CBString(c.passwordConfirm())
+    );
   }
 
   private static IdU1CommandEmailAddBegin toWireCommandEmailAddBegin(
@@ -338,6 +350,8 @@ public final class IdUCB1Validation
         return fromWireCommandUserSelf(c);
       } else if (message instanceof IdU1CommandRealnameUpdate c) {
         return fromWireCommandRealnameUpdate(c);
+      } else if (message instanceof IdU1CommandPasswordUpdate c) {
+        return fromWireCommandPasswordUpdate(c);
 
         /*
          * Responses.
@@ -378,6 +392,15 @@ public final class IdUCB1Validation
     final IdU1CommandRealnameUpdate c)
   {
     return new IdUCommandRealnameUpdate(new IdRealName(c.fieldName().value()));
+  }
+
+  private static IdUCommandPasswordUpdate fromWireCommandPasswordUpdate(
+    final IdU1CommandPasswordUpdate c)
+  {
+    return new IdUCommandPasswordUpdate(
+      c.fieldPassword().value(),
+      c.fieldPasswordConfirm().value()
+    );
   }
 
   private static IdUCommandEmailAddBegin fromWireCommandEmailAddBegin(

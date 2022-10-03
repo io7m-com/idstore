@@ -79,12 +79,21 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     if (action instanceof IdSecUserActionRealnameUpdate e) {
       return checkUserActionRealnameUpdate(e);
     }
+    if (action instanceof IdSecUserActionPasswordUpdate e) {
+      return checkUserActionPasswordUpdate(e);
+    }
 
     return new IdSecPolicyResultDenied("Operation not permitted.");
   }
 
   private static IdSecPolicyResultType checkUserActionRealnameUpdate(
     final IdSecUserActionRealnameUpdate e)
+  {
+    return new IdSecPolicyResultPermitted();
+  }
+
+  private static IdSecPolicyResultType checkUserActionPasswordUpdate(
+    final IdSecUserActionPasswordUpdate e)
   {
     return new IdSecPolicyResultPermitted();
   }

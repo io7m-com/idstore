@@ -148,4 +148,13 @@ public final class IdUClientProtocolHandlerDisconnected
   {
     throw this.notLoggedIn();
   }
+
+  @Override
+  public void userPasswordUpdate(
+    final String password,
+    final String passwordConfirm)
+    throws IdUClientException
+  {
+    throw this.notLoggedIn();
+  }
 }

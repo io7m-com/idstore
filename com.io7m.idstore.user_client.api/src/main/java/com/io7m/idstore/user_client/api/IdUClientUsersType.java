@@ -123,4 +123,19 @@ public interface IdUClientUsersType
 
   void userRealNameUpdate(IdRealName realName)
     throws IdUClientException, InterruptedException;
+
+  /**
+   * Update the user's password.
+   *
+   * @param password        The password
+   * @param passwordConfirm The password confirmation
+   *
+   * @throws IdUClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  void userPasswordUpdate(
+    String password,
+    String passwordConfirm)
+    throws IdUClientException, InterruptedException;
 }

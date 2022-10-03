@@ -14,27 +14,32 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.protocol.user;
 
+import java.util.Objects;
+
 /**
- * The type of commands in the User protocol.
+ * A request to change the user's password.
  *
- * @param <R> The associated response type
+ * @param password The password
+ * @param passwordConfirm The password confirmation
  */
 
-public sealed interface IdUCommandType<R extends IdUResponseType>
-  extends IdUMessageType
-  permits IdUCommandEmailAddBegin,
-  IdUCommandEmailAddDeny,
-  IdUCommandEmailAddPermit,
-  IdUCommandEmailRemoveBegin,
-  IdUCommandEmailRemoveDeny,
-  IdUCommandEmailRemovePermit,
-  IdUCommandLogin,
-  IdUCommandPasswordUpdate,
-  IdUCommandRealnameUpdate,
-  IdUCommandUserSelf
+public record IdUCommandPasswordUpdate(
+  String password,
+  String passwordConfirm)
+  implements IdUCommandType<IdUResponseUserUpdate>
 {
+  /**
+   * A request to change the user's password.
+   *
+   * @param password The password
+   * @param passwordConfirm The password confirmation
+   */
 
+  public IdUCommandPasswordUpdate
+  {
+    Objects.requireNonNull(password, "password");
+    Objects.requireNonNull(passwordConfirm, "passwordConfirm");
+  }
 }

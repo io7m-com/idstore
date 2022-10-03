@@ -131,6 +131,14 @@
   [field name cb:String]
 ]
 
+[documentation IdU1CommandPasswordUpdate "A request to update the user's password."]
+[record IdU1CommandPasswordUpdate
+  [documentation password "The new password."]
+  [field password cb:String]
+  [documentation passwordConfirm "The password confirmation."]
+  [field passwordConfirm cb:String]
+]
+
 ;
 ; Responses.
 ;
@@ -220,6 +228,7 @@
       IdU1CommandEmailRemoveDeny
       IdU1CommandEmailRemovePermit
       IdU1CommandLogin
+      IdU1CommandPasswordUpdate
       IdU1CommandRealnameUpdate
       IdU1CommandUserSelf
       IdU1ResponseEmailAddBegin

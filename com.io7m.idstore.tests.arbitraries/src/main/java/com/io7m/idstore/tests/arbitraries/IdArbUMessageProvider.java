@@ -28,6 +28,7 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
+import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUMessageType;
@@ -86,6 +87,7 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
       commandLogin(),
       commandUserSelf(),
       commandUserRealnameUpdate(),
+      commandUserPasswordUpdate(),
       responseEmailAddBegin(),
       responseEmailAddDeny(),
       responseEmailAddPermit(),
@@ -167,6 +169,16 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
   {
     return Arbitraries.defaultFor(IdRealName.class)
       .map(IdUCommandRealnameUpdate::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdUCommandPasswordUpdate> commandUserPasswordUpdate()
+  {
+    return Combinators.combine(Arbitraries.strings(), Arbitraries.strings())
+      .as(IdUCommandPasswordUpdate::new);
   }
 
   /**

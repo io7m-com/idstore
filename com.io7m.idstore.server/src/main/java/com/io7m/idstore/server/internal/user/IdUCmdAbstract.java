@@ -23,7 +23,7 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageType;
-import com.io7m.idstore.server.internal.command_exec.IdCommandContext;
+import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecurityException;
@@ -34,16 +34,13 @@ import java.util.Objects;
 /**
  * The abstract base command class.
  *
- * @param <T> The type of command contexts
  * @param <C> The type of accepted commands
- * @param <R> The type of responses
  */
 
 public abstract class IdUCmdAbstract<
-  T extends IdCommandContext<R>,
-  C extends IdProtocolMessageType,
-  R extends IdProtocolMessageType>
-  implements IdCommandExecutorType<T, C, R>
+  C extends IdProtocolMessageType
+  >
+  implements IdCommandExecutorType<IdUCommandContext, C, IdUResponseType>
 {
   protected IdUCmdAbstract()
   {
@@ -51,8 +48,8 @@ public abstract class IdUCmdAbstract<
   }
 
   @Override
-  public final R execute(
-    final T context,
+  public final IdUResponseType execute(
+    final IdUCommandContext context,
     final C command)
     throws IdCommandExecutionFailure, IOException, InterruptedException
   {
@@ -76,8 +73,8 @@ public abstract class IdUCmdAbstract<
     }
   }
 
-  protected abstract R executeActual(
-    T context,
+  protected abstract IdUResponseType executeActual(
+    IdUCommandContext context,
     C command)
     throws IdValidityException, IdException, IdCommandExecutionFailure;
 }

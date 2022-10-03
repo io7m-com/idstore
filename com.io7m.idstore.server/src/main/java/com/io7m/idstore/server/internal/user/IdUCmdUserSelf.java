@@ -30,8 +30,7 @@ import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
  */
 
 public final class IdUCmdUserSelf
-  extends IdUCmdAbstract<
-  IdUCommandContext, IdUCommandUserSelf, IdUResponseType>
+  extends IdUCmdAbstract<IdUCommandUserSelf>
 {
   /**
    * IdUCmdUserSelf

@@ -23,6 +23,7 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
+import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
@@ -103,6 +104,9 @@ public final class IdUCommandExecutor
     }
     if (command instanceof IdUCommandRealnameUpdate c) {
       return new IdUCmdRealNameUpdate().execute(context, c);
+    }
+    if (command instanceof IdUCommandPasswordUpdate c) {
+      return new IdUCmdPasswordUpdate().execute(context, c);
     }
 
     throw new IllegalStateException();

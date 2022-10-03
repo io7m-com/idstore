@@ -26,26 +26,21 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecUserActionEmailAddDeny;
-import com.io7m.idstore.server.security.IdSecurity;
 
 import java.util.Objects;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_NONEXISTENT;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_REMOVE;
 import static com.io7m.idstore.model.IdEmailVerificationResolution.DENIED;
-import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
  * IdUCmdEmailRemoveDeny
  */
 
 public final class IdUCmdEmailRemoveDeny
-  extends IdUCmdAbstract<
-  IdUCommandContext, IdUCommandEmailRemoveDeny, IdUResponseType>
+  extends IdUCmdAbstract<IdUCommandEmailRemoveDeny>
 {
   /**
    * IdUCmdEmailRemoveDeny
@@ -64,14 +59,7 @@ public final class IdUCmdEmailRemoveDeny
   {
     final var token = command.token();
     final var user = context.user();
-    if (IdSecurity.check(new IdSecUserActionEmailAddDeny(user))
-      instanceof IdSecPolicyResultDenied denied) {
-      throw context.fail(
-        FORBIDDEN_403,
-        SECURITY_POLICY_DENIED,
-        denied.message()
-      );
-    }
+    context.securityCheck(new IdSecUserActionEmailAddDeny(user));
 
     final var transaction =
       context.transaction();

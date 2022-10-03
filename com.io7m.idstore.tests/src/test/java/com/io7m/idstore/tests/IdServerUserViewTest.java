@@ -74,7 +74,8 @@ public final class IdServerUserViewTest extends IdWithServerContract
       final var res =
         this.httpClient.send(req, HttpResponse.BodyHandlers.ofString());
 
-      assertTrue(res.body().startsWith("/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */"));
+      assertTrue(res.body().startsWith(
+        "/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */"));
     }
 
     {
@@ -252,7 +253,9 @@ public final class IdServerUserViewTest extends IdWithServerContract
 
     this.login();
     this.openPage("/email-add", "idstore: Add an email address.");
-    this.openPage("/email-add-run?email=extras@example.com", "idstore: Verification");
+    this.openPage(
+      "/email-add-run?email=extras@example.com",
+      "idstore: Verification");
 
     this.permitEmailChallenge("/email-verification-permit/?token=%s");
   }
@@ -275,7 +278,9 @@ public final class IdServerUserViewTest extends IdWithServerContract
 
     this.login();
     this.openPage("/email-add", "idstore: Add an email address.");
-    this.openPage("/email-add-run?email=extras@example.com", "idstore: Verification");
+    this.openPage(
+      "/email-add-run?email=extras@example.com",
+      "idstore: Verification");
 
     this.permitEmailChallenge("/email-verification-deny/?token=%s");
   }
@@ -354,7 +359,8 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.openPage("/email-add", "idstore: Add an email address.");
 
     this.expectError(
-      HttpRequest.newBuilder(this.viewURL("/email-verification-permit/?token=what")),
+      HttpRequest.newBuilder(this.viewURL(
+        "/email-verification-permit/?token=what")),
       400,
       "idstore: Error");
   }
@@ -495,9 +501,13 @@ public final class IdServerUserViewTest extends IdWithServerContract
 
     this.login();
     this.openPage("/email-add", "idstore: Add an email address.");
-    this.openPage("/email-add-run?email=extras@example.com", "idstore: Verification");
+    this.openPage(
+      "/email-add-run?email=extras@example.com",
+      "idstore: Verification");
     this.permitEmailChallenge("/email-verification-permit/?token=%s");
-    this.openPage("/email-remove-run?email=extras@example.com", "idstore: Verification");
+    this.openPage(
+      "/email-remove-run?email=extras@example.com",
+      "idstore: Verification");
     this.permitEmailChallenge("/email-verification-permit/?token=%s");
   }
 
@@ -519,9 +529,13 @@ public final class IdServerUserViewTest extends IdWithServerContract
 
     this.login();
     this.openPage("/email-add", "idstore: Add an email address.");
-    this.openPage("/email-add-run?email=extras@example.com", "idstore: Verification");
+    this.openPage(
+      "/email-add-run?email=extras@example.com",
+      "idstore: Verification");
     this.permitEmailChallenge("/email-verification-permit/?token=%s");
-    this.openPage("/email-remove-run?email=extras@example.com", "idstore: Verification");
+    this.openPage(
+      "/email-remove-run?email=extras@example.com",
+      "idstore: Verification");
     this.permitEmailChallenge("/email-verification-deny/?token=%s");
   }
 
@@ -724,7 +738,9 @@ public final class IdServerUserViewTest extends IdWithServerContract
 
     this.login();
     this.openPage("/realname-update", "idstore: Update your real name.");
-    this.openPage("/realname-update-run?realname=Someone%20Else", "idstore: User Profile");
+    this.openPage(
+      "/realname-update-run?realname=Someone%20Else",
+      "idstore: User Profile");
 
     final var user = this.userGet(userId);
     assertEquals("Someone Else", user.realName().value());
@@ -778,6 +794,155 @@ public final class IdServerUserViewTest extends IdWithServerContract
 
     this.expectError(
       HttpRequest.newBuilder(this.viewURL("/realname-update-run")),
+      400,
+      "idstore: Error");
+  }
+
+  /**
+   * Authentication is required.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUnauthUpdatePasswordRun()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    this.serverCreateUser(admin, "someone");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL("/password-update-run")),
+      401,
+      "idstore: Login");
+  }
+
+  /**
+   * Authentication is required.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUnauthUpdatePassword()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    this.serverCreateUser(admin, "someone");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL("/password-update")),
+      401,
+      "idstore: Login");
+  }
+
+  /**
+   * Updating a password works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUpdatePassword()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/password-update", "idstore: Update your password.");
+    this.openPage(
+      "/password-update-run?password0=abc&password1=abc",
+      "idstore: Password Updated");
+  }
+
+  /**
+   * Updating a password fails if the confirmation does not match.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUpdatePasswordInvalid()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/password-update", "idstore: Update your password.");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL(
+        "/password-update-run?password0=abc&password1=xyz")),
+      400,
+      "idstore: Error");
+  }
+
+  /**
+   * Updating a password fails if the confirmation does not match.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUpdatePasswordInvalidMissing0()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/password-update", "idstore: Update your password.");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL(
+        "/password-update-run?password0=abc")),
+      400,
+      "idstore: Error");
+  }
+
+  /**
+   * Updating a password fails if the confirmation does not match.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUpdatePasswordInvalidMissing1()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/password-update", "idstore: Update your password.");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL(
+        "/password-update-run?password1=xyz")),
       400,
       "idstore: Error");
   }

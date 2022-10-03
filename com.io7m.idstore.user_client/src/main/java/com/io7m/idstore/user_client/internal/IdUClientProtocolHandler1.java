@@ -31,6 +31,7 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
+import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
@@ -321,6 +322,18 @@ public final class IdUClientProtocolHandler1
     this.sendCommand(
       IdUResponseUserUpdate.class,
       new IdUCommandRealnameUpdate(realName)
+    );
+  }
+
+  @Override
+  public void userPasswordUpdate(
+    final String password,
+    final String passwordConfirm)
+    throws IdUClientException, InterruptedException
+  {
+    this.sendCommand(
+      IdUResponseUserUpdate.class,
+      new IdUCommandPasswordUpdate(password, passwordConfirm)
     );
   }
 

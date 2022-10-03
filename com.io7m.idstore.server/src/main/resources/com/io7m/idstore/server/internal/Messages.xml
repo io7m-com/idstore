@@ -47,4 +47,7 @@
 
   <entry key="pwResetRateLimited">Password resets are rate-limited. Please try again shortly!</entry>
   <entry key="pwResetRequireParameters">You must at least specify an email address or username.</entry>
+
+  <entry key="passwordUpdateSuccessTitle">Password Updated</entry>
+  <entry key="passwordUpdateSuccess">Password updated successfully.</entry>
 </properties>

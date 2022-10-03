@@ -88,6 +88,7 @@ public final class IdFMTemplateLoader implements TemplateLoader
     "pagePasswordReset",
     "pagePasswordResetConfirm",
     "pageRealNameUpdate",
+    "pagePasswordUpdate",
     "pageUserSelf"
   );
 

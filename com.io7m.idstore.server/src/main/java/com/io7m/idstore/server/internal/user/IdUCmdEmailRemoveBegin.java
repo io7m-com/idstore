@@ -36,9 +36,7 @@ import com.io7m.idstore.server.internal.IdServerMailService;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.freemarker.IdFMEmailVerificationData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
-import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecUserActionEmailRemoveBegin;
-import com.io7m.idstore.server.security.IdSecurity;
 import io.opentelemetry.api.trace.Span;
 
 import java.io.StringWriter;
@@ -47,17 +45,14 @@ import java.util.Map;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_REMOVE;
-import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
  * IdUCmdEmailRemoveBegin
  */
 
 public final class IdUCmdEmailRemoveBegin
-  extends IdUCmdAbstract<
-  IdUCommandContext, IdUCommandEmailRemoveBegin, IdUResponseType>
+  extends IdUCmdAbstract<IdUCommandEmailRemoveBegin>
 {
   /**
    * IdUCmdEmailRemoveBegin
@@ -91,14 +86,7 @@ public final class IdUCmdEmailRemoveBegin
       configuration.mailConfiguration();
 
     final var user = context.user();
-    if (IdSecurity.check(new IdSecUserActionEmailRemoveBegin(user))
-      instanceof IdSecPolicyResultDenied denied) {
-      throw context.fail(
-        FORBIDDEN_403,
-        SECURITY_POLICY_DENIED,
-        denied.message()
-      );
-    }
+    context.securityCheck(new IdSecUserActionEmailRemoveBegin(user));
 
     final var email =
       command.email();

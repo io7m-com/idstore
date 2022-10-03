@@ -38,9 +38,7 @@ import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.freemarker.IdFMEmailVerificationData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
-import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecUserActionEmailAddBegin;
-import com.io7m.idstore.server.security.IdSecurity;
 import io.opentelemetry.api.trace.Span;
 
 import java.io.StringWriter;
@@ -49,17 +47,14 @@ import java.util.Map;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_ADD;
-import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
  * IdUCmdEmailAddBegin
  */
 
 public final class IdUCmdEmailAddBegin
-  extends IdUCmdAbstract<
-  IdUCommandContext, IdUCommandEmailAddBegin, IdUResponseType>
+  extends IdUCmdAbstract<IdUCommandEmailAddBegin>
 {
   /**
    * IdUCmdEmailAddBegin
@@ -97,14 +92,7 @@ public final class IdUCmdEmailAddBegin
       configuration.mailConfiguration();
 
     final var user = context.user();
-    if (IdSecurity.check(new IdSecUserActionEmailAddBegin(user))
-      instanceof IdSecPolicyResultDenied denied) {
-      throw context.fail(
-        FORBIDDEN_403,
-        SECURITY_POLICY_DENIED,
-        denied.message()
-      );
-    }
+    context.securityCheck(new IdSecUserActionEmailAddBegin(user));
 
     if (!rateLimitService.isAllowedByRateLimit(user.id())) {
       throw context.fail(

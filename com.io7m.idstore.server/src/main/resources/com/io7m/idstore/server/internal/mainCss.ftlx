@@ -710,3 +710,46 @@ table.ids_adminUserProfile_loginHistory > tr > td:first-child
   padding-left: 1em;
   height: 3em;
 }
+
+/*
+ * Password update form.
+ */
+
+.ids_passwordUpdateForm
+{
+  display: grid;
+  grid-template-columns: 8em 32em;
+  grid-template-rows:    3em;
+  grid-gap:              16px;
+  margin-top:            4em;
+}
+.ids_passwordUpdateForm_passwordLabel        { grid-column: 1; grid-row: 1; }
+.ids_passwordUpdateForm_passwordField        { grid-column: 2; grid-row: 1; }
+.ids_passwordUpdateForm_passwordConfirmLabel { grid-column: 1; grid-row: 2; }
+.ids_passwordUpdateForm_passwordConfirmField { grid-column: 2; grid-row: 2; }
+.ids_passwordUpdateForm_submit               { grid-column: 2; grid-row: 3; }
+
+.ids_passwordUpdateForm_passwordLabel,
+.ids_passwordUpdateForm_passwordConfirmLabel
+{
+  display: flex;
+  align-items: center;
+  height: 3em;
+}
+
+.ids_passwordUpdateForm_passwordField,
+.ids_passwordUpdateForm_passwordConfirmField
+{
+  display: flex;
+  align-items: center;
+  padding: 0;
+  padding-left: 1em;
+  height: 3em;
+}
+
+.ids_passwordUpdateForm_submit
+{
+  margin:  2px;
+  padding: 0em;
+  height: 3em;
+}

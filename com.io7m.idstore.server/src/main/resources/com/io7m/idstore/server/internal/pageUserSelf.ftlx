@@ -40,9 +40,7 @@
           <td>Real Name</td>
           <td>${user.realName()}</td>
           <td>
-            <div class="cxbutton">
-              <a href="/realname-update">Update</a>
-            </div>
+            <a class="cxbutton" href="/realname-update">Update</a>
           </td>
         </tr>
         <tr>
@@ -54,6 +52,13 @@
           <td>Last Updated</td>
           <td>${user.timeUpdated()}</td>
           <td/>
+        </tr>
+        <tr>
+          <td>Password</td>
+          <td>(Hidden)</td>
+          <td>
+            <a class="cxbutton" href="/password-update">Change</a>
+          </td>
         </tr>
       </table>
 

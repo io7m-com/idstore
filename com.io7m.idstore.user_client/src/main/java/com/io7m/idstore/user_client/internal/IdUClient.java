@@ -156,4 +156,13 @@ public final class IdUClient implements IdUClientType
   {
     this.handler.userRealNameUpdate(realName);
   }
+
+  @Override
+  public void userPasswordUpdate(
+    final String password,
+    final String passwordConfirm)
+    throws IdUClientException, InterruptedException
+  {
+    this.handler.userPasswordUpdate(password, passwordConfirm);
+  }
 }

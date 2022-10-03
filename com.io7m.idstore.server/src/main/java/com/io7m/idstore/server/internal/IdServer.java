@@ -58,6 +58,8 @@ import com.io7m.idstore.server.internal.user_view.IdUViewPasswordReset;
 import com.io7m.idstore.server.internal.user_view.IdUViewPasswordResetConfirm;
 import com.io7m.idstore.server.internal.user_view.IdUViewPasswordResetConfirmRun;
 import com.io7m.idstore.server.internal.user_view.IdUViewPasswordResetRun;
+import com.io7m.idstore.server.internal.user_view.IdUViewPasswordUpdate;
+import com.io7m.idstore.server.internal.user_view.IdUViewPasswordUpdateRun;
 import com.io7m.idstore.server.internal.user_view.IdUViewRealnameUpdate;
 import com.io7m.idstore.server.internal.user_view.IdUViewRealnameUpdateRun;
 import com.io7m.idstore.server.logging.IdServerRequestLog;
@@ -579,6 +581,32 @@ public final class IdServer implements IdServerType
         IdUViewPasswordResetConfirmRun.class,
         IdUViewPasswordResetConfirmRun::new),
       "/password-reset-confirm-run/*"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordUpdate.class,
+        IdUViewPasswordUpdate::new),
+      "/password-update"
+    );
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordUpdate.class,
+        IdUViewPasswordUpdate::new),
+      "/password-update/*"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordUpdateRun.class,
+        IdUViewPasswordUpdateRun::new),
+      "/password-update-run"
+    );
+    servlets.addServlet(
+      servletHolders.create(
+        IdUViewPasswordUpdateRun.class,
+        IdUViewPasswordUpdateRun::new),
+      "/password-update-run/*"
     );
   }
 

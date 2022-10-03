@@ -35,6 +35,7 @@ import java.util.Objects;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -667,6 +668,32 @@ public final class IdServerUsersTest extends IdWithServerContract
 
     final var userNow = this.client.userSelf();
     assertEquals("A New Name", userNow.realName().value());
+  }
+
+  /**
+   * Updating a user password works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testPasswordUpdate()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    this.serverCreateUser(admin, "someone");
+
+    final var user =
+      this.client.login("someone", "12345678", this.serverUserAPIURL());
+
+    this.client.userPasswordUpdate("abcd", "abcd");
+
+    final var userNow = this.client.userSelf();
+    assertNotEquals(user.password(), userNow.password());
   }
 
   /**

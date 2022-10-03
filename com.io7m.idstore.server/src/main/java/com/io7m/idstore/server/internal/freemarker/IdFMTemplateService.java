@@ -171,6 +171,17 @@ public final class IdFMTemplateService implements IdServiceType
   }
 
   /**
+   * @return The password update page template
+   */
+
+  public IdFMTemplateType<IdFMPasswordUpdateData> pagePasswordUpdateTemplate()
+  {
+    return new IdGenericTemplate<>(
+      this.findTemplate("pagePasswordUpdate")
+    );
+  }
+
+  /**
    * @return The password reset page template
    */
 

@@ -31,6 +31,7 @@ public sealed interface IdSecUserActionType
   IdSecUserActionEmailRemoveBegin,
   IdSecUserActionEmailRemoveDeny,
   IdSecUserActionEmailRemovePermit,
+  IdSecUserActionPasswordUpdate,
   IdSecUserActionRealnameUpdate
 {
   /**
