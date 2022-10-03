@@ -1,0 +1,95 @@
+.root
+{
+  -fx-font-size: 10pt;
+  -fx-font-family: "Sans";
+
+  -fx-base:              #e8ebf3;
+  -fx-accent:            #454545;
+  -fx-default-button:    #454545;
+  -fx-focus-color:       #454545;
+  -fx-faint-focus-color: #45454522;
+}
+
+.progress-bar > .track
+{
+  -fx-background-insets: 0 0 0 0;
+  -fx-background-radius: 0 0 0 0;
+  -fx-border-insets: 0 0 0 0;
+  -fx-padding: 0 0 0 0;
+}
+
+.progress-bar > .bar
+{
+  -fx-background-insets: 0 0 0 0;
+  -fx-background-radius: 0 0 0 0;
+  -fx-border-insets: 0 0 0 0;
+  -fx-padding: 0 0 0 0;
+}
+
+.button,
+.check-box,
+.choice-box,
+.color-picker,
+.color-picker.split-button,
+.combo-box-base,
+.container,
+.control-buttons-tab,
+.menu-button,
+.progress-bar,
+.radio-button,
+.text-field,
+.text-area,
+.tab,
+.tab-down-button,
+.tab-header-area,
+.tab-pane,
+.toggle-button
+{
+  -fx-background-radius: 0 0 0 0;
+  -fx-border-radius: 0 0 0 0;
+}
+
+.tabButton {
+  -fx-font-size: 8pt;
+}
+
+.errorHighlight
+{
+  -fx-background-color: #ffbbbb;
+}
+
+.userTable
+{
+  -fx-font-size: 9pt;
+  -fx-font-family: "Monospaced";
+}
+
+.userTableItem
+{
+
+}
+
+.permissionTable
+{
+  -fx-font-size: 10pt;
+  -fx-font-family: "Monospaced";
+}
+
+.emailTable
+{
+  -fx-font-size: 10pt;
+  -fx-font-family: "Monospaced";
+}
+
+.dataField
+{
+  -fx-font-size: 10pt;
+  -fx-font-family: "Monospaced";
+}
+
+.noHeader .column-header-background
+{
+  -fx-max-height: 0;
+  -fx-pref-height: 0;
+  -fx-min-height: 0;
+}

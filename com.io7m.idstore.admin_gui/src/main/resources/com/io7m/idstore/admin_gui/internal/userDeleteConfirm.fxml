@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?><?import javafx.scene.control.Button?><?import javafx.scene.control.Label?><?import javafx.scene.control.TextField?><?import javafx.scene.image.Image?><?import javafx.scene.image.ImageView?><?import javafx.scene.layout.HBox?><?import javafx.scene.layout.Region?><?import javafx.scene.layout.VBox?><?import javafx.scene.text.Font?>
+<VBox prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.io7m.idstore.admin_gui.internal.users.IdAGUserDeleteConfirmController">
+   <padding>
+      <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+   </padding>
+   <children>
+      <HBox>
+         <children>
+            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true" smooth="false">
+               <image>
+                  <Image url="@alert.png" />
+               </image>
+            </ImageView>
+            <VBox HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="32.0" />
+               </HBox.margin>
+               <children>
+                  <Label text="%userDelete.confirmTitle">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+                  <Label text="%userDelete.confirmMessage">
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label layoutX="10.0" layoutY="44.0" text="%userDelete.confirmWarn">
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+                  <HBox>
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                     <children>
+                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0" text="%users.idName" />
+                        <TextField fx:id="userNameField" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" onAction="#onUserNameFieldChanged" onKeyReleased="#onUserNameFieldChanged" prefHeight="32.0" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets left="16.0" />
+                           </HBox.margin>
+                        </TextField>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox>
+         <VBox.margin>
+            <Insets top="32.0" />
+         </VBox.margin>
+         <children>
+            <Button fx:id="cancel" cancelButton="true" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#onCancelSelected" prefHeight="32.0" prefWidth="128.0" text="%cancel" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="delete" defaultButton="true" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" onAction="#onDeleteSelected" prefHeight="32.0" prefWidth="128.0" text="%userDelete.delete" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

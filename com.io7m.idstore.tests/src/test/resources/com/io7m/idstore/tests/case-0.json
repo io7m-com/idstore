@@ -1,0 +1,19 @@
+{
+  "%Type": "CommandUserSearchBegin",
+  "%Schema": "https://www.io7m.com/idstore/admin-api-1.json",
+  "Parameters": {
+    "Limit": -4094669,
+    "Ordering": {
+      "Columns": []
+    },
+    "Search": "䧹뷛팽㠔晔ᗟ馷㭝婝⌤顬",
+    "TimeCreatedRange": {
+      "TimeLower": "1969-12-31T23:27:11.224Z",
+      "TimeUpper": "1970-01-30T23:27:11.224Z"
+    },
+    "TimeUpdatedRange": {
+      "TimeLower": "1970-01-01T00:00:23.105Z",
+      "TimeUpper": "1970-01-31T00:00:23.105Z"
+    }
+  }
+}

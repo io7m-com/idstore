@@ -1,0 +1,113 @@
+[#ftl output_format="XHTML"]
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="/css/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/xbutton.css"/>
+  <title>${htmlTitle}</title>
+</head>
+<body>
+
+<div id="ids_main">
+  <div id="ids_header">
+    <span class="ids_logo">
+      <img src="/logo" width="16" height="16" class="ids_header_logo ids_logo"/> ${pageHeaderTitle}
+    </span>
+    <span class="ids_empty">&#x000A;</span>
+    <span class="ids_profile_links">
+      <a href="/logout">Log out</a>
+    </span>
+  </div>
+
+  <div id="ids_content">
+    <div class="ids_standardPage_container">
+      <h1>User Profile</h1>
+
+      <table class="ids_userProfile">
+        <tr>
+          <td>User ID</td>
+          <td>${user.id()}</td>
+          <td/>
+        </tr>
+        <tr>
+          <td>Username</td>
+          <td>${user.idName()}</td>
+          <td/>
+        </tr>
+        <tr>
+          <td>Real Name</td>
+          <td>${user.realName()}</td>
+          <td>
+            <a class="cxbutton" href="/realname-update">Update</a>
+          </td>
+        </tr>
+        <tr>
+          <td>Created</td>
+          <td>${user.timeCreated()}</td>
+          <td/>
+        </tr>
+        <tr>
+          <td>Last Updated</td>
+          <td>${user.timeUpdated()}</td>
+          <td/>
+        </tr>
+        <tr>
+          <td>Password</td>
+          <td>(Hidden)</td>
+          <td>
+            <a class="cxbutton" href="/password-update">Change</a>
+          </td>
+        </tr>
+      </table>
+
+      <h2>Email Addresses</h2>
+      <table class="ids_userProfile_emails">
+        <tr>
+          <td>${user.emails().first()}</td>
+          <td>
+            <a href="/email-remove-run/?email=${user.emails().first()}" class="cxbutton">Remove</a>
+          </td>
+        </tr>
+        [#list user.emails().rest() as email]
+        <tr>
+          <td>${email}</td>
+          <td>
+            <a href="/email-remove-run/?email=${email}" class="cxbutton">Remove</a>
+          </td>
+        </tr>
+        [/#list]
+        <tr>
+          <td>...</td>
+          <td>
+            <a href="/email-add" class="cxbutton">Add</a>
+          </td>
+        </tr>
+      </table>
+
+      <h2>Login History</h2>
+      <table class="ids_userProfile_loginHistory">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>User Agent</th>
+            <th>Host</th>
+          </tr>
+        </thead>
+        <tbody>
+          [#list loginHistory as login]
+          <tr>
+            <td>${login.time()}</td>
+            <td>${login.userAgent()}</td>
+            <td>${login.host()}</td>
+          </tr>
+          [/#list]
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

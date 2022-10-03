@@ -1,0 +1,246 @@
+;
+; Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+;
+; Permission to use, copy, modify, and/or distribute this software for any
+; purpose with or without fee is hereby granted, provided that the above
+; copyright notice and this permission notice appear in all copies.
+;
+; THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+; WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+; MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+; SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+; WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+; IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+;
+
+[language cedarbridge 1 0]
+
+[package com.io7m.idstore.protocol.user.cb]
+
+[import com.io7m.cedarbridge cb]
+
+[documentation IdU1UUID "A 128-bit UUID value."]
+[record IdU1UUID
+  [documentation msb "The most significant bits of the UUID."]
+  [field msb cb:IntegerUnsigned64]
+  [documentation lsb "The least significant bits of the UUID."]
+  [field lsb cb:IntegerUnsigned64]
+]
+
+[documentation IdU1Password "Information for a hashed password."]
+[record IdU1Password
+  [documentation algorithm "The password algorithm."]
+  [field algorithm cb:String]
+  [documentation hash "The password hash."]
+  [field hash cb:String]
+  [documentation salt "The password salt."]
+  [field salt cb:String]
+]
+
+[documentation IdU1TimestampUTC "A UTC timestamp value."]
+[record IdU1TimestampUTC
+  [documentation year "The year."]
+  [field year cb:IntegerUnsigned32]
+  [documentation month "The month in the range [1, 12]."]
+  [field month cb:IntegerUnsigned8]
+  [documentation day "The day of the month in the range [1, 31]."]
+  [field day cb:IntegerUnsigned8]
+  [documentation hour "The hour in the range [0, 23]."]
+  [field hour cb:IntegerUnsigned8]
+  [documentation minute "The minute in the range [0, 59]."]
+  [field minute cb:IntegerUnsigned8]
+  [documentation second "The second in the range [0, 59]."]
+  [field second cb:IntegerUnsigned8]
+  [documentation millisecond "The millisecond in the range [0, 999]."]
+  [field millisecond cb:IntegerUnsigned32]
+]
+
+[documentation IdU1User "A user."]
+[record IdU1User
+  [documentation id "The user ID."]
+  [field id IdU1UUID]
+  [documentation idName "The user ID name."]
+  [field idName cb:String]
+  [documentation realName "The user real name."]
+  [field realName cb:String]
+  [documentation emails "The user emails."]
+  [field emails [cb:List cb:String]]
+  [documentation timeCreated "The time the account was created."]
+  [field timeCreated IdU1TimestampUTC]
+  [documentation timeUpdated "The time the account was updated."]
+  [field timeUpdated IdU1TimestampUTC]
+  [documentation password "The user password."]
+  [field password IdU1Password]
+]
+
+;
+; Commands.
+;
+
+[documentation IdU1CommandLogin "A request to log in."]
+[record IdU1CommandLogin
+  [documentation userName "The username."]
+  [field userName cb:String]
+  [documentation password "The password."]
+  [field password cb:String]
+]
+
+[documentation IdU1CommandUserSelf "A request to fetch the user's own profile."]
+[record IdU1CommandUserSelf]
+
+[documentation IdU1CommandEmailAddBegin "A request to add an email address."]
+[record IdU1CommandEmailAddBegin
+  [documentation email "The email address."]
+  [field email cb:String]
+]
+
+[documentation IdU1CommandEmailRemoveBegin "A request to remove an email address."]
+[record IdU1CommandEmailRemoveBegin
+  [documentation email "The email address."]
+  [field email cb:String]
+]
+
+[documentation IdU1CommandEmailAddPermit "A request to complete an email address challenge."]
+[record IdU1CommandEmailAddPermit
+  [documentation token "The challenge token."]
+  [field token cb:String]
+]
+
+[documentation IdU1CommandEmailRemovePermit "A request to complete an email address challenge."]
+[record IdU1CommandEmailRemovePermit
+  [documentation token "The challenge token."]
+  [field token cb:String]
+]
+
+[documentation IdU1CommandEmailAddDeny "A request to complete an email address challenge."]
+[record IdU1CommandEmailAddDeny
+  [documentation token "The challenge token."]
+  [field token cb:String]
+]
+
+[documentation IdU1CommandEmailRemoveDeny "A request to complete an email address challenge."]
+[record IdU1CommandEmailRemoveDeny
+  [documentation token "The challenge token."]
+  [field token cb:String]
+]
+
+[documentation IdU1CommandRealnameUpdate "A request to update the user's real name."]
+[record IdU1CommandRealnameUpdate
+  [documentation name "The new name."]
+  [field name cb:String]
+]
+
+[documentation IdU1CommandPasswordUpdate "A request to update the user's password."]
+[record IdU1CommandPasswordUpdate
+  [documentation password "The new password."]
+  [field password cb:String]
+  [documentation passwordConfirm "The password confirmation."]
+  [field passwordConfirm cb:String]
+]
+
+;
+; Responses.
+;
+
+[documentation IdU1ResponseError "An error response."]
+[record IdU1ResponseError
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId IdU1UUID]
+  [documentation errorCode "The error code."]
+  [field errorCode cb:String]
+  [documentation message "The error message."]
+  [field message cb:String]
+]
+
+[documentation IdU1ResponseLogin "A response to IdU1CommandLogin."]
+[record IdU1ResponseLogin
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId IdU1UUID]
+  [documentation user "The user."]
+  [field user IdU1User]
+]
+
+[documentation IdU1ResponseUserSelf "A response to IdU1CommandUserSelf."]
+[record IdU1ResponseUserSelf
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId IdU1UUID]
+  [documentation user "The user."]
+  [field user IdU1User]
+]
+
+[documentation IdU1ResponseUserUpdate "A response to various update commands."]
+[record IdU1ResponseUserUpdate
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId IdU1UUID]
+  [documentation user "The user."]
+  [field user IdU1User]
+]
+
+[documentation IdU1ResponseEmailAddBegin "A response to IdU1CommandEmailAddBegin."]
+[record IdU1ResponseEmailAddBegin
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId IdU1UUID]
+]
+
+[documentation IdU1ResponseEmailRemoveBegin "A response to IdU1CommandEmailRemoveBegin."]
+[record IdU1ResponseEmailRemoveBegin
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId IdU1UUID]
+]
+
+[documentation IdU1ResponseEmailAddPermit "A response to IdU1CommandEmailAddPermit."]
+[record IdU1ResponseEmailAddPermit
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId IdU1UUID]
+]
+
+[documentation IdU1ResponseEmailRemovePermit "A response to IdU1CommandEmailRemovePermit."]
+[record IdU1ResponseEmailRemovePermit
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId IdU1UUID]
+]
+
+[documentation IdU1ResponseEmailAddDeny "A response to IdU1CommandEmailAddDeny."]
+[record IdU1ResponseEmailAddDeny
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId IdU1UUID]
+]
+
+[documentation IdU1ResponseEmailRemoveDeny "A response to IdU1CommandEmailRemoveDeny."]
+[record IdU1ResponseEmailRemoveDeny
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId IdU1UUID]
+]
+
+;
+; Protocol.
+;
+
+[documentation IdU1 "The User v1 protocol."]
+[protocol IdU1
+  [version 1
+    [types-added
+      IdU1CommandEmailAddBegin
+      IdU1CommandEmailAddDeny
+      IdU1CommandEmailAddPermit
+      IdU1CommandEmailRemoveBegin
+      IdU1CommandEmailRemoveDeny
+      IdU1CommandEmailRemovePermit
+      IdU1CommandLogin
+      IdU1CommandPasswordUpdate
+      IdU1CommandRealnameUpdate
+      IdU1CommandUserSelf
+      IdU1ResponseEmailAddBegin
+      IdU1ResponseEmailAddDeny
+      IdU1ResponseEmailAddPermit
+      IdU1ResponseEmailRemoveBegin
+      IdU1ResponseEmailRemoveDeny
+      IdU1ResponseEmailRemovePermit
+      IdU1ResponseError
+      IdU1ResponseLogin
+      IdU1ResponseUserSelf
+      IdU1ResponseUserUpdate
+    ]
+  ]
+]

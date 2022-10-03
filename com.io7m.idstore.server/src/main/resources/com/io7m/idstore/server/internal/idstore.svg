@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg width="64"
+     height="64"
+     viewBox="0 0 64 64"
+     version="1.1"
+     id="svg5"
+     inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+     sodipodi:docname="icatiro.svg"
+     xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+     xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+     xmlns="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="6.4283951"
+     inkscape:cx="45.579028"
+     inkscape:cy="32.823123"
+     inkscape:window-width="1440"
+     inkscape:window-height="810"
+     inkscape:window-x="1951"
+     inkscape:window-y="107"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid979"
+       spacingx="8"
+       spacingy="8"
+       empspacing="8" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect1002"
+       style="fill:#000000;fill-opacity:1;stroke-width:0.999999;stroke-linecap:square"
+       d="M 0 0 L 0 64 L 64 64 L 64 0 L 0 0 z M 8 8 L 56 8 L 56 56 L 8 56 L 8 8 z " />
+  </g>
+</svg>

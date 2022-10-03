@@ -1,0 +1,755 @@
+[#ftl output_format="plainText"]
+
+/*
+ * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+ * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+a {
+  color: ${colors.mainLinkColor()};
+}
+
+body
+{
+  background-color: ${colors.mainBackgroundColor()};
+  color:            ${colors.mainTextColor()};
+  font-family:      monospace;
+}
+
+#ids_main
+{
+  background-color: ${colors.mainBackgroundColor()};
+  color:            ${colors.mainTextColor()};
+  font-family:      monospace;
+}
+
+#ids_header
+{
+  height:           2em;
+  background-color: ${colors.headerBackgroundColor()};
+  color:            ${colors.headerTextColor()};
+
+  display:        flex;
+  flex-direction: row;
+  align-items:    center;
+
+  padding-left:  0.25em;
+  padding-right: 0.25em;
+}
+
+#ids_content
+{
+  flex:    1;
+  margin:  1em;
+  display: flex;
+}
+
+img.ids_header_logo
+{
+  filter:       invert(100%);
+  margin-right: 0.5em;
+}
+
+span.ids_logo
+{
+  display:     flex;
+  align-items: center;
+}
+span.ids_empty
+{
+  flex: 1;
+}
+span.ids_profile_links > a
+{
+  color: ${colors.headerLinkColor()};
+}
+
+/*
+ * Error messages.
+ */
+
+.ids_error_message h3
+{
+  margin-top: 0em;
+}
+.ids_error_message
+{
+  border:        1px ${colors.errorBorderColor()} solid;
+  padding:       2em;
+  margin-bottom: 3em;
+}
+
+/*
+ * Standard form elements.
+ */
+
+.ids_formItem
+{
+  display:      flex;
+  align-items:  center;
+  padding:      0;
+  height:       3em;
+}
+input.ids_formItem
+{
+  padding-left: 1em;
+}
+
+/*
+ * Standard page container.
+ */
+
+div.ids_standardPage_container
+{
+  margin:    2em;
+  width:     100%;
+  max-width: 80em;
+}
+
+/*
+ * Login form.
+ */
+
+div.ids_loginForm_container
+{
+  margin:         8em;
+  width:          100%;
+
+  display:        flex;
+  align-items:    center;
+  flex-direction: column;
+}
+
+div.ids_loginForm_error
+{
+
+}
+
+div.ids_loginForm_logo
+{
+  margin-bottom: 3em;
+}
+
+.ids_loginForm
+{
+  display:               grid;
+  grid-template-columns: 8em 24em;
+  grid-template-rows:    3em;
+  grid-gap:              16px;
+
+  margin-left:   -9.5em;
+  margin-bottom: 2em;
+}
+
+.ids_loginForm_usernameLabel { grid-column: 1; grid-row: 1; }
+.ids_loginForm_username      { grid-column: 2; grid-row: 1; }
+.ids_loginForm_passwordLabel { grid-column: 1; grid-row: 2; }
+.ids_loginForm_password      { grid-column: 2; grid-row: 2; }
+.ids_loginForm_submit        { grid-column: 2; grid-row: 3; }
+
+form.ids_loginForm
+{
+
+}
+
+.ids_loginForm_username,
+.ids_loginForm_password
+{
+  display:      flex;
+  align-items:  center;
+  height:       3em;
+  padding:      0;
+  padding-left: 1em;
+}
+
+.ids_loginForm_usernameLabel,
+.ids_loginForm_passwordLabel
+{
+  display:     flex;
+  align-items: center;
+  height:      3em;
+  padding:     0;
+}
+
+.ids_loginForm_submit
+{
+  height:      3em;
+  margin:      2px;
+  padding:     0em;
+  display:     table-cell;
+  align-items: center;
+}
+
+.ids_loginForm_loginTitle
+{
+  margin-bottom: 2em;
+}
+
+/*
+ * User profile.
+ */
+
+table.ids_userProfile
+{
+  width:           100%;
+  border-collapse: collapse;
+}
+table.ids_userProfile th
+{
+  border: 1px ${colors.mainTableBorderColor()} solid;
+}
+table.ids_userProfile td
+{
+  border:        1px ${colors.mainTableBorderColor()} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_userProfile thead
+{
+
+}
+
+table.ids_userProfile > tr > td:first-child
+{
+  width: 16em;
+}
+
+table.ids_userProfile > tr > td:last-child
+{
+  width:   8em;
+  margin:  0;
+  padding: 1px;
+}
+
+table.ids_userProfile > tr > td:last-child .cxbutton
+{
+  margin: 0px;
+  width:  8em;
+  height: 1em;
+}
+
+/*
+ * User profile: Emails
+ */
+
+table.ids_userProfile_emails
+{
+  width: 100%;
+  border-collapse: collapse;
+}
+table.ids_userProfile_emails th
+{
+  border: 1px ${colors.mainTableBorderColor()} solid;
+  height: 2em;
+}
+table.ids_userProfile_emails td
+{
+  border:        1px ${colors.mainTableBorderColor()} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_userProfile_emails thead
+{
+
+}
+
+table.ids_userProfile_emails > tr > td:last-child
+{
+  width:   8em;
+  margin:  0;
+  padding: 1px;
+}
+
+table.ids_userProfile_emails > tr > td:last-child .cxbutton
+{
+  margin: 0px;
+  width:  8em;
+  height: 1em;
+}
+
+/*
+ * User profile: Login history
+ */
+
+table.ids_userProfile_loginHistory
+{
+  width:           100%;
+  border-collapse: collapse;
+}
+table.ids_userProfile_loginHistory th
+{
+  border: 1px ${colors.mainTableBorderColor()} solid;
+}
+table.ids_userProfile_loginHistory td
+{
+  border:        1px ${colors.mainTableBorderColor()} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_userProfile_loginHistory > thead > tr
+{
+  height: 2.5em;
+}
+table.ids_userProfile_loginHistory > thead > tr > th
+{
+  padding-left: 1em;
+  text-align:   left;
+}
+
+table.ids_userProfile_loginHistory > tr > td:first-child
+{
+  width: 16em;
+}
+
+/*
+ * Email addition form.
+ */
+
+.ids_emailAddForm
+{
+  display: grid;
+  grid-template-columns: 8em 32em;
+  grid-template-rows:    3em;
+  grid-gap:              16px;
+  margin-top:            4em;
+}
+.ids_emailAddForm_emailLabel { grid-column: 1; grid-row: 1; }
+.ids_emailAddForm_emailField { grid-column: 2; grid-row: 1; }
+.ids_emailAddForm_submit     { grid-column: 2; grid-row: 2; }
+
+.ids_emailAddForm_emailLabel
+{
+  display:     flex;
+  align-items: center;
+  height:      3em;
+}
+
+.ids_emailAddForm_emailField
+{
+  display:      flex;
+  align-items:  center;
+  padding:      0;
+  padding-left: 1em;
+  height:       3em;
+}
+
+.ids_emailAddForm_submit
+{
+  margin:  2px;
+  padding: 0em;
+  height:  3em;
+}
+
+/*
+ * Realname update form.
+ */
+
+.ids_realnameUpdateForm
+{
+  display: grid;
+  grid-template-columns: 8em 32em;
+  grid-template-rows:    3em;
+  grid-gap:              16px;
+  margin-top:            4em;
+}
+.ids_realnameUpdateForm_existingLabel { grid-column: 1; grid-row: 1; }
+.ids_realnameUpdateForm_existingField { grid-column: 2; grid-row: 1; }
+.ids_realnameUpdateForm_realnameLabel { grid-column: 1; grid-row: 2; }
+.ids_realnameUpdateForm_realnameField { grid-column: 2; grid-row: 2; }
+.ids_realnameUpdateForm_submit        { grid-column: 2; grid-row: 3; }
+
+.ids_realnameUpdateForm_realnameLabel,
+.ids_realnameUpdateForm_existingLabel
+{
+  display: flex;
+  align-items: center;
+  height: 3em;
+}
+
+.ids_realnameUpdateForm_realnameField,
+.ids_realnameUpdateForm_existingField
+{
+  display: flex;
+  align-items: center;
+  padding: 0;
+  padding-left: 1em;
+  height: 3em;
+}
+
+.ids_realnameUpdateForm_submit
+{
+  margin:  2px;
+  padding: 0em;
+  height: 3em;
+}
+
+/*
+ * Generic message page.
+ */
+
+.ids_message_container
+{
+  margin:      2em;
+  width:       100%;
+  max-width:   80em;
+}
+.ids_message_error h3
+{
+  margin-top: 0em;
+}
+.ids_message_error
+{
+  border:        1px red solid;
+  padding:       2em;
+  margin-bottom: 3em;
+}
+div.ids_message_error > p:last-of-type
+{
+  margin-bottom: 4em;
+}
+
+.ids_message h3
+{
+  margin-top: 0em;
+}
+.ids_message
+{
+  border:        1px ${colors.mainMessageBorderColor()} solid;
+  padding:       2em;
+  margin-bottom: 3em;
+}
+div.ids_message > p:last-of-type
+{
+  margin-bottom: 4em;
+}
+
+/*
+ * Admin main page.
+ */
+
+div.ids_standardPage_container > ul > li
+{
+  margin-bottom: 1em;
+}
+
+/*
+ * Admin users page.
+ */
+
+table.ids_adminUsers
+{
+  width:           100%;
+  border-collapse: collapse;
+}
+table.ids_adminUsers th
+{
+  border: 1px ${colors.mainTableBorderColor()} solid;
+}
+table.ids_adminUsers td
+{
+  border:        1px ${colors.mainTableBorderColor()} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_adminUsers > thead > tr
+{
+  height: 2.5em;
+}
+table.ids_adminUsers > thead > tr > th
+{
+  padding-left: 1em;
+  text-align:   left;
+}
+table.ids_adminUsers > tbody > tr > td:first-child
+{
+  width: 24em;
+}
+
+div.ids_adminUsers_prevNext
+{
+  display:        flex;
+  flex-direction: row;
+  align-items:    center;
+  margin-top:     2em;
+  margin-right:   2px;
+  margin-left:    2px;
+}
+
+span.ids_adminUsers_prev > a
+{
+  width: 8em;
+}
+span.ids_adminUsers_prevEmpty
+{
+  width: 8em;
+}
+
+div.ids_adminUsers_prevNext > span:nth-child(2)
+{
+  flex: 1;
+  text-align: center;
+}
+
+span.ids_adminUsers_next > a
+{
+  width: 8em;
+}
+span.ids_adminUsers_nextEmpty
+{
+  width: 8em;
+}
+
+form.ids_adminUsers_search
+{
+  display:        flex;
+  flex-direction: row;
+  align-items:    center;
+  margin-bottom:  2em;
+}
+form.ids_adminUsers_search > .ids_adminUsers_searchLabel
+{
+  margin-right: 2em;
+}
+form.ids_adminUsers_search > .ids_adminUsers_searchField
+{
+  flex:           1;
+  margin-right:   2em;
+  height:         2em;
+  padding-top:    2px;
+  padding-bottom: 2px;
+  padding-left:   1em;
+}
+form.ids_adminUsers_search > .ids_adminUsers_searchButton
+{
+  width: 8em;
+}
+
+ /*
+  * Admin user profile.
+  */
+
+form.ids_adminUserProfile_details
+{
+  display:               grid;
+  grid-template-columns: 8em;
+  grid-template-rows:    3em;
+  grid-gap:              16px;
+  margin-top:            4em;
+  margin-bottom:         4em;
+}
+.ids_adminUserProfile_idLabel       { grid-column: 1; grid-row: 1; }
+.ids_adminUserProfile_idField       { grid-column: 2; grid-row: 1; }
+.ids_adminUserProfile_idNameLabel   { grid-column: 1; grid-row: 2; }
+.ids_adminUserProfile_idNameField   { grid-column: 2; grid-row: 2; }
+.ids_adminUserProfile_realNameLabel { grid-column: 1; grid-row: 3; }
+.ids_adminUserProfile_realNameField { grid-column: 2; grid-row: 3; }
+.ids_adminUserProfile_update        { grid-column: 2; grid-row: 4; }
+
+form.ids_adminUserProfile_emailAdd
+{
+  display: flex;
+}
+.ids_adminUserProfile_emailAddLabel  { }
+.ids_adminUserProfile_emailAddField  { flex: 1; }
+.ids_adminUserProfile_emailAddSubmit { }
+
+/*
+ * User profile: Emails
+ */
+
+table.ids_adminUserProfile_emails
+{
+  width: 100%;
+  border-collapse: collapse;
+}
+table.ids_adminUserProfile_emails th
+{
+  border: 1px ${colors.mainTableBorderColor()} solid;
+  height: 2em;
+}
+table.ids_adminUserProfile_emails td
+{
+  border:        1px ${colors.mainTableBorderColor()} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_adminUserProfile_emails thead
+{
+
+}
+
+table.ids_adminUserProfile_emails > tr > td:last-child
+{
+  width:   8em;
+  margin:  0;
+  padding: 1px;
+}
+
+table.ids_adminUserProfile_emails > tr > td:last-child .cxbutton
+{
+  margin: 0px;
+  width:  8em;
+  height: 1em;
+}
+
+/*
+ * User profile: Login history
+ */
+
+table.ids_adminUserProfile_loginHistory
+{
+  width:           100%;
+  border-collapse: collapse;
+}
+table.ids_adminUserProfile_loginHistory th
+{
+  border: 1px ${colors.mainTableBorderColor()} solid;
+}
+table.ids_adminUserProfile_loginHistory td
+{
+  border:        1px ${colors.mainTableBorderColor()} solid;
+  height:        2.5em;
+  padding-left:  1em;
+  padding-right: 1em;
+}
+table.ids_adminUserProfile_loginHistory > thead > tr
+{
+  height: 2.5em;
+}
+table.ids_adminUserProfile_loginHistory > thead > tr > th
+{
+  padding-left: 1em;
+  text-align:   left;
+}
+
+table.ids_adminUserProfile_loginHistory > tr > td:first-child
+{
+  width: 16em;
+}
+
+/*
+ * Password reset form.
+ */
+
+.ids_pwResetForm
+{
+  display: grid;
+  grid-template-columns: 8em 32em;
+  grid-template-rows:    3em;
+  grid-gap:              16px;
+  margin-top:            4em;
+}
+
+.ids_pwResetForm_usernameLabel { grid-column: 1; grid-row: 1; }
+.ids_pwResetForm_usernameField { grid-column: 2; grid-row: 1; }
+.ids_pwResetForm_emailLabel    { grid-column: 1; grid-row: 2; }
+.ids_pwResetForm_emailField    { grid-column: 2; grid-row: 2; }
+.ids_pwResetForm_submit        { grid-column: 2; grid-row: 3; }
+
+.ids_pwResetForm_emailLabel,
+.ids_pwResetForm_usernameLabel
+{
+  display: flex;
+  align-items: center;
+  height: 3em;
+}
+
+.ids_pwResetForm_emailField,
+.ids_pwResetForm_usernameField
+{
+  display: flex;
+  align-items: center;
+  padding: 0;
+  padding-left: 1em;
+  height: 3em;
+}
+
+.ids_pwResetForm_submit
+{
+  margin:  2px;
+  padding: 0em;
+  height: 3em;
+}
+
+.ids_pwResetForm_password0Label { grid-column: 1; grid-row: 1; }
+.ids_pwResetForm_password0Field { grid-column: 2; grid-row: 1; }
+.ids_pwResetForm_password1Label { grid-column: 1; grid-row: 2; }
+.ids_pwResetForm_password1Field { grid-column: 2; grid-row: 2; }
+.ids_pwResetForm_submit         { grid-column: 2; grid-row: 3; }
+
+.ids_pwResetForm_password1Label,
+.ids_pwResetForm_password0Label
+{
+  display: flex;
+  align-items: center;
+  height: 3em;
+}
+
+.ids_pwResetForm_password1Field,
+.ids_pwResetForm_password0Field
+{
+  display: flex;
+  align-items: center;
+  padding: 0;
+  padding-left: 1em;
+  height: 3em;
+}
+
+/*
+ * Password update form.
+ */
+
+.ids_passwordUpdateForm
+{
+  display: grid;
+  grid-template-columns: 8em 32em;
+  grid-template-rows:    3em;
+  grid-gap:              16px;
+  margin-top:            4em;
+}
+.ids_passwordUpdateForm_passwordLabel        { grid-column: 1; grid-row: 1; }
+.ids_passwordUpdateForm_passwordField        { grid-column: 2; grid-row: 1; }
+.ids_passwordUpdateForm_passwordConfirmLabel { grid-column: 1; grid-row: 2; }
+.ids_passwordUpdateForm_passwordConfirmField { grid-column: 2; grid-row: 2; }
+.ids_passwordUpdateForm_submit               { grid-column: 2; grid-row: 3; }
+
+.ids_passwordUpdateForm_passwordLabel,
+.ids_passwordUpdateForm_passwordConfirmLabel
+{
+  display: flex;
+  align-items: center;
+  height: 3em;
+}
+
+.ids_passwordUpdateForm_passwordField,
+.ids_passwordUpdateForm_passwordConfirmField
+{
+  display: flex;
+  align-items: center;
+  padding: 0;
+  padding-left: 1em;
+  height: 3em;
+}
+
+.ids_passwordUpdateForm_submit
+{
+  margin:  2px;
+  padding: 0em;
+  height: 3em;
+}

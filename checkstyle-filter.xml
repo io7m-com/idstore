@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE suppressions PUBLIC
+  "-//Checkstyle//DTD SuppressionFilter Configuration 1.0//EN"
+  "https://checkstyle.org/dtds/suppressions_1_0.dtd">
+
+<suppressions>
+  <!-- Secondary record constructors require parameter name shadowing. -->
+  <suppress files="IdStorageName\.java"
+            checks="HiddenField"/>
+
+  <suppress files="IdLoggingHTTPRequestLayout\.java"
+            checks="JavadocVariable"/>
+
+  <!-- Secondary record constructors require parameter name shadowing. -->
+  <suppress files="IdAuditEvent\.java"
+            checks="HiddenField"/>
+  <suppress files="IdUserOrdering\.java"
+            checks="HiddenField"/>
+  <suppress files="IdAdminOrdering\.java"
+            checks="HiddenField"/>
+  <suppress files="IdNonEmptyList\.java"
+            checks="HiddenField"/>
+  <suppress files="IdColor\.java"
+            checks="HiddenField"/>
+  <suppress files="IdA1UserOrdering\.java"
+            checks="HiddenField"/>
+  <suppress files="IdA1AdminOrdering\.java"
+            checks="HiddenField"/>
+  <suppress files="IdUserSearchByEmailParameters\.java"
+            checks="HiddenField"/>
+  <suppress files="IdAdminSearchByEmailParameters\.java"
+            checks="HiddenField"/>
+  <suppress files="IdEmail\.java"
+            checks="HiddenField"/>
+  <suppress files="IdAdminPermissionSet\.java"
+            checks="HiddenField"/>
+  <suppress files="IdServerHistoryConfiguration\.java"
+            checks="HiddenField"/>
+
+  <suppress files="IdSCommandVersion\.java"
+            checks="IllegalInstantiation"/>
+  <suppress files="IdPSCommandVersion\.java"
+            checks="IllegalInstantiation"/>
+
+  <!-- Without pattern matching... -->
+  <suppress files="IdACommandExecutor\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACommandExecutor\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdACommandExecutor\.java"
+            checks="ExecutableStatementCount"/>
+  <suppress files="IdU1CommandExecutor\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACommandExecutor\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdPCommandExecutor\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdPCommandExecutor\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdACommandExecutor\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACommandExecutor\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdSecPolicyDefault\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdSecPolicyDefault\.java"
+            checks="CyclomaticComplexity"/>
+
+  <suppress files="IdUCommandExecutor\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdUCommandExecutor\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdUCommandExecutor\.java"
+            checks="ExecutableStatementCount"/>
+  <suppress files="IdUCommandExecutor\.java"
+            checks="CyclomaticComplexity"/>
+
+  <suppress files="IdACB1ValidationAdmin\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACB1ValidationAdmin\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdACB1ValidationAdmin\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdACB1ValidationAdmin\.java"
+            checks="MissingJavadocMethod"/>
+
+  <suppress files="IdACB1ValidationGeneral\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACB1ValidationGeneral\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdACB1ValidationGeneral\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdACB1ValidationGeneral\.java"
+            checks="MissingJavadocMethod"/>
+
+  <suppress files="IdACB1ValidationUser\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACB1ValidationUser\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdACB1ValidationUser\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdACB1ValidationUser\.java"
+            checks="MissingJavadocMethod"/>
+
+  <suppress files="IdACB1Validation\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="MissingJavadocMethod"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="ClassFanOutComplexity"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="JavaNCSS"/>
+  <suppress files="IdACB1Validation\.java"
+            checks="ExecutableStatementCount"/>
+
+  <suppress files="IdAClientProtocolHandler1\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdArbA1MessageProvider\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdA1CommandExecutor\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdA1CommandExecutor\.java"
+            checks="ExecutableStatementCount"/>
+
+  <suppress files="IdUCB1ValidationAdmin\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdUCB1ValidationAdmin\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdUCB1ValidationAdmin\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdUCB1ValidationAdmin\.java"
+            checks="MissingJavadocMethod"/>
+
+  <suppress files="IdUCB1ValidationGeneral\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdUCB1ValidationGeneral\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdUCB1ValidationGeneral\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdUCB1ValidationGeneral\.java"
+            checks="MissingJavadocMethod"/>
+
+  <suppress files="IdUCB1ValidationUser\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdUCB1ValidationUser\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdUCB1ValidationUser\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdUCB1ValidationUser\.java"
+            checks="MissingJavadocMethod"/>
+
+  <suppress files="IdUCB1Validation\.java"
+            checks="NPathComplexity"/>
+  <suppress files="IdUCB1Validation\.java"
+            checks="CyclomaticComplexity"/>
+  <suppress files="IdUCB1Validation\.java"
+            checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdUCB1Validation\.java"
+            checks="MissingJavadocMethod"/>
+  <suppress files="IdUCB1Validation\.java"
+            checks="ClassFanOutComplexity"/>
+  <suppress files="IdUCB1Validation\.java"
+            checks="JavaNCSS"/>
+  <suppress files="IdUCB1Validation\.java"
+            checks="ExecutableStatementCount"/>
+
+  <suppress files="IdA1CmdAbstract\.java"
+            checks="ThrowsCount"/>
+  
+  <!-- MXBeans have specific name conventions. -->
+  <suppress files="IdDatabaseMetricsMXBean\.java"
+            checks="TypeName"/>
+
+</suppressions>

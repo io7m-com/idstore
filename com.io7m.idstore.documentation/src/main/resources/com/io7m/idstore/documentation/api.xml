@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         title="API Access"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <xi:include href="proto_admin_v1.xml"/>
+  <xi:include href="proto_user_v1.xml"/>
+  <xi:include href="javadoc.xml"/>
+
+</Section>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         id="5242f097-2f68-4f19-8293-7a7ce68a8b7e"
+         title="User Protocol 1">
+
+  <Subsection title="Encoding">
+    <Paragraph>
+      The version 1 User protocol uses
+      <LinkExternal target="https://www.io7m.com/software/cedarbridge">cedarbridge</LinkExternal>
+      encoded messages over HTTP(s).
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Login" id="f85b9cf5-4d9d-42d2-a2af-e2ace9a1eb8e">
+    <Paragraph>
+      Send an <Term type="type">IdU1CommandLogin</Term> command to <Term type="expression">/v1/login</Term>. If
+      the login succeeds, a cookie named <Term type="expression">IDSTORE_USER_API_SESSION</Term> will be set.
+      This cookie must be included with all subsequent requests.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Commands">
+    <Paragraph>
+      After <Link target="f85b9cf5-4d9d-42d2-a2af-e2ace9a1eb8e">logging in successfully</Link>, send commands of
+      type <Term type="type">IdU1Command*</Term> to <Term type="expression">/v1/command</Term>. Failed commands
+      will yield a value of type <Term type="type">IdU1ResponseError</Term>, whilst successful results will yield
+      values of type <Term type="type">IdU1Response*</Term>.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Schemas">
+    <FormalItem title="Schemas">
+      <Verbatim><xi:include href="com/io7m/idstore/protocol/user/cb/User.cbs" parse="text"/></Verbatim>
+    </FormalItem>
+  </Subsection>
+
+  <xi:include href="proto_user_v1_xhtml.xml"/>
+
+</Section>

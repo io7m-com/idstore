@@ -1,0 +1,61 @@
+/*
+ * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+ * SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+ * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+
+package com.io7m.idstore.server.api;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import java.util.Objects;
+
+/**
+ * Plaintext SMTP with a mandatory, authenticated STARTTLS upgrade. Strict
+ * validation of server certificates is enabled. Server certificates must be
+ * issued 1) by a certificate authority in the trust store; and 2) to a
+ * subject matching the identity of the remote SMTP server.
+ *
+ * @param host The mail host
+ * @param port The port
+ */
+
+@JsonDeserialize
+@JsonSerialize
+@JsonTypeName("SMTP_TLS")
+public record IdServerMailTransportSMTP_TLS(
+  @JsonProperty(value = "Host", required = true)
+  String host,
+  @JsonProperty(value = "Port", required = true)
+  int port)
+  implements IdServerMailTransportConfigurationType
+{
+  /**
+   * Plaintext SMTP with a mandatory, authenticated STARTTLS upgrade. Strict
+   * validation of server certificates is enabled. Server certificates must be
+   * issued 1) by a certificate authority in the system trust store; and 2) to a
+   * subject matching the identity of the remote SMTP server.
+   *
+   * @param host The mail host
+   * @param port The port
+   */
+
+  public IdServerMailTransportSMTP_TLS
+  {
+    Objects.requireNonNull(host, "host");
+  }
+}

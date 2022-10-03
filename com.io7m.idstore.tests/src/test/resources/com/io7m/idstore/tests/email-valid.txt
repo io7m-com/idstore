@@ -1,0 +1,13 @@
+1234567890@example.com
+_______@example.com
+email@example-one.com
+email@example.co.jp
+email@example.com
+email@example.museum
+email@example.name
+email@subdomain.example.com
+firstname+lastname@example.com
+firstname-lastname@example.com
+firstname.lastname@example.com
+much.“more\ unusual”@example.com
+“email”@example.com

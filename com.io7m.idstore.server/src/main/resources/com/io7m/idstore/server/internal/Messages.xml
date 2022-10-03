@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+  <entry key="productTitle">idstore</entry>
+  <entry key="error">Error</entry>
+  <entry key="errorInvalidUsernamePassword">Invalid username or password.</entry>
+  <entry key="operationNotPermitted">Operation not permitted.</entry>
+  <entry key="unauthorized">Unauthorized.</entry>
+  <entry key="methodNotAllowed">HTTP method not allowed.</entry>
+  <entry key="loginFailed">Login failed.</entry>
+  <entry key="expectedCommand">Expected a "{0}".</entry>
+  <entry key="invalidImage">Invalid image.</entry>
+  <entry key="requestTooLarge">A request of size {0} is too large.</entry>
+  <entry key="missingParameter">Missing a required parameter "{0}"</entry>
+  <entry key="invalidParameter">Invalid value for parameter "{0}"</entry>
+  <entry key="notFound">Not found.</entry>
+  <entry key="commandNotHere">Cannot use this command here.</entry>
+  <entry key="userIdNameDuplicate">Duplicate user ID name: "{0}"</entry>
+  <entry key="adminIdNameDuplicate">Duplicate admin ID name: "{0}"</entry>
+
+  <entry key="emailVerificationRateLimited">Email verifications are rate-limited. Please try again shortly!</entry>
+  <entry key="emailVerificationSuccessTitle">Verified</entry>
+  <entry key="emailVerificationSuccess">Email verified successfully.</entry>
+  <entry key="emailVerificationFailed">Email verification failed.</entry>
+  <entry key="emailDuplicate">Email address is already in use.</entry>
+  <entry key="emailRemoveLast">You cannot remove the last email address on your account.</entry>
+  <entry key="emailVerificationTitle">Verification</entry>
+  <entry key="emailVerificationSent">A verification email was sent to {0}. Please follow the link in the email to verify the address.</entry>
+  <entry key="mailSystemFailure"><![CDATA[An error occurred with the mail system whilst attempting to send a verification email to {0}:
+  {1}
+]]></entry>
+
+  <entry key="banned"><![CDATA[You have been temporarily banned for the following reason: {0}. Your ban will expire on {1}.]]></entry>
+  <entry key="bannedNoExpire"><![CDATA[You have been permanently banned for the following reason: {0}.]]></entry>
+
+  <entry key="userNonexistent">No such user.</entry>
+  <entry key="passwordResetNonexistent">No such password reset token.</entry>
+  <entry key="passwordResetMismatch">The password confirmation does not match the password you entered.</entry>
+
+  <entry key="emailPasswordResetSuccessTitle">Password Reset</entry>
+  <entry key="emailPasswordResetSuccess">Password reset successfully.</entry>
+  <entry key="emailPasswordResetFailed">Password reset failed.</entry>
+  <entry key="emailPasswordResetTitle">Password Reset</entry>
+  <entry key="emailPasswordResetSent">A password reset link was sent. Please follow the link in the email to confirm the reset.</entry>
+
+  <entry key="pwResetRateLimited">Password resets are rate-limited. Please try again shortly!</entry>
+  <entry key="pwResetRequireParameters">You must at least specify an email address or username.</entry>
+
+  <entry key="passwordUpdateSuccessTitle">Password Updated</entry>
+  <entry key="passwordUpdateSuccess">Password updated successfully.</entry>
+</properties>

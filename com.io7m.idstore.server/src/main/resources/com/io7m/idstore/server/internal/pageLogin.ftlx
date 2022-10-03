@@ -1,0 +1,54 @@
+[#ftl output_format="XHTML"]
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8"/>
+  <link rel="stylesheet" type="text/css" href="/css/reset.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/xbutton.css"/>
+  <title>${htmlTitle}</title>
+</head>
+<body>
+
+<div id="ids_main">
+  <div id="ids_header">
+    <span class="ids_logo">
+      <img src="/logo" width="16" height="16" class="ids_header_logo ids_logo"/> ${pageHeaderTitle}
+    </span>
+  </div>
+
+  <div id="ids_content">
+    <div class="ids_loginForm_container">
+      [#if logo]
+      <div class="ids_loginForm_logo">
+        <img src="/logo"/>
+      </div>
+      [/#if]
+
+      [#if loginTitle??]
+      <p class="ids_loginForm_loginTitle">${loginTitle}</p>
+      [/#if]
+
+      <form class="ids_loginForm" action="/login" method="post">
+        <label class="ids_loginForm_usernameLabel"   for="user">Username</label>
+        <input class="ids_loginForm_username"        type="text" name="username"/>
+        <label class="ids_loginForm_passwordLabel"   for="password">Password</label>
+        <input class="ids_loginForm_password"        type="password" name="password"/>
+        <input class="ids_loginForm_submit cxbutton" type="submit" value="Log In" />
+      </form>
+
+      [#if errorMessage??]
+      <div class="ids_loginForm_error">
+        <p class="ids_message_error">${errorMessage}</p>
+      </div>
+      [/#if]
+
+      <p><a href="/password-reset">Forgot password...</a></p>
+
+      [#if loginExtraText??]${loginExtraText?no_esc}[/#if]
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

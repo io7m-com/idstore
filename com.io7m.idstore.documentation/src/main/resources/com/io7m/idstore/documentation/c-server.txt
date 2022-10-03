@@ -1,0 +1,11 @@
+Usage: server [options]
+
+  Options:
+  * --configuration
+      The configuration file
+    --verbose
+      Set the minimum logging verbosity level.
+      Default: info
+      Possible Values: [trace, debug, info, warn, error]
+
+
