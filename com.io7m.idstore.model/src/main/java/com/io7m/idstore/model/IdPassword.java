@@ -16,6 +16,8 @@
 
 package com.io7m.idstore.model;
 
+import java.util.Formattable;
+import java.util.Formatter;
 import java.util.HexFormat;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -32,6 +34,7 @@ public record IdPassword(
   IdPasswordAlgorithmType algorithm,
   String hash,
   String salt)
+  implements Formattable
 {
   /**
    * The pattern that defines a valid hash.
@@ -85,5 +88,15 @@ public record IdPassword(
       passwordText,
       HexFormat.of().parseHex(this.salt)
     );
+  }
+
+  @Override
+  public void formatTo(
+    final Formatter formatter,
+    final int flags,
+    final int width,
+    final int precision)
+  {
+    formatter.format("%s|%s|%s", this.algorithm.identifier(), this.hash, this.salt);
   }
 }

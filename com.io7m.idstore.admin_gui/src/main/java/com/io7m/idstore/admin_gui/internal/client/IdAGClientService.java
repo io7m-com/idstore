@@ -33,6 +33,7 @@ import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserColumnOrdering;
+import com.io7m.idstore.model.IdUserCreate;
 import com.io7m.idstore.model.IdUserOrdering;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
@@ -873,6 +874,31 @@ public final class IdAGClientService implements IdServiceType, Closeable
 
       try {
         future.complete(this.client.userLoginHistory(id));
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Create a user.
+   *
+   * @param create The user creation info
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdUser> userCreate(
+    final IdUserCreate create)
+  {
+    final var future = new CompletableFuture<IdUser>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.userCreate(create));
         this.requestFinish();
       } catch (final Exception e) {
         future.completeExceptionally(this.requestFailed(task, e));

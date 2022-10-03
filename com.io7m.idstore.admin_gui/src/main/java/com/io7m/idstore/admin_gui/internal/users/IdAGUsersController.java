@@ -27,9 +27,11 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
+import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdUserCreate;
 import com.io7m.idstore.model.IdUserSummary;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import javafx.application.Platform;
@@ -106,6 +108,7 @@ public final class IdAGUsersController implements Initializable
   @FXML private TextField userIdNameField;
   @FXML private TextField userRealNameField;
   @FXML private TextField userSearchField;
+  @FXML private TextField userPasswordField;
   @FXML private ListView<IdLogin> loginHistoryList;
 
   /**
@@ -241,8 +244,8 @@ public final class IdAGUsersController implements Initializable
     this.userList.getSelectionModel()
       .selectedItemProperty()
       .addListener((obs, userOld, userNew) -> {
-      this.onUserSelected(userNew);
-    });
+        this.onUserSelected(userNew);
+      });
 
     this.loginHistoryList.setCellFactory(
       new IsAGUserLoginHistoryCellFactory(this.strings));
@@ -406,6 +409,7 @@ public final class IdAGUsersController implements Initializable
       this.userIdNameField.setText(this.user.idName().toString());
       this.userRealNameField.setText(this.user.realName().toString());
       this.userEmails.setAll(this.user.emails().toList());
+      this.userPasswordField.setText("%s".formatted(this.user.password()));
       this.userDetailsUnlock();
       this.emailAdd.setDisable(false);
       this.emailDelete.setDisable(true);
@@ -414,8 +418,40 @@ public final class IdAGUsersController implements Initializable
 
   @FXML
   private void onUserCreateSelected()
+    throws IOException
   {
+    final var controller =
+      IdAGUserCreateController.openDialog(this.configuration, this.strings);
 
+    final Optional<IdUserCreate> create = controller.result();
+    create.ifPresent(this.client::userCreate);
+  }
+
+  @FXML
+  private void onPasswordChangeSelected()
+    throws IOException
+  {
+    final var controller =
+      IdAGUserPasswordChangeController.openDialog(
+        this.configuration,
+        this.strings);
+
+    final Optional<IdPassword> password = controller.result();
+    if (password.isPresent()) {
+      final var future =
+        this.client.userUpdate(
+          this.user.id(),
+          Optional.empty(),
+          Optional.empty(),
+          password
+        );
+
+      future.whenComplete((received, exception) -> {
+        if (received != null) {
+          this.onUserReceived(Optional.of(received));
+        }
+      });
+    }
   }
 
   @FXML

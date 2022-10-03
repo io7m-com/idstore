@@ -233,7 +233,7 @@ table.ids_userProfile > tr > td:last-child
   padding: 1px;
 }
 
-table.ids_userProfile > tr > td:last-child .ids_xbutton
+table.ids_userProfile > tr > td:last-child .cxbutton
 {
   margin: 0px;
   width:  8em;
@@ -273,7 +273,7 @@ table.ids_userProfile_emails > tr > td:last-child
   padding: 1px;
 }
 
-table.ids_userProfile_emails > tr > td:last-child .ids_xbutton
+table.ids_userProfile_emails > tr > td:last-child .cxbutton
 {
   margin: 0px;
   width:  8em;
@@ -601,7 +601,7 @@ table.ids_adminUserProfile_emails > tr > td:last-child
   padding: 1px;
 }
 
-table.ids_adminUserProfile_emails > tr > td:last-child .ids_xbutton
+table.ids_adminUserProfile_emails > tr > td:last-child .cxbutton
 {
   margin: 0px;
   width:  8em;

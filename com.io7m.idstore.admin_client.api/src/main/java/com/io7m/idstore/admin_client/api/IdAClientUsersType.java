@@ -25,6 +25,7 @@ import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdUserCreate;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
@@ -154,7 +155,7 @@ public interface IdAClientUsersType
   /**
    * Update the given user.
    *
-   * @param user    The user
+   * @param user     The user
    * @param idName   The new idname
    * @param realName The new realname
    * @param password The new password
@@ -205,7 +206,7 @@ public interface IdAClientUsersType
     UUID id,
     IdEmail email)
     throws IdAClientException, InterruptedException;
-  
+
   /**
    * Create a user.
    *
@@ -228,6 +229,30 @@ public interface IdAClientUsersType
     IdEmail email,
     IdPassword password)
     throws IdAClientException, InterruptedException;
+
+  /**
+   * Create a user.
+   *
+   * @param create The creation info
+   *
+   * @return The created user
+   *
+   * @throws IdAClientException   On errors
+   * @throws InterruptedException On interruption
+   */
+
+  default IdUser userCreate(
+    final IdUserCreate create)
+    throws IdAClientException, InterruptedException
+  {
+    return this.userCreate(
+      create.id(),
+      create.idName(),
+      create.realName(),
+      create.email(),
+      create.password()
+    );
+  }
 
   /**
    * Delete the given user.
