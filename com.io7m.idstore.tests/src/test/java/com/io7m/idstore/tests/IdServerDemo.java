@@ -126,21 +126,24 @@ public final class IdServerDemo
         directory.resolve("user-api"),
         "localhost",
         50000,
-        URI.create("http://localhost:50000/")
+        URI.create("http://localhost:50000/"),
+        Optional.empty()
       );
     final var userViewService =
       new IdServerHTTPServiceConfiguration(
         directory.resolve("user-view"),
         "localhost",
         50001,
-        URI.create("http://localhost:50001/")
+        URI.create("http://localhost:50001/"),
+        Optional.empty()
       );
     final var adminApiService =
       new IdServerHTTPServiceConfiguration(
         directory.resolve("admin-api"),
         "localhost",
         51000,
-        URI.create("http://localhost:51000/")
+        URI.create("http://localhost:51000/"),
+        Optional.empty()
       );
 
     final var branding =

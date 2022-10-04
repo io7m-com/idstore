@@ -678,13 +678,15 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
 
     for (final var item : items) {
       final var value = item.idName().value();
+      if (Objects.equals(value, "admin")) {
+        continue;
+      }
       assertTrue(
         value.endsWith("0"),
         "Value '%s' must end with 0".formatted(value)
       );
     }
   }
-
 
   /**
    * Admins can be listed/searched and paging works.

@@ -535,6 +535,11 @@
         <artifactId>com.io7m.jvindicator.core</artifactId>
         <version>${com.io7m.jvindicator.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.mock-server</groupId>
+        <artifactId>mockserver-netty</artifactId>
+        <version>5.14.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

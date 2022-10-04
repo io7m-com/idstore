@@ -89,6 +89,11 @@
         use to connect to this server. This value is used in, for example, password reset emails to provide URLs that
         users can follow to reset their passwords.
       </Paragraph>
+      <Paragraph>
+        The <Term type="expression">SessionExpiration</Term> property, if present, specifies the duration after which
+        idle sessions on the server will expire. The value must be expressed
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+      </Paragraph>
     </Subsection>
     <Subsection title="UserAPIService">
       <Paragraph>
@@ -110,6 +115,11 @@
         The <Term type="expression">ExternalAddress</Term> property specifies the external address that clients will
         use to connect to this server. This value is used in, for example, password reset emails to provide URLs that
         users can follow to reset their passwords.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="expression">SessionExpiration</Term> property, if present, specifies the duration after which
+        idle sessions on the server will expire. The value must be expressed
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
       </Paragraph>
     </Subsection>
     <Subsection title="UserViewService">
@@ -133,6 +143,11 @@
         use to connect to this server. This value is used in, for example, password reset emails to provide URLs that
         users can follow to reset their passwords.
       </Paragraph>
+      <Paragraph>
+        The <Term type="expression">SessionExpiration</Term> property, if present, specifies the duration after which
+        idle sessions on the server will expire. The value must be expressed
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+      </Paragraph>
     </Subsection>
     <Subsection title="Example">
       <Paragraph>
@@ -145,7 +160,8 @@
     "SessionDirectory": "/tmp/idstore-session-admin-api",
     "ListenAddress": "localhost",
     "ListenPort": 51000,
-    "ExternalAddress": "https://admin.idstore.example.com/"
+    "ExternalAddress": "https://admin.idstore.example.com/",
+    "SessionExpiration": "PT30M"
   },
   "UserAPIService": {
     "SessionDirectory": "/tmp/idstore-session-user-api",

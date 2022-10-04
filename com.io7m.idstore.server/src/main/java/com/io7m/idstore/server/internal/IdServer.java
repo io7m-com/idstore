@@ -363,6 +363,12 @@ public final class IdServer implements IdServerType
     final var sessionHandler = new SessionHandler();
     sessionHandler.setSessionCookie("IDSTORE_USER_VIEW_SESSION");
 
+    httpConfig.sessionExpiration().ifPresent(expiration -> {
+      sessionHandler.setMaxInactiveInterval(
+        Math.toIntExact(expiration.toSeconds())
+      );
+    });
+
     final var sessionStore = new FileSessionDataStore();
     sessionStore.setStoreDir(httpConfig.sessionDirectory().toFile());
 
@@ -658,6 +664,12 @@ public final class IdServer implements IdServerType
     final var sessionHandler = new SessionHandler();
     sessionHandler.setSessionCookie("IDSTORE_USER_API_SESSION");
 
+    httpConfig.sessionExpiration().ifPresent(expiration -> {
+      sessionHandler.setMaxInactiveInterval(
+        Math.toIntExact(expiration.toSeconds())
+      );
+    });
+
     final var sessionStore = new FileSessionDataStore();
     sessionStore.setStoreDir(httpConfig.sessionDirectory().toFile());
 
@@ -747,6 +759,12 @@ public final class IdServer implements IdServerType
 
     final var sessionHandler = new SessionHandler();
     sessionHandler.setSessionCookie("IDSTORE_ADMIN_API_SESSION");
+
+    httpConfig.sessionExpiration().ifPresent(expiration -> {
+      sessionHandler.setMaxInactiveInterval(
+        Math.toIntExact(expiration.toSeconds())
+      );
+    });
 
     final var sessionStore = new FileSessionDataStore();
     sessionStore.setStoreDir(httpConfig.sessionDirectory().toFile());

@@ -160,6 +160,9 @@
       "ExternalAddress": {
         "type": "string"
       },
+      "SessionExpiration": {
+        "type": "string"
+      },
       "required": [
         "SessionDirectory",
         "ListenAddress",
@@ -195,6 +198,19 @@
       "required": [
         "UserLoginHistoryLimit",
         "AdminLoginHistoryLimit"
+      ]
+    },
+
+    "RateLimiting": {
+      "EmailVerificationRateLimit": {
+        "type": "string"
+      },
+      "PasswordResetRateLimit": {
+        "type": "string"
+      },
+      "required": [
+        "EmailVerificationRateLimit",
+        "PasswordResetRateLimit"
       ]
     },
 
@@ -341,6 +357,9 @@
       "OpenTelemetry": {
         "$ref": "#/$defs/OpenTelemetry"
       },
+      "RateLimiting": {
+        "$ref": "#/$defs/RateLimiting"
+      },
       "required": [
         "%Schema",
         "Branding",
@@ -348,7 +367,8 @@
         "HTTP",
         "History",
         "Mail",
-        "OpenTelemetry"
+        "OpenTelemetry",
+        "RateLimiting"
       ]
     }
   },
