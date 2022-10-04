@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.internal.user_view;
 
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.server.internal.IdRequests;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerStrings;
@@ -27,6 +28,7 @@ import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.jvindicator.core.Vindication;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -76,20 +78,23 @@ public final class IdUViewPasswordResetRun extends IdCommonInstrumentedServlet
     final HttpServletResponse response)
     throws ServletException, IOException
   {
-    final var emailParameter =
-      getParameterOrEmpty(request, "email");
-    final var nameParameter =
-      getParameterOrEmpty(request, "username");
-
     try {
+      final var vindicator =
+        Vindication.startWithExceptions(IdValidityException::new);
+      final var emailParameter =
+        vindicator.addRequiredParameter("email", x -> x);
+      final var nameParameter =
+        vindicator.addRequiredParameter("username", x -> x);
+
+      vindicator.check(request.getParameterMap());
+
       this.userPasswordResets.resetBegin(
         request.getRemoteHost(),
         IdRequests.requestUserAgent(request),
         requestIdFor(request),
-        Optional.ofNullable(emailParameter),
-        Optional.ofNullable(nameParameter)
+        Optional.ofNullable(emailParameter.get()),
+        Optional.ofNullable(nameParameter.get())
       );
-
       this.showSent(request, response);
     } catch (final IdCommandExecutionFailure e) {
       this.showError(
@@ -98,6 +103,8 @@ public final class IdUViewPasswordResetRun extends IdCommonInstrumentedServlet
         e.httpStatusCode(),
         e.getMessage()
       );
+    } catch (final IdValidityException e) {
+      this.showError(request, response, 400, e.getMessage());
     }
   }
 

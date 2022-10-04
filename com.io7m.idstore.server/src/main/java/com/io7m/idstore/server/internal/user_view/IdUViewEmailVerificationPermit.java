@@ -21,6 +21,7 @@ import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdToken;
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddPermit;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
@@ -35,6 +36,7 @@ import com.io7m.idstore.server.internal.user.IdUCmdEmailAddPermit;
 import com.io7m.idstore.server.internal.user.IdUCmdEmailRemovePermit;
 import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.jvindicator.core.Vindication;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -92,32 +94,28 @@ public final class IdUViewEmailVerificationPermit
     final HttpServletResponse servletResponse)
     throws ServletException, IOException
   {
-    final var tokenParameter =
-      request.getParameter("token");
-
-    if (tokenParameter == null) {
-      this.showError(
-        request,
-        servletResponse,
-        this.strings.format("missingParameter", "token"),
-        false
-      );
-      return;
-    }
-
-    final IdToken token;
     try {
-      token = new IdToken(tokenParameter);
-    } catch (final Exception e) {
-      this.showError(
-        request,
-        servletResponse,
-        this.strings.format("invalidParameter", "token"),
-        false
-      );
-      return;
-    }
+      final var vindicator =
+        Vindication.startWithExceptions(IdValidityException::new);
+      final var tokenParameter =
+        vindicator.addRequiredParameter("token", IdToken::new);
 
+      vindicator.check(request.getParameterMap());
+
+      this.runForToken(request, servletResponse, tokenParameter.get());
+    } catch (final IdValidityException e) {
+      this.showError(request, servletResponse, e.getMessage(), false);
+    } catch (final Exception e) {
+      this.showError(request, servletResponse, e.getMessage(), true);
+    }
+  }
+
+  private void runForToken(
+    final HttpServletRequest request,
+    final HttpServletResponse servletResponse,
+    final IdToken token)
+    throws IOException
+  {
     try (var connection =
            this.database.openConnection(IDSTORE)) {
       try (var transaction =

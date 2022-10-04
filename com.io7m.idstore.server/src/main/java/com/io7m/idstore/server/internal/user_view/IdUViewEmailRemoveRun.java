@@ -25,6 +25,7 @@ import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.user.IdUCmdEmailRemoveBegin;
 import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.jvindicator.core.Vindication;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -78,23 +79,14 @@ public final class IdUViewEmailRemoveRun extends IdUViewAuthenticatedServlet
     final var messageServlet =
       new IdUViewMessage(this.services());
 
-    final var emailParameter = request.getParameter("email");
-    if (emailParameter == null) {
-      userController.messageCurrentSet(
-        new IdSessionMessage(
-          requestIdFor(request),
-          true,
-          false,
-          strings.format("error"),
-          strings.format("missingParameter", "email"),
-          "/"
-        )
-      );
-      messageServlet.service(request, servletResponse);
-      return;
-    }
-
     try {
+      final var vindicator =
+        Vindication.startWithExceptions(IdValidityException::new);
+      final var emailParameter =
+        vindicator.addRequiredParameter("email", IdEmail::new);
+
+      vindicator.check(request.getParameterMap());
+
       final var database = this.database();
       try (var connection = database.openConnection(IDSTORE)) {
         try (var transaction = connection.openTransaction()) {
@@ -107,8 +99,10 @@ public final class IdUViewEmailRemoveRun extends IdUViewAuthenticatedServlet
               this.user()
             );
 
+          final var email =
+            emailParameter.get();
           final var command =
-            new IdUCommandEmailRemoveBegin(new IdEmail(emailParameter));
+            new IdUCommandEmailRemoveBegin(email);
           new IdUCmdEmailRemoveBegin()
             .execute(context, command);
 
@@ -120,7 +114,7 @@ public final class IdUViewEmailRemoveRun extends IdUViewAuthenticatedServlet
               false,
               false,
               strings.format("emailVerificationTitle"),
-              strings.format("emailVerificationSent", emailParameter),
+              strings.format("emailVerificationSent", email),
               "/"
             )
           );

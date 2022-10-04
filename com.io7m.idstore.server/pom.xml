@@ -163,6 +163,10 @@
       <groupId>com.io7m.verdant</groupId>
       <artifactId>com.io7m.verdant.core.cb</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.io7m.jvindicator</groupId>
+      <artifactId>com.io7m.jvindicator.core</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>io.opentelemetry</groupId>

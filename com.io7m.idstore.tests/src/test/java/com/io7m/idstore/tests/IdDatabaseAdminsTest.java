@@ -677,7 +677,11 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     assertTrue(items.size() < 52);
 
     for (final var item : items) {
-      assertTrue(item.idName().value().endsWith("0"));
+      final var value = item.idName().value();
+      assertTrue(
+        value.endsWith("0"),
+        "Value '%s' must end with 0".formatted(value)
+      );
     }
   }
 

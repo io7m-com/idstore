@@ -49,13 +49,14 @@
   <properties>
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
     <com.io7m.cedarbridge.version>0.0.9</com.io7m.cedarbridge.version>
+    <com.io7m.cxbutton.version>0.0.3</com.io7m.cxbutton.version>
     <com.io7m.dixmont.version>0.0.2</com.io7m.dixmont.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jbssio.version>1.1.1</com.io7m.jbssio.version>
+    <com.io7m.jvindicator.version>0.0.1</com.io7m.jvindicator.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
     <com.io7m.trasco.version>0.0.5</com.io7m.trasco.version>
     <com.io7m.verdant.version>0.0.1</com.io7m.verdant.version>
-    <com.io7m.cxbutton.version>0.0.3</com.io7m.cxbutton.version>
     <io7m.api.previousVersion>0.0.1-SNAPSHOT</io7m.api.previousVersion>
     <jackson.version>2.13.4</jackson.version>
     <jetty.version>11.0.11</jetty.version>
@@ -528,6 +529,11 @@
         <groupId>com.io7m.cxbutton</groupId>
         <artifactId>com.io7m.cxbutton.core</artifactId>
         <version>${com.io7m.cxbutton.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.jvindicator</groupId>
+        <artifactId>com.io7m.jvindicator.core</artifactId>
+        <version>${com.io7m.jvindicator.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

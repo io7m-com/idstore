@@ -18,9 +18,11 @@
 package com.io7m.idstore.server.internal.user_view;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
+import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdToken;
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddDeny;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
@@ -35,6 +37,7 @@ import com.io7m.idstore.server.internal.user.IdUCmdEmailAddDeny;
 import com.io7m.idstore.server.internal.user.IdUCmdEmailRemoveDeny;
 import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.jvindicator.core.Vindication;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -92,32 +95,39 @@ public final class IdUViewEmailVerificationDeny
     final HttpServletResponse servletResponse)
     throws ServletException, IOException
   {
-    final var tokenParameter =
-      request.getParameter("token");
-
-    if (tokenParameter == null) {
-      this.showError(
-        request,
-        servletResponse,
-        this.strings.format("missingParameter", "token"),
-        false
-      );
-      return;
-    }
-
-    final IdToken token;
     try {
-      token = new IdToken(tokenParameter);
-    } catch (final Exception e) {
+      final var vindicator =
+        Vindication.startWithExceptions(IdValidityException::new);
+      final var tokenParameter =
+        vindicator.addRequiredParameter("token", IdToken::new);
+
+      vindicator.check(request.getParameterMap());
+
+      this.runForToken(request, servletResponse, tokenParameter.get());
+    } catch (final IdCommandExecutionFailure e) {
       this.showError(
         request,
         servletResponse,
-        this.strings.format("invalidParameter", "token"),
-        false
+        e.getMessage(),
+        e.httpStatusCode() >= 500
       );
-      return;
+    } catch (final IdValidityException e) {
+      this.showError(request, servletResponse, e.getMessage(), false);
+    } catch (final Exception e) {
+      this.showError(request, servletResponse, e.getMessage(), true);
     }
+  }
 
+  private void runForToken(
+    final HttpServletRequest request,
+    final HttpServletResponse servletResponse,
+    final IdToken token)
+    throws
+    IdDatabaseException,
+    IOException,
+    IdCommandExecutionFailure,
+    InterruptedException
+  {
     try (var connection =
            this.database.openConnection(IDSTORE)) {
       try (var transaction =
@@ -171,20 +181,6 @@ public final class IdUViewEmailVerificationDeny
         transaction.commit();
         this.showSuccess(request, servletResponse);
       }
-    } catch (final IdCommandExecutionFailure e) {
-      this.showError(
-        request,
-        servletResponse,
-        e.getMessage(),
-        e.httpStatusCode() >= 500
-      );
-    } catch (final Exception e) {
-      this.showError(
-        request,
-        servletResponse,
-        e.getMessage(),
-        true
-      );
     }
   }
 
