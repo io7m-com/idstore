@@ -59,7 +59,7 @@ public final class IdACmdAuditSearchPrevious
     final var users =
       transaction.queries(IdDatabaseAuditQueriesType.class);
 
-    final var session = context.userSession();
+    final var session = context.session();
     final var paging = session.auditPaging();
     final var data = paging.pagePrevious(users);
 

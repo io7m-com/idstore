@@ -169,21 +169,18 @@ public final class IdUserPasswordResetServiceTest
           Duration.of(10L, ChronoUnit.MINUTES)
         ),
         new IdServerHTTPServiceConfiguration(
-          this.directory,
           "127.0.0.1",
           50000,
           URI.create("http://localhost"),
           Optional.empty()
         ),
         new IdServerHTTPServiceConfiguration(
-          this.directory,
           "127.0.0.1",
           50001,
           URI.create("http://localhost"),
           Optional.empty()
         ),
         new IdServerHTTPServiceConfiguration(
-          this.directory,
           "127.0.0.1",
           50000,
           URI.create("http://localhost"),

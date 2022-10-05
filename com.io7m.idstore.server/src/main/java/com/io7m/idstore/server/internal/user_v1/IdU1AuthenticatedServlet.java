@@ -25,6 +25,8 @@ import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.IdUserSession;
+import com.io7m.idstore.server.internal.IdUserSessionService;
 import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.ServletException;
@@ -60,7 +62,9 @@ public abstract class IdU1AuthenticatedServlet
   private final IdServerStrings strings;
   private final IdUCB1Messages messages;
   private final IdDatabaseType database;
+  private final IdUserSessionService userSessions;
   private IdUser user;
+  private IdUserSession userSession;
 
   /**
    * A servlet that checks that a user is authenticated before delegating
@@ -84,6 +88,8 @@ public abstract class IdU1AuthenticatedServlet
       services.requireService(IdUCB1Sends.class);
     this.database =
       services.requireService(IdDatabaseType.class);
+    this.userSessions =
+      services.requireService(IdUserSessionService.class);
   }
 
   /**
@@ -93,6 +99,11 @@ public abstract class IdU1AuthenticatedServlet
   protected final IdUser user()
   {
     return this.user;
+  }
+
+  protected final IdUserSession userSession()
+  {
+    return this.userSession;
   }
 
   protected final IdUCB1Sends sends()
@@ -135,7 +146,10 @@ public abstract class IdU1AuthenticatedServlet
         final var session = request.getSession(false);
         if (session != null) {
           final var userId = (UUID) session.getAttribute("UserID");
-          this.user = this.userGet(userId);
+          this.user =
+            this.userGet(userId);
+          this.userSession =
+            this.userSessions.createOrGet(userId, session.getId());
           this.serviceAuthenticated(request, servletResponse, session);
           return;
         }

@@ -28,7 +28,6 @@ import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.IdServerTelemetryService;
-import com.io7m.idstore.server.internal.IdUserSession;
 import com.io7m.idstore.server.security.IdSecActionType;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecurity;
@@ -52,16 +51,17 @@ import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
  * transaction).
  *
  * @param <E> The type of error messages
+ * @param <S> The type of sessions
  */
 
-public abstract class IdCommandContext<E extends IdProtocolMessageType>
+public abstract class IdCommandContext<E extends IdProtocolMessageType, S>
 {
   private final IdServiceDirectoryType services;
   private final UUID requestId;
   private final IdDatabaseTransactionType transaction;
   private final IdServerClock clock;
   private final IdServerStrings strings;
-  private final IdUserSession userSession;
+  private final S session;
   private final String remoteHost;
   private final String remoteUserAgent;
   private final Tracer tracer;
@@ -86,7 +86,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
     final UUID inRequestId,
     final IdDatabaseTransactionType inTransaction,
     final IdServerClock inClock,
-    final IdUserSession inSession,
+    final S inSession,
     final String inRemoteHost,
     final String inRemoteUserAgent)
   {
@@ -100,7 +100,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
       Objects.requireNonNull(inClock, "clock");
     this.strings =
       Objects.requireNonNull(inStrings, "strings");
-    this.userSession =
+    this.session =
       Objects.requireNonNull(inSession, "inSession");
     this.remoteHost =
       Objects.requireNonNull(inRemoteHost, "remoteHost");
@@ -115,9 +115,9 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType>
    * @return The user session
    */
 
-  public final IdUserSession userSession()
+  public final S session()
   {
-    return this.userSession;
+    return this.session;
   }
 
   /**

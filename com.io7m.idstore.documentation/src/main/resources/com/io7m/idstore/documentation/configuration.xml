@@ -73,10 +73,6 @@
         The configuration for the Admin API service.
       </Paragraph>
       <Paragraph>
-        The <Term type="expression">SessionDirectory</Term> property specifies a directory that will contain persistent
-        state for user sessions. This allows user logins to persist across server restarts.
-      </Paragraph>
-      <Paragraph>
         The <Term type="expression">ListenAddress</Term>
         and <Term type="expression">ListenPort</Term> properties specify the address and port to which to the HTTP
         service will bind. It is recommended that the service be bound to
@@ -100,10 +96,6 @@
         The configuration for the User API service.
       </Paragraph>
       <Paragraph>
-        The <Term type="expression">SessionDirectory</Term> property specifies a directory that will contain persistent
-        state for user sessions. This allows user logins to persist across server restarts.
-      </Paragraph>
-      <Paragraph>
         The <Term type="expression">ListenAddress</Term>
         and <Term type="expression">ListenPort</Term> properties specify the address and port to which to the HTTP
         service will bind. It is recommended that the service be bound to
@@ -125,10 +117,6 @@
     <Subsection title="UserViewService">
       <Paragraph>
         The configuration for the User View service.
-      </Paragraph>
-      <Paragraph>
-        The <Term type="expression">SessionDirectory</Term> property specifies a directory that will contain persistent
-        state for user sessions. This allows user logins to persist across server restarts.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ListenAddress</Term>
@@ -157,20 +145,17 @@
         <Verbatim><![CDATA[
 "HTTP": {
   "AdminAPIService": {
-    "SessionDirectory": "/tmp/idstore-session-admin-api",
     "ListenAddress": "localhost",
     "ListenPort": 51000,
     "ExternalAddress": "https://admin.idstore.example.com/",
     "SessionExpiration": "PT30M"
   },
   "UserAPIService": {
-    "SessionDirectory": "/tmp/idstore-session-user-api",
     "ListenAddress": "localhost",
     "ListenPort": 50000,
     "ExternalAddress": "https://user.idstore.example.com/"
   },
   "UserViewService": {
-    "SessionDirectory": "/tmp/idstore-session-user-view",
     "ListenAddress": "localhost",
     "ListenPort": 50001,
     "ExternalAddress": "https://idstore.example.com/"

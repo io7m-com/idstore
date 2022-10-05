@@ -256,7 +256,6 @@ public abstract class IdWithServerContract
 
     final var userApiService =
       new IdServerHTTPServiceConfiguration(
-        this.directory.resolve("user-api"),
         "localhost",
         50000,
         URI.create("http://localhost:50000/"),
@@ -264,7 +263,6 @@ public abstract class IdWithServerContract
       );
     final var userViewService =
       new IdServerHTTPServiceConfiguration(
-        this.directory.resolve("user-view"),
         "localhost",
         50001,
         URI.create("http://localhost:50001/"),
@@ -272,7 +270,6 @@ public abstract class IdWithServerContract
       );
     final var adminApiService =
       new IdServerHTTPServiceConfiguration(
-        this.directory.resolve("admin-api"),
         "localhost",
         51000,
         URI.create("http://localhost:51000/"),

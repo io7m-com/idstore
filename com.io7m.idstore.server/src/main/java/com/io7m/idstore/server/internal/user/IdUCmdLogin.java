@@ -18,6 +18,7 @@ package com.io7m.idstore.server.internal.user;
 
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
 import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.server.internal.IdUserSession;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 
@@ -31,7 +32,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 
 public final class IdUCmdLogin
   implements IdCommandExecutorType<
-  IdUCommandContext, IdUCommandLogin, IdUResponseType>
+  IdUserSession, IdUCommandContext, IdUCommandLogin, IdUResponseType>
 {
   /**
    * IdUCmdLogin

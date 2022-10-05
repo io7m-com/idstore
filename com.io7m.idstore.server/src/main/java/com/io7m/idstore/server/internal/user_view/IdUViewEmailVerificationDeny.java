@@ -26,8 +26,8 @@ import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddDeny;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
-import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.IdUserSessionService;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
@@ -60,8 +60,8 @@ public final class IdUViewEmailVerificationDeny
   private final IdServerStrings strings;
   private final IdFMTemplateType<IdFMMessageData> template;
   private final IdServiceDirectoryType services;
-  private final IdServerClock clock;
   private final IdServerBrandingService branding;
+  private final IdUserSessionService userSessions;
 
   /**
    * The endpoint that allows for completing email verification challenges.
@@ -80,13 +80,13 @@ public final class IdUViewEmailVerificationDeny
       inServices.requireService(IdDatabaseType.class);
     this.strings =
       inServices.requireService(IdServerStrings.class);
-    this.clock =
-      inServices.requireService(IdServerClock.class);
     this.branding =
       inServices.requireService(IdServerBrandingService.class);
     this.template =
       inServices.requireService(IdFMTemplateService.class)
         .pageMessage();
+    this.userSessions =
+      inServices.requireService(IdUserSessionService.class);
   }
 
   @Override
@@ -154,13 +154,21 @@ public final class IdUViewEmailVerificationDeny
         final var user =
           users.userGetRequire(verification.user());
 
+        final var httpSession =
+          request.getSession(true);
+        final var userSession =
+          this.userSessions.createOrGet(
+            user.id(),
+            httpSession.getId()
+          );
+
         final var commandContext =
           IdUCommandContext.create(
             this.services,
             transaction,
             request,
-            request.getSession(),
-            user
+            user,
+            userSession
           );
 
         switch (verification.operation()) {
@@ -192,7 +200,8 @@ public final class IdUViewEmailVerificationDeny
     try (var writer = servletResponse.getWriter()) {
       this.template.process(
         new IdFMMessageData(
-          this.branding.htmlTitle(this.strings.format("emailVerificationSuccessTitle")),
+          this.branding.htmlTitle(this.strings.format(
+            "emailVerificationSuccessTitle")),
           this.branding.title(),
           requestIdFor(request),
           false,

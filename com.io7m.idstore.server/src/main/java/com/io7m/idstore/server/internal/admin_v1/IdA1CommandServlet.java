@@ -24,9 +24,9 @@ import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
+import com.io7m.idstore.server.internal.IdAdminSessionService;
 import com.io7m.idstore.server.internal.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.internal.IdRequestLimits;
-import com.io7m.idstore.server.internal.IdUserSessionService;
 import com.io7m.idstore.server.internal.admin.IdACommandContext;
 import com.io7m.idstore.server.internal.admin.IdACommandExecutor;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
@@ -62,7 +62,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
   private final IdACB1Messages messages;
   private final IdACommandExecutor executor;
   private final IdServiceDirectoryType services;
-  private final IdUserSessionService sessions;
+  private final IdAdminSessionService sessions;
 
   /**
    * A servlet for executing a single command.
@@ -84,7 +84,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
     this.messages =
       inServices.requireService(IdACB1Messages.class);
     this.sessions =
-      inServices.requireService(IdUserSessionService.class);
+      inServices.requireService(IdAdminSessionService.class);
     this.executor =
       new IdACommandExecutor();
   }

@@ -23,13 +23,15 @@ import java.io.IOException;
 /**
  * The type of command executors.
  *
+ * @param <S> The type of sessions
  * @param <C> The type of command contexts
  * @param <M> The type of accepted commands
  * @param <R> The type of responses
  */
 
 public interface IdCommandExecutorType<
-  C extends IdCommandContext<R>,
+  S,
+  C extends IdCommandContext<R, S>,
   M extends IdProtocolMessageType,
   R extends IdProtocolMessageType>
 {

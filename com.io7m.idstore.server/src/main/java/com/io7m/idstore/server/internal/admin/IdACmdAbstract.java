@@ -23,6 +23,7 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageType;
+import com.io7m.idstore.server.internal.IdAdminSession;
 import com.io7m.idstore.server.internal.command_exec.IdCommandContext;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
@@ -40,10 +41,10 @@ import java.util.Objects;
  */
 
 public abstract class IdACmdAbstract<
-  T extends IdCommandContext<R>,
+  T extends IdCommandContext<R, IdAdminSession>,
   C extends IdProtocolMessageType,
   R extends IdProtocolMessageType>
-  implements IdCommandExecutorType<T, C, R>
+  implements IdCommandExecutorType<IdAdminSession, T, C, R>
 {
   protected IdACmdAbstract()
   {

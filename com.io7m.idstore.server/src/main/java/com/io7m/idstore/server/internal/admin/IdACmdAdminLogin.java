@@ -19,6 +19,7 @@ package com.io7m.idstore.server.internal.admin;
 
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.server.internal.IdAdminSession;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 
@@ -32,7 +33,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 
 public final class IdACmdAdminLogin
   implements IdCommandExecutorType<
-  IdACommandContext, IdACommandLogin, IdAResponseType>
+  IdAdminSession, IdACommandContext, IdACommandLogin, IdAResponseType>
 {
   /**
    * IdACmdAdminSelf

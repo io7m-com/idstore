@@ -60,7 +60,7 @@ public final class IdACmdAuditSearchBegin
     final var audit =
       transaction.queries(IdDatabaseAuditQueriesType.class);
 
-    final var session = context.userSession();
+    final var session = context.session();
     session.setAuditListParameters(obtainListParameters(command));
     final var paging = session.auditPaging();
     final var data = paging.pageCurrent(audit);

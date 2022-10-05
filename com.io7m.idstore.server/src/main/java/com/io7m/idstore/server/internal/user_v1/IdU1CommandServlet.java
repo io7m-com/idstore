@@ -154,8 +154,8 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
         this.services,
         transaction,
         request,
-        session,
-        this.user()
+        this.user(),
+        this.userSession()
       );
 
     final var sends =

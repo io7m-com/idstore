@@ -59,6 +59,7 @@ import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.server.internal.IdAdminSession;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 
@@ -70,6 +71,7 @@ import java.io.IOException;
 
 public final class IdACommandExecutor
   implements IdCommandExecutorType<
+  IdAdminSession,
   IdACommandContext,
   IdACommandType<? extends IdAResponseType>,
   IdAResponseType>

@@ -25,11 +25,9 @@ import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
 import com.io7m.idstore.server.internal.IdUserSession;
-import com.io7m.idstore.server.internal.IdUserSessionService;
 import com.io7m.idstore.server.internal.command_exec.IdCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -41,7 +39,8 @@ import static com.io7m.idstore.server.internal.IdServerRequestDecoration.request
  * The command context for user API commands.
  */
 
-public final class IdUCommandContext extends IdCommandContext<IdUResponseType>
+public final class IdUCommandContext
+  extends IdCommandContext<IdUResponseType, IdUserSession>
 {
   private final IdUser user;
 
@@ -99,8 +98,8 @@ public final class IdUCommandContext extends IdCommandContext<IdUResponseType>
    * @param services    The service directory
    * @param transaction The database transaction
    * @param request     The request
-   * @param session     The HTTP session
    * @param user        The current user
+   * @param inSession   The user session
    *
    * @return A context
    */
@@ -109,8 +108,8 @@ public final class IdUCommandContext extends IdCommandContext<IdUResponseType>
     final IdServiceDirectoryType services,
     final IdDatabaseTransactionType transaction,
     final HttpServletRequest request,
-    final HttpSession session,
-    final IdUser user)
+    final IdUser user,
+    final IdUserSession inSession)
   {
     return new IdUCommandContext(
       services,
@@ -119,8 +118,7 @@ public final class IdUCommandContext extends IdCommandContext<IdUResponseType>
       transaction,
       services.requireService(IdServerClock.class),
       user,
-      services.requireService(IdUserSessionService.class)
-        .createOrGet(user.id(), session.getId()),
+      inSession,
       request.getRemoteHost(),
       requestUserAgent(request)
     );

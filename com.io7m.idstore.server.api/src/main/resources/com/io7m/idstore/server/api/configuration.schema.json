@@ -148,9 +148,6 @@
     },
 
     "HTTPService": {
-      "SessionDirectory": {
-        "type": "string"
-      },
       "ListenAddress": {
         "type": "string"
       },
@@ -164,7 +161,6 @@
         "type": "string"
       },
       "required": [
-        "SessionDirectory",
         "ListenAddress",
         "ListenPort",
         "ExternalAddress"

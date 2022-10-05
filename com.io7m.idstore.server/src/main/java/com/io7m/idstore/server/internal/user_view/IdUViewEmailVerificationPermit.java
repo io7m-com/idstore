@@ -25,8 +25,8 @@ import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddPermit;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
-import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.IdUserSessionService;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
@@ -59,8 +59,8 @@ public final class IdUViewEmailVerificationPermit
   private final IdServerStrings strings;
   private final IdFMTemplateType<IdFMMessageData> template;
   private final IdServiceDirectoryType services;
-  private final IdServerClock clock;
   private final IdServerBrandingService branding;
+  private final IdUserSessionService userSessions;
 
   /**
    * The endpoint that allows for completing email verification challenges.
@@ -79,13 +79,13 @@ public final class IdUViewEmailVerificationPermit
       inServices.requireService(IdDatabaseType.class);
     this.strings =
       inServices.requireService(IdServerStrings.class);
-    this.clock =
-      inServices.requireService(IdServerClock.class);
     this.branding =
       inServices.requireService(IdServerBrandingService.class);
     this.template =
       inServices.requireService(IdFMTemplateService.class)
         .pageMessage();
+    this.userSessions =
+      inServices.requireService(IdUserSessionService.class);
   }
 
   @Override
@@ -141,13 +141,27 @@ public final class IdUViewEmailVerificationPermit
           verificationOpt.get();
         final var user =
           users.userGetRequire(verification.user());
+
+        /*
+         * Create a session temporarily to run the command, and then
+         * immediately invalidate it.
+         */
+
+        final var httpSession =
+          request.getSession(true);
+        final var userSession =
+          this.userSessions.createOrGet(
+            user.id(),
+            httpSession.getId()
+          );
+
         final var commandContext =
           IdUCommandContext.create(
             this.services,
             transaction,
             request,
-            request.getSession(),
-            user
+            user,
+            userSession
           );
 
         switch (verification.operation()) {

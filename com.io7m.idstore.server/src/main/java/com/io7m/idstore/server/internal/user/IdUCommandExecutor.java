@@ -28,6 +28,7 @@ import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.server.internal.IdUserSession;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 
@@ -39,6 +40,7 @@ import java.io.IOException;
 
 public final class IdUCommandExecutor
   implements IdCommandExecutorType<
+  IdUserSession,
   IdUCommandContext,
   IdUCommandType<? extends IdUResponseType>,
   IdUResponseType>

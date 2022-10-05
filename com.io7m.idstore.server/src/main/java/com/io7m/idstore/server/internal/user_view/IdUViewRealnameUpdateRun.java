@@ -72,8 +72,6 @@ public final class IdUViewRealnameUpdateRun extends IdUViewAuthenticatedServlet
     final HttpSession session)
     throws IOException, ServletException
   {
-    final var userController =
-      this.userController();
     final var strings =
       this.strings();
     final var messageServlet =
@@ -95,8 +93,8 @@ public final class IdUViewRealnameUpdateRun extends IdUViewAuthenticatedServlet
               this.services(),
               transaction,
               request,
-              session,
-              this.user()
+              this.user(),
+              this.userSession()
             );
 
           final var command =
@@ -109,7 +107,7 @@ public final class IdUViewRealnameUpdateRun extends IdUViewAuthenticatedServlet
         }
       }
     } catch (final IdCommandExecutionFailure e) {
-      userController.messageCurrentSet(
+      this.userSession().messageCurrentSet(
         new IdSessionMessage(
           requestIdFor(request),
           true,
@@ -121,7 +119,7 @@ public final class IdUViewRealnameUpdateRun extends IdUViewAuthenticatedServlet
       );
       messageServlet.service(request, servletResponse);
     } catch (final IdValidityException e) {
-      userController.messageCurrentSet(
+      this.userSession().messageCurrentSet(
         new IdSessionMessage(
           requestIdFor(request),
           true,
@@ -133,7 +131,7 @@ public final class IdUViewRealnameUpdateRun extends IdUViewAuthenticatedServlet
       );
       messageServlet.service(request, servletResponse);
     } catch (final Exception e) {
-      userController.messageCurrentSet(
+      this.userSession().messageCurrentSet(
         new IdSessionMessage(
           requestIdFor(request),
           true,

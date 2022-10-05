@@ -22,9 +22,9 @@ import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.server.internal.IdAdminSession;
 import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
-import com.io7m.idstore.server.internal.IdUserSession;
 import com.io7m.idstore.server.internal.command_exec.IdCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 
@@ -35,7 +35,8 @@ import java.util.UUID;
  * The command context for public API commands.
  */
 
-public final class IdACommandContext extends IdCommandContext<IdAResponseType>
+public final class IdACommandContext
+  extends IdCommandContext<IdAResponseType, IdAdminSession>
 {
   private final IdAdmin admin;
 
@@ -70,7 +71,7 @@ public final class IdACommandContext extends IdCommandContext<IdAResponseType>
     final IdDatabaseTransactionType inTransaction,
     final IdServerClock inClock,
     final IdAdmin inAdmin,
-    final IdUserSession inSession,
+    final IdAdminSession inSession,
     final String remoteHost,
     final String remoteUserAgent)
   {

@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.net.URI;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,7 +29,6 @@ import java.util.Optional;
 /**
  * Configuration for individual HTTP services.
  *
- * @param sessionDirectory  The directory containing session files
  * @param listenAddress     The listen address
  * @param listenPort        The listen port
  * @param externalAddress   The externally visible address
@@ -41,8 +39,6 @@ import java.util.Optional;
 @JsonDeserialize
 @JsonSerialize
 public record IdServerHTTPServiceConfiguration(
-  @JsonProperty(value = "SessionDirectory", required = true)
-  Path sessionDirectory,
   @JsonProperty(value = "ListenAddress", required = true)
   String listenAddress,
   @JsonProperty(value = "ListenPort", required = true)
@@ -57,7 +53,6 @@ public record IdServerHTTPServiceConfiguration(
   /**
    * Configuration for the part of the server that serves over HTTP.
    *
-   * @param sessionDirectory  The directory containing session files
    * @param listenAddress     The listen address
    * @param listenPort        The listen port
    * @param externalAddress   The externally visible address
@@ -67,7 +62,6 @@ public record IdServerHTTPServiceConfiguration(
 
   public IdServerHTTPServiceConfiguration
   {
-    Objects.requireNonNull(sessionDirectory, "sessionDirectory");
     Objects.requireNonNull(listenAddress, "listenAddress");
     Objects.requireNonNull(externalAddress, "externalAddress");
     Objects.requireNonNull(sessionExpiration, "sessionExpiration");
