@@ -59,7 +59,7 @@ public final class IdACmdUserSearchPrevious
     final var users =
       transaction.queries(IdDatabaseUsersQueriesType.class);
 
-    final var session = context.userSession();
+    final var session = context.session();
     final var paging = session.userPaging();
     final var data = paging.pagePrevious(users);
 

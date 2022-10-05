@@ -14,40 +14,49 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.internal.command_exec;
-
-import com.io7m.idstore.protocol.api.IdProtocolMessageType;
-
-import java.io.IOException;
+package com.io7m.idstore.model;
 
 /**
- * The type of command executors.
- *
- * @param <S> The type of sessions
- * @param <C> The type of command contexts
- * @param <M> The type of accepted commands
- * @param <R> The type of responses
+ * Standard login metadata values.
  */
 
-public interface IdCommandExecutorType<
-  S,
-  C extends IdCommandContext<R, S>,
-  M extends IdProtocolMessageType,
-  R extends IdProtocolMessageType>
+public final class IdLoginMetadataStandard
 {
+  private IdLoginMetadataStandard()
+  {
+
+  }
+
   /**
-   * Execute a command.
+   * The name used to store the remote host.
    *
-   * @param context The execution context
-   * @param command The command
-   *
-   * @return The result of execution
-   *
-   * @throws IdCommandExecutionFailure On errors
+   * @return The key name
    */
 
-  R execute(
-    C context,
-    M command)
-    throws IdCommandExecutionFailure, IOException, InterruptedException;
+  public static String remoteHost()
+  {
+    return "REMOTE_HOST";
+  }
+
+  /**
+   * The name used to store the remote host being proxied.
+   *
+   * @return The key name
+   */
+
+  public static String remoteHostProxied()
+  {
+    return "REMOTE_HOST_PROXIED";
+  }
+
+  /**
+   * The name used to store the user agent.
+   *
+   * @return The key name
+   */
+
+  public static String userAgent()
+  {
+    return "USER_AGENT";
+  }
 }

@@ -29,6 +29,7 @@ import com.io7m.idstore.model.IdRealName;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -175,17 +176,15 @@ public non-sealed interface IdDatabaseAdminsQueriesType
   /**
    * Record the fact that the given admin has logged in.
    *
-   * @param id        The admin ID
-   * @param userAgent The user agent
-   * @param host      The host from which the admin logged in
+   * @param id       The admin ID
+   * @param metadata The login metadata
    *
    * @throws IdDatabaseException On errors
    */
 
   void adminLogin(
     UUID id,
-    String userAgent,
-    String host)
+    Map<String, String> metadata)
     throws IdDatabaseException;
 
   /**

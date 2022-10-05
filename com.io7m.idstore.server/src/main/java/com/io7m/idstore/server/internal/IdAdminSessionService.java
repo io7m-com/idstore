@@ -28,37 +28,37 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A service to create and manage user sessions.
+ * A service to create and manage admin sessions.
  */
 
-public final class IdUserSessionService
+public final class IdAdminSessionService
   implements IdServiceType, HttpSessionListener
 {
   private static final Logger LOG =
-    LoggerFactory.getLogger(IdUserSessionService.class);
+    LoggerFactory.getLogger(IdAdminSessionService.class);
 
-  private final ConcurrentHashMap<String, IdUserSession> sessions;
+  private final ConcurrentHashMap<String, IdAdminSession> sessions;
   private final ObservableLongGauge sessionsGauge;
 
   /**
-   * A service to create and manage user sessions.
+   * A service to create and manage admin sessions.
    *
    * @param inTelemetry The telemetry service
    */
 
-  public IdUserSessionService(
+  public IdAdminSessionService(
     final IdServerTelemetryService inTelemetry)
   {
     this.sessions = new ConcurrentHashMap<>();
 
     final var meter =
       inTelemetry.openTelemetry()
-        .meterBuilder("IdUserSessionService")
+        .meterBuilder("IdAdminSessionService")
         .build();
 
     this.sessionsGauge =
-      meter.gaugeBuilder("userSessions")
-        .setDescription("Active user sessions.")
+      meter.gaugeBuilder("adminSessions")
+        .setDescription("Active admin sessions.")
         .ofLongs()
         .buildWithCallback(m -> {
           m.record(Integer.toUnsignedLong(this.sessions.size()));
@@ -68,36 +68,36 @@ public final class IdUserSessionService
   @Override
   public String description()
   {
-    return "User session service.";
+    return "Admin session service.";
   }
 
   /**
-   * Create or get an existing user session.
+   * Create or get an existing admin session.
    *
-   * @param userId    The user ID
+   * @param adminId   The admin ID
    * @param sessionId The session ID
    *
-   * @return A user session
+   * @return A admin session
    */
 
-  public IdUserSession createOrGet(
-    final UUID userId,
+  public IdAdminSession createOrGet(
+    final UUID adminId,
     final String sessionId)
   {
-    Objects.requireNonNull(userId, "userId");
+    Objects.requireNonNull(adminId, "adminId");
     Objects.requireNonNull(sessionId, "sessionId");
 
-    final var id = "%s:%s".formatted(userId, sessionId);
+    final var id = "%s:%s".formatted(adminId, sessionId);
     return this.sessions.computeIfAbsent(
       id,
       ignored -> {
         final var sizeNow = this.sessions.size() + 1;
         LOG.debug(
-          "[{}] create user session ({} now active)",
+          "[{}] create admin session ({} now active)",
           id,
           Integer.valueOf(sizeNow)
         );
-        return new IdUserSession(userId, sessionId);
+        return new IdAdminSession(adminId, sessionId);
       }
     );
   }
@@ -114,33 +114,33 @@ public final class IdUserSessionService
     final HttpSessionEvent se)
   {
     final var session = se.getSession();
-    final var userId = (UUID) session.getAttribute("UserID");
+    final var adminId = (UUID) session.getAttribute("UserID");
     final var sessionId = session.getId();
 
-    if (userId != null) {
-      this.delete(userId, sessionId);
+    if (adminId != null) {
+      this.delete(adminId, sessionId);
     }
   }
 
   /**
-   * Delete a user session if one exists.
+   * Delete a admin session if one exists.
    *
-   * @param userId    The user ID
+   * @param adminId   The admin ID
    * @param sessionId The session ID
    */
 
   public void delete(
-    final UUID userId,
+    final UUID adminId,
     final String sessionId)
   {
-    Objects.requireNonNull(userId, "userId");
+    Objects.requireNonNull(adminId, "adminId");
     Objects.requireNonNull(sessionId, "sessionId");
 
-    final var id = "%s:%s".formatted(userId, sessionId);
+    final var id = "%s:%s".formatted(adminId, sessionId);
     this.sessions.remove(id);
 
     LOG.debug(
-      "[{}] delete user session ({} now active)",
+      "[{}] delete admin session ({} now active)",
       id,
       Integer.valueOf(this.sessions.size())
     );
@@ -149,7 +149,7 @@ public final class IdUserSessionService
   @Override
   public String toString()
   {
-    return "[IdUserSessionService 0x%s]"
+    return "[IdAdminSessionService 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode()));
   }
 }

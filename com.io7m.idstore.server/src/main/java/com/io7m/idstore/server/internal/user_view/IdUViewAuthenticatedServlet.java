@@ -58,11 +58,11 @@ public abstract class IdUViewAuthenticatedServlet
   private final IdServerStrings strings;
   private final IdDatabaseType database;
   private final IdServiceDirectoryType services;
-  private final IdUserSessionService userControllers;
+  private final IdUserSessionService userSessions;
   private final IdFMTemplateType<IdFMMessageData> template;
   private final IdServerBrandingService branding;
   private IdUser user;
-  private IdUserSession userController;
+  private IdUserSession userSession;
 
   /**
    * A servlet that checks that a user is authenticated before delegating
@@ -84,7 +84,7 @@ public abstract class IdUViewAuthenticatedServlet
       inServices.requireService(IdServerClock.class);
     this.database =
       inServices.requireService(IdDatabaseType.class);
-    this.userControllers =
+    this.userSessions =
       inServices.requireService(IdUserSessionService.class);
     this.branding =
       inServices.requireService(IdServerBrandingService.class);
@@ -93,9 +93,9 @@ public abstract class IdUViewAuthenticatedServlet
         .pageMessage();
   }
 
-  protected final IdUserSession userController()
+  protected final IdUserSession userSession()
   {
-    return this.userController;
+    return this.userSession;
   }
 
   protected final IdUser user()
@@ -138,8 +138,8 @@ public abstract class IdUViewAuthenticatedServlet
         final var userId = (UUID) session.getAttribute("UserID");
         if (userId != null) {
           this.user = this.userGet(userId);
-          this.userController =
-            this.userControllers.createOrGet(userId, session.getId());
+          this.userSession =
+            this.userSessions.createOrGet(userId, session.getId());
           this.serviceAuthenticated(request, servletResponse, session);
           return;
         }

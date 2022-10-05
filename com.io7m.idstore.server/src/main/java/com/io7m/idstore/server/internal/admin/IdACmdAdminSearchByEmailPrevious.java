@@ -59,7 +59,7 @@ public final class IdACmdAdminSearchByEmailPrevious
     final var admins =
       transaction.queries(IdDatabaseAdminsQueriesType.class);
 
-    final var session = context.userSession();
+    final var session = context.session();
     final var paging = session.adminByEmailPaging();
     final var data = paging.pagePrevious(admins);
 

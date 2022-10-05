@@ -42,6 +42,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -58,6 +59,8 @@ import static com.io7m.idstore.model.IdAdminColumn.BY_IDNAME;
 import static com.io7m.idstore.model.IdAdminColumn.BY_REALNAME;
 import static com.io7m.idstore.model.IdAdminColumn.BY_TIME_CREATED;
 import static com.io7m.idstore.model.IdAdminColumn.BY_TIME_UPDATED;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static java.time.OffsetDateTime.now;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -458,8 +461,10 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
 
     admins.adminLogin(
       admin.id(),
-      "Mozilla/5.0 (X11; Linux x86_64)",
-      "127.0.0.1"
+      Map.ofEntries(
+        Map.entry(remoteHost(), "127.0.0.1"),
+        Map.entry(userAgent(), "Mozilla/5.0 (X11; Linux x86_64)")
+      )
     );
 
     checkAuditLog(
@@ -491,8 +496,11 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
       assertThrows(IdDatabaseException.class, () -> {
         admins.adminLogin(
           randomUUID(),
-          "Mozilla/5.0 (X11; Linux x86_64)",
-          "127.0.0.1");
+          Map.ofEntries(
+            Map.entry(remoteHost(), "127.0.0.1"),
+            Map.entry(userAgent(), "Mozilla/5.0 (X11; Linux x86_64)")
+          )
+        );
       });
     assertEquals(ADMIN_NONEXISTENT, ex.errorCode());
   }
@@ -677,10 +685,16 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     assertTrue(items.size() < 52);
 
     for (final var item : items) {
-      assertTrue(item.idName().value().endsWith("0"));
+      final var value = item.idName().value();
+      if (Objects.equals(value, "admin")) {
+        continue;
+      }
+      assertTrue(
+        value.endsWith("0"),
+        "Value '%s' must end with 0".formatted(value)
+      );
     }
   }
-
 
   /**
    * Admins can be listed/searched and paging works.

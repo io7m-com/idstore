@@ -59,7 +59,7 @@ public final class IdACmdUserSearchByEmailBegin
     final var users =
       transaction.queries(IdDatabaseUsersQueriesType.class);
 
-    final var session = context.userSession();
+    final var session = context.session();
     session.setUserSearchByEmailParameters(obtainListParameters(command));
     final var paging = session.userByEmailPaging();
     final var data = paging.pageCurrent(users);

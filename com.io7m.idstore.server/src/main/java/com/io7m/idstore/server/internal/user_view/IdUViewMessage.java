@@ -78,14 +78,14 @@ public final class IdUViewMessage extends IdUViewAuthenticatedServlet
     final HttpSession session)
     throws Exception
   {
-    final var userController =
+    final var userSession =
       this.services()
         .requireService(IdUserSessionService.class)
         .createOrGet((UUID) session.getAttribute("UserID"), session.getId());
 
     servletResponse.setContentType("application/xhtml+xml");
 
-    final var messageOpt = userController.messageCurrent();
+    final var messageOpt = userSession.messageCurrent();
     if (messageOpt.isEmpty()) {
       servletResponse.sendRedirect("/");
       return;

@@ -11,6 +11,7 @@ com.io7m.idstore.tests.arbitraries.IdArbBanProvider
 com.io7m.idstore.tests.arbitraries.IdArbEmailProvider
 com.io7m.idstore.tests.arbitraries.IdArbHashProvider
 com.io7m.idstore.tests.arbitraries.IdArbIdNameProvider
+com.io7m.idstore.tests.arbitraries.IdArbInetAddressProvider
 com.io7m.idstore.tests.arbitraries.IdArbLoginProvider
 com.io7m.idstore.tests.arbitraries.IdArbOffsetDateTimeProvider
 com.io7m.idstore.tests.arbitraries.IdArbPasswordProvider
@@ -18,6 +19,7 @@ com.io7m.idstore.tests.arbitraries.IdArbRealNameProvider
 com.io7m.idstore.tests.arbitraries.IdArbSubsetMatchProvider
 com.io7m.idstore.tests.arbitraries.IdArbTimeRangeProvider
 com.io7m.idstore.tests.arbitraries.IdArbTokenProvider
+com.io7m.idstore.tests.arbitraries.IdArbUMessageProvider
 com.io7m.idstore.tests.arbitraries.IdArbURIProvider
 com.io7m.idstore.tests.arbitraries.IdArbUUIDProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserOrderingProvider
@@ -25,4 +27,3 @@ com.io7m.idstore.tests.arbitraries.IdArbUserProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserSearchByEmailParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserSearchParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserSummaryProvider
-com.io7m.idstore.tests.arbitraries.IdArbUMessageProvider

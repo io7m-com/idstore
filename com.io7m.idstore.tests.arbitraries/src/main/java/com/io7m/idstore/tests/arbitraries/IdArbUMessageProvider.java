@@ -47,6 +47,7 @@ import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Combinators;
 import net.jqwik.api.providers.TypeUsage;
 
+import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
@@ -318,7 +319,18 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
       Arbitraries.defaultFor(IdName.class);
     final var s1 =
       Arbitraries.strings();
+    final var s2 =
+      Arbitraries.defaultFor(String.class)
+        .tuple2()
+        .list()
+        .map(tuple2s -> {
+          final var map = new HashMap<String, String>();
+          for (final var t : tuple2s) {
+            map.put(t.get1(), t.get2());
+          }
+          return map;
+        });
 
-    return Combinators.combine(s0, s1).as(IdUCommandLogin::new);
+    return Combinators.combine(s0, s1, s2).as(IdUCommandLogin::new);
   }
 }

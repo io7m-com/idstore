@@ -30,7 +30,9 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,7 +77,7 @@ public final class IdServerUsersTest extends IdWithServerContract
     final var userId =
       this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var user = this.client.userSelf();
     assertEquals("someone", user.realName().value());
@@ -100,7 +102,7 @@ public final class IdServerUsersTest extends IdWithServerContract
 
     final var ex =
       Assertions.assertThrows(IdUClientException.class, () -> {
-        this.client.login("someone1", "12345678", this.serverUserAPIURL());
+        this.client.login("someone1", "12345678", this.serverUserAPIURL(), Map.of());
       });
 
     assertTrue(
@@ -127,7 +129,7 @@ public final class IdServerUsersTest extends IdWithServerContract
 
     final var ex =
       Assertions.assertThrows(IdUClientException.class, () -> {
-        this.client.login("someone", "123456789", this.serverUserAPIURL());
+        this.client.login("someone", "123456789", this.serverUserAPIURL(), Map.of());
       });
 
     assertTrue(
@@ -152,7 +154,7 @@ public final class IdServerUsersTest extends IdWithServerContract
     final var userId =
       this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     this.client.userEmailAddBegin(newMail);
@@ -197,7 +199,7 @@ public final class IdServerUsersTest extends IdWithServerContract
     final var userId =
       this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     this.client.userEmailAddBegin(newMail);
@@ -245,7 +247,7 @@ public final class IdServerUsersTest extends IdWithServerContract
     final var userId =
       this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("someone@example.com");
     assertThrows(IdUClientException.class, () -> {
@@ -273,7 +275,7 @@ public final class IdServerUsersTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
     this.serverCreateUser(admin, "someone2");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     this.client.userEmailAddBegin(newMail);
@@ -285,7 +287,7 @@ public final class IdServerUsersTest extends IdWithServerContract
     final var token =
       email.getHeader("X-IDStore-Verification-Token")[0];
 
-    this.client.login("someone2", "12345678", this.serverUserAPIURL());
+    this.client.login("someone2", "12345678", this.serverUserAPIURL(), Map.of());
 
     assertThrows(IdUClientException.class, () -> {
       this.client.userEmailAddPermit(new IdToken(token));
@@ -311,7 +313,7 @@ public final class IdServerUsersTest extends IdWithServerContract
       this.serverCreateAdminInitial("admin", "12345678");
     this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     this.client.userEmailAddBegin(newMail);
@@ -353,7 +355,7 @@ public final class IdServerUsersTest extends IdWithServerContract
       this.serverCreateAdminInitial("admin", "12345678");
     this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     this.requestEmailAddition(newMail);
@@ -413,7 +415,7 @@ public final class IdServerUsersTest extends IdWithServerContract
       this.serverCreateAdminInitial("admin", "12345678");
     this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     this.requestEmailAddition(newMail);
@@ -462,7 +464,7 @@ public final class IdServerUsersTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
     this.serverCreateUser(admin, "someone2");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     this.requestEmailAddition(newMail);
@@ -476,7 +478,7 @@ public final class IdServerUsersTest extends IdWithServerContract
     final var token =
       email.getHeader("X-IDStore-Verification-Token")[0];
 
-    this.client.login("someone2", "12345678", this.serverUserAPIURL());
+    this.client.login("someone2", "12345678", this.serverUserAPIURL(), Map.of());
 
     assertThrows(IdUClientException.class, () -> {
       this.client.userEmailRemovePermit(new IdToken(token));
@@ -504,7 +506,7 @@ public final class IdServerUsersTest extends IdWithServerContract
 
     this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
     this.requestEmailAddition(new IdEmail("gauss@example.com"));
 
     /*
@@ -551,7 +553,7 @@ public final class IdServerUsersTest extends IdWithServerContract
       this.serverCreateAdminInitial("admin", "12345678");
     this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     assertThrows(IdUClientException.class, () -> {
@@ -575,7 +577,7 @@ public final class IdServerUsersTest extends IdWithServerContract
       this.serverCreateAdminInitial("admin", "12345678");
     this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     this.client.userEmailAddBegin(newMail);
@@ -618,7 +620,7 @@ public final class IdServerUsersTest extends IdWithServerContract
       this.serverCreateAdminInitial("admin", "12345678");
     this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     this.requestEmailAddition(newMail);
@@ -663,7 +665,7 @@ public final class IdServerUsersTest extends IdWithServerContract
       this.serverCreateAdminInitial("admin", "12345678");
     this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
     this.client.userRealNameUpdate(new IdRealName("A New Name"));
 
     final var userNow = this.client.userSelf();
@@ -688,7 +690,7 @@ public final class IdServerUsersTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     final var user =
-      this.client.login("someone", "12345678", this.serverUserAPIURL());
+      this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     this.client.userPasswordUpdate("abcd", "abcd");
 
@@ -712,7 +714,7 @@ public final class IdServerUsersTest extends IdWithServerContract
       this.serverCreateAdminInitial("admin", "12345678");
     this.serverCreateUser(admin, "someone");
 
-    this.client.login("someone", "12345678", this.serverUserAPIURL());
+    this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
 
     final var newMail = new IdEmail("gauss@example.com");
     this.client.userEmailAddBegin(newMail);

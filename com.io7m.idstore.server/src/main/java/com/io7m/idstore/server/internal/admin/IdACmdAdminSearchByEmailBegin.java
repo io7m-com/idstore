@@ -59,7 +59,7 @@ public final class IdACmdAdminSearchByEmailBegin
     final var admins =
       transaction.queries(IdDatabaseAdminsQueriesType.class);
 
-    final var session = context.userSession();
+    final var session = context.session();
     session.setAdminSearchByEmailParameters(obtainListParameters(command));
     final var paging = session.adminByEmailPaging();
     final var data = paging.pageCurrent(admins);

@@ -54,6 +54,7 @@ module com.io7m.idstore.server
   requires com.io7m.jaffirm.core;
   requires com.io7m.jdeferthrow.core;
   requires com.io7m.jmulticlose.core;
+  requires com.io7m.jvindicator.core;
   requires com.io7m.jxtrand.vanilla;
   requires com.io7m.verdant.core.cb;
   requires com.io7m.verdant.core;

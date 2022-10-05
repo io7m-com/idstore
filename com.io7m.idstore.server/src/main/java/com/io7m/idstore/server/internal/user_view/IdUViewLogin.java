@@ -44,12 +44,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static org.eclipse.jetty.http.HttpStatus.FORBIDDEN_403;
 
 /**
@@ -210,10 +213,13 @@ public final class IdUViewLogin extends IdCommonInstrumentedServlet
     LOG.info("user '{}' logged in", username);
     session.setAttribute("UserID", user.id());
 
+    final var metadata = new HashMap<String, String>(2);
+    metadata.put(userAgent(), IdRequests.requestUserAgent(request));
+    metadata.put(remoteHost(), request.getRemoteAddr());
+
     users.userLogin(
       user.id(),
-      IdRequests.requestUserAgent(request),
-      request.getRemoteAddr(),
+      metadata,
       this.configuration.configuration()
         .history()
         .userLoginHistoryLimit()

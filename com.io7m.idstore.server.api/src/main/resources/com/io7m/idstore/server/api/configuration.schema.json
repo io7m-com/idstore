@@ -148,9 +148,6 @@
     },
 
     "HTTPService": {
-      "SessionDirectory": {
-        "type": "string"
-      },
       "ListenAddress": {
         "type": "string"
       },
@@ -160,8 +157,10 @@
       "ExternalAddress": {
         "type": "string"
       },
+      "SessionExpiration": {
+        "type": "string"
+      },
       "required": [
-        "SessionDirectory",
         "ListenAddress",
         "ListenPort",
         "ExternalAddress"
@@ -195,6 +194,19 @@
       "required": [
         "UserLoginHistoryLimit",
         "AdminLoginHistoryLimit"
+      ]
+    },
+
+    "RateLimiting": {
+      "EmailVerificationRateLimit": {
+        "type": "string"
+      },
+      "PasswordResetRateLimit": {
+        "type": "string"
+      },
+      "required": [
+        "EmailVerificationRateLimit",
+        "PasswordResetRateLimit"
       ]
     },
 
@@ -341,6 +353,9 @@
       "OpenTelemetry": {
         "$ref": "#/$defs/OpenTelemetry"
       },
+      "RateLimiting": {
+        "$ref": "#/$defs/RateLimiting"
+      },
       "required": [
         "%Schema",
         "Branding",
@@ -348,7 +363,8 @@
         "HTTP",
         "History",
         "Mail",
-        "OpenTelemetry"
+        "OpenTelemetry",
+        "RateLimiting"
       ]
     }
   },

@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.internal.user_view;
 
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerStrings;
@@ -28,6 +29,7 @@ import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
 import com.io7m.idstore.server.internal.user.IdUCmdPasswordUpdate;
 import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.jvindicator.core.Vindication;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -84,49 +86,21 @@ public final class IdUViewPasswordUpdateRun extends IdUViewAuthenticatedServlet
     final HttpSession session)
     throws IOException, ServletException
   {
-    final var userController =
-      this.userController();
     final var strings =
       this.strings();
     final var messageServlet =
       new IdUViewMessage(this.services());
 
-    final var password0Parameter =
-      request.getParameter("password0");
-    final var password1Parameter =
-      request.getParameter("password1");
-
-    if (password0Parameter == null) {
-      userController.messageCurrentSet(
-        new IdSessionMessage(
-          requestIdFor(request),
-          true,
-          false,
-          strings.format("error"),
-          strings.format("missingParameter", "password0"),
-          "/password-update"
-        )
-      );
-      messageServlet.service(request, servletResponse);
-      return;
-    }
-
-    if (password1Parameter == null) {
-      userController.messageCurrentSet(
-        new IdSessionMessage(
-          requestIdFor(request),
-          true,
-          false,
-          strings.format("error"),
-          strings.format("missingParameter", "password1"),
-          "/password-update"
-        )
-      );
-      messageServlet.service(request, servletResponse);
-      return;
-    }
-
     try {
+      final var vindicator =
+        Vindication.startWithExceptions(IdValidityException::new);
+      final var password0Parameter =
+        vindicator.addRequiredParameter("password0", Vindication.strings());
+      final var password1Parameter =
+        vindicator.addRequiredParameter("password1", Vindication.strings());
+
+      vindicator.check(request.getParameterMap());
+
       final var database = this.database();
       try (var connection = database.openConnection(IDSTORE)) {
         try (var transaction = connection.openTransaction()) {
@@ -135,14 +109,14 @@ public final class IdUViewPasswordUpdateRun extends IdUViewAuthenticatedServlet
               this.services(),
               transaction,
               request,
-              session,
-              this.user()
+              this.user(),
+              this.userSession()
             );
 
           final var command =
             new IdUCommandPasswordUpdate(
-              password0Parameter,
-              password1Parameter
+              password0Parameter.get(),
+              password1Parameter.get()
             );
 
           new IdUCmdPasswordUpdate()
@@ -153,7 +127,7 @@ public final class IdUViewPasswordUpdateRun extends IdUViewAuthenticatedServlet
         }
       }
     } catch (final IdCommandExecutionFailure e) {
-      userController.messageCurrentSet(
+      this.userSession().messageCurrentSet(
         new IdSessionMessage(
           requestIdFor(request),
           true,
@@ -164,8 +138,20 @@ public final class IdUViewPasswordUpdateRun extends IdUViewAuthenticatedServlet
         )
       );
       messageServlet.service(request, servletResponse);
+    } catch (final IdValidityException e) {
+      this.userSession().messageCurrentSet(
+        new IdSessionMessage(
+          requestIdFor(request),
+          true,
+          false,
+          strings.format("error"),
+          e.getMessage(),
+          "/password-update"
+        )
+      );
+      messageServlet.service(request, servletResponse);
     } catch (final Exception e) {
-      userController.messageCurrentSet(
+      this.userSession().messageCurrentSet(
         new IdSessionMessage(
           requestIdFor(request),
           true,

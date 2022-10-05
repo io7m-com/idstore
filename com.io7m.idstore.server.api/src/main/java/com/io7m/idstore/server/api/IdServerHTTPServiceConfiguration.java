@@ -16,49 +16,54 @@
 
 package com.io7m.idstore.server.api;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.net.URI;
-import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Configuration for individual HTTP services.
  *
- * @param sessionDirectory The directory containing session files
- * @param listenAddress    The listen address
- * @param listenPort       The listen port
- * @param externalAddress  The externally visible address
+ * @param listenAddress     The listen address
+ * @param listenPort        The listen port
+ * @param externalAddress   The externally visible address
+ * @param sessionExpiration The session expiration duration, if sessions should
+ *                          expire
  */
 
 @JsonDeserialize
 @JsonSerialize
 public record IdServerHTTPServiceConfiguration(
-  @JsonProperty(value = "SessionDirectory", required = true)
-  Path sessionDirectory,
   @JsonProperty(value = "ListenAddress", required = true)
   String listenAddress,
   @JsonProperty(value = "ListenPort", required = true)
   int listenPort,
   @JsonProperty(value = "ExternalAddress", required = true)
-  URI externalAddress)
+  URI externalAddress,
+  @JsonInclude(JsonInclude.Include.NON_ABSENT)
+  @JsonProperty(value = "SessionExpiration", required = false)
+  Optional<Duration> sessionExpiration)
   implements IdServerJSONConfigurationElementType
 {
   /**
    * Configuration for the part of the server that serves over HTTP.
    *
-   * @param sessionDirectory The directory containing session files
-   * @param listenAddress    The listen address
-   * @param listenPort       The listen port
-   * @param externalAddress  The externally visible address
+   * @param listenAddress     The listen address
+   * @param listenPort        The listen port
+   * @param externalAddress   The externally visible address
+   * @param sessionExpiration The session expiration duration, if sessions
+   *                          should expire
    */
 
   public IdServerHTTPServiceConfiguration
   {
-    Objects.requireNonNull(sessionDirectory, "sessionDirectory");
     Objects.requireNonNull(listenAddress, "listenAddress");
     Objects.requireNonNull(externalAddress, "externalAddress");
+    Objects.requireNonNull(sessionExpiration, "sessionExpiration");
   }
 }

@@ -24,6 +24,7 @@ import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.server.internal.IdUserSession;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecurityException;
@@ -37,10 +38,8 @@ import java.util.Objects;
  * @param <C> The type of accepted commands
  */
 
-public abstract class IdUCmdAbstract<
-  C extends IdProtocolMessageType
-  >
-  implements IdCommandExecutorType<IdUCommandContext, C, IdUResponseType>
+public abstract class IdUCmdAbstract<C extends IdProtocolMessageType>
+  implements IdCommandExecutorType<IdUserSession, IdUCommandContext, C, IdUResponseType>
 {
   protected IdUCmdAbstract()
   {

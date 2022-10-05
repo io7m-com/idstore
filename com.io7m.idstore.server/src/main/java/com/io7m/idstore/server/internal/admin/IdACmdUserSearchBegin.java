@@ -60,7 +60,7 @@ public final class IdACmdUserSearchBegin
     final var users =
       transaction.queries(IdDatabaseUsersQueriesType.class);
 
-    final var session = context.userSession();
+    final var session = context.session();
     session.setUserSearchParameters(obtainListParameters(command));
     final var paging = session.userPaging();
     final var data = paging.pageCurrent(users);

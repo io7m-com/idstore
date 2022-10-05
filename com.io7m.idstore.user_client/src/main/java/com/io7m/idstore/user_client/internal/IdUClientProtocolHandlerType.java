@@ -20,6 +20,7 @@ import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.idstore.user_client.api.IdUClientUsersType;
 
 import java.net.URI;
+import java.util.Map;
 
 /**
  * A versioned protocol handler.
@@ -34,6 +35,7 @@ public interface IdUClientProtocolHandlerType
    * @param user     The user
    * @param password The password
    * @param base     The base URI
+   * @param metadata Optional metadata properties to include with the request
    *
    * @return A new protocol handler
    *
@@ -44,6 +46,7 @@ public interface IdUClientProtocolHandlerType
   IdUNewHandler login(
     String user,
     String password,
-    URI base)
+    URI base,
+    Map<String, String> metadata)
     throws IdUClientException, InterruptedException;
 }

@@ -21,11 +21,12 @@ import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdToken;
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddPermit;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
-import com.io7m.idstore.server.internal.IdServerClock;
 import com.io7m.idstore.server.internal.IdServerStrings;
+import com.io7m.idstore.server.internal.IdUserSessionService;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.common.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
@@ -35,6 +36,7 @@ import com.io7m.idstore.server.internal.user.IdUCmdEmailAddPermit;
 import com.io7m.idstore.server.internal.user.IdUCmdEmailRemovePermit;
 import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.jvindicator.core.Vindication;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,8 +59,8 @@ public final class IdUViewEmailVerificationPermit
   private final IdServerStrings strings;
   private final IdFMTemplateType<IdFMMessageData> template;
   private final IdServiceDirectoryType services;
-  private final IdServerClock clock;
   private final IdServerBrandingService branding;
+  private final IdUserSessionService userSessions;
 
   /**
    * The endpoint that allows for completing email verification challenges.
@@ -77,13 +79,13 @@ public final class IdUViewEmailVerificationPermit
       inServices.requireService(IdDatabaseType.class);
     this.strings =
       inServices.requireService(IdServerStrings.class);
-    this.clock =
-      inServices.requireService(IdServerClock.class);
     this.branding =
       inServices.requireService(IdServerBrandingService.class);
     this.template =
       inServices.requireService(IdFMTemplateService.class)
         .pageMessage();
+    this.userSessions =
+      inServices.requireService(IdUserSessionService.class);
   }
 
   @Override
@@ -92,32 +94,28 @@ public final class IdUViewEmailVerificationPermit
     final HttpServletResponse servletResponse)
     throws ServletException, IOException
   {
-    final var tokenParameter =
-      request.getParameter("token");
-
-    if (tokenParameter == null) {
-      this.showError(
-        request,
-        servletResponse,
-        this.strings.format("missingParameter", "token"),
-        false
-      );
-      return;
-    }
-
-    final IdToken token;
     try {
-      token = new IdToken(tokenParameter);
-    } catch (final Exception e) {
-      this.showError(
-        request,
-        servletResponse,
-        this.strings.format("invalidParameter", "token"),
-        false
-      );
-      return;
-    }
+      final var vindicator =
+        Vindication.startWithExceptions(IdValidityException::new);
+      final var tokenParameter =
+        vindicator.addRequiredParameter("token", IdToken::new);
 
+      vindicator.check(request.getParameterMap());
+
+      this.runForToken(request, servletResponse, tokenParameter.get());
+    } catch (final IdValidityException e) {
+      this.showError(request, servletResponse, e.getMessage(), false);
+    } catch (final Exception e) {
+      this.showError(request, servletResponse, e.getMessage(), true);
+    }
+  }
+
+  private void runForToken(
+    final HttpServletRequest request,
+    final HttpServletResponse servletResponse,
+    final IdToken token)
+    throws IOException
+  {
     try (var connection =
            this.database.openConnection(IDSTORE)) {
       try (var transaction =
@@ -143,13 +141,27 @@ public final class IdUViewEmailVerificationPermit
           verificationOpt.get();
         final var user =
           users.userGetRequire(verification.user());
+
+        /*
+         * Create a session temporarily to run the command, and then
+         * immediately invalidate it.
+         */
+
+        final var httpSession =
+          request.getSession(true);
+        final var userSession =
+          this.userSessions.createOrGet(
+            user.id(),
+            httpSession.getId()
+          );
+
         final var commandContext =
           IdUCommandContext.create(
             this.services,
             transaction,
             request,
-            request.getSession(),
-            user
+            user,
+            userSession
           );
 
         switch (verification.operation()) {

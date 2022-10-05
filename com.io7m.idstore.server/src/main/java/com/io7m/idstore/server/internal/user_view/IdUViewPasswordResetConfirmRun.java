@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.internal.user_view;
 
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.server.internal.IdRequests;
 import com.io7m.idstore.server.internal.IdServerBrandingService;
 import com.io7m.idstore.server.internal.IdServerStrings;
@@ -27,6 +28,7 @@ import com.io7m.idstore.server.internal.freemarker.IdFMMessageData;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateService;
 import com.io7m.idstore.server.internal.freemarker.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.jvindicator.core.Vindication;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -76,21 +78,26 @@ public final class IdUViewPasswordResetConfirmRun extends IdCommonInstrumentedSe
     final HttpServletResponse response)
     throws ServletException, IOException
   {
-    final var password0Parameter =
-      getParameterOrEmpty(request, "password0");
-    final var password1Parameter =
-      getParameterOrEmpty(request, "password1");
-    final var tokenParameter =
-      getParameterOrEmpty(request, "token");
-
     try {
+      final var vindicator =
+        Vindication.startWithExceptions(IdValidityException::new);
+
+      final var password0Parameter =
+        vindicator.addRequiredParameter("password0", x -> x);
+      final var password1Parameter =
+        vindicator.addRequiredParameter("password1", x -> x);
+      final var tokenParameter =
+        vindicator.addRequiredParameter("token", x -> x);
+
+      vindicator.check(request.getParameterMap());
+
       this.userPasswordResets.resetConfirm(
         request.getRemoteHost(),
         IdRequests.requestUserAgent(request),
         requestIdFor(request),
-        Optional.ofNullable(password0Parameter),
-        Optional.ofNullable(password1Parameter),
-        Optional.ofNullable(tokenParameter)
+        Optional.ofNullable(password0Parameter.get()),
+        Optional.ofNullable(password1Parameter.get()),
+        Optional.ofNullable(tokenParameter.get())
       );
 
       this.showConfirmed(request, response);
@@ -101,6 +108,8 @@ public final class IdUViewPasswordResetConfirmRun extends IdCommonInstrumentedSe
         e.httpStatusCode(),
         e.getMessage()
       );
+    } catch (final IdValidityException e) {
+      this.showError(request, response, 400, e.getMessage());
     }
   }
 

@@ -84,6 +84,8 @@
   [field userName cb:String]
   [documentation password "The password."]
   [field password cb:String]
+  [documentation metadata "Extra metadata included with the login request."]
+  [field metadata [cb:Map cb:String cb:String]]
 ]
 
 [documentation IdU1CommandUserSelf "A request to fetch the user's own profile."]

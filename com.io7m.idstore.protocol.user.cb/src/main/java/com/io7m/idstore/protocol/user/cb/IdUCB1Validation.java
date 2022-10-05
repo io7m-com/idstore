@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.protocol.user.cb;
 
+import com.io7m.cedarbridge.runtime.api.CBMap;
 import com.io7m.cedarbridge.runtime.api.CBString;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -48,11 +49,15 @@ import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserSelf;
 import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.protocol.user.cb.internal.IdUCB1ValidationGeneral.fromWireUUID;
 import static com.io7m.idstore.protocol.user.cb.internal.IdUCB1ValidationGeneral.fromWireUser;
 import static com.io7m.idstore.protocol.user.cb.internal.IdUCB1ValidationGeneral.toWireUUID;
 import static com.io7m.idstore.protocol.user.cb.internal.IdUCB1ValidationGeneral.toWireUser;
+import static java.util.Map.entry;
 
 /**
  * Functions to translate between the core command set and the User v1
@@ -271,7 +276,19 @@ public final class IdUCB1Validation
   {
     return new IdU1CommandLogin(
       new CBString(login.userName().value()),
-      new CBString(login.password())
+      new CBString(login.password()),
+      toWireLoginMetadata(login.metadata())
+    );
+  }
+
+  private static CBMap<CBString, CBString> toWireLoginMetadata(
+    final Map<String, String> metadata)
+  {
+    return new CBMap<>(
+      metadata.entrySet()
+        .stream()
+        .map(e -> entry(new CBString(e.getKey()), new CBString(e.getValue())))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
     );
   }
 
@@ -300,8 +317,19 @@ public final class IdUCB1Validation
   {
     return new IdUCommandLogin(
       new IdName(login.fieldUserName().value()),
-      login.fieldPassword().value()
+      login.fieldPassword().value(),
+      fromWireCommandLoginMetadata(login.fieldMetadata())
     );
+  }
+
+  private static Map<String, String> fromWireCommandLoginMetadata(
+    final CBMap<CBString, CBString> map)
+  {
+    return map.values()
+      .entrySet()
+      .stream()
+      .map(e -> Map.entry(e.getKey().value(), e.getValue().value()))
+      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   @Override

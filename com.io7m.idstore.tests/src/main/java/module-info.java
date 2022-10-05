@@ -38,6 +38,8 @@ open module com.io7m.idstore.tests
   requires com.io7m.cxbutton.core;
   requires com.io7m.dixmont.colors;
   requires com.io7m.jmulticlose.core;
+  requires com.io7m.verdant.core.cb;
+  requires com.io7m.verdant.core;
   requires jakarta.mail;
   requires java.net.http;
   requires java.sql;

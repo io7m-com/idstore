@@ -14,39 +14,36 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.user_client.api;
 
-import com.io7m.idstore.model.IdUser;
+package com.io7m.idstore.tests;
 
-import java.io.Closeable;
+import com.io7m.idstore.user_client.IdUClients;
+
 import java.net.URI;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
-/**
- * The type of clients.
- */
-
-public interface IdUClientType
-  extends Closeable, IdUClientUsersType
+public final class IdLoginBlast
 {
-  /**
-   * Log in.
-   *
-   * @param user     The admin username
-   * @param password The password
-   * @param base     The base URI
-   * @param metadata Optional metadata to be included with the request
-   *
-   * @return The logged-in user
-   *
-   * @throws IdUClientException   On errors
-   * @throws InterruptedException On interruption
-   */
+  private IdLoginBlast()
+  {
 
-  IdUser login(
-    String user,
-    String password,
-    URI base,
-    Map<String, String> metadata)
-    throws IdUClientException, InterruptedException;
+  }
+
+  public static void main(
+    final String[] args)
+    throws Exception
+  {
+    final var clients = new IdUClients();
+    try (var client = clients.create(Locale.ROOT)) {
+      for (int index = 0; index < 1000; ++index) {
+        client.login(
+          "someone",
+          "abc",
+          URI.create("http://localhost:50000/"),
+          Map.of());
+      }
+    }
+  }
 }

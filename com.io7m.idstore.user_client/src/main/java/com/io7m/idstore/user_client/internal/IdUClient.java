@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -76,7 +77,8 @@ public final class IdUClient implements IdUClientType
   public IdUser login(
     final String user,
     final String password,
-    final URI base)
+    final URI base,
+    final Map<String, String> metadata)
     throws IdUClientException, InterruptedException
   {
     final var newHandler =
@@ -88,7 +90,7 @@ public final class IdUClient implements IdUClientType
       );
 
     final var result =
-      newHandler.login(user, password, base);
+      newHandler.login(user, password, base, metadata);
 
     this.handler = result.handler();
     return result.userLoggedIn();

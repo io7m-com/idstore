@@ -127,6 +127,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static java.net.http.HttpResponse.BodyHandlers;
@@ -142,10 +143,9 @@ public final class IdAClientProtocolHandler1
     LoggerFactory.getLogger(IdAClientProtocolHandler1.class);
 
   private final URI commandURI;
-  private final URI transactionURI;
   private final IdACB1Messages messages;
   private final URI loginURI;
-  private IdAdmin receivedOnLogin;
+  private IdACommandLogin mostRecentLogin;
 
   /**
    * The version 1 protocol handler.
@@ -171,9 +171,6 @@ public final class IdAClientProtocolHandler1
     this.commandURI =
       inBase.resolve("command")
         .normalize();
-    this.transactionURI =
-      inBase.resolve("transaction")
-        .normalize();
   }
 
   @Override
@@ -183,10 +180,8 @@ public final class IdAClientProtocolHandler1
     final URI base)
     throws IdAClientException, InterruptedException
   {
-    final var result =
-      this.sendLogin(new IdACommandLogin(new IdName(admin), password))
-        .admin();
-
+    this.mostRecentLogin = new IdACommandLogin(new IdName(admin), password);
+    final var result = this.sendLogin(this.mostRecentLogin).admin();
     return new IdANewHandler(result, this);
   }
 
@@ -194,8 +189,7 @@ public final class IdAClientProtocolHandler1
     final IdACommandLogin message)
     throws InterruptedException, IdAClientException
   {
-    return this.send(this.loginURI, IdAResponseLogin.class, message, false)
-      .orElseThrow(() -> new IllegalStateException("send() returned empty"));
+    return this.send(1, this.loginURI, IdAResponseLogin.class, true, message);
   }
 
   private <T extends IdAResponseType> T sendCommand(
@@ -203,15 +197,15 @@ public final class IdAClientProtocolHandler1
     final IdACommandType<T> message)
     throws InterruptedException, IdAClientException
   {
-    return this.send(this.commandURI, responseClass, message, false)
-      .orElseThrow(() -> new IllegalStateException("send() returned empty"));
+    return this.send(1, this.commandURI, responseClass, false, message);
   }
 
-  private <T extends IdAResponseType> Optional<T> send(
+  private <T extends IdAResponseType> T send(
+    final int attempt,
     final URI uri,
     final Class<T> responseClass,
-    final IdACommandType<T> message,
-    final boolean allowNotFound)
+    final boolean isLoggingIn,
+    final IdACommandType<T> message)
     throws InterruptedException, IdAClientException
   {
     try {
@@ -233,10 +227,6 @@ public final class IdAClientProtocolHandler1
 
       LOG.debug("server: status {}", response.statusCode());
 
-      if (response.statusCode() == 404 && allowNotFound) {
-        return Optional.empty();
-      }
-
       final var responseHeaders =
         response.headers();
 
@@ -244,14 +234,15 @@ public final class IdAClientProtocolHandler1
         responseHeaders.firstValue("content-type")
           .orElse("application/octet-stream");
 
-      if (!contentType.equals(IdACB1Messages.contentType())) {
+      final var expectedContentType = IdACB1Messages.contentType();
+      if (!contentType.equals(expectedContentType)) {
         throw new IdAClientException(
           PROTOCOL_ERROR,
           this.strings()
             .format(
               "errorContentType",
               commandType,
-              IdACB1Messages.contentType(),
+              expectedContentType,
               contentType)
         );
       }
@@ -259,7 +250,7 @@ public final class IdAClientProtocolHandler1
       final var responseMessage =
         this.messages.parse(response.body());
 
-      if (!(responseMessage instanceof IdAResponseType)) {
+      if (!(responseMessage instanceof final IdAResponseType responseActual)) {
         throw new IdAClientException(
           PROTOCOL_ERROR,
           this.strings()
@@ -272,8 +263,21 @@ public final class IdAClientProtocolHandler1
         );
       }
 
-      final var responseActual = (IdAResponseType) responseMessage;
       if (responseActual instanceof IdAResponseError error) {
+        if (attempt < 3) {
+          if (isAuthenticationError(error) && !isLoggingIn) {
+            LOG.debug("attempting re-login");
+            this.sendLogin(this.mostRecentLogin);
+            return this.send(
+              attempt + 1,
+              uri,
+              responseClass,
+              false,
+              message
+            );
+          }
+        }
+
         throw new IdAClientException(
           new IdErrorCode(error.errorCode()),
           this.strings()
@@ -300,12 +304,18 @@ public final class IdAClientProtocolHandler1
         );
       }
 
-      return Optional.of(responseClass.cast(responseMessage));
+      return responseClass.cast(responseMessage);
     } catch (final IdProtocolException e) {
       throw new IdAClientException(PROTOCOL_ERROR, e);
     } catch (final IOException e) {
       throw new IdAClientException(IO_ERROR, e);
     }
+  }
+
+  private static boolean isAuthenticationError(
+    final IdAResponseError error)
+  {
+    return Objects.equals(error.errorCode(), AUTHENTICATION_ERROR.id());
   }
 
   @Override

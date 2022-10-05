@@ -16,22 +16,6 @@
 
 package com.io7m.idstore.server.internal;
 
-import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPaging;
-import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPagingType;
-import com.io7m.idstore.database.api.IdDatabaseAdminSearchPaging;
-import com.io7m.idstore.database.api.IdDatabaseAdminSearchPagingType;
-import com.io7m.idstore.database.api.IdDatabaseAuditListPaging;
-import com.io7m.idstore.database.api.IdDatabaseAuditListPagingType;
-import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPaging;
-import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPagingType;
-import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
-import com.io7m.idstore.database.api.IdDatabaseUserSearchPagingType;
-import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
-import com.io7m.idstore.model.IdAdminSearchParameters;
-import com.io7m.idstore.model.IdAuditSearchParameters;
-import com.io7m.idstore.model.IdUserSearchByEmailParameters;
-import com.io7m.idstore.model.IdUserSearchParameters;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,17 +28,7 @@ public final class IdUserSession
 {
   private final UUID userId;
   private final String sessionId;
-  private IdUserSearchParameters userSearchParameters;
-  private IdDatabaseUserSearchPagingType userSearchPaging;
-  private IdUserSearchByEmailParameters userSearchByEmailParameters;
-  private IdDatabaseUserSearchByEmailPagingType userSearchByEmailPaging;
   private Optional<IdSessionMessage> message;
-  private IdAuditSearchParameters auditListParameters;
-  private IdDatabaseAuditListPagingType auditPaging;
-  private IdAdminSearchParameters adminSearchParameters;
-  private IdDatabaseAdminSearchPagingType adminSearchPaging;
-  private IdAdminSearchByEmailParameters adminSearchByEmailParameters;
-  private IdDatabaseAdminSearchByEmailPagingType adminSearchByEmailPaging;
 
   /**
    * A controller for a single user session.
@@ -71,96 +45,25 @@ public final class IdUserSession
       Objects.requireNonNull(inUserId, "userId");
     this.sessionId =
       Objects.requireNonNull(inSessionId, "sessionId");
-
-    this.userSearchParameters =
-      IdUserSearchParameters.defaults();
-    this.userSearchPaging =
-      IdDatabaseUserSearchPaging.create(this.userSearchParameters);
-
-    this.userSearchByEmailParameters =
-      IdUserSearchByEmailParameters.defaults();
-    this.userSearchByEmailPaging =
-      IdDatabaseUserSearchByEmailPaging.create(this.userSearchByEmailParameters);
-
-    this.auditListParameters =
-      IdAuditSearchParameters.defaults();
-    this.auditPaging =
-      IdDatabaseAuditListPaging.create(this.auditListParameters);
-
-    this.adminSearchParameters =
-      IdAdminSearchParameters.defaults();
-    this.adminSearchPaging =
-      IdDatabaseAdminSearchPaging.create(this.adminSearchParameters);
-
-    this.adminSearchByEmailParameters =
-      IdAdminSearchByEmailParameters.defaults();
-    this.adminSearchByEmailPaging =
-      IdDatabaseAdminSearchByEmailPaging.create(this.adminSearchByEmailParameters);
-
     this.message =
       Optional.empty();
   }
 
   /**
-   * @return The most recent user paging handler
-   */
-
-  public IdDatabaseUserSearchPagingType userPaging()
-  {
-    return this.userSearchPaging;
-  }
-
-  /**
-   * @return The most recent user paging handler
-   */
-
-  public IdDatabaseUserSearchByEmailPagingType userByEmailPaging()
-  {
-    return this.userSearchByEmailPaging;
-  }
-
-  /**
-   * Set the user listing parameters.
+   * Set the current session message.
    *
-   * @param userParameters The user parameters
+   * @param inMessage The message
    */
 
-  public void setUserSearchParameters(
-    final IdUserSearchParameters userParameters)
+  public void messageCurrentSet(
+    final IdSessionMessage inMessage)
   {
-    this.userSearchParameters =
-      Objects.requireNonNull(userParameters, "userParameters");
-
-    if (!Objects.equals(
-      this.userSearchPaging.pageParameters(),
-      userParameters)) {
-      this.userSearchPaging =
-        IdDatabaseUserSearchPaging.create(userParameters);
-    }
+    this.message =
+      Optional.of(Objects.requireNonNull(inMessage, "message"));
   }
 
   /**
-   * Set the user listing parameters.
-   *
-   * @param userParameters The user parameters
-   */
-
-  public void setUserSearchByEmailParameters(
-    final IdUserSearchByEmailParameters userParameters)
-  {
-    this.userSearchByEmailParameters =
-      Objects.requireNonNull(userParameters, "userParameters");
-
-    if (!Objects.equals(
-      this.userSearchByEmailPaging.pageParameters(),
-      userParameters)) {
-      this.userSearchByEmailPaging =
-        IdDatabaseUserSearchByEmailPaging.create(userParameters);
-    }
-  }
-
-  /**
-   * @return The current message
+   * @return The current session message
    */
 
   public Optional<IdSessionMessage> messageCurrent()
@@ -175,114 +78,5 @@ public final class IdUserSession
   public void messageDiscard()
   {
     this.message = Optional.empty();
-  }
-
-  /**
-   * Set the current message.
-   *
-   * @param inMessage The message
-   */
-
-  public void messageCurrentSet(
-    final IdSessionMessage inMessage)
-  {
-    this.message = Optional.of(
-      Objects.requireNonNull(inMessage, "message")
-    );
-  }
-
-  /**
-   * Set the audit listing parameters.
-   *
-   * @param auditParameters The audit parameters
-   */
-
-  public void setAuditListParameters(
-    final IdAuditSearchParameters auditParameters)
-  {
-    this.auditListParameters =
-      Objects.requireNonNull(auditParameters, "auditParameters");
-
-    if (!Objects.equals(this.auditPaging.pageParameters(), auditParameters)) {
-      this.auditPaging =
-        IdDatabaseAuditListPaging.create(auditParameters);
-    }
-  }
-
-  /**
-   * @return The most recent audit list parameters
-   */
-
-  public IdAuditSearchParameters auditListParameters()
-  {
-    return this.auditListParameters;
-  }
-
-  /**
-   * @return The most recent audit paging handler
-   */
-
-  public IdDatabaseAuditListPagingType auditPaging()
-  {
-    return this.auditPaging;
-  }
-
-
-  /**
-   * @return The most recent admin paging handler
-   */
-
-  public IdDatabaseAdminSearchPagingType adminPaging()
-  {
-    return this.adminSearchPaging;
-  }
-
-  /**
-   * @return The most recent admin paging handler
-   */
-
-  public IdDatabaseAdminSearchByEmailPagingType adminByEmailPaging()
-  {
-    return this.adminSearchByEmailPaging;
-  }
-
-  /**
-   * Set the admin listing parameters.
-   *
-   * @param adminParameters The admin parameters
-   */
-
-  public void setAdminSearchParameters(
-    final IdAdminSearchParameters adminParameters)
-  {
-    this.adminSearchParameters =
-      Objects.requireNonNull(adminParameters, "adminParameters");
-
-    if (!Objects.equals(
-      this.adminSearchPaging.pageParameters(),
-      adminParameters)) {
-      this.adminSearchPaging =
-        IdDatabaseAdminSearchPaging.create(adminParameters);
-    }
-  }
-
-  /**
-   * Set the admin listing parameters.
-   *
-   * @param adminParameters The admin parameters
-   */
-
-  public void setAdminSearchByEmailParameters(
-    final IdAdminSearchByEmailParameters adminParameters)
-  {
-    this.adminSearchByEmailParameters =
-      Objects.requireNonNull(adminParameters, "adminParameters");
-
-    if (!Objects.equals(
-      this.adminSearchByEmailPaging.pageParameters(),
-      adminParameters)) {
-      this.adminSearchByEmailPaging =
-        IdDatabaseAdminSearchByEmailPaging.create(adminParameters);
-    }
   }
 }

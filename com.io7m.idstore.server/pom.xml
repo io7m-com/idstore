@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server</artifactId>
@@ -162,6 +162,10 @@
     <dependency>
       <groupId>com.io7m.verdant</groupId>
       <artifactId>com.io7m.verdant.core.cb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.jvindicator</groupId>
+      <artifactId>com.io7m.jvindicator.core</artifactId>
     </dependency>
 
     <dependency>

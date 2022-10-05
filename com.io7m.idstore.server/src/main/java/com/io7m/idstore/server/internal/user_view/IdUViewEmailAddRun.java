@@ -25,6 +25,7 @@ import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.user.IdUCmdEmailAddBegin;
 import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.jvindicator.core.Vindication;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -71,30 +72,19 @@ public final class IdUViewEmailAddRun extends IdUViewAuthenticatedServlet
     final HttpSession session)
     throws IOException, ServletException
   {
-    final var userController =
-      this.userController();
     final var strings =
       this.strings();
     final var messageServlet =
       new IdUViewMessage(this.services());
 
-    final var emailParameter = request.getParameter("email");
-    if (emailParameter == null) {
-      userController.messageCurrentSet(
-        new IdSessionMessage(
-          requestIdFor(request),
-          true,
-          false,
-          strings.format("error"),
-          strings.format("missingParameter", "email"),
-          "/email-add"
-        )
-      );
-      messageServlet.service(request, servletResponse);
-      return;
-    }
-
     try {
+      final var vindicator =
+        Vindication.startWithExceptions(IdValidityException::new);
+      final var emailParameter =
+        vindicator.addRequiredParameter("email", IdEmail::new);
+
+      vindicator.check(request.getParameterMap());
+
       final var database = this.database();
       try (var connection = database.openConnection(IDSTORE)) {
         try (var transaction = connection.openTransaction()) {
@@ -103,24 +93,26 @@ public final class IdUViewEmailAddRun extends IdUViewAuthenticatedServlet
               this.services(),
               transaction,
               request,
-              session,
-              this.user()
+              this.user(),
+              this.userSession()
             );
 
+          final var email =
+            emailParameter.get();
           final var command =
-            new IdUCommandEmailAddBegin(new IdEmail(emailParameter));
+            new IdUCommandEmailAddBegin(email);
           new IdUCmdEmailAddBegin()
             .execute(context, command);
 
           transaction.commit();
 
-          userController.messageCurrentSet(
+          this.userSession().messageCurrentSet(
             new IdSessionMessage(
               requestIdFor(request),
               false,
               false,
               strings.format("emailVerificationTitle"),
-              strings.format("emailVerificationSent", emailParameter),
+              strings.format("emailVerificationSent", email),
               "/"
             )
           );
@@ -129,7 +121,7 @@ public final class IdUViewEmailAddRun extends IdUViewAuthenticatedServlet
         }
       }
     } catch (final IdCommandExecutionFailure e) {
-      userController.messageCurrentSet(
+      this.userSession().messageCurrentSet(
         new IdSessionMessage(
           requestIdFor(request),
           true,
@@ -141,7 +133,7 @@ public final class IdUViewEmailAddRun extends IdUViewAuthenticatedServlet
       );
       messageServlet.service(request, servletResponse);
     } catch (final IdValidityException e) {
-      userController.messageCurrentSet(
+      this.userSession().messageCurrentSet(
         new IdSessionMessage(
           requestIdFor(request),
           true,
@@ -153,7 +145,7 @@ public final class IdUViewEmailAddRun extends IdUViewAuthenticatedServlet
       );
       messageServlet.service(request, servletResponse);
     } catch (final Exception e) {
-      userController.messageCurrentSet(
+      this.userSession().messageCurrentSet(
         new IdSessionMessage(
           requestIdFor(request),
           true,

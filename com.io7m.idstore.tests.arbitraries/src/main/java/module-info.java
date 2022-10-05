@@ -27,6 +27,7 @@ import com.io7m.idstore.tests.arbitraries.IdArbBanProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbEmailProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbHashProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbIdNameProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbInetAddressProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbLoginProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbOffsetDateTimeProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbPasswordProvider;
@@ -75,6 +76,7 @@ module com.io7m.idstore.tests.arbitraries
       IdArbEmailProvider,
       IdArbHashProvider,
       IdArbIdNameProvider,
+      IdArbInetAddressProvider,
       IdArbLoginProvider,
       IdArbOffsetDateTimeProvider,
       IdArbPasswordProvider,
@@ -82,14 +84,14 @@ module com.io7m.idstore.tests.arbitraries
       IdArbSubsetMatchProvider,
       IdArbTimeRangeProvider,
       IdArbTokenProvider,
+      IdArbUMessageProvider,
       IdArbURIProvider,
       IdArbUUIDProvider,
       IdArbUserOrderingProvider,
       IdArbUserProvider,
       IdArbUserSearchByEmailParametersProvider,
       IdArbUserSearchParametersProvider,
-      IdArbUserSummaryProvider,
-      IdArbUMessageProvider
+      IdArbUserSummaryProvider
     ;
 
   exports com.io7m.idstore.tests.arbitraries;

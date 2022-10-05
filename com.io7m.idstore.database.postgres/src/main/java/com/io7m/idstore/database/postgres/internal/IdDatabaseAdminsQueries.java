@@ -49,6 +49,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -57,6 +58,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
+import static com.io7m.idstore.database.postgres.internal.IdDatabaseUsersQueries.formatHosts;
 import static com.io7m.idstore.database.postgres.internal.Tables.ADMINS;
 import static com.io7m.idstore.database.postgres.internal.Tables.AUDIT;
 import static com.io7m.idstore.database.postgres.internal.Tables.BANS;
@@ -69,6 +71,9 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NOT_INITIAL;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHostProxied;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -514,13 +519,11 @@ final class IdDatabaseAdminsQueries
   @Override
   public void adminLogin(
     final UUID id,
-    final String userAgent,
-    final String host)
+    final Map<String, String> metadata)
     throws IdDatabaseException
   {
     Objects.requireNonNull(id, "id");
-    Objects.requireNonNull(userAgent, "userAgent");
-    Objects.requireNonNull(host, "host");
+    Objects.requireNonNull(metadata, "metadata");
 
     final var transaction =
       this.transaction();
@@ -542,8 +545,9 @@ final class IdDatabaseAdminsQueries
       context.insertInto(LOGIN_HISTORY)
         .set(LOGIN_HISTORY.USER_ID, id)
         .set(LOGIN_HISTORY.TIME, this.currentTime())
-        .set(LOGIN_HISTORY.AGENT, userAgent)
-        .set(LOGIN_HISTORY.HOST, host)
+        .set(LOGIN_HISTORY.AGENT, metadata.getOrDefault(userAgent(), ""))
+        .set(LOGIN_HISTORY.HOST, metadata.getOrDefault(remoteHost(), ""))
+        .set(LOGIN_HISTORY.PROXIED_HOST, metadata.getOrDefault(remoteHostProxied(), ""))
         .execute();
 
       /*
@@ -556,7 +560,7 @@ final class IdDatabaseAdminsQueries
           .set(AUDIT.TIME, time)
           .set(AUDIT.TYPE, "ADMIN_LOGGED_IN")
           .set(AUDIT.USER_ID, id)
-          .set(AUDIT.MESSAGE, host);
+          .set(AUDIT.MESSAGE, formatHosts(metadata));
 
       audit.execute();
     } catch (final DataAccessException e) {

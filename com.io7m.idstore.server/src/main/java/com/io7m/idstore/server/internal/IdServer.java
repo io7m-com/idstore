@@ -74,7 +74,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.DefaultSessionIdManager;
-import org.eclipse.jetty.server.session.FileSessionDataStore;
+import org.eclipse.jetty.server.session.NullSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.slf4j.Logger;
@@ -244,8 +244,12 @@ public final class IdServer implements IdServerType
     services.register(IdServerMailService.class, mailService);
 
     services.register(
+      IdAdminSessionService.class,
+      new IdAdminSessionService(this.telemetry)
+    );
+    services.register(
       IdUserSessionService.class,
-      new IdUserSessionService()
+      new IdUserSessionService(this.telemetry)
     );
 
     final var templates = IdFMTemplateService.create();
@@ -345,11 +349,8 @@ public final class IdServer implements IdServerType
      * Configure all the servlets.
      */
 
-    final var servletHolders =
-      new IdServletHolders(services);
-    final var servlets =
-      new ServletContextHandler();
-
+    final var servletHolders = new IdServletHolders(services);
+    final var servlets = new ServletContextHandler();
     createUserViewServerServlets(servletHolders, servlets);
 
     /*
@@ -362,12 +363,18 @@ public final class IdServer implements IdServerType
 
     final var sessionHandler = new SessionHandler();
     sessionHandler.setSessionCookie("IDSTORE_USER_VIEW_SESSION");
+    sessionHandler.addEventListener(
+      services.requireService(IdUserSessionService.class));
 
-    final var sessionStore = new FileSessionDataStore();
-    sessionStore.setStoreDir(httpConfig.sessionDirectory().toFile());
+    httpConfig.sessionExpiration().ifPresent(expiration -> {
+      sessionHandler.setMaxInactiveInterval(
+        Math.toIntExact(expiration.toSeconds())
+      );
+    });
+
 
     final var sessionCache = new DefaultSessionCache(sessionHandler);
-    sessionCache.setSessionDataStore(sessionStore);
+    sessionCache.setSessionDataStore(new NullSessionDataStore());
 
     sessionHandler.setSessionCache(sessionCache);
     sessionHandler.setSessionIdManager(sessionIds);
@@ -629,10 +636,8 @@ public final class IdServer implements IdServerType
      * Configure all the servlets.
      */
 
-    final var servletHolders =
-      new IdServletHolders(services);
-    final var servlets =
-      new ServletContextHandler();
+    final var servletHolders = new IdServletHolders(services);
+    final var servlets = new ServletContextHandler();
 
     servlets.addServlet(
       servletHolders.create(IdU1Versions.class, IdU1Versions::new),
@@ -657,12 +662,17 @@ public final class IdServer implements IdServerType
 
     final var sessionHandler = new SessionHandler();
     sessionHandler.setSessionCookie("IDSTORE_USER_API_SESSION");
+    sessionHandler.addEventListener(
+      services.requireService(IdUserSessionService.class));
 
-    final var sessionStore = new FileSessionDataStore();
-    sessionStore.setStoreDir(httpConfig.sessionDirectory().toFile());
+    httpConfig.sessionExpiration().ifPresent(expiration -> {
+      sessionHandler.setMaxInactiveInterval(
+        Math.toIntExact(expiration.toSeconds())
+      );
+    });
 
     final var sessionCache = new DefaultSessionCache(sessionHandler);
-    sessionCache.setSessionDataStore(sessionStore);
+    sessionCache.setSessionDataStore(new NullSessionDataStore());
 
     sessionHandler.setSessionCache(sessionCache);
     sessionHandler.setSessionIdManager(sessionIds);
@@ -747,12 +757,17 @@ public final class IdServer implements IdServerType
 
     final var sessionHandler = new SessionHandler();
     sessionHandler.setSessionCookie("IDSTORE_ADMIN_API_SESSION");
+    sessionHandler.addEventListener(
+      services.requireService(IdAdminSessionService.class));
 
-    final var sessionStore = new FileSessionDataStore();
-    sessionStore.setStoreDir(httpConfig.sessionDirectory().toFile());
+    httpConfig.sessionExpiration().ifPresent(expiration -> {
+      sessionHandler.setMaxInactiveInterval(
+        Math.toIntExact(expiration.toSeconds())
+      );
+    });
 
     final var sessionCache = new DefaultSessionCache(sessionHandler);
-    sessionCache.setSessionDataStore(sessionStore);
+    sessionCache.setSessionDataStore(new NullSessionDataStore());
 
     sessionHandler.setSessionCache(sessionCache);
     sessionHandler.setSessionIdManager(sessionIds);
