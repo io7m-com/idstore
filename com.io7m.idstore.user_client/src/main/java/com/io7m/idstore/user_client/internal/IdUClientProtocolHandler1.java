@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
@@ -107,10 +108,12 @@ public final class IdUClientProtocolHandler1
   public IdUNewHandler login(
     final String user,
     final String password,
-    final URI base)
+    final URI base,
+    final Map<String, String> metadata)
     throws IdUClientException, InterruptedException
   {
-    this.mostRecentLogin = new IdUCommandLogin(new IdName(user), password);
+    this.mostRecentLogin =
+      new IdUCommandLogin(new IdName(user), password, metadata);
     final var result = this.sendLogin(this.mostRecentLogin).user();
     return new IdUNewHandler(result, this);
   }

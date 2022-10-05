@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -71,6 +72,9 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_E
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID_NAME;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHostProxied;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static java.lang.Boolean.TRUE;
 
 final class IdDatabaseUsersQueries
@@ -169,6 +173,28 @@ final class IdDatabaseUsersQueries
         });
     }
     return List.copyOf(fields);
+  }
+
+
+  private static IdUserPasswordReset mapPasswordReset(
+    final UserPasswordResetsRecord rec)
+  {
+    return new IdUserPasswordReset(
+      rec.getUserId(),
+      new IdToken(rec.getToken()),
+      rec.getExpires()
+    );
+  }
+
+  private static IdLogin mapLogin(
+    final LoginHistoryRecord r)
+  {
+    return new IdLogin(
+      r.getUserId(),
+      r.getTime(),
+      r.getHost(),
+      r.getAgent()
+    );
   }
 
   @Override
@@ -429,14 +455,12 @@ final class IdDatabaseUsersQueries
   @Override
   public void userLogin(
     final UUID id,
-    final String userAgent,
-    final String host,
+    final Map<String, String> metadata,
     final int limitHistory)
     throws IdDatabaseException
   {
     Objects.requireNonNull(id, "id");
-    Objects.requireNonNull(userAgent, "userAgent");
-    Objects.requireNonNull(host, "host");
+    Objects.requireNonNull(metadata, "metadata");
 
     final var transaction =
       this.transaction();
@@ -488,8 +512,9 @@ final class IdDatabaseUsersQueries
       context.insertInto(LOGIN_HISTORY)
         .set(LOGIN_HISTORY.USER_ID, id)
         .set(LOGIN_HISTORY.TIME, this.currentTime())
-        .set(LOGIN_HISTORY.AGENT, userAgent)
-        .set(LOGIN_HISTORY.HOST, host)
+        .set(LOGIN_HISTORY.AGENT, metadata.getOrDefault(userAgent(), ""))
+        .set(LOGIN_HISTORY.HOST, metadata.getOrDefault(remoteHost(), ""))
+        .set(LOGIN_HISTORY.PROXIED_HOST, metadata.getOrDefault(remoteHostProxied(), ""))
         .execute();
 
       /*
@@ -502,7 +527,7 @@ final class IdDatabaseUsersQueries
           .set(AUDIT.TIME, time)
           .set(AUDIT.TYPE, "USER_LOGGED_IN")
           .set(AUDIT.USER_ID, id)
-          .set(AUDIT.MESSAGE, host);
+          .set(AUDIT.MESSAGE, formatHosts(metadata));
 
       audit.execute();
     } catch (final DataAccessException e) {
@@ -511,6 +536,20 @@ final class IdDatabaseUsersQueries
     } finally {
       querySpan.end();
     }
+  }
+
+  static String formatHosts(
+    final Map<String, String> metadata)
+  {
+    final var host =
+      metadata.getOrDefault(remoteHost(), "");
+    final var proxied =
+      metadata.getOrDefault(remoteHostProxied(), "");
+
+    if (proxied.isEmpty()) {
+      return host;
+    }
+    return "%s (%s)".formatted(host, proxied);
   }
 
   @Override
@@ -1394,26 +1433,5 @@ final class IdDatabaseUsersQueries
     } finally {
       querySpan.end();
     }
-  }
-
-  private static IdUserPasswordReset mapPasswordReset(
-    final UserPasswordResetsRecord rec)
-  {
-    return new IdUserPasswordReset(
-      rec.getUserId(),
-      new IdToken(rec.getToken()),
-      rec.getExpires()
-    );
-  }
-
-  private static IdLogin mapLogin(
-    final LoginHistoryRecord r)
-  {
-    return new IdLogin(
-      r.getUserId(),
-      r.getTime(),
-      r.getHost(),
-      r.getAgent()
-    );
   }
 }

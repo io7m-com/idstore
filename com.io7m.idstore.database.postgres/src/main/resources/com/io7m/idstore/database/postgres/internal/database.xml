@@ -214,6 +214,7 @@ create table login_history (
   user_id        uuid                     not null,
   time           timestamp with time zone not null,
   host           varchar(1000000)         not null,
+  proxied_host   varchar(1000000)         not null,
   agent          varchar(1000000)         not null,
 
   foreign key (user_id) references user_ids (id)

@@ -14,36 +14,49 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.model;
 
-package com.io7m.idstore.tests;
+/**
+ * Standard login metadata values.
+ */
 
-import com.io7m.idstore.user_client.IdUClients;
-
-import java.net.URI;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-
-public final class IdLoginBlast
+public final class IdLoginMetadataStandard
 {
-  private IdLoginBlast()
+  private IdLoginMetadataStandard()
   {
 
   }
 
-  public static void main(
-    final String[] args)
-    throws Exception
+  /**
+   * The name used to store the remote host.
+   *
+   * @return The key name
+   */
+
+  public static String remoteHost()
   {
-    final var clients = new IdUClients();
-    try (var client = clients.create(Locale.ROOT)) {
-      for (int index = 0; index < 1000; ++index) {
-        client.login(
-          "someone",
-          "abc",
-          URI.create("http://localhost:50000/"),
-          Map.of());
-      }
-    }
+    return "REMOTE_HOST";
+  }
+
+  /**
+   * The name used to store the remote host being proxied.
+   *
+   * @return The key name
+   */
+
+  public static String remoteHostProxied()
+  {
+    return "REMOTE_HOST_PROXIED";
+  }
+
+  /**
+   * The name used to store the user agent.
+   *
+   * @return The key name
+   */
+
+  public static String userAgent()
+  {
+    return "USER_AGENT";
   }
 }

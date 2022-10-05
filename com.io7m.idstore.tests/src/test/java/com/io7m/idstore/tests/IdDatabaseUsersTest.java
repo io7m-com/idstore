@@ -22,6 +22,7 @@ import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.model.IdLoginMetadataStandard;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
@@ -35,8 +36,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -47,6 +51,8 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_E
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID_NAME;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHostProxied;
 import static com.io7m.idstore.model.IdUserColumn.BY_IDNAME;
 import static com.io7m.idstore.model.IdUserColumn.BY_REALNAME;
 import static com.io7m.idstore.model.IdUserColumn.BY_TIME_CREATED;
@@ -359,8 +365,7 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
 
     users.userLogin(
       user.id(),
-      "Mozilla/5.0 (X11; Linux x86_64)",
-      "127.0.0.1",
+      Map.of(remoteHost(), "127.0.0.1"),
       100
     );
 
@@ -369,6 +374,67 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("USER_CREATED", id.toString()),
       new ExpectedEvent("USER_LOGGED_IN", "127.0.0.1")
+    );
+  }
+
+  /**
+   * Logging in works for proxied hosts.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserLoginProxied()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    final var id =
+      randomUUID();
+    final var now =
+      now();
+
+    final var password =
+      databaseGenerateBadPassword();
+
+    final var user =
+      users.userCreate(
+        id,
+        new IdName("someone"),
+        new IdRealName("someone"),
+        new IdEmail("someone@example.com"),
+        now,
+        password
+      );
+
+    users.userLogin(
+      user.id(),
+      Map.ofEntries(
+        Map.entry(remoteHost(), "127.0.0.1"),
+        Map.entry(remoteHostProxied(), "fe80:0:0:0:18c6:61ff:fedb:dfed")
+      ),
+      100
+    );
+
+    checkAuditLog(
+      transaction,
+      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
+      new ExpectedEvent("USER_CREATED", id.toString()),
+      new ExpectedEvent("USER_LOGGED_IN", "127.0.0.1 (fe80:0:0:0:18c6:61ff:fedb:dfed)")
     );
   }
 
@@ -394,8 +460,7 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       assertThrows(IdDatabaseException.class, () -> {
         users.userLogin(
           randomUUID(),
-          "Mozilla/5.0 (X11; Linux x86_64)",
-          "127.0.0.1",
+          Map.of(),
           100
           );
       });

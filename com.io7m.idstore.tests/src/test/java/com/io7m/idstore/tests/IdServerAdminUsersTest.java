@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -126,7 +127,7 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
       this.serverCreateUser(admin, "someone");
 
     final var ex =
-      Assertions.assertThrows(IdAClientException.class, () -> {
+      assertThrows(IdAClientException.class, () -> {
         this.client.login("admin1", "12345678", this.serverAdminAPIURL());
       });
 
@@ -153,7 +154,7 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
       this.serverCreateUser(admin, "someone");
 
     final var ex =
-      Assertions.assertThrows(IdAClientException.class, () -> {
+      assertThrows(IdAClientException.class, () -> {
         this.client.login("admin", "123456789", this.serverAdminAPIURL());
       });
 
@@ -467,7 +468,7 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
     this.client.userDelete(id);
 
     final var ex =
-      Assertions.assertThrows(IdAClientException.class, () -> {
+      assertThrows(IdAClientException.class, () -> {
         this.client.userUpdate(
           user0.id(),
           empty(),
@@ -509,7 +510,7 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
 
     final var ex =
       assertThrows(IdUClientException.class, () -> {
-        this.userClient.login("other", "12345678", this.serverUserAPIURL());
+        this.userClient.login("other", "12345678", this.serverUserAPIURL(), Map.of());
       });
 
     assertTrue(
@@ -540,12 +541,12 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
     this.client.userBanCreate(new IdBan(
       other,
       "Spite",
-      Optional.empty()
+      empty()
     ));
 
     final var ex =
       assertThrows(IdUClientException.class, () -> {
-        this.userClient.login("other", "12345678", this.serverUserAPIURL());
+        this.userClient.login("other", "12345678", this.serverUserAPIURL(), Map.of());
       });
 
     assertTrue(
@@ -579,7 +580,7 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
       Optional.of(timeNow().minusYears(1000L))
     ));
 
-    this.userClient.login("other", "12345678", this.serverUserAPIURL());
+    this.userClient.login("other", "12345678", this.serverUserAPIURL(), Map.of());
   }
 
   private static void checkItems(

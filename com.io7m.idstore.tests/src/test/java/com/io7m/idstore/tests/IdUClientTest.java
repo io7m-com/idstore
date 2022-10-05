@@ -47,6 +47,8 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
@@ -174,7 +176,8 @@ public final class IdUClientTest
     this.client.login(
       "someone",
       "whatever",
-      URI.create("http://localhost:60000/")
+      URI.create("http://localhost:60000/"),
+      Map.of()
     );
 
     final var result = this.client.userSelf();
@@ -225,7 +228,8 @@ public final class IdUClientTest
     this.client.login(
       "someone",
       "whatever",
-      URI.create("http://localhost:60000/")
+      URI.create("http://localhost:60000/"),
+      Map.of()
     );
 
     final var ex =
@@ -279,7 +283,8 @@ public final class IdUClientTest
     this.client.login(
       "someone",
       "whatever",
-      URI.create("http://localhost:60000/")
+      URI.create("http://localhost:60000/"),
+      Map.of()
     );
 
     final var ex =

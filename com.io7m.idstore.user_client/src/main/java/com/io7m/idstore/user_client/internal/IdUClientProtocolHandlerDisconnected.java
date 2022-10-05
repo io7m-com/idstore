@@ -25,6 +25,7 @@ import com.io7m.idstore.user_client.api.IdUClientException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NOT_LOGGED_IN;
@@ -65,7 +66,8 @@ public final class IdUClientProtocolHandlerDisconnected
   public IdUNewHandler login(
     final String user,
     final String password,
-    final URI base)
+    final URI base,
+    final Map<String, String> metadata)
     throws IdUClientException, InterruptedException
   {
     final var handler =
@@ -76,7 +78,7 @@ public final class IdUClientProtocolHandlerDisconnected
         base
       );
 
-    return handler.login(user, password, base);
+    return handler.login(user, password, base, metadata);
   }
 
   private IdUClientException notLoggedIn()

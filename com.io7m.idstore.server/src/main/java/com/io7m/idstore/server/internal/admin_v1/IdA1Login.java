@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Objects;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
@@ -48,6 +49,8 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_METHOD_ERRO
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static com.io7m.idstore.server.internal.IdServerRequestDecoration.requestIdFor;
 import static com.io7m.idstore.server.logging.IdServerMDCRequestProcessor.mdcForRequest;
 import static org.eclipse.jetty.http.HttpStatus.BAD_REQUEST_400;
@@ -195,11 +198,10 @@ public final class IdA1Login extends IdCommonInstrumentedServlet
     session.setAttribute("AdminID", admin.id());
     response.setStatus(200);
 
-    admins.adminLogin(
-      admin.id(),
-      IdRequests.requestUserAgent(request),
-      request.getRemoteAddr()
-    );
+    final var metadata = new HashMap<String, String>(2);
+    metadata.put(userAgent(), IdRequests.requestUserAgent(request));
+    metadata.put(remoteHost(), request.getRemoteAddr());
+    admins.adminLogin(admin.id(), metadata);
 
     this.sendLoginResponse(request, response, admin);
   }

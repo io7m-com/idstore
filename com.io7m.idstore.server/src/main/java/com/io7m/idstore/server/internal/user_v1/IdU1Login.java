@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Objects;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
@@ -49,6 +50,8 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_METHOD_ERRO
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
+import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static com.io7m.idstore.server.internal.IdServerRequestDecoration.requestIdFor;
 import static com.io7m.idstore.server.logging.IdServerMDCRequestProcessor.mdcForRequest;
 import static org.eclipse.jetty.http.HttpStatus.BAD_REQUEST_400;
@@ -246,10 +249,13 @@ public final class IdU1Login extends IdCommonInstrumentedServlet
     session.setAttribute("UserID", user.id());
     response.setStatus(200);
 
+    final var metadata = new HashMap<>(login.metadata());
+    metadata.put(userAgent(), IdRequests.requestUserAgent(request));
+    metadata.put(remoteHost(), request.getRemoteAddr());
+
     users.userLogin(
       user.id(),
-      IdRequests.requestUserAgent(request),
-      request.getRemoteAddr(),
+      metadata,
       this.configuration.configuration()
         .history()
         .userLoginHistoryLimit()
@@ -270,7 +276,9 @@ public final class IdU1Login extends IdCommonInstrumentedServlet
     try {
       final var data =
         this.messages.serialize(
-          new IdUResponseLogin(requestIdFor(request), user.withRedactedPassword())
+          new IdUResponseLogin(
+            requestIdFor(request),
+            user.withRedactedPassword())
         );
       response.setContentLength(data.length);
       try (var output = response.getOutputStream()) {

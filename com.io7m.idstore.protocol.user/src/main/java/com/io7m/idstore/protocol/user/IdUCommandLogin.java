@@ -18,30 +18,35 @@ package com.io7m.idstore.protocol.user;
 
 import com.io7m.idstore.model.IdName;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * A request to log in.
  *
- * @param userName The username
- * @param password The password
+ * @param userName       The username
+ * @param password       The password
+ * @param metadata Extra metadata included with the request
  */
 
 public record IdUCommandLogin(
   IdName userName,
-  String password)
+  String password,
+  Map<String, String> metadata)
   implements IdUCommandType<IdUResponseLogin>
 {
   /**
    * A request to log in.
    *
-   * @param userName The username
-   * @param password The password
+   * @param userName       The username
+   * @param password       The password
+   * @param metadata Extra metadata included with the request
    */
 
   public IdUCommandLogin
   {
     Objects.requireNonNull(userName, "userName");
     Objects.requireNonNull(password, "password");
+    Objects.requireNonNull(metadata, "metadata");
   }
 }

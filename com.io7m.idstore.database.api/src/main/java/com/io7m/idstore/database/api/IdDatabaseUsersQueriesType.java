@@ -32,6 +32,7 @@ import com.io7m.idstore.model.IdUserSummary;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -168,8 +169,7 @@ public non-sealed interface IdDatabaseUsersQueriesType
    * Record the fact that the given user has logged in.
    *
    * @param id           The user ID
-   * @param userAgent    The user agent
-   * @param host         The host from which the user logged in
+   * @param metadata     The optional metadata included with the request
    * @param limitHistory The limit on the number of login records that will be
    *                     kept
    *
@@ -178,8 +178,7 @@ public non-sealed interface IdDatabaseUsersQueriesType
 
   void userLogin(
     UUID id,
-    String userAgent,
-    String host,
+    Map<String, String> metadata,
     int limitHistory)
     throws IdDatabaseException;
 

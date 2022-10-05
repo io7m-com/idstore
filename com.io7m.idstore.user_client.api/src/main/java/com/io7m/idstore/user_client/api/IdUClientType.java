@@ -20,6 +20,7 @@ import com.io7m.idstore.model.IdUser;
 
 import java.io.Closeable;
 import java.net.URI;
+import java.util.Map;
 
 /**
  * The type of clients.
@@ -34,15 +35,18 @@ public interface IdUClientType
    * @param user     The admin username
    * @param password The password
    * @param base     The base URI
+   * @param metadata Optional metadata to be included with the request
    *
    * @return The logged-in user
-   * @throws IdUClientException    On errors
+   *
+   * @throws IdUClientException   On errors
    * @throws InterruptedException On interruption
    */
 
   IdUser login(
     String user,
     String password,
-    URI base)
+    URI base,
+    Map<String, String> metadata)
     throws IdUClientException, InterruptedException;
 }

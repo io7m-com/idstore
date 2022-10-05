@@ -36,6 +36,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.net.http.HttpRequest.BodyPublishers.ofByteArray;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -184,7 +186,7 @@ public final class IdServerUserErrorsTest extends IdWithServerContract
           URI.create(this.serverUserAPIURL() + "user/1/0/login")
         ).POST(ofByteArray(
           this.message.serialize(
-            new IdUCommandLogin(new IdName("someone"), "12345678"))))
+            new IdUCommandLogin(new IdName("someone"), "12345678", Map.of()))))
         .build();
 
     final var response =
