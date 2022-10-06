@@ -31,6 +31,7 @@ import com.io7m.idstore.server.internal.admin.IdACommandContext;
 import com.io7m.idstore.server.internal.admin.IdACommandExecutor;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import io.opentelemetry.api.trace.Span;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -188,7 +189,9 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
     try {
       final IdAResponseType result = this.executor.execute(context, command);
       sends.send(servletResponse, 200, result);
-      if (!(result instanceof IdAResponseError)) {
+      if (result instanceof IdAResponseError error) {
+        Span.current().setAttribute("idstore.errorCode", error.errorCode());
+      } else {
         transaction.commit();
       }
     } catch (final IdCommandExecutionFailure e) {
