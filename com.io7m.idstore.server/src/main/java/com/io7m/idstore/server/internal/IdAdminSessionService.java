@@ -53,11 +53,11 @@ public final class IdAdminSessionService
 
     final var meter =
       inTelemetry.openTelemetry()
-        .meterBuilder("IdAdminSessionService")
+        .meterBuilder(IdAdminSessionService.class.getCanonicalName())
         .build();
 
     this.sessionsGauge =
-      meter.gaugeBuilder("adminSessions")
+      meter.gaugeBuilder("idstore.activeAdminSessions")
         .setDescription("Active admin sessions.")
         .ofLongs()
         .buildWithCallback(m -> {
