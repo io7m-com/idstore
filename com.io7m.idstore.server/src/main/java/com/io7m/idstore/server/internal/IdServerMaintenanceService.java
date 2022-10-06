@@ -173,6 +173,6 @@ public final class IdServerMaintenanceService
   public String toString()
   {
     return "[IdServerMaintenanceService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

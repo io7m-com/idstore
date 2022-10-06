@@ -150,6 +150,6 @@ public final class IdUserSessionService
   public String toString()
   {
     return "[IdUserSessionService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

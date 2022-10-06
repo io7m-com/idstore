@@ -312,7 +312,7 @@ public final class IdUserPasswordResetService implements IdServiceType
   public String toString()
   {
     return "[IdUserPasswordResetService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 
   private static final class OpResetConfirm

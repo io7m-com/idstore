@@ -139,6 +139,6 @@ public final class IdServerConfigurationFiles
   public String toString()
   {
     return "[IdServerConfigurationFiles 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

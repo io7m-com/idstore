@@ -75,6 +75,6 @@ public final class IdServerEventBusService
   public String toString()
   {
     return "[IdServerEventBusService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

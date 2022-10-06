@@ -201,7 +201,7 @@ public final class IdServerTelemetryService
   public String toString()
   {
     return "[IdServerTelemetryService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 
   @Override

@@ -62,6 +62,6 @@ public final class IdServerConfigurationService implements IdServiceType
   public String toString()
   {
     return "[IdServerConfigurationService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

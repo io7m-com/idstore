@@ -98,6 +98,6 @@ public final class IdRequestLimits implements IdServiceType
   public String toString()
   {
     return "[IdRequestLimits 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

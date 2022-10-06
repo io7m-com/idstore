@@ -152,7 +152,7 @@ public final class IdDatabase implements IdDatabaseType
   public String toString()
   {
     return "[IdDatabase 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 
   private static String version()
