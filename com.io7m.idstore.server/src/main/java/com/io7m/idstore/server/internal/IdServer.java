@@ -456,6 +456,13 @@ public final class IdServer implements IdServerType
     );
 
     servlets.addServlet(
+      servletHolders.create(
+        IdCommonLogoServlet.class,
+        IdCommonLogoServlet::new),
+      "/favicon.ico"
+    );
+
+    servlets.addServlet(
       servletHolders.create(IdUViewEmailAdd.class, IdUViewEmailAdd::new),
       "/email-add"
     );
