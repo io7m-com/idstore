@@ -22,7 +22,6 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseFactoryType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.postgres.internal.IdDatabase;
-import com.io7m.idstore.database.postgres.internal.IdDatabaseMetrics;
 import com.io7m.trasco.api.TrEventExecutingSQL;
 import com.io7m.trasco.api.TrEventType;
 import com.io7m.trasco.api.TrEventUpgrading;
@@ -38,13 +37,7 @@ import org.postgresql.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.math.BigInteger;
 import java.net.URI;
 import java.sql.Connection;
@@ -190,14 +183,10 @@ public final class IdDatabases implements IdDatabaseFactoryType
         connection.commit();
       }
 
-      final var metrics = new IdDatabaseMetrics();
-      setupMetrics(metrics);
-
       return new IdDatabase(
         openTelemetry,
         configuration.clock(),
-        dataSource,
-        metrics
+        dataSource
       );
     } catch (final IOException e) {
       throw new IdDatabaseException(e.getMessage(), e, IO_ERROR);
@@ -207,24 +196,6 @@ public final class IdDatabases implements IdDatabaseFactoryType
       throw new IdDatabaseException(e.getMessage(), e, SQL_REVISION_ERROR);
     } catch (final SQLException e) {
       throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
-    }
-  }
-
-  private static void setupMetrics(
-    final IdDatabaseMetrics metrics)
-  {
-    try {
-      final var server =
-        ManagementFactory.getPlatformMBeanServer();
-      final var objectName =
-        new ObjectName("com.io7m.idstore.database.postgres:name=Metrics");
-
-      server.registerMBean(metrics, objectName);
-    } catch (final MalformedObjectNameException
-                   | InstanceAlreadyExistsException
-                   | MBeanRegistrationException
-                   | NotCompliantMBeanException e) {
-      LOG.error("unable to register metrics bean: ", e);
     }
   }
 

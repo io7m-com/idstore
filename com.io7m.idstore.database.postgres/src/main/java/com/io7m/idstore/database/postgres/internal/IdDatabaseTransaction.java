@@ -34,8 +34,6 @@ import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
 import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,7 +57,6 @@ final class IdDatabaseTransaction
 {
   private final IdDatabaseConnection connection;
   private final Span transactionSpan;
-  private Instant timeStart;
   private UUID currentUserId;
   private UUID currentAdminId;
 
@@ -93,13 +90,10 @@ final class IdDatabaseTransaction
 
   IdDatabaseTransaction(
     final IdDatabaseConnection inConnection,
-    final Instant inTimeStart,
     final Span inTransactionScope)
   {
     this.connection =
       Objects.requireNonNull(inConnection, "connection");
-    this.timeStart =
-      Objects.requireNonNull(inTimeStart, "timeStart");
     this.transactionSpan =
       Objects.requireNonNull(inTransactionScope, "inMetricsScope");
   }
@@ -177,8 +171,8 @@ final class IdDatabaseTransaction
     try {
       this.connection.connection().rollback();
       this.connection.database()
-        .metrics()
-        .addTransactionTimeRolledBack(this.updateTransactionTime());
+        .counterTransactionRollbacks()
+        .add(1L);
     } catch (final SQLException e) {
       throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
     }
@@ -191,26 +185,11 @@ final class IdDatabaseTransaction
     try {
       this.connection.connection().commit();
       this.connection.database()
-        .metrics()
-        .addTransactionTimeCommitted(this.updateTransactionTime());
+        .counterTransactionCommits()
+        .add(1L);
     } catch (final SQLException e) {
       throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
     }
-  }
-
-  private double updateTransactionTime()
-  {
-    final var timeNow =
-      this.connection.database()
-        .clock()
-        .instant();
-    final var diff =
-      Duration.between(this.timeStart, timeNow);
-    final var timeMs =
-      (double) diff.toMillis() / 1000.0;
-
-    this.timeStart = timeNow;
-    return timeMs;
   }
 
   @Override

@@ -171,6 +171,7 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
         transaction.commit();
       }
     } catch (final IdCommandExecutionFailure e) {
+      Span.current().setAttribute("idstore.errorCode", e.errorCode().id());
       sends.send(
         servletResponse,
         e.httpStatusCode(),

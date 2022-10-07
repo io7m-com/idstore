@@ -22,6 +22,7 @@ import com.io7m.idstore.database.api.IdDatabaseRole;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.zaxxer.hikari.HikariDataSource;
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import org.jooq.conf.RenderNameCase;
@@ -45,8 +46,10 @@ public final class IdDatabase implements IdDatabaseType
   private final Clock clock;
   private final HikariDataSource dataSource;
   private final Settings settings;
-  private final IdDatabaseMetrics metrics;
   private final Tracer tracer;
+  private final LongCounter transactions;
+  private final LongCounter transactionCommits;
+  private final LongCounter transactionRollbacks;
 
   /**
    * The default postgres server database implementation.
@@ -54,14 +57,12 @@ public final class IdDatabase implements IdDatabaseType
    * @param inOpenTelemetry A telemetry interface
    * @param inClock         The clock
    * @param inDataSource    A pooled data source
-   * @param inMetrics       A metrics bean
    */
 
   public IdDatabase(
     final OpenTelemetry inOpenTelemetry,
     final Clock inClock,
-    final HikariDataSource inDataSource,
-    final IdDatabaseMetrics inMetrics)
+    final HikariDataSource inDataSource)
   {
     this.telemetry =
       Objects.requireNonNull(inOpenTelemetry, "inOpenTelemetry");
@@ -71,10 +72,51 @@ public final class IdDatabase implements IdDatabaseType
       Objects.requireNonNull(inClock, "clock");
     this.dataSource =
       Objects.requireNonNull(inDataSource, "dataSource");
-    this.metrics =
-      Objects.requireNonNull(inMetrics, "metrics");
     this.settings =
       new Settings().withRenderNameCase(RenderNameCase.LOWER);
+
+    final var meters =
+      this.telemetry.meterBuilder(
+        "com.io7m.idstore.database.postgres")
+        .build();
+
+    this.transactions =
+      meters.counterBuilder("IdDatabase.transactions")
+        .build();
+    this.transactionCommits =
+      meters.counterBuilder("IdDatabase.commits")
+        .build();
+    this.transactionRollbacks =
+      meters.counterBuilder("IdDatabase.commits")
+        .build();
+  }
+
+  private static String version()
+  {
+    final var p =
+      IdDatabase.class.getPackage();
+    final var v =
+      p.getImplementationVersion();
+
+    if (v == null) {
+      return "0.0.0";
+    }
+    return v;
+  }
+
+  LongCounter counterTransactions()
+  {
+    return this.transactions;
+  }
+
+  LongCounter counterTransactionCommits()
+  {
+    return this.transactionCommits;
+  }
+
+  LongCounter counterTransactionRollbacks()
+  {
+    return this.transactionRollbacks;
   }
 
   @Override
@@ -116,15 +158,6 @@ public final class IdDatabase implements IdDatabaseType
   }
 
   /**
-   * @return The database metrics
-   */
-
-  public IdDatabaseMetrics metrics()
-  {
-    return this.metrics;
-  }
-
-  /**
    * @return The jooq SQL settings
    */
 
@@ -153,18 +186,5 @@ public final class IdDatabase implements IdDatabaseType
   {
     return "[IdDatabase 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode(), 16));
-  }
-
-  private static String version()
-  {
-    final var p =
-      IdDatabase.class.getPackage();
-    final var v =
-      p.getImplementationVersion();
-
-    if (v == null) {
-      return "0.0.0";
-    }
-    return v;
   }
 }
