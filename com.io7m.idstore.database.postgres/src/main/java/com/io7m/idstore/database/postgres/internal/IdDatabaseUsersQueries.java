@@ -67,6 +67,7 @@ import static com.io7m.idstore.database.postgres.internal.Tables.LOGIN_HISTORY;
 import static com.io7m.idstore.database.postgres.internal.Tables.USERS;
 import static com.io7m.idstore.database.postgres.internal.Tables.USER_IDS;
 import static com.io7m.idstore.database.postgres.internal.Tables.USER_PASSWORD_RESETS;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_EMAIL;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
@@ -248,7 +249,7 @@ final class IdDatabaseUsersQueries
         final var existing =
           context.fetchOptional(
             EMAILS,
-            EMAILS.EMAIL_ADDRESS.eq(email.value())
+            EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value())
               .and(EMAILS.USER_ID.isNotNull())
           );
 
@@ -423,7 +424,7 @@ final class IdDatabaseUsersQueries
     try {
       final var emailOpt =
         context.selectFrom(EMAILS)
-          .where(EMAILS.EMAIL_ADDRESS.eq(email.value()))
+          .where(EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value()))
           .fetchOptional();
 
       if (emailOpt.isEmpty()) {
@@ -514,7 +515,9 @@ final class IdDatabaseUsersQueries
         .set(LOGIN_HISTORY.TIME, this.currentTime())
         .set(LOGIN_HISTORY.AGENT, metadata.getOrDefault(userAgent(), ""))
         .set(LOGIN_HISTORY.HOST, metadata.getOrDefault(remoteHost(), ""))
-        .set(LOGIN_HISTORY.PROXIED_HOST, metadata.getOrDefault(remoteHostProxied(), ""))
+        .set(
+          LOGIN_HISTORY.PROXIED_HOST,
+          metadata.getOrDefault(remoteHostProxied(), ""))
         .execute();
 
       /*
@@ -724,7 +727,7 @@ final class IdDatabaseUsersQueries
       final var searchLike =
         "%%%s%%".formatted(parameters.search());
       final var searchCondition =
-        DSL.condition(EMAILS.EMAIL_ADDRESS.like(searchLike));
+        DSL.condition(EMAILS.EMAIL_ADDRESS.likeIgnoreCase(searchLike));
 
       final var allConditions =
         timeCreatedCondition
@@ -811,7 +814,7 @@ final class IdDatabaseUsersQueries
       final var searchLike =
         "%%%s%%".formatted(parameters.search());
       final var searchCondition =
-        DSL.condition(EMAILS.EMAIL_ADDRESS.like(searchLike));
+        DSL.condition(EMAILS.EMAIL_ADDRESS.likeIgnoreCase(searchLike));
 
       final var allConditions =
         timeCreatedCondition
@@ -1020,6 +1023,18 @@ final class IdDatabaseUsersQueries
       context.fetchOptional(USERS, USERS.ID.eq(id))
         .orElseThrow(USER_DOES_NOT_EXIST);
 
+      final var existing =
+        context.selectFrom(EMAILS)
+          .where(EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value()))
+          .fetchOptional();
+
+      if (existing.isPresent()) {
+        throw new IdDatabaseException(
+          "Email %s already exists.".formatted(email),
+          EMAIL_DUPLICATE
+        );
+      }
+
       context.insertInto(EMAILS)
         .set(EMAILS.USER_ID, id)
         .set(EMAILS.EMAIL_ADDRESS, email.value())
@@ -1065,7 +1080,8 @@ final class IdDatabaseUsersQueries
       final var existing =
         context.fetchOptional(
           EMAILS,
-          EMAILS.USER_ID.eq(id).and(EMAILS.EMAIL_ADDRESS.eq(email.value()))
+          EMAILS.USER_ID.eq(id)
+            .and(EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value()))
         );
 
       if (existing.isEmpty()) {
@@ -1078,7 +1094,8 @@ final class IdDatabaseUsersQueries
        */
 
       context.deleteFrom(EMAILS)
-        .where(EMAILS.USER_ID.eq(id).and(EMAILS.EMAIL_ADDRESS.eq(email.value())))
+        .where(EMAILS.USER_ID.eq(id)
+                 .and(EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value())))
         .execute();
 
       context.insertInto(AUDIT)

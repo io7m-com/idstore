@@ -620,7 +620,7 @@ final class IdDatabaseAdminsQueries
       final var searchLike =
         "%%%s%%".formatted(parameters.search());
       final var searchCondition =
-        DSL.condition(EMAILS.EMAIL_ADDRESS.like(searchLike));
+        DSL.condition(EMAILS.EMAIL_ADDRESS.likeIgnoreCase(searchLike));
 
       final var allConditions =
         timeCreatedCondition
@@ -706,7 +706,7 @@ final class IdDatabaseAdminsQueries
       final var searchLike =
         "%%%s%%".formatted(parameters.search());
       final var searchCondition =
-        DSL.condition(EMAILS.EMAIL_ADDRESS.like(searchLike));
+        DSL.condition(EMAILS.EMAIL_ADDRESS.likeIgnoreCase(searchLike));
 
       final var allConditions =
         timeCreatedCondition
@@ -1052,7 +1052,8 @@ final class IdDatabaseAdminsQueries
       final var existing =
         context.fetchOptional(
           EMAILS,
-          EMAILS.ADMIN_ID.eq(id).and(EMAILS.EMAIL_ADDRESS.eq(email.value()))
+          EMAILS.ADMIN_ID.eq(id)
+            .and(EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value()))
         );
 
       if (existing.isEmpty()) {
@@ -1065,7 +1066,8 @@ final class IdDatabaseAdminsQueries
        */
 
       context.deleteFrom(EMAILS)
-        .where(EMAILS.ADMIN_ID.eq(id).and(EMAILS.EMAIL_ADDRESS.eq(email.value())))
+        .where(EMAILS.ADMIN_ID.eq(id)
+                 .and(EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value())))
         .execute();
 
       context.insertInto(AUDIT)

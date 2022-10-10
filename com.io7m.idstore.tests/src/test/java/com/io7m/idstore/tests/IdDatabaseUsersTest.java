@@ -22,7 +22,6 @@ import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
-import com.io7m.idstore.model.IdLoginMetadataStandard;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
@@ -36,8 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.net.Inet6Address;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIRED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_EMAIL;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
@@ -434,7 +432,9 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       transaction,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("USER_CREATED", id.toString()),
-      new ExpectedEvent("USER_LOGGED_IN", "127.0.0.1 (fe80:0:0:0:18c6:61ff:fedb:dfed)")
+      new ExpectedEvent(
+        "USER_LOGGED_IN",
+        "127.0.0.1 (fe80:0:0:0:18c6:61ff:fedb:dfed)")
     );
   }
 
@@ -462,7 +462,7 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
           randomUUID(),
           Map.of(),
           100
-          );
+        );
       });
     assertEquals(USER_NONEXISTENT, ex.errorCode());
   }
@@ -741,7 +741,7 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
           150
         ));
 
-    final List<IdUserSummary>  items = paging.pageCurrent(users);
+    final List<IdUserSummary> items = paging.pageCurrent(users);
     assertEquals(0, paging.pageNumber());
     assertEquals(1, paging.pageCount());
     assertEquals(50, items.size());
@@ -1181,7 +1181,9 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       transaction,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("USER_CREATED", user.id().toString()),
-      new ExpectedEvent("USER_EMAIL_REMOVED", user.id() + "|someone@example.com"),
+      new ExpectedEvent(
+        "USER_EMAIL_REMOVED",
+        user.id() + "|someone@example.com"),
       new ExpectedEvent("USER_DELETED", user.id().toString())
     );
   }
@@ -1233,6 +1235,44 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       new ExpectedEvent("USER_BANNED", user.toString()),
       new ExpectedEvent("USER_BAN_REMOVED", user.toString())
     );
+  }
+
+  /**
+   * Emails are case-insensitive.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testEmailCaseInsensitive()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var user =
+      this.databaseCreateUserInitial(adminId, "someone", "12345678");
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    users.userEmailAdd(user, new IdEmail("SOMEONE@EXAMPLE.ORG"));
+
+    final var ex =
+      assertThrows(IdDatabaseException.class, () -> {
+        users.userEmailAdd(user, new IdEmail("someone@example.org"));
+      });
+    assertEquals(EMAIL_DUPLICATE, ex.errorCode());
   }
 
   private static void checkPage(
