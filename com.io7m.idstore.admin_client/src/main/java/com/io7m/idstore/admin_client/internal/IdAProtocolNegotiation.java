@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import static com.io7m.idstore.admin_client.internal.IdACompression.decompressResponse;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NO_SUPPORTED_PROTOCOLS;
@@ -95,9 +96,12 @@ public final class IdAProtocolNegotiation
 
     final VProtocols message;
     try {
-      message = protocols.parse(base, response.body());
+      final var body = decompressResponse(response, response.headers());
+      message = protocols.parse(base, body);
     } catch (final VProtocolException e) {
       throw new IdAClientException(PROTOCOL_ERROR, e);
+    } catch (final IOException e) {
+      throw new IdAClientException(IO_ERROR, e);
     }
 
     return message.protocols()

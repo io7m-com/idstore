@@ -61,6 +61,7 @@ import java.util.Objects;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.user_client.internal.IdUCompression.decompressResponse;
 import static java.net.http.HttpResponse.BodyHandlers;
 
 /**
@@ -181,7 +182,7 @@ public final class IdUClientProtocolHandler1
       }
 
       final var responseMessage =
-        this.messages.parse(response.body());
+        this.messages.parse(decompressResponse(response, responseHeaders));
 
       if (!(responseMessage instanceof IdUResponseType)) {
         throw new IdUClientException(
