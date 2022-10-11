@@ -50,4 +50,6 @@
 
   <entry key="passwordUpdateSuccessTitle">Password Updated</entry>
   <entry key="passwordUpdateSuccess">Password updated successfully.</entry>
+
+  <entry key="errorSearchStart">You must begin a search before you can fetch the next or previous pages.</entry>
 </properties>

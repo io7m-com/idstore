@@ -19,12 +19,13 @@ package com.io7m.idstore.server.internal.admin;
 
 import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAuditRead;
+
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 
 /**
  * IdACmdAuditSearchPrevious
@@ -56,21 +57,20 @@ public final class IdACmdAuditSearchPrevious
 
     context.securityCheck(new IdSecAdminActionAuditRead(admin));
 
-    final var users =
+    final var audit =
       transaction.queries(IdDatabaseAuditQueriesType.class);
+    final var session =
+      context.session();
+    final var searchOpt =
+      session.auditSearch();
 
-    final var session = context.session();
-    final var paging = session.auditPaging();
-    final var data = paging.pagePrevious(users);
+    if (searchOpt.isEmpty()) {
+      throw context.failFormatted(
+        400, PROTOCOL_ERROR, "errorSearchStart");
+    }
 
-    return new IdAResponseAuditSearchPrevious(
-      context.requestId(),
-      new IdPage<>(
-        data,
-        paging.pageNumber(),
-        paging.pageCount(),
-        paging.pageFirstOffset()
-      )
-    );
+    final var search = searchOpt.get();
+    final var page = search.pagePrevious(audit);
+    return new IdAResponseAuditSearchPrevious(context.requestId(), page);
   }
 }

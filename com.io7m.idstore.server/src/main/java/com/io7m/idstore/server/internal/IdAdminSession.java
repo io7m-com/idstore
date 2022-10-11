@@ -20,19 +20,18 @@ import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPaging;
 import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPagingType;
 import com.io7m.idstore.database.api.IdDatabaseAdminSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseAdminSearchPagingType;
-import com.io7m.idstore.database.api.IdDatabaseAuditListPaging;
-import com.io7m.idstore.database.api.IdDatabaseAuditListPagingType;
+import com.io7m.idstore.database.api.IdDatabaseAuditEventsSearchType;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPaging;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPagingType;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseUserSearchPagingType;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
-import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -47,8 +46,7 @@ public final class IdAdminSession
   private IdDatabaseUserSearchPagingType userSearchPaging;
   private IdUserSearchByEmailParameters userSearchByEmailParameters;
   private IdDatabaseUserSearchByEmailPagingType userSearchByEmailPaging;
-  private IdAuditSearchParameters auditListParameters;
-  private IdDatabaseAuditListPagingType auditPaging;
+  private Optional<IdDatabaseAuditEventsSearchType> auditPaging;
   private IdAdminSearchParameters adminSearchParameters;
   private IdDatabaseAdminSearchPagingType adminSearchPaging;
   private IdAdminSearchByEmailParameters adminSearchByEmailParameters;
@@ -80,10 +78,8 @@ public final class IdAdminSession
     this.userSearchByEmailPaging =
       IdDatabaseUserSearchByEmailPaging.create(this.userSearchByEmailParameters);
 
-    this.auditListParameters =
-      IdAuditSearchParameters.defaults();
     this.auditPaging =
-      IdDatabaseAuditListPaging.create(this.auditListParameters);
+      Optional.empty();
 
     this.adminSearchParameters =
       IdAdminSearchParameters.defaults();
@@ -156,34 +152,6 @@ public final class IdAdminSession
   }
 
   /**
-   * Set the audit listing parameters.
-   *
-   * @param auditParameters The audit parameters
-   */
-
-  public void setAuditListParameters(
-    final IdAuditSearchParameters auditParameters)
-  {
-    this.auditListParameters =
-      Objects.requireNonNull(auditParameters, "auditParameters");
-
-    if (!Objects.equals(this.auditPaging.pageParameters(), auditParameters)) {
-      this.auditPaging =
-        IdDatabaseAuditListPaging.create(auditParameters);
-    }
-  }
-
-  /**
-   * @return The most recent audit paging handler
-   */
-
-  public IdDatabaseAuditListPagingType auditPaging()
-  {
-    return this.auditPaging;
-  }
-
-
-  /**
    * @return The most recent admin paging handler
    */
 
@@ -239,5 +207,27 @@ public final class IdAdminSession
       this.adminSearchByEmailPaging =
         IdDatabaseAdminSearchByEmailPaging.create(adminParameters);
     }
+  }
+
+  /**
+   * @return The audit record search
+   */
+
+  public Optional<IdDatabaseAuditEventsSearchType> auditSearch()
+  {
+    return this.auditPaging;
+  }
+
+  /**
+   * Set the new audit record search.
+   *
+   * @param search The audit record search
+   */
+
+  public void setAuditSearch(
+    final IdDatabaseAuditEventsSearchType search)
+  {
+    this.auditPaging =
+      Optional.of(Objects.requireNonNull(search, "search"));
   }
 }

@@ -14,18 +14,17 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.database.api;
 
 import com.io7m.idstore.model.IdAuditEvent;
-import com.io7m.idstore.model.IdAuditSearchParameters;
 
 /**
- * The type of paging handlers that handle audit events.
+ * The type of audit event searches.
  */
 
-public interface IdDatabaseAuditListPagingType
-  extends IdDatabasePagingType<
-  IdAuditSearchParameters, IdAuditEvent, IdDatabaseAuditQueriesType>
+public interface IdDatabaseAuditEventsSearchType
+  extends IdDatabasePagedQueryType<IdDatabaseAuditQueriesType, IdAuditEvent>
 {
 
 }

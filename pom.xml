@@ -53,6 +53,7 @@
     <com.io7m.dixmont.version>0.0.2</com.io7m.dixmont.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jbssio.version>1.1.1</com.io7m.jbssio.version>
+    <com.io7m.jqpage.version>0.0.1</com.io7m.jqpage.version>
     <com.io7m.jvindicator.version>0.0.1</com.io7m.jvindicator.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
     <com.io7m.trasco.version>0.0.5</com.io7m.trasco.version>
@@ -544,6 +545,11 @@
         <groupId>org.mock-server</groupId>
         <artifactId>mockserver-netty</artifactId>
         <version>5.14.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.jqpage</groupId>
+        <artifactId>com.io7m.jqpage.core</artifactId>
+        <version>${com.io7m.jqpage.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

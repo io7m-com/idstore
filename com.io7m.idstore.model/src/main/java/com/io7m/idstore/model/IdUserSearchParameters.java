@@ -30,7 +30,7 @@ import static com.io7m.idstore.model.IdUserColumn.BY_ID;
  *                         returned
  * @param timeUpdatedRange Only users updated within this time range are
  *                         returned
- * @param search The search query
+ * @param search           The search query
  * @param ordering         The ordering specification
  * @param limit            The limit on the number of returned users
  */
@@ -49,7 +49,7 @@ public record IdUserSearchParameters(
    *                         returned
    * @param timeUpdatedRange Only users updated within this time range are
    *                         returned
-   *                         @param search The search query
+   * @param search           The search query
    * @param ordering         The ordering specification
    * @param limit            The limit on the number of returned users
    */

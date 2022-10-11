@@ -14,50 +14,58 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.database.api;
 
-import com.io7m.idstore.model.IdAuditSearchParameters;
-
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import com.io7m.idstore.model.IdPage;
 
 /**
- * The database queries involving the audit log.
+ * The type of paged queries.
+ *
+ * @param <Q> The type of required query interfaces
+ * @param <T> The type of result values
  */
 
-public non-sealed interface IdDatabaseAuditQueriesType
-  extends IdDatabaseQueriesType
+public interface IdDatabasePagedQueryType<Q extends IdDatabaseQueriesType, T>
 {
   /**
-   * Retrieve all audit events from the database matching the given parameters.
+   * Get data for the current page.
    *
-   * @param parameters The search parameters
+   * @param queries The query interface
    *
-   * @return A series of audit events, sorted by time
+   * @return A page of results
    *
    * @throws IdDatabaseException On errors
    */
 
-  IdDatabaseAuditEventsSearchType auditEventsSearch(
-    IdAuditSearchParameters parameters)
+  IdPage<T> pageCurrent(Q queries)
     throws IdDatabaseException;
 
   /**
-   * Create an audit event.
+   * Get data for the next page. If the current page is the last page, the
+   * function acts as {@link #pageCurrent(IdDatabaseQueriesType)}.
    *
-   * @param userId  The user ID of the event
-   * @param time    The event time
-   * @param type    The event type
-   * @param message The event message
+   * @param queries The query interface
+   *
+   * @return A page of results
    *
    * @throws IdDatabaseException On errors
    */
 
-  void auditPut(
-    UUID userId,
-    OffsetDateTime time,
-    String type,
-    String message)
+  IdPage<T> pageNext(Q queries)
     throws IdDatabaseException;
 
+  /**
+   * Get data for the previous page. If the current page is the first page, the
+   * function acts as {@link #pageCurrent(IdDatabaseQueriesType)}.
+   *
+   * @param queries The query interface
+   *
+   * @return A page of results
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  IdPage<T> pagePrevious(Q queries)
+    throws IdDatabaseException;
 }

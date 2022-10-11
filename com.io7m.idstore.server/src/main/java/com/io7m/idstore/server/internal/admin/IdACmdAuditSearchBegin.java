@@ -20,7 +20,6 @@ package com.io7m.idstore.server.internal.admin;
 import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
 import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.model.IdAuditSearchParameters;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
@@ -60,20 +59,16 @@ public final class IdACmdAuditSearchBegin
     final var audit =
       transaction.queries(IdDatabaseAuditQueriesType.class);
 
-    final var session = context.session();
-    session.setAuditListParameters(obtainListParameters(command));
-    final var paging = session.auditPaging();
-    final var data = paging.pageCurrent(audit);
+    final var session =
+      context.session();
+    final var parameters =
+      obtainListParameters(command);
 
-    return new IdAResponseAuditSearchBegin(
-      context.requestId(),
-      new IdPage<>(
-        data,
-        paging.pageNumber(),
-        paging.pageCount(),
-        paging.pageFirstOffset()
-      )
-    );
+    final var search = audit.auditEventsSearch(parameters);
+    session.setAuditSearch(search);
+
+    final var page = search.pageCurrent(audit);
+    return new IdAResponseAuditSearchBegin(context.requestId(), page);
   }
 
   private static IdAuditSearchParameters obtainListParameters(
