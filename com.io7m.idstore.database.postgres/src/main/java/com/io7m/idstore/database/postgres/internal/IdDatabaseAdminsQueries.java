@@ -43,7 +43,6 @@ import com.io7m.jqpage.core.JQField;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPageDefinition;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPagination;
 import com.io7m.jqpage.core.JQOrder;
-import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.jooq.Condition;
 import org.jooq.Result;
 import org.jooq.exception.DataAccessException;
