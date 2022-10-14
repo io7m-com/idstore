@@ -20,7 +20,6 @@ package com.io7m.idstore.server.internal.admin;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.model.IdAdminSearchParameters;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
@@ -59,20 +58,15 @@ public final class IdACmdAdminSearchBegin
 
     final var admins =
       transaction.queries(IdDatabaseAdminsQueriesType.class);
+    final var search =
+      admins.adminSearch(obtainListParameters(command));
 
     final var session = context.session();
-    session.setAdminSearchParameters(obtainListParameters(command));
-    final var paging = session.adminPaging();
-    final var data = paging.pageCurrent(admins);
+    session.setAdminSearch(search);
 
     return new IdAResponseAdminSearchBegin(
       context.requestId(),
-      new IdPage<>(
-        data,
-        paging.pageNumber(),
-        paging.pageCount(),
-        paging.pageFirstOffset()
-      )
+      search.pageCurrent(admins)
     );
   }
 

@@ -18,6 +18,8 @@
 package com.io7m.idstore.database.postgres.internal;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailType;
+import com.io7m.idstore.database.api.IdDatabaseUserSearchType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.database.postgres.internal.tables.records.EmailsRecord;
 import com.io7m.idstore.database.postgres.internal.tables.records.LoginHistoryRecord;
@@ -28,28 +30,29 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
+import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdPasswordAlgorithms;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.model.IdUserOrdering;
+import com.io7m.idstore.model.IdUserColumnOrdering;
 import com.io7m.idstore.model.IdUserPasswordReset;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
+import com.io7m.jqpage.core.JQField;
+import com.io7m.jqpage.core.JQKeysetRandomAccessPageDefinition;
+import com.io7m.jqpage.core.JQKeysetRandomAccessPagination;
+import com.io7m.jqpage.core.JQOrder;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.OrderField;
 import org.jooq.Result;
-import org.jooq.SelectForUpdateStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -76,6 +79,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHostProxied;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.DB_STATEMENT;
 import static java.lang.Boolean.TRUE;
 
 final class IdDatabaseUsersQueries
@@ -128,54 +132,6 @@ final class IdDatabaseUsersQueries
       PASSWORD_ERROR
     );
   }
-
-  private static Collection<? extends OrderField<?>> orderFields(
-    final IdUserOrdering ordering)
-  {
-    final var columns = ordering.ordering();
-    final var fields = new ArrayList<OrderField<?>>(columns.size());
-    for (final var columnOrder : columns) {
-      fields.add(
-        switch (columnOrder.column()) {
-          case BY_ID -> {
-            if (columnOrder.ascending()) {
-              yield USERS.ID.asc();
-            }
-            yield USERS.ID.desc();
-          }
-
-          case BY_IDNAME -> {
-            if (columnOrder.ascending()) {
-              yield USERS.ID_NAME.asc();
-            }
-            yield USERS.ID_NAME.desc();
-          }
-
-          case BY_REALNAME -> {
-            if (columnOrder.ascending()) {
-              yield USERS.REAL_NAME.asc();
-            }
-            yield USERS.REAL_NAME.desc();
-          }
-
-          case BY_TIME_CREATED -> {
-            if (columnOrder.ascending()) {
-              yield USERS.TIME_CREATED.asc();
-            }
-            yield USERS.TIME_CREATED.desc();
-          }
-
-          case BY_TIME_UPDATED -> {
-            if (columnOrder.ascending()) {
-              yield USERS.TIME_UPDATED.asc();
-            }
-            yield USERS.TIME_UPDATED.desc();
-          }
-        });
-    }
-    return List.copyOf(fields);
-  }
-
 
   private static IdUserPasswordReset mapPasswordReset(
     final UserPasswordResetsRecord rec)
@@ -677,331 +633,6 @@ final class IdDatabaseUsersQueries
   }
 
   @Override
-  public List<IdUserSummary> userSearchByEmail(
-    final IdUserSearchByEmailParameters parameters,
-    final Optional<List<Object>> seek)
-    throws IdDatabaseException
-  {
-    Objects.requireNonNull(parameters, "parameters");
-    Objects.requireNonNull(seek, "seek");
-
-    final var transaction =
-      this.transaction();
-    final var context =
-      transaction.createContext();
-    final var querySpan =
-      transaction.createQuerySpan("IdDatabaseUsersQueries.userSearchByEmail");
-
-    try {
-      final var baseSelection =
-        context.select(
-            USERS.ID,
-            USERS.ID_NAME,
-            USERS.REAL_NAME,
-            USERS.TIME_CREATED,
-            USERS.TIME_UPDATED)
-          .from(USERS.join(EMAILS).on(USERS.ID.eq(EMAILS.USER_ID)));
-
-      /*
-       * The users must lie within the given time ranges.
-       */
-
-      final var timeCreatedRange = parameters.timeCreatedRange();
-      final var timeCreatedCondition =
-        DSL.condition(
-          USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
-            .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
-        );
-
-      final var timeUpdatedRange = parameters.timeUpdatedRange();
-      final var timeUpdatedCondition =
-        DSL.condition(
-          USERS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
-            .and(USERS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
-        );
-
-      /*
-       * Only users with matching email addresses will be returned.
-       */
-
-      final var searchLike =
-        "%%%s%%".formatted(parameters.search());
-      final var searchCondition =
-        DSL.condition(EMAILS.EMAIL_ADDRESS.likeIgnoreCase(searchLike));
-
-      final var allConditions =
-        timeCreatedCondition
-          .and(timeUpdatedCondition)
-          .and(searchCondition);
-
-      final var baseOrdering =
-        baseSelection.where(allConditions)
-          .groupBy(USERS.ID)
-          .orderBy(orderFields(parameters.ordering()));
-
-      /*
-       * If a seek is specified, then seek!
-       */
-
-      final SelectForUpdateStep<?> next;
-      if (seek.isPresent()) {
-        final var page = seek.get();
-        final var fields = page.toArray();
-        next = baseOrdering.seek(fields)
-          .limit(Integer.valueOf(parameters.limit()));
-      } else {
-        next = baseOrdering.limit(Integer.valueOf(parameters.limit()));
-      }
-
-      final var results = new ArrayList<IdUserSummary>(parameters.limit());
-      final var records = next.fetch();
-      for (final var record : records) {
-        results.add(new IdUserSummary(
-          record.get(USERS.ID),
-          new IdName(record.get(USERS.ID_NAME)),
-          new IdRealName(record.get(USERS.REAL_NAME)),
-          record.get(USERS.TIME_CREATED),
-          record.get(USERS.TIME_UPDATED))
-        );
-      }
-      return results;
-    } catch (final DataAccessException e) {
-      querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
-    } finally {
-      querySpan.end();
-    }
-  }
-
-  @Override
-  public long userSearchByEmailCount(
-    final IdUserSearchByEmailParameters parameters)
-    throws IdDatabaseException
-  {
-    Objects.requireNonNull(parameters, "parameters");
-
-    final var transaction =
-      this.transaction();
-    final var context =
-      transaction.createContext();
-    final var querySpan =
-      transaction.createQuerySpan(
-        "IdDatabaseUsersQueries.userSearchByEmailCount");
-
-    try {
-      /*
-       * The users must lie within the given time ranges.
-       */
-
-      final var timeCreatedRange = parameters.timeCreatedRange();
-      final var timeCreatedCondition =
-        DSL.condition(
-          USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
-            .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
-        );
-
-      final var timeUpdatedRange = parameters.timeUpdatedRange();
-      final var timeUpdatedCondition =
-        DSL.condition(
-          USERS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
-            .and(USERS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
-        );
-
-      /*
-       * Only users with matching email addresses will be returned.
-       */
-
-      final var searchLike =
-        "%%%s%%".formatted(parameters.search());
-      final var searchCondition =
-        DSL.condition(EMAILS.EMAIL_ADDRESS.likeIgnoreCase(searchLike));
-
-      final var allConditions =
-        timeCreatedCondition
-          .and(timeUpdatedCondition)
-          .and(searchCondition);
-
-      final var query =
-        context.selectDistinct(DSL.count().over().as("Total"))
-          .from(USERS.join(EMAILS).on(USERS.ID.eq(EMAILS.USER_ID)))
-          .where(allConditions)
-          .groupBy(USERS.ID)
-          .fetchOneInto(int.class);
-
-      return query.longValue();
-    } catch (final DataAccessException e) {
-      querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
-    } finally {
-      querySpan.end();
-    }
-  }
-
-  @Override
-  public List<IdUserSummary> userSearch(
-    final IdUserSearchParameters parameters,
-    final Optional<List<Object>> seek)
-    throws IdDatabaseException
-  {
-    Objects.requireNonNull(parameters, "parameters");
-    Objects.requireNonNull(seek, "seek");
-
-    final var transaction =
-      this.transaction();
-    final var context =
-      transaction.createContext();
-    final var querySpan =
-      transaction.createQuerySpan("IdDatabaseUsersQueries.userSearch");
-
-    try {
-      final var baseSelection =
-        context.selectFrom(USERS);
-
-      /*
-       * The users must lie within the given time ranges.
-       */
-
-      final var timeCreatedRange = parameters.timeCreatedRange();
-      final var timeCreatedCondition =
-        DSL.condition(
-          USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
-            .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
-        );
-
-      final var timeUpdatedRange = parameters.timeUpdatedRange();
-      final var timeUpdatedCondition =
-        DSL.condition(
-          USERS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
-            .and(USERS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
-        );
-
-      /*
-       * A search query might be present.
-       */
-
-      final Condition searchCondition;
-      final var search = parameters.search();
-      if (search.isPresent()) {
-        final var searchText = "%%%s%%".formatted(search.get());
-        searchCondition =
-          DSL.condition(USERS.ID_NAME.likeIgnoreCase(searchText))
-            .or(DSL.condition(USERS.REAL_NAME.likeIgnoreCase(searchText)))
-            .or(DSL.condition(USERS.ID.likeIgnoreCase(searchText)));
-      } else {
-        searchCondition = DSL.trueCondition();
-      }
-
-      final var allConditions =
-        timeCreatedCondition
-          .and(timeUpdatedCondition)
-          .and(searchCondition);
-
-      final var baseOrdering =
-        baseSelection.where(allConditions)
-          .orderBy(orderFields(parameters.ordering()));
-
-      /*
-       * If a seek is specified, then seek!
-       */
-
-      final SelectForUpdateStep<?> next;
-      if (seek.isPresent()) {
-        final var page = seek.get();
-        final var fields = page.toArray();
-        next = baseOrdering.seek(fields)
-          .limit(Integer.valueOf(parameters.limit()));
-      } else {
-        next = baseOrdering.limit(Integer.valueOf(parameters.limit()));
-      }
-
-      return next.fetch()
-        .map(record -> {
-          return new IdUserSummary(
-            record.get(USERS.ID),
-            new IdName(record.get(USERS.ID_NAME)),
-            new IdRealName(record.get(USERS.REAL_NAME)),
-            record.get(USERS.TIME_CREATED),
-            record.get(USERS.TIME_UPDATED)
-          );
-        });
-    } catch (final DataAccessException e) {
-      querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
-    } finally {
-      querySpan.end();
-    }
-  }
-
-  @Override
-  public long userSearchCount(
-    final IdUserSearchParameters parameters)
-    throws IdDatabaseException
-  {
-    Objects.requireNonNull(parameters, "parameters");
-
-    final var transaction =
-      this.transaction();
-    final var context =
-      transaction.createContext();
-    final var querySpan =
-      transaction.createQuerySpan("IdDatabaseUsersQueries.userSearchCount");
-
-    try {
-
-      /*
-       * The users must lie within the given time ranges.
-       */
-
-      final var timeCreatedRange = parameters.timeCreatedRange();
-      final var timeCreatedCondition =
-        DSL.condition(
-          USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
-            .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
-        );
-
-      final var timeUpdatedRange = parameters.timeUpdatedRange();
-      final var timeUpdatedCondition =
-        DSL.condition(
-          USERS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
-            .and(USERS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
-        );
-
-      /*
-       * A search query might be present.
-       */
-
-      final Condition searchCondition;
-      final var search = parameters.search();
-      if (search.isPresent()) {
-        final var searchText = "%%%s%%".formatted(search.get());
-        searchCondition =
-          DSL.condition(USERS.ID_NAME.likeIgnoreCase(searchText))
-            .or(DSL.condition(USERS.REAL_NAME.likeIgnoreCase(searchText)))
-            .or(DSL.condition(USERS.ID.likeIgnoreCase(searchText)));
-      } else {
-        searchCondition = DSL.trueCondition();
-      }
-
-      final var allConditions =
-        timeCreatedCondition
-          .and(timeUpdatedCondition)
-          .and(searchCondition);
-
-      return ((Integer) context.selectCount()
-        .from(USERS)
-        .where(allConditions)
-        .fetchOne()
-        .getValue(0))
-        .longValue();
-    } catch (final DataAccessException e) {
-      querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
-    } finally {
-      querySpan.end();
-    }
-  }
-
-  @Override
   public void userEmailAdd(
     final UUID id,
     final IdEmail email)
@@ -1449,6 +1080,313 @@ final class IdDatabaseUsersQueries
       throw handleDatabaseException(transaction, e);
     } finally {
       querySpan.end();
+    }
+  }
+
+  private static JQField orderingToJQField(
+    final IdUserColumnOrdering ordering)
+  {
+    final var field =
+      switch (ordering.column()) {
+        case BY_ID -> USERS.ID;
+        case BY_IDNAME -> USERS.ID_NAME;
+        case BY_REALNAME -> USERS.REAL_NAME;
+        case BY_TIME_CREATED -> USERS.TIME_CREATED;
+        case BY_TIME_UPDATED -> USERS.TIME_UPDATED;
+      };
+
+    return new JQField(
+      field,
+      ordering.ascending() ? JQOrder.ASCENDING : JQOrder.DESCENDING
+    );
+  }
+
+  @Override
+  public IdDatabaseUserSearchType userSearch(
+    final IdUserSearchParameters parameters)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(parameters, "parameters");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan(
+        "IdDatabaseUsersQueries.userSearch.create");
+
+    try {
+
+      /*
+       * The users must lie within the given time ranges.
+       */
+
+      final var timeCreatedRange = parameters.timeCreatedRange();
+      final var timeCreatedCondition =
+        DSL.condition(
+          USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
+      final var timeUpdatedCondition =
+        DSL.condition(
+          USERS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(USERS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
+        );
+
+      /*
+       * A search query might be present.
+       */
+
+      final Condition searchCondition;
+      final var search = parameters.search();
+      if (search.isPresent()) {
+        final var searchText = "%%%s%%".formatted(search.get());
+        searchCondition =
+          DSL.condition(USERS.ID_NAME.likeIgnoreCase(searchText))
+            .or(DSL.condition(USERS.REAL_NAME.likeIgnoreCase(searchText)))
+            .or(DSL.condition(USERS.ID.likeIgnoreCase(searchText)));
+      } else {
+        searchCondition = DSL.trueCondition();
+      }
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
+
+      final var orderField =
+        orderingToJQField(parameters.ordering());
+
+      final var pages =
+        JQKeysetRandomAccessPagination.createPageDefinitions(
+          context,
+          USERS,
+          List.of(orderField),
+          List.of(allConditions),
+          List.of(),
+          Integer.toUnsignedLong(parameters.limit()),
+          statement -> {
+            querySpan.setAttribute(DB_STATEMENT, statement.toString());
+          }
+        );
+
+      return new IdDatabaseUsersQueries.UsersSearch(pages);
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
+    }
+  }
+
+  @Override
+  public IdDatabaseUserSearchByEmailType userSearchByEmail(
+    final IdUserSearchByEmailParameters parameters)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(parameters, "parameters");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan(
+        "IdDatabaseUsersQueries.userSearchByEmail.create");
+
+    try {
+      final var baseTable =
+        USERS.join(EMAILS)
+          .on(USERS.ID.eq(EMAILS.USER_ID));
+
+      /*
+       * The users must lie within the given time ranges.
+       */
+
+      final var timeCreatedRange = parameters.timeCreatedRange();
+      final var timeCreatedCondition =
+        DSL.condition(
+          USERS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(USERS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
+      final var timeUpdatedCondition =
+        DSL.condition(
+          USERS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(USERS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
+        );
+
+      /*
+       * Only users with matching email addresses will be returned.
+       */
+
+      final var searchLike =
+        "%%%s%%".formatted(parameters.search());
+      final var searchCondition =
+        DSL.condition(EMAILS.EMAIL_ADDRESS.likeIgnoreCase(searchLike));
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
+
+      final var orderField =
+        orderingToJQField(parameters.ordering());
+
+      final var pages =
+        JQKeysetRandomAccessPagination.createPageDefinitions(
+          context,
+          baseTable,
+          List.of(orderField),
+          List.of(allConditions),
+          List.of(USERS.ID),
+          Integer.toUnsignedLong(parameters.limit()),
+          statement -> {
+            querySpan.setAttribute(DB_STATEMENT, statement.toString());
+          }
+        );
+
+      return new IdDatabaseUsersQueries.UsersByEmailSearch(
+        pages
+      );
+
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
+    }
+  }
+
+  private static final class UsersByEmailSearch
+    extends IdAbstractSearch<
+    IdDatabaseUsersQueries,
+    IdDatabaseUsersQueriesType,
+    IdUserSummary>
+    implements IdDatabaseUserSearchByEmailType
+  {
+    UsersByEmailSearch(
+      final List<JQKeysetRandomAccessPageDefinition> inPages)
+    {
+      super(inPages);
+    }
+
+    @Override
+    protected IdPage<IdUserSummary> page(
+      final IdDatabaseUsersQueries queries,
+      final JQKeysetRandomAccessPageDefinition page)
+      throws IdDatabaseException
+    {
+      final var transaction =
+        queries.transaction();
+      final var context =
+        transaction.createContext();
+
+      final var querySpan =
+        transaction.createQuerySpan(
+          "IdDatabaseUsersQueries.userSearchByEmail.page");
+
+      try {
+        final var query =
+          page.queryFields(context, List.of(
+            USERS.ID,
+            USERS.ID_NAME,
+            USERS.REAL_NAME,
+            USERS.TIME_CREATED,
+            USERS.TIME_UPDATED
+          ));
+
+        querySpan.setAttribute(DB_STATEMENT, query.toString());
+
+        final var items =
+          query.fetch().map(record -> {
+            return new IdUserSummary(
+              record.get(USERS.ID),
+              new IdName(record.get(USERS.ID_NAME)),
+              new IdRealName(record.get(USERS.REAL_NAME)),
+              record.get(USERS.TIME_CREATED),
+              record.get(USERS.TIME_UPDATED)
+            );
+          });
+
+        return new IdPage<>(
+          items,
+          (int) page.index(),
+          this.pageCount(),
+          page.firstOffset()
+        );
+      } catch (final DataAccessException e) {
+        querySpan.recordException(e);
+        throw handleDatabaseException(transaction, e);
+      } finally {
+        querySpan.end();
+      }
+    }
+  }
+
+  private static final class UsersSearch
+    extends IdAbstractSearch<
+    IdDatabaseUsersQueries,
+    IdDatabaseUsersQueriesType,
+    IdUserSummary>
+    implements IdDatabaseUserSearchType
+  {
+    UsersSearch(
+      final List<JQKeysetRandomAccessPageDefinition> inPages)
+    {
+      super(inPages);
+    }
+
+    @Override
+    protected IdPage<IdUserSummary> page(
+      final IdDatabaseUsersQueries queries,
+      final JQKeysetRandomAccessPageDefinition page)
+      throws IdDatabaseException
+    {
+      final var transaction =
+        queries.transaction();
+      final var context =
+        transaction.createContext();
+
+      final var querySpan =
+        transaction.createQuerySpan(
+          "IdDatabaseUsersQueries.userSearch.page");
+
+      try {
+        final var query =
+          page.queryFields(context, List.of(
+            USERS.ID,
+            USERS.ID_NAME,
+            USERS.REAL_NAME,
+            USERS.TIME_CREATED,
+            USERS.TIME_UPDATED
+          ));
+
+        querySpan.setAttribute(DB_STATEMENT, query.toString());
+
+        final var items =
+          query.fetch().map(record -> {
+            return new IdUserSummary(
+              record.get(USERS.ID),
+              new IdName(record.get(USERS.ID_NAME)),
+              new IdRealName(record.get(USERS.REAL_NAME)),
+              record.get(USERS.TIME_CREATED),
+              record.get(USERS.TIME_UPDATED)
+            );
+          });
+
+        return new IdPage<>(
+          items,
+          (int) page.index(),
+          this.pageCount(),
+          page.firstOffset()
+        );
+      } catch (final DataAccessException e) {
+        querySpan.recordException(e);
+        throw handleDatabaseException(transaction, e);
+      } finally {
+        querySpan.end();
+      }
     }
   }
 }

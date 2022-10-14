@@ -19,7 +19,6 @@ package com.io7m.idstore.server.internal.admin;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
@@ -58,20 +57,15 @@ public final class IdACmdAdminSearchByEmailBegin
 
     final var admins =
       transaction.queries(IdDatabaseAdminsQueriesType.class);
+    final var search =
+      admins.adminSearchByEmail(obtainListParameters(command));
 
     final var session = context.session();
-    session.setAdminSearchByEmailParameters(obtainListParameters(command));
-    final var paging = session.adminByEmailPaging();
-    final var data = paging.pageCurrent(admins);
+    session.setAdminSearchByEmail(search);
 
     return new IdAResponseAdminSearchByEmailBegin(
       context.requestId(),
-      new IdPage<>(
-        data,
-        paging.pageNumber(),
-        paging.pageCount(),
-        paging.pageFirstOffset()
-      )
+      search.pageCurrent(admins)
     );
   }
 

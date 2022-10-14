@@ -24,7 +24,6 @@ import com.io7m.cedarbridge.runtime.api.CBString;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminColumn;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
-import com.io7m.idstore.model.IdAdminOrdering;
 import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
@@ -70,7 +69,6 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.cb.IdA1Admin;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminColumn;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminColumnOrdering;
-import com.io7m.idstore.protocol.admin.cb.IdA1AdminOrdering;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminSearchByEmailParameters;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminSearchParameters;
@@ -110,7 +108,6 @@ import com.io7m.idstore.protocol.admin.cb.IdA1ResponseAdminSelf;
 import com.io7m.idstore.protocol.admin.cb.IdA1ResponseAdminUpdate;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -369,7 +366,7 @@ public final class IdACB1ValidationAdmin
       toWireTimeRange(parameters.timeCreatedRange()),
       toWireTimeRange(parameters.timeUpdatedRange()),
       new CBString(parameters.search()),
-      toWireAdminOrdering(parameters.ordering()),
+      toWireAdminColumnOrdering(parameters.ordering()),
       new CBIntegerUnsigned16(parameters.limit())
     );
   }
@@ -401,26 +398,8 @@ public final class IdACB1ValidationAdmin
       toWireTimeRange(parameters.timeCreatedRange()),
       toWireTimeRange(parameters.timeUpdatedRange()),
       fromOptional(parameters.search().map(CBString::new)),
-      toWireAdminOrdering(parameters.ordering()),
+      toWireAdminColumnOrdering(parameters.ordering()),
       new CBIntegerUnsigned16(parameters.limit())
-    );
-  }
-
-  private static IdA1AdminOrdering toWireAdminOrdering(
-    final IdAdminOrdering ordering)
-  {
-    return new IdA1AdminOrdering(
-      toWireAdminColumnOrderings(ordering.ordering())
-    );
-  }
-
-  private static CBList<IdA1AdminColumnOrdering> toWireAdminColumnOrderings(
-    final List<IdAdminColumnOrdering> ordering)
-  {
-    return new CBList<>(
-      ordering.stream()
-        .map(IdACB1ValidationAdmin::toWireAdminColumnOrdering)
-        .toList()
     );
   }
 
@@ -872,7 +851,7 @@ public final class IdACB1ValidationAdmin
       fromWireTimeRange(p.fieldTimeCreatedRange()),
       fromWireTimeRange(p.fieldTimeUpdatedRange()),
       p.fieldSearch().value(),
-      fromWireAdminOrdering(p.fieldOrdering()),
+      fromWireAdminColumnOrdering(p.fieldOrdering()),
       p.fieldLimit().value()
     );
   }
@@ -884,29 +863,12 @@ public final class IdACB1ValidationAdmin
       fromWireTimeRange(p.fieldTimeCreatedRange()),
       fromWireTimeRange(p.fieldTimeUpdatedRange()),
       p.fieldSearch().asOptional().map(CBString::value),
-      fromWireAdminOrdering(p.fieldOrdering()),
+      fromWireAdminColumnOrdering(p.fieldOrdering()),
       p.fieldLimit().value()
     );
   }
 
-  private static IdAdminOrdering fromWireAdminOrdering(
-    final IdA1AdminOrdering o)
-  {
-    return new IdAdminOrdering(
-      fromWireColumnOrderings(o.fieldColumns())
-    );
-  }
-
-  private static List<IdAdminColumnOrdering> fromWireColumnOrderings(
-    final CBList<IdA1AdminColumnOrdering> c)
-  {
-    return c.values()
-      .stream()
-      .map(IdACB1ValidationAdmin::fromWireColumnOrdering)
-      .toList();
-  }
-
-  private static IdAdminColumnOrdering fromWireColumnOrdering(
+  private static IdAdminColumnOrdering fromWireAdminColumnOrdering(
     final IdA1AdminColumnOrdering o)
   {
     return new IdAdminColumnOrdering(

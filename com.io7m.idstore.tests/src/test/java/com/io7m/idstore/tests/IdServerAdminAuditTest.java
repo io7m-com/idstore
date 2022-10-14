@@ -22,7 +22,6 @@ import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUserColumnOrdering;
-import com.io7m.idstore.model.IdUserOrdering;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,10 +42,8 @@ public final class IdServerAdminAuditTest extends IdWithServerContract
       OffsetDateTime.now().plusDays(30L)
     );
 
-  private static final IdUserOrdering ORDER_BY_IDNAME =
-    new IdUserOrdering(
-      List.of(new IdUserColumnOrdering(BY_IDNAME, true))
-    );
+  private static final IdUserColumnOrdering ORDER_BY_IDNAME =
+    new IdUserColumnOrdering(BY_IDNAME, true);
 
   private IdAClients clients;
   private IdAClientType client;

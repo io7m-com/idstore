@@ -17,8 +17,6 @@
 package com.io7m.idstore.tests;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
-import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPaging;
-import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
@@ -26,7 +24,6 @@ import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUserColumnOrdering;
-import com.io7m.idstore.model.IdUserOrdering;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
@@ -518,26 +515,24 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           Optional.empty(),
-          new IdUserOrdering(List.of(new IdUserColumnOrdering(
-            BY_IDNAME,
-            true))),
+          new IdUserColumnOrdering(BY_IDNAME, true),
           600
         );
 
-      final var usersListed =
-        users.userSearch(parameters, Optional.empty());
+      final var search =
+        users.userSearch(parameters);
+      final var page =
+        search.pageCurrent(users);
 
-      assertEquals(500, usersListed.size());
+      assertEquals(500, page.items().size());
 
       for (int index = 0; index < 500; ++index) {
         final var name =
           new IdName("someone_%03d".formatted(index));
         final var realName =
           new IdRealName("someone %03d".formatted(index));
-        final var email =
-          new IdEmail("someone_%03d@example.com".formatted(index));
 
-        final var u = usersListed.get(index);
+        final var u = page.items().get(index);
         assertEquals(name, u.idName());
         assertEquals(realName, u.realName());
       }
@@ -549,16 +544,16 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           Optional.empty(),
-          new IdUserOrdering(List.of(new IdUserColumnOrdering(
-            BY_IDNAME,
-            false))),
+          new IdUserColumnOrdering(BY_IDNAME, false),
           600
         );
 
-      final var usersListed =
-        users.userSearch(parameters, Optional.empty());
+      final var search =
+        users.userSearch(parameters);
+      final var page =
+        search.pageCurrent(users);
 
-      assertEquals(500, usersListed.size());
+      assertEquals(500, page.items().size());
 
       for (int index = 0; index < 500; ++index) {
         final var id =
@@ -567,10 +562,8 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
           new IdName("someone_%03d".formatted(id));
         final var realName =
           new IdRealName("someone %03d".formatted(id));
-        final var email =
-          new IdEmail("someone_%03d@example.com".formatted(id));
 
-        final var u = usersListed.get(index);
+        final var u = page.items().get(index);
         assertEquals(name, u.idName());
         assertEquals(realName, u.realName());
       }
@@ -622,63 +615,51 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       );
     }
 
-    final var paging =
-      IdDatabaseUserSearchPaging.create(
+    final var search =
+      users.userSearch(
         new IdUserSearchParameters(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           Optional.empty(),
-          new IdUserOrdering(List.of(
-            new IdUserColumnOrdering(BY_IDNAME, true),
-            new IdUserColumnOrdering(BY_REALNAME, true),
-            new IdUserColumnOrdering(BY_TIME_UPDATED, true),
-            new IdUserColumnOrdering(BY_TIME_CREATED, true)
-          )),
+          new IdUserColumnOrdering(BY_IDNAME, true),
           150
-        ));
+        )
+      );
 
-    List<IdUserSummary> items;
-    assertEquals(0, paging.pageNumber());
-    items = paging.pageCurrent(users);
-    assertEquals(150, items.size());
-    checkPage(0, 150, items);
-    assertTrue(paging.pageNextAvailable());
+    var page = search.pageCurrent(users);
+    assertEquals(1, page.pageIndex());
+    assertEquals(150, page.items().size());
+    checkPage(0, 150, page.items());
 
-    items = paging.pageNext(users);
-    assertEquals(150, items.size());
-    assertEquals(1, paging.pageNumber());
-    checkPage(150, 300, items);
-    assertTrue(paging.pageNextAvailable());
+    page = search.pageNext(users);
+    assertEquals(150, page.items().size());
+    assertEquals(2, page.pageIndex());
+    checkPage(150, 300, page.items());
 
-    items = paging.pageNext(users);
-    assertEquals(150, items.size());
-    assertEquals(2, paging.pageNumber());
-    checkPage(300, 450, items);
-    assertTrue(paging.pageNextAvailable());
+    page = search.pageNext(users);
+    assertEquals(150, page.items().size());
+    assertEquals(3, page.pageIndex());
+    checkPage(300, 450, page.items());
 
-    items = paging.pageNext(users);
-    assertEquals(50, items.size());
-    assertEquals(3, paging.pageNumber());
-    checkPage(450, 500, items);
-    assertFalse(paging.pageNextAvailable());
+    page = search.pageNext(users);
+    assertEquals(50, page.items().size());
+    assertEquals(4, page.pageIndex());
+    checkPage(450, 500, page.items());
 
-    items = paging.pagePrevious(users);
-    assertEquals(150, items.size());
-    assertEquals(2, paging.pageNumber());
-    checkPage(300, 450, items);
-    assertTrue(paging.pageNextAvailable());
+    page = search.pagePrevious(users);
+    assertEquals(150, page.items().size());
+    assertEquals(3, page.pageIndex());
+    checkPage(300, 450, page.items());
 
-    items = paging.pagePrevious(users);
-    assertEquals(150, items.size());
-    assertEquals(1, paging.pageNumber());
-    checkPage(150, 300, items);
-    assertTrue(paging.pageNextAvailable());
+    page = search.pagePrevious(users);
+    assertEquals(150, page.items().size());
+    assertEquals(2, page.pageIndex());
+    checkPage(150, 300, page.items());
 
-    items = paging.pagePrevious(users);
-    assertEquals(150, items.size());
-    assertEquals(0, paging.pageNumber());
-    checkPage(0, 150, items);
-    assertTrue(paging.pageNextAvailable());
+    page = search.pagePrevious(users);
+    assertEquals(150, page.items().size());
+    assertEquals(1, page.pageIndex());
+    checkPage(0, 150, page.items());
   }
 
   /**
@@ -726,31 +707,26 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       );
     }
 
-    final var paging =
-      IdDatabaseUserSearchByEmailPaging.create(
+    final var search =
+      users.userSearchByEmail(
         new IdUserSearchByEmailParameters(
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
           "0@example.com",
-          new IdUserOrdering(List.of(
-            new IdUserColumnOrdering(BY_IDNAME, true),
-            new IdUserColumnOrdering(BY_REALNAME, true),
-            new IdUserColumnOrdering(BY_TIME_UPDATED, true),
-            new IdUserColumnOrdering(BY_TIME_CREATED, true)
-          )),
+          new IdUserColumnOrdering(BY_IDNAME, true),
           150
         ));
 
-    final List<IdUserSummary> items = paging.pageCurrent(users);
-    assertEquals(0, paging.pageNumber());
-    assertEquals(1, paging.pageCount());
+    final var page = search.pageCurrent(users);
+    final List<IdUserSummary> items = page.items();
+    assertEquals(1, page.pageIndex());
+    assertEquals(1, page.pageCount());
     assertEquals(50, items.size());
 
     for (final var item : items) {
       assertTrue(item.idName().value().endsWith("0"));
     }
   }
-
 
   /**
    * Users can be listed/searched and paging works.
@@ -796,26 +772,20 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
       );
     }
 
-    final var paging =
-      IdDatabaseUserSearchPaging.create(
-        new IdUserSearchParameters(
-          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
-          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
-          Optional.of("od"),
-          new IdUserOrdering(List.of(
-            new IdUserColumnOrdering(BY_IDNAME, true),
-            new IdUserColumnOrdering(BY_REALNAME, true),
-            new IdUserColumnOrdering(BY_TIME_UPDATED, true),
-            new IdUserColumnOrdering(BY_TIME_CREATED, true)
-          )),
-          150
-        ));
+    final var search =
+      users.userSearch(new IdUserSearchParameters(
+        new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+        new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+        Optional.of("od"),
+        new IdUserColumnOrdering(BY_IDNAME, true),
+        150
+      ));
 
-    final List<IdUserSummary> items;
-    assertEquals(0, paging.pageNumber());
-    items = paging.pageCurrent(users);
-    assertEquals(39, items.size());
-    assertFalse(paging.pageNextAvailable());
+
+    final var page = search.pageCurrent(users);
+    assertEquals(1, page.pageIndex());
+    assertEquals(1, page.pageCount());
+    assertEquals(39, page.items().size());
 
     final var expected = Set.of(
       "Gabfests Godlessness",
@@ -861,7 +831,8 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
 
     for (final var e : expected) {
       assertTrue(
-        items.stream().anyMatch(u -> Objects.equals(u.realName().value(), e)),
+        page.items().stream()
+          .anyMatch(u -> Objects.equals(u.realName().value(), e)),
         "Must contain " + e
       );
     }

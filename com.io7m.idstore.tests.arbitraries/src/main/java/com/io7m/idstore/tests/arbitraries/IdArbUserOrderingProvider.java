@@ -18,7 +18,6 @@ package com.io7m.idstore.tests.arbitraries;
 
 import com.io7m.idstore.model.IdUserColumn;
 import com.io7m.idstore.model.IdUserColumnOrdering;
-import com.io7m.idstore.model.IdUserOrdering;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.providers.TypeUsage;
@@ -26,7 +25,7 @@ import net.jqwik.api.providers.TypeUsage;
 import java.util.Set;
 
 /**
- * A provider of {@link IdUserOrdering} values.
+ * A provider of {@link IdUserColumnOrdering} values.
  */
 
 public final class IdArbUserOrderingProvider extends IdArbAbstractProvider
@@ -44,7 +43,7 @@ public final class IdArbUserOrderingProvider extends IdArbAbstractProvider
   public boolean canProvideFor(
     final TypeUsage targetType)
   {
-    return targetType.isOfType(IdUserOrdering.class);
+    return targetType.isOfType(IdUserColumnOrdering.class);
   }
 
   @Override
@@ -54,17 +53,8 @@ public final class IdArbUserOrderingProvider extends IdArbAbstractProvider
   {
     final var a =
       Arbitraries.defaultFor(IdUserColumn.class)
-        .set()
-        .map(cs -> {
-          return new IdUserOrdering(
-            cs.stream()
-              .map(c -> new IdUserColumnOrdering(c, true))
-              .toList()
-          );
-        });
+        .map(cs -> new IdUserColumnOrdering(cs, true));
 
-    return Set.of(
-      a
-    );
+    return Set.of(a);
   }
 }

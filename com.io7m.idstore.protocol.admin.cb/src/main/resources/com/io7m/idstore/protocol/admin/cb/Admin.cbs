@@ -136,12 +136,6 @@
   [field ascending cb:Boolean]
 ]
 
-[documentation IdA1AdminOrdering "A set of column ordering specs."]
-[record IdA1AdminOrdering
-  [documentation columns "The column orders."]
-  [field columns [cb:List IdA1AdminColumnOrdering]]
-]
-
 [documentation IdA1AdminSearchParameters "Search parameters for admins."]
 [record IdA1AdminSearchParameters
   [documentation timeCreatedRange "The range of creation times for returned admins."]
@@ -151,7 +145,7 @@
   [documentation search "The search query text."]
   [field search [cb:Option cb:String]]
   [documentation ordering "The result ordering."]
-  [field ordering IdA1AdminOrdering]
+  [field ordering IdA1AdminColumnOrdering]
   [documentation limit "The limit on the number of results."]
   [field limit cb:IntegerUnsigned16]
 ]
@@ -165,7 +159,7 @@
   [documentation search "The search query text."]
   [field search cb:String]
   [documentation ordering "The result ordering."]
-  [field ordering IdA1AdminOrdering]
+  [field ordering IdA1AdminColumnOrdering]
   [documentation limit "The limit on the number of results."]
   [field limit cb:IntegerUnsigned16]
 ]
@@ -206,12 +200,6 @@
   [field ascending cb:Boolean]
 ]
 
-[documentation IdA1UserOrdering "A set of column ordering specs."]
-[record IdA1UserOrdering
-  [documentation columns "The column orders."]
-  [field columns [cb:List IdA1UserColumnOrdering]]
-]
-
 [documentation IdA1UserSearchParameters "Search parameters for users."]
 [record IdA1UserSearchParameters
   [documentation timeCreatedRange "The range of creation times for returned users."]
@@ -221,7 +209,7 @@
   [documentation search "The search query text."]
   [field search [cb:Option cb:String]]
   [documentation ordering "The result ordering."]
-  [field ordering IdA1UserOrdering]
+  [field ordering IdA1UserColumnOrdering]
   [documentation limit "The limit on the number of results."]
   [field limit cb:IntegerUnsigned16]
 ]
@@ -235,7 +223,7 @@
   [documentation search "The search query text."]
   [field search cb:String]
   [documentation ordering "The result ordering."]
-  [field ordering IdA1UserOrdering]
+  [field ordering IdA1UserColumnOrdering]
   [documentation limit "The limit on the number of results."]
   [field limit cb:IntegerUnsigned16]
 ]

@@ -34,7 +34,6 @@ import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserColumnOrdering;
 import com.io7m.idstore.model.IdUserCreate;
-import com.io7m.idstore.model.IdUserOrdering;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
@@ -70,10 +69,8 @@ public final class IdAGClientService implements IdServiceType, Closeable
   private static final Logger LOG =
     LoggerFactory.getLogger(IdAGClientService.class);
 
-  private static final IdUserOrdering DEFAULT_USER_ORDERING =
-    new IdUserOrdering(
-      List.of(new IdUserColumnOrdering(BY_IDNAME, true))
-    );
+  private static final IdUserColumnOrdering DEFAULT_USER_ORDERING =
+    new IdUserColumnOrdering(BY_IDNAME, true);
 
   private final IdAGEventBus eventBus;
   private final ExecutorService executor;

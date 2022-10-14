@@ -23,8 +23,10 @@ import com.io7m.idstore.database.postgres.internal.tables.records.AuditRecord;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdPage;
+import com.io7m.jqpage.core.JQField;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPageDefinition;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPagination;
+import com.io7m.jqpage.core.JQOrder;
 import org.jooq.Condition;
 import org.jooq.Select;
 import org.jooq.Table;
@@ -112,7 +114,9 @@ final class IdDatabaseAuditQueries
         JQKeysetRandomAccessPagination.createPageDefinitions(
           context,
           baseTable,
-          List.of(AUDIT.ID),
+          List.of(new JQField(AUDIT.ID, JQOrder.ASCENDING)),
+          List.of(allConditions),
+          List.of(),
           Integer.toUnsignedLong(parameters.limit())
         );
 

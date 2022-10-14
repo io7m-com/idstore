@@ -17,11 +17,8 @@
 
 package com.io7m.idstore.model;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-import static com.io7m.idstore.model.IdUserColumn.BY_ID;
 
 /**
  * The immutable parameters required to search users.
@@ -39,7 +36,7 @@ public record IdUserSearchParameters(
   IdTimeRange timeCreatedRange,
   IdTimeRange timeUpdatedRange,
   Optional<String> search,
-  IdUserOrdering ordering,
+  IdUserColumnOrdering ordering,
   int limit)
 {
   /**
@@ -70,20 +67,5 @@ public record IdUserSearchParameters(
   public int limit()
   {
     return Math.max(1, this.limit);
-  }
-
-  /**
-   * @return Reasonable default parameters
-   */
-
-  public static IdUserSearchParameters defaults()
-  {
-    return new IdUserSearchParameters(
-      IdTimeRange.largest(),
-      IdTimeRange.largest(),
-      Optional.empty(),
-      new IdUserOrdering(List.of(new IdUserColumnOrdering(BY_ID, false))),
-      10
-    );
   }
 }

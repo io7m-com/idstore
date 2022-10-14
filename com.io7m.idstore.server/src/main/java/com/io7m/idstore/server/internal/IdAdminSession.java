@@ -16,19 +16,11 @@
 
 package com.io7m.idstore.server.internal;
 
-import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPaging;
-import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPagingType;
-import com.io7m.idstore.database.api.IdDatabaseAdminSearchPaging;
-import com.io7m.idstore.database.api.IdDatabaseAdminSearchPagingType;
+import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailType;
+import com.io7m.idstore.database.api.IdDatabaseAdminSearchType;
 import com.io7m.idstore.database.api.IdDatabaseAuditEventsSearchType;
-import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPaging;
-import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailPagingType;
-import com.io7m.idstore.database.api.IdDatabaseUserSearchPaging;
-import com.io7m.idstore.database.api.IdDatabaseUserSearchPagingType;
-import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
-import com.io7m.idstore.model.IdAdminSearchParameters;
-import com.io7m.idstore.model.IdUserSearchByEmailParameters;
-import com.io7m.idstore.model.IdUserSearchParameters;
+import com.io7m.idstore.database.api.IdDatabaseUserSearchByEmailType;
+import com.io7m.idstore.database.api.IdDatabaseUserSearchType;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -42,15 +34,11 @@ public final class IdAdminSession
 {
   private final UUID adminId;
   private final String sessionId;
-  private IdUserSearchParameters userSearchParameters;
-  private IdDatabaseUserSearchPagingType userSearchPaging;
-  private IdUserSearchByEmailParameters userSearchByEmailParameters;
-  private IdDatabaseUserSearchByEmailPagingType userSearchByEmailPaging;
   private Optional<IdDatabaseAuditEventsSearchType> auditPaging;
-  private IdAdminSearchParameters adminSearchParameters;
-  private IdDatabaseAdminSearchPagingType adminSearchPaging;
-  private IdAdminSearchByEmailParameters adminSearchByEmailParameters;
-  private IdDatabaseAdminSearchByEmailPagingType adminSearchByEmailPaging;
+  private Optional<IdDatabaseAdminSearchType> adminSearch;
+  private Optional<IdDatabaseAdminSearchByEmailType> adminSearchByEmail;
+  private Optional<IdDatabaseUserSearchType> userSearch;
+  private Optional<IdDatabaseUserSearchByEmailType> userSearchByEmail;
 
   /**
    * A controller for a single admin session.
@@ -68,145 +56,16 @@ public final class IdAdminSession
     this.sessionId =
       Objects.requireNonNull(inSessionId, "sessionId");
 
-    this.userSearchParameters =
-      IdUserSearchParameters.defaults();
-    this.userSearchPaging =
-      IdDatabaseUserSearchPaging.create(this.userSearchParameters);
-
-    this.userSearchByEmailParameters =
-      IdUserSearchByEmailParameters.defaults();
-    this.userSearchByEmailPaging =
-      IdDatabaseUserSearchByEmailPaging.create(this.userSearchByEmailParameters);
-
     this.auditPaging =
       Optional.empty();
-
-    this.adminSearchParameters =
-      IdAdminSearchParameters.defaults();
-    this.adminSearchPaging =
-      IdDatabaseAdminSearchPaging.create(this.adminSearchParameters);
-
-    this.adminSearchByEmailParameters =
-      IdAdminSearchByEmailParameters.defaults();
-    this.adminSearchByEmailPaging =
-      IdDatabaseAdminSearchByEmailPaging.create(this.adminSearchByEmailParameters);
-
-  }
-
-  /**
-   * @return The most recent user paging handler
-   */
-
-  public IdDatabaseUserSearchPagingType userPaging()
-  {
-    return this.userSearchPaging;
-  }
-
-  /**
-   * @return The most recent user paging handler
-   */
-
-  public IdDatabaseUserSearchByEmailPagingType userByEmailPaging()
-  {
-    return this.userSearchByEmailPaging;
-  }
-
-  /**
-   * Set the user listing parameters.
-   *
-   * @param userParameters The user parameters
-   */
-
-  public void setUserSearchParameters(
-    final IdUserSearchParameters userParameters)
-  {
-    this.userSearchParameters =
-      Objects.requireNonNull(userParameters, "userParameters");
-
-    if (!Objects.equals(
-      this.userSearchPaging.pageParameters(),
-      userParameters)) {
-      this.userSearchPaging =
-        IdDatabaseUserSearchPaging.create(userParameters);
-    }
-  }
-
-  /**
-   * Set the user listing parameters.
-   *
-   * @param userParameters The user parameters
-   */
-
-  public void setUserSearchByEmailParameters(
-    final IdUserSearchByEmailParameters userParameters)
-  {
-    this.userSearchByEmailParameters =
-      Objects.requireNonNull(userParameters, "userParameters");
-
-    if (!Objects.equals(
-      this.userSearchByEmailPaging.pageParameters(),
-      userParameters)) {
-      this.userSearchByEmailPaging =
-        IdDatabaseUserSearchByEmailPaging.create(userParameters);
-    }
-  }
-
-  /**
-   * @return The most recent admin paging handler
-   */
-
-  public IdDatabaseAdminSearchPagingType adminPaging()
-  {
-    return this.adminSearchPaging;
-  }
-
-  /**
-   * @return The most recent admin paging handler
-   */
-
-  public IdDatabaseAdminSearchByEmailPagingType adminByEmailPaging()
-  {
-    return this.adminSearchByEmailPaging;
-  }
-
-  /**
-   * Set the admin listing parameters.
-   *
-   * @param adminParameters The admin parameters
-   */
-
-  public void setAdminSearchParameters(
-    final IdAdminSearchParameters adminParameters)
-  {
-    this.adminSearchParameters =
-      Objects.requireNonNull(adminParameters, "adminParameters");
-
-    if (!Objects.equals(
-      this.adminSearchPaging.pageParameters(),
-      adminParameters)) {
-      this.adminSearchPaging =
-        IdDatabaseAdminSearchPaging.create(adminParameters);
-    }
-  }
-
-  /**
-   * Set the admin listing parameters.
-   *
-   * @param adminParameters The admin parameters
-   */
-
-  public void setAdminSearchByEmailParameters(
-    final IdAdminSearchByEmailParameters adminParameters)
-  {
-    this.adminSearchByEmailParameters =
-      Objects.requireNonNull(adminParameters, "adminParameters");
-
-    if (!Objects.equals(
-      this.adminSearchByEmailPaging.pageParameters(),
-      adminParameters)) {
-      this.adminSearchByEmailPaging =
-        IdDatabaseAdminSearchByEmailPaging.create(adminParameters);
-    }
+    this.adminSearch =
+      Optional.empty();
+    this.adminSearchByEmail =
+      Optional.empty();
+    this.userSearch =
+      Optional.empty();
+    this.userSearchByEmail =
+      Optional.empty();
   }
 
   /**
@@ -228,6 +87,94 @@ public final class IdAdminSession
     final IdDatabaseAuditEventsSearchType search)
   {
     this.auditPaging =
+      Optional.of(Objects.requireNonNull(search, "search"));
+  }
+
+  /**
+   * @return The admin by email search
+   */
+
+  public Optional<IdDatabaseAdminSearchByEmailType> adminSearchByEmail()
+  {
+    return this.adminSearchByEmail;
+  }
+
+  /**
+   * Set the new admin by email search.
+   *
+   * @param search The admin by email search
+   */
+
+  public void setAdminSearchByEmail(
+    final IdDatabaseAdminSearchByEmailType search)
+  {
+    this.adminSearchByEmail =
+      Optional.of(Objects.requireNonNull(search, "search"));
+  }
+
+  /**
+   * @return The admin search
+   */
+
+  public Optional<IdDatabaseAdminSearchType> adminSearch()
+  {
+    return this.adminSearch;
+  }
+
+  /**
+   * Set the new admin search.
+   *
+   * @param search The admin search
+   */
+
+  public void setAdminSearch(
+    final IdDatabaseAdminSearchType search)
+  {
+    this.adminSearch =
+      Optional.of(Objects.requireNonNull(search, "search"));
+  }
+
+  /**
+   * @return The user by email search
+   */
+
+  public Optional<IdDatabaseUserSearchByEmailType> userSearchByEmail()
+  {
+    return this.userSearchByEmail;
+  }
+
+  /**
+   * Set the new user by email search.
+   *
+   * @param search The user by email search
+   */
+
+  public void setUserSearchByEmail(
+    final IdDatabaseUserSearchByEmailType search)
+  {
+    this.userSearchByEmail =
+      Optional.of(Objects.requireNonNull(search, "search"));
+  }
+
+  /**
+   * @return The user search
+   */
+
+  public Optional<IdDatabaseUserSearchType> userSearch()
+  {
+    return this.userSearch;
+  }
+
+  /**
+   * Set the new user search.
+   *
+   * @param search The user search
+   */
+
+  public void setUserSearch(
+    final IdDatabaseUserSearchType search)
+  {
+    this.userSearch =
       Optional.of(Objects.requireNonNull(search, "search"));
   }
 }

@@ -557,7 +557,7 @@ public final class IdAGUsersController implements Initializable
     final IdPage<IdUserSummary> page)
   {
     Platform.runLater(() -> {
-      final var pageIndex = page.pageIndex() + 1;
+      final var pageIndex = page.pageIndex();
       final var pageCount = page.pageCount();
 
       this.userPagePrev.setDisable(pageIndex == 1);

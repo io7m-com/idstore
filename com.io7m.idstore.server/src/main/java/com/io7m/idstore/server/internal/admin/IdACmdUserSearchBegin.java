@@ -19,7 +19,6 @@ package com.io7m.idstore.server.internal.admin;
 
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
@@ -60,19 +59,16 @@ public final class IdACmdUserSearchBegin
     final var users =
       transaction.queries(IdDatabaseUsersQueriesType.class);
 
-    final var session = context.session();
-    session.setUserSearchParameters(obtainListParameters(command));
-    final var paging = session.userPaging();
-    final var data = paging.pageCurrent(users);
+    final var session =
+      context.session();
+    final var search =
+      users.userSearch(obtainListParameters(command));
+
+    session.setUserSearch(search);
 
     return new IdAResponseUserSearchBegin(
       context.requestId(),
-      new IdPage<>(
-        data,
-        paging.pageNumber(),
-        paging.pageCount(),
-        paging.pageFirstOffset()
-      )
+      search.pageCurrent(users)
     );
   }
 

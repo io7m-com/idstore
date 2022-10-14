@@ -28,7 +28,6 @@ import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserPasswordReset;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
-import com.io7m.idstore.model.IdUserSummary;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -221,68 +220,6 @@ public non-sealed interface IdDatabaseUsersQueriesType
     throws IdDatabaseException;
 
   /**
-   * List users.
-   *
-   * @param parameters The search parameters
-   * @param seek       The record to which to seek, if any
-   *
-   * @return The users
-   *
-   * @throws IdDatabaseException On errors
-   */
-
-  List<IdUserSummary> userSearch(
-    IdUserSearchParameters parameters,
-    Optional<List<Object>> seek)
-    throws IdDatabaseException;
-
-  /**
-   * Determine approximate number of results that would be returned in total by
-   * a given search.
-   *
-   * @param parameters The search parameters
-   *
-   * @return The users
-   *
-   * @throws IdDatabaseException On errors
-   */
-
-  long userSearchCount(
-    IdUserSearchParameters parameters)
-    throws IdDatabaseException;
-
-  /**
-   * List users.
-   *
-   * @param parameters The search parameters
-   * @param seek       The record to which to seek, if any
-   *
-   * @return The users
-   *
-   * @throws IdDatabaseException On errors
-   */
-
-  List<IdUserSummary> userSearchByEmail(
-    IdUserSearchByEmailParameters parameters,
-    Optional<List<Object>> seek)
-    throws IdDatabaseException;
-
-  /**
-   * Determine approximate number of results that would be returned in total by
-   * a given search.
-   *
-   * @param parameters The search parameters
-   *
-   * @return The users
-   *
-   * @throws IdDatabaseException On errors
-   */
-
-  long userSearchByEmailCount(
-    IdUserSearchByEmailParameters parameters)
-    throws IdDatabaseException;
-
-  /**
    * Add an email address to the given user.
    *
    * @param id    The user ID
@@ -427,4 +364,33 @@ public non-sealed interface IdDatabaseUsersQueriesType
   void userPasswordResetDelete(
     IdUserPasswordReset reset)
     throws IdDatabaseException;
+
+  /**
+   * List users.
+   *
+   * @param parameters The search parameters
+   *
+   * @return The users
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  IdDatabaseUserSearchType userSearch(
+    IdUserSearchParameters parameters)
+    throws IdDatabaseException;
+
+  /**
+   * List users.
+   *
+   * @param parameters The search parameters
+   *
+   * @return The users
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  IdDatabaseUserSearchByEmailType userSearchByEmail(
+    IdUserSearchByEmailParameters parameters)
+    throws IdDatabaseException;
+
 }

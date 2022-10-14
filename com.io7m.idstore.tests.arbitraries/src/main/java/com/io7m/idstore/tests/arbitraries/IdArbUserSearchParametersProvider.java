@@ -17,7 +17,7 @@
 package com.io7m.idstore.tests.arbitraries;
 
 import com.io7m.idstore.model.IdTimeRange;
-import com.io7m.idstore.model.IdUserOrdering;
+import com.io7m.idstore.model.IdUserColumnOrdering;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
@@ -57,7 +57,7 @@ public final class IdArbUserSearchParametersProvider extends IdArbAbstractProvid
     final var t =
       Arbitraries.defaultFor(IdTimeRange.class);
     final var o =
-      Arbitraries.defaultFor(IdUserOrdering.class);
+      Arbitraries.defaultFor(IdUserColumnOrdering.class);
     final var s =
       Arbitraries.strings();
     final var i =

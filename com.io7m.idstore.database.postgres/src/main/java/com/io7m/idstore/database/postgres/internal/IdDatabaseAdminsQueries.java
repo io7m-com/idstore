@@ -16,13 +16,15 @@
 
 package com.io7m.idstore.database.postgres.internal;
 
+import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailType;
+import com.io7m.idstore.database.api.IdDatabaseAdminSearchType;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.postgres.internal.tables.records.AdminsRecord;
 import com.io7m.idstore.database.postgres.internal.tables.records.EmailsRecord;
 import com.io7m.idstore.model.IdAdmin;
-import com.io7m.idstore.model.IdAdminOrdering;
+import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
@@ -32,20 +34,22 @@ import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
+import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdPasswordAlgorithms;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
+import com.io7m.jqpage.core.JQField;
+import com.io7m.jqpage.core.JQKeysetRandomAccessPageDefinition;
+import com.io7m.jqpage.core.JQKeysetRandomAccessPagination;
+import com.io7m.jqpage.core.JQOrder;
+import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.jooq.Condition;
-import org.jooq.OrderField;
 import org.jooq.Result;
-import org.jooq.SelectForUpdateStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -74,6 +78,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHostProxied;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.DB_STATEMENT;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -92,53 +97,6 @@ final class IdDatabaseAdminsQueries
     final IdDatabaseTransaction inTransaction)
   {
     super(inTransaction);
-  }
-
-  private static Collection<? extends OrderField<?>> orderFields(
-    final IdAdminOrdering ordering)
-  {
-    final var columns = ordering.ordering();
-    final var fields = new ArrayList<OrderField<?>>(columns.size());
-    for (final var columnOrder : columns) {
-      fields.add(
-        switch (columnOrder.column()) {
-          case BY_ID -> {
-            if (columnOrder.ascending()) {
-              yield ADMINS.ID.asc();
-            }
-            yield ADMINS.ID.desc();
-          }
-
-          case BY_IDNAME -> {
-            if (columnOrder.ascending()) {
-              yield ADMINS.ID_NAME.asc();
-            }
-            yield ADMINS.ID_NAME.desc();
-          }
-
-          case BY_REALNAME -> {
-            if (columnOrder.ascending()) {
-              yield ADMINS.REAL_NAME.asc();
-            }
-            yield ADMINS.REAL_NAME.desc();
-          }
-
-          case BY_TIME_CREATED -> {
-            if (columnOrder.ascending()) {
-              yield ADMINS.TIME_CREATED.asc();
-            }
-            yield ADMINS.TIME_CREATED.desc();
-          }
-
-          case BY_TIME_UPDATED -> {
-            if (columnOrder.ascending()) {
-              yield ADMINS.TIME_UPDATED.asc();
-            }
-            yield ADMINS.TIME_UPDATED.desc();
-          }
-        });
-    }
-    return List.copyOf(fields);
   }
 
   private static IdAdmin adminMap(
@@ -188,6 +146,24 @@ final class IdDatabaseAdminsQueries
       exception.getMessage(),
       exception,
       PASSWORD_ERROR
+    );
+  }
+
+  private static JQField orderingToJQField(
+    final IdAdminColumnOrdering ordering)
+  {
+    final var field =
+      switch (ordering.column()) {
+        case BY_ID -> ADMINS.ID;
+        case BY_IDNAME -> ADMINS.ID_NAME;
+        case BY_REALNAME -> ADMINS.REAL_NAME;
+        case BY_TIME_CREATED -> ADMINS.TIME_CREATED;
+        case BY_TIME_UPDATED -> ADMINS.TIME_UPDATED;
+      };
+
+    return new JQField(
+      field,
+      ordering.ascending() ? JQOrder.ASCENDING : JQOrder.DESCENDING
     );
   }
 
@@ -547,7 +523,9 @@ final class IdDatabaseAdminsQueries
         .set(LOGIN_HISTORY.TIME, this.currentTime())
         .set(LOGIN_HISTORY.AGENT, metadata.getOrDefault(userAgent(), ""))
         .set(LOGIN_HISTORY.HOST, metadata.getOrDefault(remoteHost(), ""))
-        .set(LOGIN_HISTORY.PROXIED_HOST, metadata.getOrDefault(remoteHostProxied(), ""))
+        .set(
+          LOGIN_HISTORY.PROXIED_HOST,
+          metadata.getOrDefault(remoteHostProxied(), ""))
         .execute();
 
       /*
@@ -572,271 +550,17 @@ final class IdDatabaseAdminsQueries
   }
 
   @Override
-  public List<IdAdminSummary> adminSearchByEmail(
-    final IdAdminSearchByEmailParameters parameters,
-    final Optional<List<Object>> seek)
-    throws IdDatabaseException
-  {
-    Objects.requireNonNull(parameters, "parameters");
-    Objects.requireNonNull(seek, "seek");
-
-    final var transaction = this.transaction();
-    final var context = transaction.createContext();
-    final var querySpan =
-      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminSearchByEmail");
-
-    try {
-      final var baseSelection =
-        context.select(
-            ADMINS.ID,
-            ADMINS.ID_NAME,
-            ADMINS.REAL_NAME,
-            ADMINS.TIME_CREATED,
-            ADMINS.TIME_UPDATED)
-          .from(ADMINS.join(EMAILS).on(ADMINS.ID.eq(EMAILS.ADMIN_ID)));
-
-      /*
-       * The admins must lie within the given time ranges.
-       */
-
-      final var timeCreatedRange = parameters.timeCreatedRange();
-      final var timeCreatedCondition =
-        DSL.condition(
-          ADMINS.TIME_CREATED.ge(timeCreatedRange.timeLower())
-            .and(ADMINS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
-        );
-
-      final var timeUpdatedRange = parameters.timeUpdatedRange();
-      final var timeUpdatedCondition =
-        DSL.condition(
-          ADMINS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
-            .and(ADMINS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
-        );
-
-      /*
-       * Only admins with matching email addresses will be returned.
-       */
-
-      final var searchLike =
-        "%%%s%%".formatted(parameters.search());
-      final var searchCondition =
-        DSL.condition(EMAILS.EMAIL_ADDRESS.likeIgnoreCase(searchLike));
-
-      final var allConditions =
-        timeCreatedCondition
-          .and(timeUpdatedCondition)
-          .and(searchCondition);
-
-      final var baseOrdering =
-        baseSelection.where(allConditions)
-          .groupBy(ADMINS.ID)
-          .orderBy(orderFields(parameters.ordering()));
-
-      /*
-       * If a seek is specified, then seek!
-       */
-
-      final SelectForUpdateStep<?> next;
-      if (seek.isPresent()) {
-        final var page = seek.get();
-        final var fields = page.toArray();
-        next = baseOrdering.seek(fields)
-          .limit(Integer.valueOf(parameters.limit()));
-      } else {
-        next = baseOrdering.limit(Integer.valueOf(parameters.limit()));
-      }
-
-      final var results = new ArrayList<IdAdminSummary>(parameters.limit());
-      final var records = next.fetch();
-      for (final var record : records) {
-        results.add(new IdAdminSummary(
-          record.get(ADMINS.ID),
-          new IdName(record.get(ADMINS.ID_NAME)),
-          new IdRealName(record.get(ADMINS.REAL_NAME)),
-          record.get(ADMINS.TIME_CREATED),
-          record.get(ADMINS.TIME_UPDATED))
-        );
-      }
-      return results;
-    } catch (final DataAccessException e) {
-      querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
-    } finally {
-      querySpan.end();
-    }
-  }
-
-  @Override
-  public long adminSearchByEmailCount(
-    final IdAdminSearchByEmailParameters parameters)
-    throws IdDatabaseException
-  {
-    Objects.requireNonNull(parameters, "parameters");
-
-    final var transaction =
-      this.transaction();
-    final var context =
-      transaction.createContext();
-    final var querySpan =
-      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminSearchByEmailCount");
-
-    try {
-      /*
-       * The admins must lie within the given time ranges.
-       */
-
-      final var timeCreatedRange = parameters.timeCreatedRange();
-      final var timeCreatedCondition =
-        DSL.condition(
-          ADMINS.TIME_CREATED.ge(timeCreatedRange.timeLower())
-            .and(ADMINS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
-        );
-
-      final var timeUpdatedRange = parameters.timeUpdatedRange();
-      final var timeUpdatedCondition =
-        DSL.condition(
-          ADMINS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
-            .and(ADMINS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
-        );
-
-      /*
-       * Only admins with matching email addresses will be returned.
-       */
-
-      final var searchLike =
-        "%%%s%%".formatted(parameters.search());
-      final var searchCondition =
-        DSL.condition(EMAILS.EMAIL_ADDRESS.likeIgnoreCase(searchLike));
-
-      final var allConditions =
-        timeCreatedCondition
-          .and(timeUpdatedCondition)
-          .and(searchCondition);
-
-      final var query =
-        context.selectDistinct(DSL.count().over().as("Total"))
-          .from(ADMINS.join(EMAILS).on(ADMINS.ID.eq(EMAILS.ADMIN_ID)))
-          .where(allConditions)
-          .groupBy(ADMINS.ID)
-          .fetchOneInto(int.class);
-
-      return query.longValue();
-    } catch (final DataAccessException e) {
-      querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
-    } finally {
-      querySpan.end();
-    }
-  }
-
-  @Override
-  public List<IdAdminSummary> adminSearch(
-    final IdAdminSearchParameters parameters,
-    final Optional<List<Object>> seek)
-    throws IdDatabaseException
-  {
-    Objects.requireNonNull(parameters, "parameters");
-    Objects.requireNonNull(seek, "seek");
-
-    final var transaction =
-      this.transaction();
-    final var context =
-      transaction.createContext();
-    final var querySpan =
-      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminSearch");
-
-    try {
-      final var baseSelection =
-        context.selectFrom(ADMINS);
-
-      /*
-       * The admins must lie within the given time ranges.
-       */
-
-      final var timeCreatedRange = parameters.timeCreatedRange();
-      final var timeCreatedCondition =
-        DSL.condition(
-          ADMINS.TIME_CREATED.ge(timeCreatedRange.timeLower())
-            .and(ADMINS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
-        );
-
-      final var timeUpdatedRange = parameters.timeUpdatedRange();
-      final var timeUpdatedCondition =
-        DSL.condition(
-          ADMINS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
-            .and(ADMINS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
-        );
-
-      /*
-       * A search query might be present.
-       */
-
-      final Condition searchCondition;
-      final var search = parameters.search();
-      if (search.isPresent()) {
-        final var searchText = "%%%s%%".formatted(search.get());
-        searchCondition =
-          DSL.condition(ADMINS.ID_NAME.likeIgnoreCase(searchText))
-            .or(DSL.condition(ADMINS.REAL_NAME.likeIgnoreCase(searchText)))
-            .or(DSL.condition(ADMINS.ID.likeIgnoreCase(searchText)));
-      } else {
-        searchCondition = DSL.trueCondition();
-      }
-
-      final var allConditions =
-        timeCreatedCondition
-          .and(timeUpdatedCondition)
-          .and(searchCondition);
-
-      final var baseOrdering =
-        baseSelection.where(allConditions)
-          .orderBy(orderFields(parameters.ordering()));
-
-      /*
-       * If a seek is specified, then seek!
-       */
-
-      final SelectForUpdateStep<?> next;
-      if (seek.isPresent()) {
-        final var page = seek.get();
-        final var fields = page.toArray();
-        next = baseOrdering.seek(fields)
-          .limit(Integer.valueOf(parameters.limit()));
-      } else {
-        next = baseOrdering.limit(Integer.valueOf(parameters.limit()));
-      }
-
-      return next.fetch()
-        .map(record -> {
-          return new IdAdminSummary(
-            record.get(ADMINS.ID),
-            new IdName(record.get(ADMINS.ID_NAME)),
-            new IdRealName(record.get(ADMINS.REAL_NAME)),
-            record.get(ADMINS.TIME_CREATED),
-            record.get(ADMINS.TIME_UPDATED)
-          );
-        });
-    } catch (final DataAccessException e) {
-      querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
-    } finally {
-      querySpan.end();
-    }
-  }
-
-  @Override
-  public long adminSearchCount(
+  public IdDatabaseAdminSearchType adminSearch(
     final IdAdminSearchParameters parameters)
     throws IdDatabaseException
   {
     Objects.requireNonNull(parameters, "parameters");
 
-    final var transaction =
-      this.transaction();
-    final var context =
-      transaction.createContext();
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
     final var querySpan =
-      transaction.createQuerySpan("IdDatabaseAdminsQueries.adminSearchCount");
+      transaction.createQuerySpan(
+        "IdDatabaseAdminsQueries.adminSearch.create");
 
     try {
 
@@ -879,12 +603,23 @@ final class IdDatabaseAdminsQueries
           .and(timeUpdatedCondition)
           .and(searchCondition);
 
-      return ((Integer) context.selectCount()
-        .from(ADMINS)
-        .where(allConditions)
-        .fetchOne()
-        .getValue(0))
-        .longValue();
+      final var orderField =
+        orderingToJQField(parameters.ordering());
+
+      final var pages =
+        JQKeysetRandomAccessPagination.createPageDefinitions(
+          context,
+          ADMINS,
+          List.of(orderField),
+          List.of(allConditions),
+          List.of(),
+          Integer.toUnsignedLong(parameters.limit()),
+          statement -> {
+            querySpan.setAttribute(DB_STATEMENT, statement.toString());
+          }
+        );
+
+      return new AdminsSearch(pages);
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e);
@@ -1246,6 +981,213 @@ final class IdDatabaseAdminsQueries
       throw handleDatabaseException(transaction, e);
     } finally {
       querySpan.end();
+    }
+  }
+
+  @Override
+  public IdDatabaseAdminSearchByEmailType adminSearchByEmail(
+    final IdAdminSearchByEmailParameters parameters)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(parameters, "parameters");
+
+    final var transaction = this.transaction();
+    final var context = transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan(
+        "IdDatabaseAdminsQueries.adminSearchByEmail.create");
+
+    try {
+      final var baseTable =
+        ADMINS.join(EMAILS)
+          .on(ADMINS.ID.eq(EMAILS.ADMIN_ID));
+
+      /*
+       * The admins must lie within the given time ranges.
+       */
+
+      final var timeCreatedRange = parameters.timeCreatedRange();
+      final var timeCreatedCondition =
+        DSL.condition(
+          ADMINS.TIME_CREATED.ge(timeCreatedRange.timeLower())
+            .and(ADMINS.TIME_CREATED.le(timeCreatedRange.timeUpper()))
+        );
+
+      final var timeUpdatedRange = parameters.timeUpdatedRange();
+      final var timeUpdatedCondition =
+        DSL.condition(
+          ADMINS.TIME_UPDATED.ge(timeUpdatedRange.timeLower())
+            .and(ADMINS.TIME_UPDATED.le(timeUpdatedRange.timeUpper()))
+        );
+
+      /*
+       * Only admins with matching email addresses will be returned.
+       */
+
+      final var searchLike =
+        "%%%s%%".formatted(parameters.search());
+      final var searchCondition =
+        DSL.condition(EMAILS.EMAIL_ADDRESS.likeIgnoreCase(searchLike));
+
+      final var allConditions =
+        timeCreatedCondition
+          .and(timeUpdatedCondition)
+          .and(searchCondition);
+
+      final var orderField =
+        orderingToJQField(parameters.ordering());
+
+      final var pages =
+        JQKeysetRandomAccessPagination.createPageDefinitions(
+          context,
+          baseTable,
+          List.of(orderField),
+          List.of(allConditions),
+          List.of(ADMINS.ID),
+          Integer.toUnsignedLong(parameters.limit()),
+          statement -> {
+            querySpan.setAttribute(DB_STATEMENT, statement.toString());
+          }
+        );
+
+      return new AdminsByEmailSearch(pages);
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(this.transaction(), e);
+    } finally {
+      querySpan.end();
+    }
+  }
+
+  private static final class AdminsByEmailSearch
+    extends IdAbstractSearch<
+    IdDatabaseAdminsQueries,
+    IdDatabaseAdminsQueriesType,
+    IdAdminSummary>
+    implements IdDatabaseAdminSearchByEmailType
+  {
+    AdminsByEmailSearch(
+      final List<JQKeysetRandomAccessPageDefinition> inPages)
+    {
+      super(inPages);
+    }
+
+    @Override
+    protected IdPage<IdAdminSummary> page(
+      final IdDatabaseAdminsQueries queries,
+      final JQKeysetRandomAccessPageDefinition page)
+      throws IdDatabaseException
+    {
+      final var transaction =
+        queries.transaction();
+      final var context =
+        transaction.createContext();
+
+      final var querySpan =
+        transaction.createQuerySpan(
+          "IdDatabaseAdminsQueries.adminSearchByEmail.page");
+
+      try {
+        final var query =
+          page.queryFields(context, List.of(
+            ADMINS.ID,
+            ADMINS.ID_NAME,
+            ADMINS.REAL_NAME,
+            ADMINS.TIME_CREATED,
+            ADMINS.TIME_UPDATED
+          ));
+
+        querySpan.setAttribute(DB_STATEMENT, query.toString());
+
+        final var items =
+          query.fetch().map(record -> {
+            return new IdAdminSummary(
+              record.get(ADMINS.ID),
+              new IdName(record.get(ADMINS.ID_NAME)),
+              new IdRealName(record.get(ADMINS.REAL_NAME)),
+              record.get(ADMINS.TIME_CREATED),
+              record.get(ADMINS.TIME_UPDATED)
+            );
+          });
+
+        return new IdPage<>(
+          items,
+          (int) page.index(),
+          this.pageCount(),
+          page.firstOffset()
+        );
+      } catch (final DataAccessException e) {
+        querySpan.recordException(e);
+        throw handleDatabaseException(transaction, e);
+      } finally {
+        querySpan.end();
+      }
+    }
+  }
+
+  private static final class AdminsSearch
+    extends IdAbstractSearch<
+    IdDatabaseAdminsQueries,
+    IdDatabaseAdminsQueriesType,
+    IdAdminSummary>
+    implements IdDatabaseAdminSearchType
+  {
+    AdminsSearch(
+      final List<JQKeysetRandomAccessPageDefinition> inPages)
+    {
+      super(inPages);
+    }
+
+    @Override
+    protected IdPage<IdAdminSummary> page(
+      final IdDatabaseAdminsQueries queries,
+      final JQKeysetRandomAccessPageDefinition page)
+      throws IdDatabaseException
+    {
+      final var transaction =
+        queries.transaction();
+      final var context =
+        transaction.createContext();
+
+      final var querySpan =
+        transaction.createQuerySpan(
+          "IdDatabaseAdminsQueries.adminSearch.page");
+
+      try {
+        final var query =
+          page.queryFields(context, List.of(
+            ADMINS.ID,
+            ADMINS.ID_NAME,
+            ADMINS.REAL_NAME,
+            ADMINS.TIME_CREATED,
+            ADMINS.TIME_UPDATED
+          ));
+
+        querySpan.setAttribute(DB_STATEMENT, query.toString());
+
+        final var items =
+          query.fetch().map(record -> {
+            return new IdAdminSummary(
+              record.get(ADMINS.ID),
+              new IdName(record.get(ADMINS.ID_NAME)),
+              new IdRealName(record.get(ADMINS.REAL_NAME)),
+              record.get(ADMINS.TIME_CREATED),
+              record.get(ADMINS.TIME_UPDATED)
+            );
+          });
+
+        return new IdPage<>(
+          items,
+          (int) page.index(),
+          this.pageCount(),
+          page.firstOffset()
+        );
+      } catch (final DataAccessException e) {
+        querySpan.recordException(e);
+        throw handleDatabaseException(transaction, e);
+      } finally {
+        querySpan.end();
+      }
     }
   }
 }
