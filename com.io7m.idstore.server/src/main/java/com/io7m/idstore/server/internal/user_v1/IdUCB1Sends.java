@@ -116,6 +116,6 @@ public final class IdUCB1Sends implements IdServiceType
   public String toString()
   {
     return "[IdUCB1Sends 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

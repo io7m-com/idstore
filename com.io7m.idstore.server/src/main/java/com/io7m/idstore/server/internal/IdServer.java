@@ -69,9 +69,8 @@ import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.SpanKind;
-import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.StatisticsHandler;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.DefaultSessionIdManager;
 import org.eclipse.jetty.server.session.NullSessionDataStore;
@@ -81,7 +80,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
@@ -381,20 +379,11 @@ public final class IdServer implements IdServerType
     sessionHandler.setHandler(servlets);
 
     /*
-     * Set up an MBean container so that the statistics handler can export
-     * statistics to JMX.
+     * Enable gzip.
      */
 
-    final var mbeanContainer =
-      new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-    server.addBean(mbeanContainer);
-
-    /*
-     * Set up a statistics handler that wraps everything.
-     */
-
-    final var statsHandler = new StatisticsHandler();
-    statsHandler.setHandler(sessionHandler);
+    final var gzip = new GzipHandler();
+    gzip.setHandler(sessionHandler);
 
     /*
      * Add a connector listener that adds unique identifiers to all requests.
@@ -406,7 +395,7 @@ public final class IdServer implements IdServerType
 
     server.setErrorHandler(new IdErrorHandler());
     server.setRequestLog(new IdServerRequestLog(services, "user_view"));
-    server.setHandler(statsHandler);
+    server.setHandler(gzip);
     server.start();
     LOG.info("[{}] User view server started", address);
     return server;
@@ -453,6 +442,13 @@ public final class IdServer implements IdServerType
         IdCommonLogoServlet.class,
         IdCommonLogoServlet::new),
       "/logo"
+    );
+
+    servlets.addServlet(
+      servletHolders.create(
+        IdCommonLogoServlet.class,
+        IdCommonLogoServlet::new),
+      "/favicon.ico"
     );
 
     servlets.addServlet(
@@ -679,20 +675,11 @@ public final class IdServer implements IdServerType
     sessionHandler.setHandler(servlets);
 
     /*
-     * Set up an MBean container so that the statistics handler can export
-     * statistics to JMX.
+     * Enable gzip.
      */
 
-    final var mbeanContainer =
-      new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-    server.addBean(mbeanContainer);
-
-    /*
-     * Set up a statistics handler that wraps everything.
-     */
-
-    final var statsHandler = new StatisticsHandler();
-    statsHandler.setHandler(sessionHandler);
+    final var gzip = new GzipHandler();
+    gzip.setHandler(sessionHandler);
 
     /*
      * Add a connector listener that adds unique identifiers to all requests.
@@ -704,7 +691,7 @@ public final class IdServer implements IdServerType
 
     server.setErrorHandler(new IdErrorHandler());
     server.setRequestLog(new IdServerRequestLog(services, "user_api"));
-    server.setHandler(statsHandler);
+    server.setHandler(gzip);
     server.start();
     LOG.info("[{}] User API server started", address);
     return server;
@@ -774,20 +761,11 @@ public final class IdServer implements IdServerType
     sessionHandler.setHandler(servlets);
 
     /*
-     * Set up an MBean container so that the statistics handler can export
-     * statistics to JMX.
+     * Enable gzip.
      */
 
-    final var mbeanContainer =
-      new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
-    server.addBean(mbeanContainer);
-
-    /*
-     * Set up a statistics handler that wraps everything.
-     */
-
-    final var statsHandler = new StatisticsHandler();
-    statsHandler.setHandler(sessionHandler);
+    final var gzip = new GzipHandler();
+    gzip.setHandler(sessionHandler);
 
     /*
      * Add a connector listener that adds unique identifiers to all requests.
@@ -799,7 +777,7 @@ public final class IdServer implements IdServerType
 
     server.setErrorHandler(new IdErrorHandler());
     server.setRequestLog(new IdServerRequestLog(services, "admin_api"));
-    server.setHandler(statsHandler);
+    server.setHandler(gzip);
     server.start();
     LOG.info("[{}] Admin API server started", address);
     return server;

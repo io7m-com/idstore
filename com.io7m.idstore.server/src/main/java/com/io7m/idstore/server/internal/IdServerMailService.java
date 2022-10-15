@@ -238,7 +238,7 @@ public final class IdServerMailService implements IdServiceType, AutoCloseable
   public String toString()
   {
     return "[IdServerMailService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 
   @Override

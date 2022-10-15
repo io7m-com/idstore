@@ -22,7 +22,6 @@ import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUserColumnOrdering;
-import com.io7m.idstore.model.IdUserOrdering;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,10 +42,8 @@ public final class IdServerAdminAuditTest extends IdWithServerContract
       OffsetDateTime.now().plusDays(30L)
     );
 
-  private static final IdUserOrdering ORDER_BY_IDNAME =
-    new IdUserOrdering(
-      List.of(new IdUserColumnOrdering(BY_IDNAME, true))
-    );
+  private static final IdUserColumnOrdering ORDER_BY_IDNAME =
+    new IdUserColumnOrdering(BY_IDNAME, true);
 
   private IdAClients clients;
   private IdAClientType client;
@@ -100,63 +97,63 @@ public final class IdServerAdminAuditTest extends IdWithServerContract
           10
         );
 
-      assertEquals(3, e.pageCount());
+      assertEquals(4, e.pageCount());
       assertEquals(0, e.pageFirstOffset());
-      assertEquals(0, e.pageIndex());
+      assertEquals(1, e.pageIndex());
       assertEquals(10, e.items().size());
       checkItems(e, 0, 10);
     }
 
     {
       final var e = this.client.auditSearchNext();
-      assertEquals(3, e.pageCount());
+      assertEquals(4, e.pageCount());
       assertEquals(10, e.pageFirstOffset());
-      assertEquals(1, e.pageIndex());
+      assertEquals(2, e.pageIndex());
       assertEquals(10, e.items().size());
       checkItems(e, 10, 10);
     }
 
     {
       final var e = this.client.auditSearchNext();
-      assertEquals(3, e.pageCount());
+      assertEquals(4, e.pageCount());
       assertEquals(20, e.pageFirstOffset());
-      assertEquals(2, e.pageIndex());
+      assertEquals(3, e.pageIndex());
       assertEquals(10, e.items().size());
       checkItems(e, 20, 10);
     }
 
     {
       final var e = this.client.auditSearchNext();
-      assertEquals(3, e.pageCount());
+      assertEquals(4, e.pageCount());
       assertEquals(30, e.pageFirstOffset());
-      assertEquals(3, e.pageIndex());
+      assertEquals(4, e.pageIndex());
       assertEquals(2, e.items().size());
       checkItems(e, 30, 2);
     }
 
     {
       final var e = this.client.auditSearchPrevious();
-      assertEquals(3, e.pageCount());
+      assertEquals(4, e.pageCount());
       assertEquals(20, e.pageFirstOffset());
-      assertEquals(2, e.pageIndex());
+      assertEquals(3, e.pageIndex());
       assertEquals(10, e.items().size());
       checkItems(e, 20, 10);
     }
 
     {
       final var e = this.client.auditSearchPrevious();
-      assertEquals(3, e.pageCount());
+      assertEquals(4, e.pageCount());
       assertEquals(10, e.pageFirstOffset());
-      assertEquals(1, e.pageIndex());
+      assertEquals(2, e.pageIndex());
       assertEquals(10, e.items().size());
       checkItems(e, 10, 10);
     }
 
     {
       final var e = this.client.auditSearchPrevious();
-      assertEquals(3, e.pageCount());
+      assertEquals(4, e.pageCount());
       assertEquals(0, e.pageFirstOffset());
-      assertEquals(0, e.pageIndex());
+      assertEquals(1, e.pageIndex());
       assertEquals(10, e.items().size());
       checkItems(e, 0, 10);
     }

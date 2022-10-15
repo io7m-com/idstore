@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.tests.arbitraries;
 
-import com.io7m.idstore.model.IdAdminOrdering;
+import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdTimeRange;
 import net.jqwik.api.Arbitraries;
@@ -56,7 +56,7 @@ public final class IdArbAdminSearchByEmailParametersProvider extends IdArbAbstra
     final var t =
       Arbitraries.defaultFor(IdTimeRange.class);
     final var o =
-      Arbitraries.defaultFor(IdAdminOrdering.class);
+      Arbitraries.defaultFor(IdAdminColumnOrdering.class);
     final var s =
       Arbitraries.strings();
     final var i =

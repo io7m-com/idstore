@@ -82,6 +82,6 @@ public final class IdRateLimitPasswordResetService implements IdServiceType
   public String toString()
   {
     return "[IdRateLimitPasswordResetService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

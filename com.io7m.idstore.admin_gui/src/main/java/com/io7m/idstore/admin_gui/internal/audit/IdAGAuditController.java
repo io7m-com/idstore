@@ -208,7 +208,7 @@ public final class IdAGAuditController implements Initializable
     final IdPage<IdAuditEvent> page)
   {
     Platform.runLater(() -> {
-      final var pageIndex = page.pageIndex() + 1;
+      final var pageIndex = page.pageIndex();
       final var pageCount = page.pageCount();
 
       this.auditPagePrev.setDisable(pageIndex == 1);

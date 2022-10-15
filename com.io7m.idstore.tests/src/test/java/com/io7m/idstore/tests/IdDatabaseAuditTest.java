@@ -18,7 +18,6 @@
 package com.io7m.idstore.tests;
 
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
-import com.io7m.idstore.database.api.IdDatabaseAuditListPaging;
 import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseException;
@@ -50,7 +49,6 @@ import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseCreate.CREATE_DATABASE;
@@ -187,35 +185,39 @@ public final class IdDatabaseAuditTest
         4
       );
 
-    assertEquals(9, audit.auditCount(parameters));
-
-    OptionalLong seek = OptionalLong.empty();
+    final var events = audit.auditEventsSearch(parameters);
 
     {
-      final var events = audit.auditEvents(parameters, seek);
-      assertEquals(4, events.size());
-      assertEquals("E0", events.get(0).message());
-      assertEquals("E1", events.get(1).message());
-      assertEquals("E2", events.get(2).message());
-      assertEquals("F3", events.get(3).message());
-      seek = OptionalLong.of(events.get(3).id());
+      final var page = events.pageCurrent(audit);
+      final var items = page.items();
+      assertEquals(4, items.size());
+      assertEquals(1, page.pageIndex());
+      assertEquals(3, page.pageCount());
+      assertEquals("E0", items.get(0).message());
+      assertEquals("E1", items.get(1).message());
+      assertEquals("E2", items.get(2).message());
+      assertEquals("F3", items.get(3).message());
     }
 
     {
-      final var events = audit.auditEvents(parameters, seek);
-      assertEquals(4, events.size());
-      assertEquals("F4", events.get(0).message());
-      assertEquals("F5", events.get(1).message());
-      assertEquals("G6", events.get(2).message());
-      assertEquals("G7", events.get(3).message());
-      seek = OptionalLong.of(events.get(3).id());
+      final var page = events.pageNext(audit);
+      final var items = page.items();
+      assertEquals(4, items.size());
+      assertEquals(2, page.pageIndex());
+      assertEquals(3, page.pageCount());
+      assertEquals("F4", items.get(0).message());
+      assertEquals("F5", items.get(1).message());
+      assertEquals("G6", items.get(2).message());
+      assertEquals("G7", items.get(3).message());
     }
 
     {
-      final var events = audit.auditEvents(parameters, seek);
-      assertEquals(1, events.size());
-      assertEquals("G8", events.get(0).message());
-      seek = OptionalLong.of(events.get(0).id());
+      final var page = events.pageNext(audit);
+      final var items = page.items();
+      assertEquals(1, items.size());
+      assertEquals(3, page.pageIndex());
+      assertEquals(3, page.pageCount());
+      assertEquals("G8", items.get(0).message());
     }
   }
 
@@ -252,27 +254,42 @@ public final class IdDatabaseAuditTest
         1
       );
 
-    OptionalLong seek = OptionalLong.empty();
+    final var events =
+      audit.auditEventsSearch(parameters);
 
     {
-      final var events = audit.auditEvents(parameters, seek);
-      assertEquals(1, events.size());
-      assertEquals("E0", events.get(0).message());
-      seek = OptionalLong.of(events.get(0).id());
+      final var page = events.pageCurrent(audit);
+      final var items = page.items();
+      assertEquals(1, items.size());
+      assertEquals(1, page.pageIndex());
+      assertEquals(4, page.pageCount());
+      assertEquals("E0", items.get(0).message());
     }
 
     {
-      final var events = audit.auditEvents(parameters, seek);
-      assertEquals(1, events.size());
-      assertEquals("E1", events.get(0).message());
-      seek = OptionalLong.of(events.get(0).id());
+      final var page = events.pageNext(audit);
+      final var items = page.items();
+      assertEquals(1, items.size());
+      assertEquals(2, page.pageIndex());
+      assertEquals(4, page.pageCount());
+      assertEquals("E1", items.get(0).message());
     }
 
     {
-      final var events = audit.auditEvents(parameters, seek);
-      assertEquals(1, events.size());
-      assertEquals("E2", events.get(0).message());
-      seek = OptionalLong.of(events.get(0).id());
+      final var page = events.pageNext(audit);
+      final var items = page.items();
+      assertEquals(1, items.size());
+      assertEquals(3, page.pageIndex());
+      assertEquals(4, page.pageCount());
+      assertEquals("E2", items.get(0).message());
+    }
+
+    {
+      final var page = events.pageNext(audit);
+      final var items = page.items();
+      assertEquals(0, items.size());
+      assertEquals(4, page.pageIndex());
+      assertEquals(4, page.pageCount());
     }
   }
 
@@ -309,32 +326,47 @@ public final class IdDatabaseAuditTest
         1
       );
 
-    OptionalLong seek = OptionalLong.empty();
+    final var events =
+      audit.auditEventsSearch(parameters);
 
     {
-      final var events = audit.auditEvents(parameters, seek);
-      assertEquals(1, events.size());
-      assertEquals("F3", events.get(0).message());
-      seek = OptionalLong.of(events.get(0).id());
+      final var page = events.pageCurrent(audit);
+      final var items = page.items();
+      assertEquals(1, items.size());
+      assertEquals(1, page.pageIndex());
+      assertEquals(4, page.pageCount());
+      assertEquals("F3", items.get(0).message());
     }
 
     {
-      final var events = audit.auditEvents(parameters, seek);
-      assertEquals(1, events.size());
-      assertEquals("F4", events.get(0).message());
-      seek = OptionalLong.of(events.get(0).id());
+      final var page = events.pageNext(audit);
+      final var items = page.items();
+      assertEquals(1, items.size());
+      assertEquals(2, page.pageIndex());
+      assertEquals(4, page.pageCount());
+      assertEquals("F4", items.get(0).message());
     }
 
     {
-      final var events = audit.auditEvents(parameters, seek);
-      assertEquals(1, events.size());
-      assertEquals("F5", events.get(0).message());
-      seek = OptionalLong.of(events.get(0).id());
+      final var page = events.pageNext(audit);
+      final var items = page.items();
+      assertEquals(1, items.size());
+      assertEquals(3, page.pageIndex());
+      assertEquals(4, page.pageCount());
+      assertEquals("F5", items.get(0).message());
+    }
+
+    {
+      final var page = events.pageNext(audit);
+      final var items = page.items();
+      assertEquals(0, items.size());
+      assertEquals(4, page.pageIndex());
+      assertEquals(4, page.pageCount());
     }
   }
 
   @Test
-  public void testAuditPaging()
+  public void testAuditSearchPaging()
     throws Exception
   {
     assertTrue(this.container.isRunning());
@@ -366,118 +398,104 @@ public final class IdDatabaseAuditTest
       );
 
     final var paging =
-      IdDatabaseAuditListPaging.create(parameters);
+      audit.auditEventsSearch(parameters);
 
     {
-      final var items = paging.pageCurrent(audit);
-      assertEquals(0, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(100, items.size());
-      checkPage(then, 0, 100, items);
-      assertTrue(paging.pageNextAvailable());
-      assertFalse(paging.pagePreviousAvailable());
+      final var page = paging.pageCurrent(audit);
+      assertEquals(1, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(100, page.items().size());
+      checkPage(then, 0, 100, page.items());
     }
 
     {
-      final var items = paging.pageNext(audit);
-      assertEquals(1, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(100, items.size());
-      checkPage(then, 100, 200, items);
-      assertTrue(paging.pageNextAvailable());
-      assertTrue(paging.pagePreviousAvailable());
+      final var page = paging.pageNext(audit);
+      assertEquals(2, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(100, page.items().size());
+      checkPage(then, 100, 200, page.items());
     }
 
     {
-      final var items = paging.pageNext(audit);
-      assertEquals(2, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(100, items.size());
-      checkPage(then, 200, 300, items);
-      assertTrue(paging.pageNextAvailable());
-      assertTrue(paging.pagePreviousAvailable());
+      final var page = paging.pageNext(audit);
+      assertEquals(3, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(100, page.items().size());
+      checkPage(then, 200, 300, page.items());
     }
 
     {
-      final var items = paging.pageNext(audit);
-      assertEquals(3, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(100, items.size());
-      checkPage(then, 300, 400, items);
-      assertTrue(paging.pageNextAvailable());
-      assertTrue(paging.pagePreviousAvailable());
+      final var page = paging.pageNext(audit);
+      assertEquals(4, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(100, page.items().size());
+      checkPage(then, 300, 400, page.items());
     }
 
     {
-      final var items = paging.pageNext(audit);
-      assertEquals(4, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(100, items.size());
-      checkPage(then, 400, 500, items);
-      assertTrue(paging.pageNextAvailable());
-      assertTrue(paging.pagePreviousAvailable());
+      final var page = paging.pageNext(audit);
+      assertEquals(5, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(100, page.items().size());
+      checkPage(then, 400, 500, page.items());
     }
 
     {
-      final var items = paging.pageNext(audit);
-      assertEquals(5, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(33, items.size());
-      checkPage(then, 500, 533, items);
-      assertFalse(paging.pageNextAvailable());
-      assertTrue(paging.pagePreviousAvailable());
+      final var page = paging.pageNext(audit);
+      assertEquals(6, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(33, page.items().size());
+      checkPage(then, 500, 533, page.items());
     }
 
     {
-      final var items = paging.pagePrevious(audit);
-      assertEquals(4, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(100, items.size());
-      checkPage(then, 400, 500, items);
-      assertTrue(paging.pageNextAvailable());
-      assertTrue(paging.pagePreviousAvailable());
+      final var page = paging.pagePrevious(audit);
+      assertEquals(5, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(100, page.items().size());
+      checkPage(then, 400, 500, page.items());
     }
 
     {
-      final var items = paging.pagePrevious(audit);
-      assertEquals(3, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(100, items.size());
-      checkPage(then, 300, 400, items);
-      assertTrue(paging.pageNextAvailable());
-      assertTrue(paging.pagePreviousAvailable());
+      final var page = paging.pagePrevious(audit);
+      assertEquals(4, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(100, page.items().size());
+      checkPage(then, 300, 400, page.items());
     }
 
     {
-      final var items = paging.pagePrevious(audit);
-      assertEquals(2, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(100, items.size());
-      checkPage(then, 200, 300, items);
-      assertTrue(paging.pageNextAvailable());
-      assertTrue(paging.pagePreviousAvailable());
+      final var page = paging.pagePrevious(audit);
+      assertEquals(3, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(100, page.items().size());
+      checkPage(then, 200, 300, page.items());
     }
 
     {
-      final var items = paging.pagePrevious(audit);
-      assertEquals(1, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(100, items.size());
-      checkPage(then, 100, 200, items);
-      assertTrue(paging.pageNextAvailable());
-      assertTrue(paging.pagePreviousAvailable());
+      final var page = paging.pagePrevious(audit);
+      assertEquals(2, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(100, page.items().size());
+      checkPage(then, 100, 200, page.items());
     }
 
     {
-      final var items = paging.pagePrevious(audit);
-      assertEquals(0, paging.pageNumber());
-      assertEquals(5, paging.pageCount());
-      assertEquals(100, items.size());
-      checkPage(then, 0, 100, items);
-      assertTrue(paging.pageNextAvailable());
-      assertFalse(paging.pagePreviousAvailable());
+      final var page = paging.pagePrevious(audit);
+      assertEquals(1, page.pageIndex());
+      assertEquals(6, page.pageCount());
+      assertEquals(100, page.items().size());
+      checkPage(then, 0, 100, page.items());
     }
   }
+
+
+
+
+
+
+
+
 
   private static void checkPage(
     final OffsetDateTime time,

@@ -128,13 +128,17 @@ create table users (
     <Statement>grant select, insert, update, delete on users to idstore</Statement>
     <Statement>grant select (id) on users to idstore_none</Statement>
 
-    <Comment>The emails table stores the set of email addresses used by users/admins.</Comment>
+    <Comment>
+      The emails table stores the set of email addresses used by users/admins. Note that
+      email addresses *do* have a unique constraint, but it's enforced by a separate index
+      that determines uniqueness based on the lowercase email address.
+    </Comment>
 
     <Statement><![CDATA[
 create table emails (
   user_id         uuid,
   admin_id        uuid,
-  email_address   varchar(1000000) not null unique,
+  email_address   varchar(1000000) not null,
 
   constraint check_user_or_admin check (
     (user_id is not null) or (admin_id is not null)
@@ -146,6 +150,12 @@ create table emails (
 ]]></Statement>
 
     <Statement>grant select, insert, delete on emails to idstore</Statement>
+
+    <Statement><![CDATA[
+-- [jooq ignore start]
+create unique index emails_unique_lower_email_idx on emails (lower(email_address));
+-- [jooq ignore stop]
+]]></Statement>
 
     <Comment>
       The email_check_delete trigger enforces the constraint that users must have at least one email address at any

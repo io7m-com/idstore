@@ -19,6 +19,8 @@ package com.io7m.idstore.tests;
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
+import com.io7m.idstore.model.IdAdminSearchParameters;
+import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -29,7 +31,6 @@ import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserColumnOrdering;
-import com.io7m.idstore.model.IdUserOrdering;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
@@ -37,7 +38,6 @@ import com.io7m.idstore.user_client.IdUClients;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.idstore.user_client.api.IdUClientType;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -62,10 +62,8 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
       OffsetDateTime.now().plusDays(30L)
     );
 
-  private static final IdUserOrdering ORDER_BY_IDNAME =
-    new IdUserOrdering(
-      List.of(new IdUserColumnOrdering(BY_IDNAME, true))
-    );
+  private static final IdUserColumnOrdering ORDER_BY_IDNAME =
+    new IdUserColumnOrdering(BY_IDNAME, true);
 
   private IdAClients clients;
   private IdAClientType client;
@@ -189,45 +187,49 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
     );
 
     {
-      final var p =
-        this.client.userSearchBegin(
-          new IdUserSearchParameters(
-            TIME_LARGE_RANGE,
-            TIME_LARGE_RANGE,
-            empty(),
-            ORDER_BY_IDNAME,
-            100
-          )
-        );
+      var offset = 0;
+      for (int pageIndex = 1; pageIndex <= 11; ++pageIndex) {
+        final IdPage<IdUserSummary> page;
+        if (pageIndex == 1) {
+          page = this.client.userSearchBegin(
+            new IdUserSearchParameters(
+              TIME_LARGE_RANGE,
+              TIME_LARGE_RANGE,
+              Optional.of("user-"),
+              ORDER_BY_IDNAME,
+              100
+            )
+          );
+        } else {
+          page = this.client.userSearchNext();
+        }
 
-      assertEquals(0, p.pageIndex());
-      assertEquals(0, p.pageFirstOffset());
-      assertEquals(10, p.pageCount());
-      checkItems(p, 0, 100);
-    }
+        assertEquals(pageIndex, page.pageIndex());
+        assertEquals(offset, page.pageFirstOffset());
+        assertEquals(11, page.pageCount());
 
-    for (int page = 1; page < 10; ++page) {
-      final var p = this.client.userSearchNext();
-      assertEquals(page, p.pageIndex());
-      assertEquals(page * 100, p.pageFirstOffset());
-      assertEquals(10, p.pageCount());
-      checkItems(p, page * 100, 100);
+        if (pageIndex == 11) {
+          checkItems(page, offset, 33);
+        } else {
+          checkItems(page, offset, 100);
+        }
+        offset += 100;
+      }
     }
 
     {
-      final var p = this.client.userSearchNext();
-      assertEquals(10, p.pageIndex());
-      assertEquals(1000, p.pageFirstOffset());
-      assertEquals(10, p.pageCount());
-      checkItems(p, 1000, 33);
-    }
+      var offset = 900;
+      for (int pageIndex = 10; pageIndex >= 1; --pageIndex) {
+        final IdPage<IdUserSummary> page =
+          this.client.userSearchPrevious();
 
-    for (int page = 9; page >= 0; --page) {
-      final var p = this.client.userSearchPrevious();
-      assertEquals(page, p.pageIndex());
-      assertEquals(page * 100, p.pageFirstOffset());
-      assertEquals(10, p.pageCount());
-      checkItems(p, page * 100, 100);
+        assertEquals(pageIndex, page.pageIndex());
+        assertEquals(offset, page.pageFirstOffset());
+        assertEquals(11, page.pageCount());
+
+        checkItems(page, offset, 100);
+        offset -= 100;
+      }
     }
   }
 
@@ -268,98 +270,98 @@ public final class IdServerAdminUsersTest extends IdWithServerContract
           )
         );
 
-      assertEquals(0, p.pageIndex());
+      assertEquals(1, p.pageIndex());
       assertEquals(0, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 0, 10);
     }
 
     {
       final var p = this.client.userSearchByEmailNext();
-      assertEquals(1, p.pageIndex());
+      assertEquals(2, p.pageIndex());
       assertEquals(10, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 10, 10);
     }
 
     {
       final var p = this.client.userSearchByEmailNext();
-      assertEquals(2, p.pageIndex());
+      assertEquals(3, p.pageIndex());
       assertEquals(20, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 20, 10);
     }
 
     {
       final var p = this.client.userSearchByEmailNext();
-      assertEquals(3, p.pageIndex());
+      assertEquals(4, p.pageIndex());
       assertEquals(30, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 30, 10);
-    }
-
-    {
-      final var p = this.client.userSearchByEmailNext();
-      assertEquals(4, p.pageIndex());
-      assertEquals(40, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
-      assertEquals(10, p.items().size());
-      checkItems(p, 40, 10);
     }
 
     {
       final var p = this.client.userSearchByEmailNext();
       assertEquals(5, p.pageIndex());
+      assertEquals(40, p.pageFirstOffset());
+      assertEquals(6, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 40, 10);
+    }
+
+    {
+      final var p = this.client.userSearchByEmailNext();
+      assertEquals(6, p.pageIndex());
       assertEquals(50, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(0, p.items().size());
     }
 
     {
       final var p = this.client.userSearchByEmailPrevious();
-      assertEquals(4, p.pageIndex());
+      assertEquals(5, p.pageIndex());
       assertEquals(40, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 40, 10);
     }
 
     {
       final var p = this.client.userSearchByEmailPrevious();
-      assertEquals(3, p.pageIndex());
+      assertEquals(4, p.pageIndex());
       assertEquals(30, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 30, 10);
     }
 
     {
       final var p = this.client.userSearchByEmailPrevious();
-      assertEquals(2, p.pageIndex());
+      assertEquals(3, p.pageIndex());
       assertEquals(20, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 20, 10);
     }
 
     {
       final var p = this.client.userSearchByEmailPrevious();
-      assertEquals(1, p.pageIndex());
+      assertEquals(2, p.pageIndex());
       assertEquals(10, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 10, 10);
     }
 
     {
       final var p = this.client.userSearchByEmailPrevious();
-      assertEquals(0, p.pageIndex());
+      assertEquals(1, p.pageIndex());
       assertEquals(0, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 0, 10);
     }

@@ -15,45 +15,16 @@
  */
 
 
-package com.io7m.idstore.database.postgres.internal;
+package com.io7m.idstore.database.api;
 
-import javax.management.MXBean;
+import com.io7m.idstore.model.IdUserSummary;
 
 /**
- * Database server metrics.
+ * The type of user searches.
  */
 
-@MXBean
-public interface IdDatabaseMetricsMXBean
+public interface IdDatabaseUserSearchType
+  extends IdDatabasePagedQueryType<IdDatabaseUsersQueriesType, IdUserSummary>
 {
-  /**
-   * @return The number of transactions committed since the application started
-   */
 
-  long getTransactionCommits();
-
-  /**
-   * @return The number of transactions rolled back since the application
-   * started
-   */
-
-  long getTransactionRollbacks();
-
-  /**
-   * @return The mean transaction time
-   */
-
-  double getTransactionMeanSeconds();
-
-  /**
-   * @return The max transaction time
-   */
-
-  double getTransactionMaxSeconds();
-
-  /**
-   * @return The min transaction time
-   */
-
-  double getTransactionMinSeconds();
 }

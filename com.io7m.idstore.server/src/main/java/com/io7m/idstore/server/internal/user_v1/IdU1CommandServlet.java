@@ -30,6 +30,7 @@ import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.internal.user.IdUCommandContext;
 import com.io7m.idstore.server.internal.user.IdUCommandExecutor;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import io.opentelemetry.api.trace.Span;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -164,10 +165,13 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
     try {
       final IdUResponseType result = this.executor.execute(context, command);
       sends.send(servletResponse, 200, result);
-      if (!(result instanceof IdUResponseError)) {
+      if (result instanceof IdUResponseError error) {
+        Span.current().setAttribute("idstore.errorCode", error.errorCode());
+      } else {
         transaction.commit();
       }
     } catch (final IdCommandExecutionFailure e) {
+      Span.current().setAttribute("idstore.errorCode", e.errorCode().id());
       sends.send(
         servletResponse,
         e.httpStatusCode(),

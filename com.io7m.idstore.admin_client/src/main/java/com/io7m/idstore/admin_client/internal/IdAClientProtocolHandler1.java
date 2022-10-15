@@ -127,6 +127,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.io7m.idstore.admin_client.internal.IdACompression.decompressResponse;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
@@ -248,7 +249,7 @@ public final class IdAClientProtocolHandler1
       }
 
       final var responseMessage =
-        this.messages.parse(response.body());
+        this.messages.parse(decompressResponse(response, responseHeaders));
 
       if (!(responseMessage instanceof final IdAResponseType responseActual)) {
         throw new IdAClientException(

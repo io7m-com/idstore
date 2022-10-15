@@ -18,7 +18,6 @@ package com.io7m.idstore.tests.arbitraries;
 
 import com.io7m.idstore.model.IdAdminColumn;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
-import com.io7m.idstore.model.IdAdminOrdering;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 import net.jqwik.api.providers.TypeUsage;
@@ -26,16 +25,17 @@ import net.jqwik.api.providers.TypeUsage;
 import java.util.Set;
 
 /**
- * A provider of {@link IdAdminOrdering} values.
+ * A provider of {@link IdAdminColumnOrdering} values.
  */
 
-public final class IdArbAdminOrderingProvider extends IdArbAbstractProvider
+public final class IdArbAdminColumnOrderingProvider
+  extends IdArbAbstractProvider
 {
   /**
    * A provider of values.
    */
 
-  public IdArbAdminOrderingProvider()
+  public IdArbAdminColumnOrderingProvider()
   {
 
   }
@@ -44,7 +44,7 @@ public final class IdArbAdminOrderingProvider extends IdArbAbstractProvider
   public boolean canProvideFor(
     final TypeUsage targetType)
   {
-    return targetType.isOfType(IdAdminOrdering.class);
+    return targetType.isOfType(IdAdminColumnOrdering.class);
   }
 
   @Override
@@ -54,14 +54,7 @@ public final class IdArbAdminOrderingProvider extends IdArbAbstractProvider
   {
     final var a =
       Arbitraries.defaultFor(IdAdminColumn.class)
-        .set()
-        .map(cs -> {
-          return new IdAdminOrdering(
-            cs.stream()
-              .map(c -> new IdAdminColumnOrdering(c, true))
-              .toList()
-          );
-        });
+        .map(cs -> new IdAdminColumnOrdering(cs, true));
 
     return Set.of(
       a

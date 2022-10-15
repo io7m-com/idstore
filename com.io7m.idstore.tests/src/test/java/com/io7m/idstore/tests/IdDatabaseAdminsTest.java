@@ -17,12 +17,9 @@
 
 package com.io7m.idstore.tests;
 
-import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailPaging;
-import com.io7m.idstore.database.api.IdDatabaseAdminSearchPaging;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
-import com.io7m.idstore.model.IdAdminOrdering;
 import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
@@ -31,6 +28,7 @@ import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdPasswordException;
@@ -56,9 +54,6 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NOT_INITIA
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_UNSET;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIRED;
 import static com.io7m.idstore.model.IdAdminColumn.BY_IDNAME;
-import static com.io7m.idstore.model.IdAdminColumn.BY_REALNAME;
-import static com.io7m.idstore.model.IdAdminColumn.BY_TIME_CREATED;
-import static com.io7m.idstore.model.IdAdminColumn.BY_TIME_UPDATED;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static java.time.OffsetDateTime.now;
@@ -512,306 +507,6 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
       .createHashed("12345678");
   }
 
-  /**
-   * Admins can be listed and paging works.
-   *
-   * @throws Exception On errors
-   */
-
-  @Test
-  public void testAdminSearchPaging()
-    throws Exception
-  {
-    assertTrue(this.containerIsRunning());
-
-    final var adminId =
-      this.databaseCreateAdminInitial(
-        "admin",
-        "12345678"
-      );
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-
-    transaction.adminIdSet(adminId);
-
-    final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
-
-    final var now =
-      now();
-    final var password =
-      databaseGenerateBadPassword();
-
-    final var adminList = new ArrayList<>();
-    for (int index = 0; index < 500; ++index) {
-      adminList.add(
-        admins.adminCreate(
-          randomUUID(),
-          new IdName("someone_%03d".formatted(index)),
-          new IdRealName("someone %03d".formatted(index)),
-          new IdEmail("someone_%03d@example.com".formatted(index)),
-          now,
-          password,
-          EnumSet.allOf(IdAdminPermission.class)
-        )
-      );
-    }
-
-    final var paging =
-      IdDatabaseAdminSearchPaging.create(
-        new IdAdminSearchParameters(
-          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
-          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
-          Optional.of("someone"),
-          new IdAdminOrdering(List.of(
-            new IdAdminColumnOrdering(BY_IDNAME, true),
-            new IdAdminColumnOrdering(BY_REALNAME, true),
-            new IdAdminColumnOrdering(BY_TIME_UPDATED, true),
-            new IdAdminColumnOrdering(BY_TIME_CREATED, true)
-          )),
-          150
-        ));
-
-    List<IdAdminSummary> items;
-    assertEquals(0, paging.pageNumber());
-    items = paging.pageCurrent(admins);
-    assertEquals(150, items.size());
-    checkPage(0, 150, items);
-    assertTrue(paging.pageNextAvailable());
-
-    items = paging.pageNext(admins);
-    assertEquals(150, items.size());
-    assertEquals(1, paging.pageNumber());
-    checkPage(150, 300, items);
-    assertTrue(paging.pageNextAvailable());
-
-    items = paging.pageNext(admins);
-    assertEquals(150, items.size());
-    assertEquals(2, paging.pageNumber());
-    checkPage(300, 450, items);
-    assertTrue(paging.pageNextAvailable());
-
-    items = paging.pageNext(admins);
-    assertEquals(50, items.size());
-    assertEquals(3, paging.pageNumber());
-    checkPage(450, 500, items);
-    assertFalse(paging.pageNextAvailable());
-
-    items = paging.pagePrevious(admins);
-    assertEquals(150, items.size());
-    assertEquals(2, paging.pageNumber());
-    checkPage(300, 450, items);
-    assertTrue(paging.pageNextAvailable());
-
-    items = paging.pagePrevious(admins);
-    assertEquals(150, items.size());
-    assertEquals(1, paging.pageNumber());
-    checkPage(150, 300, items);
-    assertTrue(paging.pageNextAvailable());
-
-    items = paging.pagePrevious(admins);
-    assertEquals(150, items.size());
-    assertEquals(0, paging.pageNumber());
-    checkPage(0, 150, items);
-    assertTrue(paging.pageNextAvailable());
-  }
-
-  /**
-   * Admins can be listed and paging works.
-   *
-   * @throws Exception On errors
-   */
-
-  @Test
-  public void testAdminSearchByEmailPaging()
-    throws Exception
-  {
-    assertTrue(this.containerIsRunning());
-
-    final var adminId =
-      this.databaseCreateAdminInitial(
-        "admin",
-        "12345678"
-      );
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-
-    transaction.adminIdSet(adminId);
-
-    final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
-
-    final var now =
-      now();
-    final var password =
-      databaseGenerateBadPassword();
-
-    final var adminList = new ArrayList<>();
-    for (int index = 0; index < 500; ++index) {
-      adminList.add(
-        admins.adminCreate(
-          randomUUID(),
-          new IdName("someone_%03d".formatted(index)),
-          new IdRealName("someone %03d".formatted(index)),
-          new IdEmail("someone_%03d@example.com".formatted(index)),
-          now,
-          password,
-          EnumSet.allOf(IdAdminPermission.class)
-        )
-      );
-    }
-
-    final var paging =
-      IdDatabaseAdminSearchByEmailPaging.create(
-        new IdAdminSearchByEmailParameters(
-          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
-          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
-          "0@example.com",
-          new IdAdminOrdering(List.of(
-            new IdAdminColumnOrdering(BY_IDNAME, true),
-            new IdAdminColumnOrdering(BY_REALNAME, true),
-            new IdAdminColumnOrdering(BY_TIME_UPDATED, true),
-            new IdAdminColumnOrdering(BY_TIME_CREATED, true)
-          )),
-          150
-        ));
-
-    final List<IdAdminSummary>  items = paging.pageCurrent(admins);
-    assertEquals(0, paging.pageNumber());
-    assertEquals(1, paging.pageCount());
-    assertTrue(items.size() >= 50);
-    assertTrue(items.size() < 52);
-
-    for (final var item : items) {
-      final var value = item.idName().value();
-      if (Objects.equals(value, "admin")) {
-        continue;
-      }
-      assertTrue(
-        value.endsWith("0"),
-        "Value '%s' must end with 0".formatted(value)
-      );
-    }
-  }
-
-  /**
-   * Admins can be listed/searched and paging works.
-   *
-   * @throws Exception On errors
-   */
-
-  @Test
-  public void testAdminListSearchPaging()
-    throws Exception
-  {
-    assertTrue(this.containerIsRunning());
-
-    final var adminId =
-      this.databaseCreateAdminInitial(
-        "admin",
-        "12345678"
-      );
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-
-    transaction.adminIdSet(adminId);
-
-    final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
-
-    final var now =
-      now();
-    final var password =
-      databaseGenerateBadPassword();
-    final var adminSet =
-      IdTestUserSet.users();
-
-    for (final var u : adminSet) {
-      admins.adminCreate(
-        u.id(),
-        u.idName(),
-        u.realName(),
-        new IdEmail(u.idName() + "@example.com"),
-        now,
-        password,
-        EnumSet.allOf(IdAdminPermission.class)
-      );
-    }
-
-    final var paging =
-      IdDatabaseAdminSearchPaging.create(
-        new IdAdminSearchParameters(
-          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
-          new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
-          Optional.of("od"),
-          new IdAdminOrdering(List.of(
-            new IdAdminColumnOrdering(BY_IDNAME, true),
-            new IdAdminColumnOrdering(BY_REALNAME, true),
-            new IdAdminColumnOrdering(BY_TIME_UPDATED, true),
-            new IdAdminColumnOrdering(BY_TIME_CREATED, true)
-          )),
-          150
-        ));
-
-    final List<IdAdminSummary> items;
-    assertEquals(0, paging.pageNumber());
-    items = paging.pageCurrent(admins);
-    assertEquals(39, items.size());
-    assertFalse(paging.pageNextAvailable());
-
-    final var expected = Set.of(
-      "Gabfests Godlessness",
-      "Neurotics Odorous",
-      "Herniates Monodies",
-      "Leaks Floodwater",
-      "Remarriage Orthodox",
-      "Moodiest Desiccants",
-      "Tipples Iodising",
-      "Modifiable Fortieths",
-      "Angola Bodging",
-      "Sorts Produces",
-      "Doodlebugs Jibbed",
-      "Widely Warmblooded",
-      "Proposes Eurodollar",
-      "Boyhood Wheeziness",
-      "Ploughs Modules",
-      "Desertification Oddments",
-      "Egotist Bloodsucker",
-      "Litmus Sod",
-      "Stranding Methodicalness",
-      "Booing Nickelodeons",
-      "Roomers Antipodean",
-      "Cruets Biodiversity",
-      "Personage Bloodthirstier",
-      "Wormwood Soundproofs",
-      "Embodies Incinerator",
-      "Unicode Mahatmas",
-      "Shoddiness Bestride",
-      "Ghettoises Geodesy",
-      "Voodooing Calculating",
-      "Podiatrist Brexit",
-      "Hodges Sloucher",
-      "Powhatan Disembodied",
-      "Productive Matriarchy",
-      "Cantor Bloodline",
-      "Goldenrod Treacherous",
-      "Lunchroom Nodes",
-      "Flammability Modernly",
-      "Strip Nobody",
-      "Spume Podding"
-    );
-
-    for (final var e : expected) {
-      assertTrue(
-        items.stream().anyMatch(u -> Objects.equals(u.realName().value(), e)),
-        "Must contain " + e
-      );
-    }
-  }
-
   private static void checkPage(
     final int indexLow,
     final int indexHigh,
@@ -1170,5 +865,83 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
       new ExpectedEvent("ADMIN_BANNED", adminId.toString()),
       new ExpectedEvent("ADMIN_BAN_REMOVED", adminId.toString())
     );
+  }
+
+  /**
+   * Admins can be listed and paging works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminSearchByEmailPaged()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var admins =
+      transaction.queries(IdDatabaseAdminsQueriesType.class);
+
+    final var now =
+      now();
+    final var password =
+      databaseGenerateBadPassword();
+
+    final var adminList = new ArrayList<>();
+    for (int index = 0; index < 500; ++index) {
+      adminList.add(
+        admins.adminCreate(
+          randomUUID(),
+          new IdName("someone_%03d".formatted(index)),
+          new IdRealName("someone %03d".formatted(index)),
+          new IdEmail("someone_%03d@example.com".formatted(index)),
+          now,
+          password,
+          EnumSet.allOf(IdAdminPermission.class)
+        )
+      );
+    }
+
+    final var parameters =
+      new IdAdminSearchByEmailParameters(
+        new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+        new IdTimeRange(now.minusDays(1L), now.plusDays(1L)),
+        "0@example.com",
+        new IdAdminColumnOrdering(BY_IDNAME, true),
+        150
+      );
+
+    final var paging =
+      admins.adminSearchByEmail(parameters);
+
+    {
+      final IdPage<IdAdminSummary> page = paging.pageCurrent(admins);
+      assertEquals(1, page.pageIndex());
+      assertEquals(1, page.pageCount());
+      assertTrue(page.items().size() >= 50);
+      assertTrue(page.items().size() <= 52);
+
+      for (final var item : page.items()) {
+        final var name = item.idName().value();
+        if (Objects.equals(name, "admin")) {
+          continue;
+        }
+        assertTrue(
+          name.endsWith("0"),
+          "Name %s must end with 0".formatted(name)
+        );
+      }
+    }
   }
 }

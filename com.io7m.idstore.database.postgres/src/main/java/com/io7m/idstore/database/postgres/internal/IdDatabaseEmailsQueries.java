@@ -65,7 +65,7 @@ final class IdDatabaseEmailsQueries
     try {
       final var emailRecordOpt =
         context.selectFrom(EMAILS)
-          .where(EMAILS.EMAIL_ADDRESS.eq(email.value()))
+          .where(EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value()))
           .fetchOptional();
 
       if (emailRecordOpt.isEmpty()) {

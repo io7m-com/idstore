@@ -1,5 +1,5 @@
 com.io7m.idstore.tests.arbitraries.IdArbAMessageProvider
-com.io7m.idstore.tests.arbitraries.IdArbAdminOrderingProvider
+com.io7m.idstore.tests.arbitraries.IdArbAdminColumnOrderingProvider
 com.io7m.idstore.tests.arbitraries.IdArbAdminPermissionSetProvider
 com.io7m.idstore.tests.arbitraries.IdArbAdminProvider
 com.io7m.idstore.tests.arbitraries.IdArbAdminSearchByEmailParametersProvider

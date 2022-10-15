@@ -84,16 +84,15 @@ public abstract class IdWithDatabaseContract
     final var audit =
       transaction.queries(IdDatabaseAuditQueriesType.class);
     final var events =
-      audit.auditEvents(
+      audit.auditEventsSearch(
         new IdAuditSearchParameters(
           new IdTimeRange(timeNow().minusYears(1L), timeNow().plusYears(1L)),
           Optional.empty(),
           Optional.empty(),
           Optional.empty(),
           MAX_VALUE
-        ),
-        OptionalLong.empty()
-      );
+        )
+      ).pageCurrent(audit).items();
 
     for (var index = 0; index < expectedEvents.length; ++index) {
       final var event =

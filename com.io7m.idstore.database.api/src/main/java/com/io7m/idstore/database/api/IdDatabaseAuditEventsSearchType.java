@@ -17,16 +17,14 @@
 
 package com.io7m.idstore.database.api;
 
-import com.io7m.idstore.model.IdAdminSearchParameters;
-import com.io7m.idstore.model.IdAdminSummary;
+import com.io7m.idstore.model.IdAuditEvent;
 
 /**
- * The type of paging handlers that handle admin summaries.
+ * The type of audit event searches.
  */
 
-public interface IdDatabaseAdminSearchPagingType
-  extends IdDatabasePagingType<
-  IdAdminSearchParameters, IdAdminSummary, IdDatabaseAdminsQueriesType>
+public interface IdDatabaseAuditEventsSearchType
+  extends IdDatabasePagedQueryType<IdDatabaseAuditQueriesType, IdAuditEvent>
 {
 
 }

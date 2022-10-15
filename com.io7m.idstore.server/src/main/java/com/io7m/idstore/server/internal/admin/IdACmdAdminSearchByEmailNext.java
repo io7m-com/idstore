@@ -19,12 +19,13 @@ package com.io7m.idstore.server.internal.admin;
 
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailNext;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailNext;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminRead;
+
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 
 /**
  * IdACmdAdminSearchByEmailNext
@@ -58,19 +59,19 @@ public final class IdACmdAdminSearchByEmailNext
 
     final var admins =
       transaction.queries(IdDatabaseAdminsQueriesType.class);
+    final var session =
+      context.session();
+    final var searchOpt =
+      session.adminSearchByEmail();
 
-    final var session = context.session();
-    final var paging = session.adminByEmailPaging();
-    final var data = paging.pageNext(admins);
+    if (searchOpt.isEmpty()) {
+      throw context.failFormatted(
+        400, PROTOCOL_ERROR, "errorSearchStart");
+    }
 
     return new IdAResponseAdminSearchByEmailNext(
       context.requestId(),
-      new IdPage<>(
-        data,
-        paging.pageNumber(),
-        paging.pageCount(),
-        paging.pageFirstOffset()
-      )
+      searchOpt.get().pageNext(admins)
     );
   }
 }

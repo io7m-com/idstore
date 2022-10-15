@@ -123,7 +123,7 @@ public final class IdFMTemplateService implements IdServiceType
   public String toString()
   {
     return "[IdFMTemplateService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 
   /**

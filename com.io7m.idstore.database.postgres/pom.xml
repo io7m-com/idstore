@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
   </parent>
 
   <artifactId>com.io7m.idstore.database.postgres</artifactId>
@@ -68,12 +68,12 @@
       <artifactId>com.io7m.anethum.common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-math3</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.io7m.jaffirm</groupId>
       <artifactId>com.io7m.jaffirm.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.jqpage</groupId>
+      <artifactId>com.io7m.jqpage.core</artifactId>
     </dependency>
 
     <dependency>
@@ -169,6 +169,11 @@
           <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-meta-extensions</artifactId>
+            <version>${jooq.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-postgres-extensions</artifactId>
             <version>${jooq.version}</version>
           </dependency>
         </dependencies>

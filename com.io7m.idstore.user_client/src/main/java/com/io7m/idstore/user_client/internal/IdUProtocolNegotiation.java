@@ -45,6 +45,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NO_SUPPORTED_PROTOCOLS;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.user_client.internal.IdUCompression.decompressResponse;
 import static java.net.http.HttpResponse.BodyHandlers.ofByteArray;
 
 /**
@@ -95,9 +96,12 @@ public final class IdUProtocolNegotiation
 
     final VProtocols message;
     try {
-      message = protocols.parse(base, response.body());
+      final var body = decompressResponse(response, response.headers());
+      message = protocols.parse(base, body);
     } catch (final VProtocolException e) {
       throw new IdUClientException(PROTOCOL_ERROR, e);
+    } catch (final IOException e) {
+      throw new IdUClientException(IO_ERROR, e);
     }
 
     return message.protocols()

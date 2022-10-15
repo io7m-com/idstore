@@ -53,11 +53,11 @@ public final class IdUserSessionService
 
     final var meter =
       inTelemetry.openTelemetry()
-        .meterBuilder("IdUserSessionService")
+        .meterBuilder(IdUserSessionService.class.getCanonicalName())
         .build();
 
     this.sessionsGauge =
-      meter.gaugeBuilder("userSessions")
+      meter.gaugeBuilder("idstore.activeUserSessions")
         .setDescription("Active user sessions.")
         .ofLongs()
         .buildWithCallback(m -> {
@@ -150,6 +150,6 @@ public final class IdUserSessionService
   public String toString()
   {
     return "[IdUserSessionService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server</artifactId>
@@ -98,10 +98,6 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-jmx</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>

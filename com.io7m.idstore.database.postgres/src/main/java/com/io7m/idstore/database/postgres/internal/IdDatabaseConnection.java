@@ -49,10 +49,10 @@ record IdDatabaseConnection(
       final var t =
         new IdDatabaseTransaction(
           this,
-          this.database.clock().instant(),
           transactionSpan
         );
 
+      this.database.counterTransactions().add(1L);
       t.setRole(this.role);
       t.commit();
       return t;

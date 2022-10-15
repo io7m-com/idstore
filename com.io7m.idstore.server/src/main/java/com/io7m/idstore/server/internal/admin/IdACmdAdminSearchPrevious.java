@@ -19,12 +19,13 @@ package com.io7m.idstore.server.internal.admin;
 
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminRead;
+
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 
 /**
  * IdACmdAdminSearchPrevious
@@ -58,19 +59,19 @@ public final class IdACmdAdminSearchPrevious
 
     final var admins =
       transaction.queries(IdDatabaseAdminsQueriesType.class);
+    final var session =
+      context.session();
+    final var searchOpt =
+      session.adminSearch();
 
-    final var session = context.session();
-    final var paging = session.adminPaging();
-    final var data = paging.pagePrevious(admins);
+    if (searchOpt.isEmpty()) {
+      throw context.failFormatted(
+        400, PROTOCOL_ERROR, "errorSearchStart");
+    }
 
     return new IdAResponseAdminSearchPrevious(
       context.requestId(),
-      new IdPage<>(
-        data,
-        paging.pageNumber(),
-        paging.pageCount(),
-        paging.pageFirstOffset()
-      )
+      searchOpt.get().pagePrevious(admins)
     );
   }
 }

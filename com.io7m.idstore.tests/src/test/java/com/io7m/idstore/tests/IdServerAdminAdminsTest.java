@@ -21,7 +21,6 @@ import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
-import com.io7m.idstore.model.IdAdminOrdering;
 import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
@@ -41,7 +40,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,10 +59,8 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
       OffsetDateTime.now().plusDays(30L)
     );
 
-  private static final IdAdminOrdering ORDER_BY_IDNAME =
-    new IdAdminOrdering(
-      List.of(new IdAdminColumnOrdering(BY_IDNAME, true))
-    );
+  private static final IdAdminColumnOrdering ORDER_BY_IDNAME =
+    new IdAdminColumnOrdering(BY_IDNAME, true);
 
   private IdAClients clients;
   private IdAClientType client;
@@ -180,45 +176,49 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
     );
 
     {
-      final var p =
-        this.client.adminSearchBegin(
-          new IdAdminSearchParameters(
-            TIME_LARGE_RANGE,
-            TIME_LARGE_RANGE,
-            Optional.of("admin-"),
-            ORDER_BY_IDNAME,
-            100
-          )
-        );
+      var offset = 0;
+      for (int pageIndex = 1; pageIndex <= 11; ++pageIndex) {
+        final IdPage<IdAdminSummary> page;
+        if (pageIndex == 1) {
+          page = this.client.adminSearchBegin(
+            new IdAdminSearchParameters(
+              TIME_LARGE_RANGE,
+              TIME_LARGE_RANGE,
+              Optional.of("admin-"),
+              ORDER_BY_IDNAME,
+              100
+            )
+          );
+        } else {
+          page = this.client.adminSearchNext();
+        }
 
-      assertEquals(0, p.pageIndex());
-      assertEquals(0, p.pageFirstOffset());
-      assertEquals(10, p.pageCount());
-      checkItems(p, 0, 100);
-    }
+        assertEquals(pageIndex, page.pageIndex());
+        assertEquals(offset, page.pageFirstOffset());
+        assertEquals(11, page.pageCount());
 
-    for (int page = 1; page < 10; ++page) {
-      final var p = this.client.adminSearchNext();
-      assertEquals(page, p.pageIndex());
-      assertEquals(page * 100, p.pageFirstOffset());
-      assertEquals(10, p.pageCount());
-      checkItems(p, page * 100, 100);
+        if (pageIndex == 11) {
+          checkItems(page, offset, 33);
+        } else {
+          checkItems(page, offset, 100);
+        }
+        offset += 100;
+      }
     }
 
     {
-      final var p = this.client.adminSearchNext();
-      assertEquals(10, p.pageIndex());
-      assertEquals(1000, p.pageFirstOffset());
-      assertEquals(10, p.pageCount());
-      checkItems(p, 1000, 33);
-    }
+      var offset = 900;
+      for (int pageIndex = 10; pageIndex >= 1; --pageIndex) {
+        final IdPage<IdAdminSummary> page =
+          this.client.adminSearchPrevious();
 
-    for (int page = 9; page >= 0; --page) {
-      final var p = this.client.adminSearchPrevious();
-      assertEquals(page, p.pageIndex());
-      assertEquals(page * 100, p.pageFirstOffset());
-      assertEquals(10, p.pageCount());
-      checkItems(p, page * 100, 100);
+        assertEquals(pageIndex, page.pageIndex());
+        assertEquals(offset, page.pageFirstOffset());
+        assertEquals(11, page.pageCount());
+
+        checkItems(page, offset, 100);
+        offset -= 100;
+      }
     }
   }
 
@@ -259,98 +259,98 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
           )
         );
 
-      assertEquals(0, p.pageIndex());
+      assertEquals(1, p.pageIndex());
       assertEquals(0, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 0, 10);
     }
 
     {
       final var p = this.client.adminSearchByEmailNext();
-      assertEquals(1, p.pageIndex());
+      assertEquals(2, p.pageIndex());
       assertEquals(10, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 10, 10);
     }
 
     {
       final var p = this.client.adminSearchByEmailNext();
-      assertEquals(2, p.pageIndex());
+      assertEquals(3, p.pageIndex());
       assertEquals(20, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 20, 10);
     }
 
     {
       final var p = this.client.adminSearchByEmailNext();
-      assertEquals(3, p.pageIndex());
+      assertEquals(4, p.pageIndex());
       assertEquals(30, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 30, 10);
-    }
-
-    {
-      final var p = this.client.adminSearchByEmailNext();
-      assertEquals(4, p.pageIndex());
-      assertEquals(40, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
-      assertEquals(10, p.items().size());
-      checkItems(p, 40, 10);
     }
 
     {
       final var p = this.client.adminSearchByEmailNext();
       assertEquals(5, p.pageIndex());
+      assertEquals(40, p.pageFirstOffset());
+      assertEquals(6, p.pageCount());
+      assertEquals(10, p.items().size());
+      checkItems(p, 40, 10);
+    }
+
+    {
+      final var p = this.client.adminSearchByEmailNext();
+      assertEquals(6, p.pageIndex());
       assertEquals(50, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(0, p.items().size());
     }
 
     {
       final var p = this.client.adminSearchByEmailPrevious();
-      assertEquals(4, p.pageIndex());
+      assertEquals(5, p.pageIndex());
       assertEquals(40, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 40, 10);
     }
 
     {
       final var p = this.client.adminSearchByEmailPrevious();
-      assertEquals(3, p.pageIndex());
+      assertEquals(4, p.pageIndex());
       assertEquals(30, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 30, 10);
     }
 
     {
       final var p = this.client.adminSearchByEmailPrevious();
-      assertEquals(2, p.pageIndex());
+      assertEquals(3, p.pageIndex());
       assertEquals(20, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 20, 10);
     }
 
     {
       final var p = this.client.adminSearchByEmailPrevious();
-      assertEquals(1, p.pageIndex());
+      assertEquals(2, p.pageIndex());
       assertEquals(10, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 10, 10);
     }
 
     {
       final var p = this.client.adminSearchByEmailPrevious();
-      assertEquals(0, p.pageIndex());
+      assertEquals(1, p.pageIndex());
       assertEquals(0, p.pageFirstOffset());
-      assertEquals(5, p.pageCount());
+      assertEquals(6, p.pageCount());
       assertEquals(10, p.items().size());
       checkItems(p, 0, 10);
     }
@@ -418,7 +418,9 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
     assertEquals(admin0r.id(), admin1.id());
     assertEquals(admin0r.idName(), admin1.idName());
     assertEquals(admin0r.realName(), admin1.realName());
-    assertEquals(IdPasswordAlgorithmRedacted.create().createHashed(""), admin1.password());
+    assertEquals(
+      IdPasswordAlgorithmRedacted.create().createHashed(""),
+      admin1.password());
   }
 
   /**

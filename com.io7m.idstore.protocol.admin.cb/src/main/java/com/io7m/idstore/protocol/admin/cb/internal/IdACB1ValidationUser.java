@@ -28,7 +28,6 @@ import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserColumn;
 import com.io7m.idstore.model.IdUserColumnOrdering;
-import com.io7m.idstore.model.IdUserOrdering;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
@@ -93,13 +92,11 @@ import com.io7m.idstore.protocol.admin.cb.IdA1ResponseUserUpdate;
 import com.io7m.idstore.protocol.admin.cb.IdA1User;
 import com.io7m.idstore.protocol.admin.cb.IdA1UserColumn;
 import com.io7m.idstore.protocol.admin.cb.IdA1UserColumnOrdering;
-import com.io7m.idstore.protocol.admin.cb.IdA1UserOrdering;
 import com.io7m.idstore.protocol.admin.cb.IdA1UserSearchByEmailParameters;
 import com.io7m.idstore.protocol.admin.cb.IdA1UserSearchParameters;
 import com.io7m.idstore.protocol.admin.cb.IdA1UserSummary;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 
-import java.util.List;
 import java.util.Optional;
 
 import static com.io7m.cedarbridge.runtime.api.CBBooleanType.fromBoolean;
@@ -327,7 +324,7 @@ public final class IdACB1ValidationUser
       toWireTimeRange(parameters.timeCreatedRange()),
       toWireTimeRange(parameters.timeUpdatedRange()),
       new CBString(parameters.search()),
-      toWireUserOrdering(parameters.ordering()),
+      toWireUserColumnOrdering(parameters.ordering()),
       new CBIntegerUnsigned16(parameters.limit())
     );
   }
@@ -359,26 +356,8 @@ public final class IdACB1ValidationUser
       toWireTimeRange(parameters.timeCreatedRange()),
       toWireTimeRange(parameters.timeUpdatedRange()),
       fromOptional(parameters.search().map(CBString::new)),
-      toWireUserOrdering(parameters.ordering()),
+      toWireUserColumnOrdering(parameters.ordering()),
       new CBIntegerUnsigned16(parameters.limit())
-    );
-  }
-
-  private static IdA1UserOrdering toWireUserOrdering(
-    final IdUserOrdering ordering)
-  {
-    return new IdA1UserOrdering(
-      toWireUserColumnOrderings(ordering.ordering())
-    );
-  }
-
-  private static CBList<IdA1UserColumnOrdering> toWireUserColumnOrderings(
-    final List<IdUserColumnOrdering> ordering)
-  {
-    return new CBList<>(
-      ordering.stream()
-        .map(IdACB1ValidationUser::toWireUserColumnOrdering)
-        .toList()
     );
   }
 
@@ -747,7 +726,7 @@ public final class IdACB1ValidationUser
       fromWireTimeRange(p.fieldTimeCreatedRange()),
       fromWireTimeRange(p.fieldTimeUpdatedRange()),
       p.fieldSearch().value(),
-      fromWireUserOrdering(p.fieldOrdering()),
+      fromWireUserColumnOrdering(p.fieldOrdering()),
       p.fieldLimit().value()
     );
   }
@@ -759,29 +738,12 @@ public final class IdACB1ValidationUser
       fromWireTimeRange(p.fieldTimeCreatedRange()),
       fromWireTimeRange(p.fieldTimeUpdatedRange()),
       p.fieldSearch().asOptional().map(CBString::value),
-      fromWireUserOrdering(p.fieldOrdering()),
+      fromWireUserColumnOrdering(p.fieldOrdering()),
       p.fieldLimit().value()
     );
   }
 
-  private static IdUserOrdering fromWireUserOrdering(
-    final IdA1UserOrdering o)
-  {
-    return new IdUserOrdering(
-      fromWireColumnOrderings(o.fieldColumns())
-    );
-  }
-
-  private static List<IdUserColumnOrdering> fromWireColumnOrderings(
-    final CBList<IdA1UserColumnOrdering> c)
-  {
-    return c.values()
-      .stream()
-      .map(IdACB1ValidationUser::fromWireColumnOrdering)
-      .toList();
-  }
-
-  private static IdUserColumnOrdering fromWireColumnOrdering(
+  private static IdUserColumnOrdering fromWireUserColumnOrdering(
     final IdA1UserColumnOrdering o)
   {
     return new IdUserColumnOrdering(

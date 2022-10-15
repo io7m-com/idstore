@@ -151,6 +151,6 @@ public final class IdACB1Messages
   public String toString()
   {
     return "[IdACB1Messages 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

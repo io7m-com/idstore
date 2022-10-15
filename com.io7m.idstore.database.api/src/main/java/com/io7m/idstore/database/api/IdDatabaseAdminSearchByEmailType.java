@@ -17,16 +17,14 @@
 
 package com.io7m.idstore.database.api;
 
-import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSummary;
 
 /**
- * The type of paging handlers that handle admin summaries.
+ * The type of admin searches.
  */
 
-public interface IdDatabaseAdminSearchByEmailPagingType
-  extends IdDatabasePagingType<
-  IdAdminSearchByEmailParameters, IdAdminSummary, IdDatabaseAdminsQueriesType>
+public interface IdDatabaseAdminSearchByEmailType
+  extends IdDatabasePagedQueryType<IdDatabaseAdminsQueriesType, IdAdminSummary>
 {
 
 }

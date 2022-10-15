@@ -87,6 +87,6 @@ public final class IdRateLimitEmailVerificationService implements IdServiceType
   public String toString()
   {
     return "[IdRateLimitEmailVerificationService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

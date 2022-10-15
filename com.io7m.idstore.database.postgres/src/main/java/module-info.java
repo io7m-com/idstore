@@ -31,11 +31,10 @@ module com.io7m.idstore.database.postgres
   requires com.io7m.anethum.common;
   requires com.io7m.jaffirm.core;
   requires com.io7m.jdeferthrow.core;
+  requires com.io7m.jqpage.core;
   requires com.io7m.trasco.api;
   requires com.io7m.trasco.vanilla;
   requires com.zaxxer.hikari;
-  requires commons.math3;
-  requires java.management;
   requires org.jooq;
   requires org.postgresql.jdbc;
   requires org.slf4j;
@@ -43,8 +42,6 @@ module com.io7m.idstore.database.postgres
   requires io.opentelemetry.api;
   requires io.opentelemetry.context;
   requires io.opentelemetry.semconv;
-
-  opens com.io7m.idstore.database.postgres.internal to java.management;
 
   exports com.io7m.idstore.database.postgres;
   exports com.io7m.idstore.database.postgres.internal.tables to org.jooq;

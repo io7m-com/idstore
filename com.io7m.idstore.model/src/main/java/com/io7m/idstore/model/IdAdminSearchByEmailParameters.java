@@ -17,10 +17,7 @@
 
 package com.io7m.idstore.model;
 
-import java.util.List;
 import java.util.Objects;
-
-import static com.io7m.idstore.model.IdAdminColumn.BY_ID;
 
 /**
  * The immutable parameters required to search admins.
@@ -38,7 +35,7 @@ public record IdAdminSearchByEmailParameters(
   IdTimeRange timeCreatedRange,
   IdTimeRange timeUpdatedRange,
   String search,
-  IdAdminOrdering ordering,
+  IdAdminColumnOrdering ordering,
   int limit)
 {
   /**
@@ -57,7 +54,7 @@ public record IdAdminSearchByEmailParameters(
     final IdTimeRange timeCreatedRange,
     final IdTimeRange timeUpdatedRange,
     final String search,
-    final IdAdminOrdering ordering,
+    final IdAdminColumnOrdering ordering,
     final int limit)
   {
     this.timeCreatedRange =
@@ -71,20 +68,5 @@ public record IdAdminSearchByEmailParameters(
       Objects.requireNonNull(ordering, "ordering");
     this.limit =
       Math.max(1, limit);
-  }
-
-  /**
-   * @return Reasonable default parameters
-   */
-
-  public static IdAdminSearchByEmailParameters defaults()
-  {
-    return new IdAdminSearchByEmailParameters(
-      IdTimeRange.largest(),
-      IdTimeRange.largest(),
-      "",
-      new IdAdminOrdering(List.of(new IdAdminColumnOrdering(BY_ID, false))),
-      10
-    );
   }
 }

@@ -20,7 +20,6 @@ import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
-import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -28,7 +27,6 @@ import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdRealName;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -191,62 +189,14 @@ public non-sealed interface IdDatabaseAdminsQueriesType
    * List admins.
    *
    * @param parameters The search parameters
-   * @param seek       The record to which to seek, if any
    *
    * @return The admins
    *
    * @throws IdDatabaseException On errors
    */
 
-  List<IdAdminSummary> adminSearch(
-    IdAdminSearchParameters parameters,
-    Optional<List<Object>> seek)
-    throws IdDatabaseException;
-
-  /**
-   * Determine approximate number of results that would be returned in total by
-   * a given search.
-   *
-   * @param parameters The search parameters
-   *
-   * @return The admins
-   *
-   * @throws IdDatabaseException On errors
-   */
-
-  long adminSearchCount(
+  IdDatabaseAdminSearchType adminSearch(
     IdAdminSearchParameters parameters)
-    throws IdDatabaseException;
-
-  /**
-   * List admins.
-   *
-   * @param parameters The search parameters
-   * @param seek       The record to which to seek, if any
-   *
-   * @return The admins
-   *
-   * @throws IdDatabaseException On errors
-   */
-
-  List<IdAdminSummary> adminSearchByEmail(
-    IdAdminSearchByEmailParameters parameters,
-    Optional<List<Object>> seek)
-    throws IdDatabaseException;
-
-  /**
-   * Determine approximate number of results that would be returned in total by
-   * a given search.
-   *
-   * @param parameters The search parameters
-   *
-   * @return The admins
-   *
-   * @throws IdDatabaseException On errors
-   */
-
-  long adminSearchByEmailCount(
-    IdAdminSearchByEmailParameters parameters)
     throws IdDatabaseException;
 
   /**
@@ -357,5 +307,19 @@ public non-sealed interface IdDatabaseAdminsQueriesType
 
   @IdDatabaseRequiresAdmin
   void adminBanDelete(IdBan ban)
+    throws IdDatabaseException;
+
+  /**
+   * List admins.
+   *
+   * @param parameters The search parameters
+   *
+   * @return The admins
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  IdDatabaseAdminSearchByEmailType adminSearchByEmail(
+    IdAdminSearchByEmailParameters parameters)
     throws IdDatabaseException;
 }

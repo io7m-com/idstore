@@ -15,7 +15,7 @@
  */
 
 import com.io7m.idstore.tests.arbitraries.IdArbAMessageProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbAdminOrderingProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbAdminColumnOrderingProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminPermissionSetProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbAdminSearchByEmailParametersProvider;
@@ -64,7 +64,7 @@ module com.io7m.idstore.tests.arbitraries
   provides ArbitraryProvider
     with
       IdArbAMessageProvider,
-      IdArbAdminOrderingProvider,
+      IdArbAdminColumnOrderingProvider,
       IdArbAdminPermissionSetProvider,
       IdArbAdminProvider,
       IdArbAdminSearchByEmailParametersProvider,

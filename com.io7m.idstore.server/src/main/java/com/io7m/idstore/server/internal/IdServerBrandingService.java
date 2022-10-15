@@ -230,7 +230,7 @@ public final class IdServerBrandingService implements IdServiceType
   public String toString()
   {
     return "[IdServerBrandingService 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode()));
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 
   /**

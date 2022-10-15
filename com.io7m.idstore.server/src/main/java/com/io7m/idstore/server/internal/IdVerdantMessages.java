@@ -61,7 +61,6 @@ public final class IdVerdantMessages implements IdServiceType
    * @throws VProtocolException On errors
    */
 
-
   public byte[] serialize(
     final VProtocols protocols,
     final int version)
@@ -93,5 +92,12 @@ public final class IdVerdantMessages implements IdServiceType
   public String description()
   {
     return "Verdant message service.";
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[IdVerdantMessages 0x%s]"
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }
