@@ -58,7 +58,7 @@
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
     <com.io7m.trasco.version>0.0.5</com.io7m.trasco.version>
     <com.io7m.verdant.version>0.0.1</com.io7m.verdant.version>
-    <io7m.api.previousVersion>0.0.2</io7m.api.previousVersion>
+    <io7m.api.previousVersion>0.0.3</io7m.api.previousVersion>
     <jackson.version>2.13.4</jackson.version>
     <jetty.version>11.0.11</jetty.version>
     <jooq.version>3.17.4</jooq.version>
