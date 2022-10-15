@@ -22,6 +22,12 @@ import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.events.IdAGEventBus;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAdminColumn;
+import com.io7m.idstore.model.IdAdminColumnOrdering;
+import com.io7m.idstore.model.IdAdminCreate;
+import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
+import com.io7m.idstore.model.IdAdminSearchParameters;
+import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
@@ -32,6 +38,7 @@ import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdUserColumn;
 import com.io7m.idstore.model.IdUserColumnOrdering;
 import com.io7m.idstore.model.IdUserCreate;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
@@ -58,7 +65,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus.DISCONNECTED;
-import static com.io7m.idstore.model.IdUserColumn.BY_IDNAME;
 
 /**
  * A client service.
@@ -70,14 +76,19 @@ public final class IdAGClientService implements IdServiceType, Closeable
     LoggerFactory.getLogger(IdAGClientService.class);
 
   private static final IdUserColumnOrdering DEFAULT_USER_ORDERING =
-    new IdUserColumnOrdering(BY_IDNAME, true);
+    new IdUserColumnOrdering(IdUserColumn.BY_IDNAME, true);
 
+
+  private static final IdAdminColumnOrdering DEFAULT_ADMIN_ORDERING =
+    new IdAdminColumnOrdering(IdAdminColumn.BY_IDNAME, true);
+  
   private final IdAGEventBus eventBus;
   private final ExecutorService executor;
   private final IdAClientType client;
   private final SimpleObjectProperty<IdAGClientStatus> status;
   private final IdAGStrings strings;
   private URI serverLatest;
+  private IdAdmin self;
 
   private IdAGClientService(
     final IdAGEventBus inEventBus,
@@ -223,10 +234,8 @@ public final class IdAGClientService implements IdServiceType, Closeable
         TRTask.create(LOG, eventConnecting.message());
 
       try {
-        future.complete(this.client.login(
-          username,
-          password,
-          this.serverLatest));
+        this.self = this.client.login(username, password, this.serverLatest);
+        future.complete(this.self);
         task.setSucceeded();
         this.publishEvent(eventConnectionOK);
         this.publishEvent(eventConnected);
@@ -650,23 +659,16 @@ public final class IdAGClientService implements IdServiceType, Closeable
   /**
    * Fetch the admin's own profile.
    *
-   * @return A future representing the operation in progress
+   * @return The logged-in admin
    */
 
-  public CompletableFuture<IdAdmin> self()
+  public IdAdmin self()
   {
-    final var future = new CompletableFuture<IdAdmin>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
+    if (this.self == null) {
+      throw new IllegalStateException("Not logged in.");
+    }
 
-      try {
-        future.complete(this.client.adminSelf());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.self;
   }
 
   /**
@@ -896,6 +898,293 @@ public final class IdAGClientService implements IdServiceType, Closeable
 
       try {
         future.complete(this.client.userCreate(create));
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Create an admin.
+   *
+   * @param create The admin creation info
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdAdmin> adminCreate(
+    final IdAdminCreate create)
+  {
+    final var future = new CompletableFuture<IdAdmin>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.adminCreate(
+          create.id(),
+          create.idName(),
+          create.realName(),
+          create.email(),
+          create.password(),
+          create.permissions()
+        ));
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Retrieve an admin.
+   *
+   * @param id The admin ID
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<Optional<IdAdmin>> adminGet(
+    final UUID id)
+  {
+    final var future = new CompletableFuture<Optional<IdAdmin>>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.adminGet(id));
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+
+
+
+
+
+
+
+  /**
+   * Start searching for admins.
+   *
+   * @param search           The search query
+   * @param timeCreatedRange The created time range
+   * @param timeUpdatedRange The updated time range
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdPage<IdAdminSummary>> adminSearchByEmailBegin(
+    final IdTimeRange timeCreatedRange,
+    final IdTimeRange timeUpdatedRange,
+    final String search)
+  {
+    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(
+          this.client.adminSearchByEmailBegin(
+            new IdAdminSearchByEmailParameters(
+              timeCreatedRange,
+              timeUpdatedRange,
+              search,
+              DEFAULT_ADMIN_ORDERING,
+              100
+            )
+          )
+        );
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Get the next page of admins.
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdPage<IdAdminSummary>> adminSearchByEmailNext()
+  {
+    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.adminSearchByEmailNext());
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Get the previous page of admins.
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdPage<IdAdminSummary>> adminSearchByEmailPrevious()
+  {
+    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.adminSearchByEmailPrevious());
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Start searching for admins.
+   *
+   * @param search           The search query
+   * @param timeCreatedRange The created time range
+   * @param timeUpdatedRange The updated time range
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdPage<IdAdminSummary>> adminSearchBegin(
+    final IdTimeRange timeCreatedRange,
+    final IdTimeRange timeUpdatedRange,
+    final Optional<String> search)
+  {
+    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(
+          this.client.adminSearchBegin(
+            new IdAdminSearchParameters(
+              timeCreatedRange,
+              timeUpdatedRange,
+              search,
+              DEFAULT_ADMIN_ORDERING,
+              100
+            )
+          )
+        );
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Get the next page of admins.
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdPage<IdAdminSummary>> adminSearchNext()
+  {
+    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.adminSearchNext());
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Get the previous page of admins.
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdPage<IdAdminSummary>> adminSearchPrevious()
+  {
+    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.adminSearchPrevious());
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Update the given admin.
+   *
+   * @param id       The ID
+   * @param idName   The ID name
+   * @param realName The real name
+   * @param password The password
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdAdmin> adminUpdate(
+    final UUID id,
+    final Optional<IdName> idName,
+    final Optional<IdRealName> realName,
+    final Optional<IdPassword> password)
+  {
+    final var future = new CompletableFuture<IdAdmin>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        future.complete(this.client.adminUpdate(id, idName, realName, password));
+        this.requestFinish();
+      } catch (final Exception e) {
+        future.completeExceptionally(this.requestFailed(task, e));
+      }
+    });
+    return future;
+  }
+
+  /**
+   * Delete an admin.
+   *
+   * @param id The admin ID
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<Void> adminDelete(
+    final UUID id)
+  {
+    final var future = new CompletableFuture<Void>();
+    this.executor.submit(() -> {
+      final var task = this.requestStart();
+
+      try {
+        this.client.adminDelete(id);
+        future.complete(null);
         this.requestFinish();
       } catch (final Exception e) {
         future.completeExceptionally(this.requestFailed(task, e));

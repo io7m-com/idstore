@@ -14,42 +14,41 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.admin_gui.internal.users;
+package com.io7m.idstore.admin_gui.internal.admins;
 
-import com.io7m.idstore.model.IdLogin;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
 /**
- * A user cell controller.
+ * A admin cell controller.
  */
 
-public final class IdAGUserLoginHistoryCellController
+public final class IdAGAdminCellController
 {
-  @FXML private Label loginTime;
-  @FXML private Label loginHost;
-  @FXML private Label loginAgent;
+  @FXML private Label adminId;
+  @FXML private Label adminIdName;
+  @FXML private Label adminRealName;
 
   /**
-   * A user cell controller.
+   * A admin cell controller.
    */
 
-  public IdAGUserLoginHistoryCellController()
+  public IdAGAdminCellController()
   {
 
   }
 
   /**
-   * Set the current login.
+   * Set the current admin.
    *
-   * @param login The login
+   * @param admin The admin
    */
 
-  public void setLogin(
-    final IdLogin login)
+  public void setAdmin(
+    final IdAGAdmin admin)
   {
-    this.loginTime.setText(login.time().toString());
-    this.loginHost.setText(login.host());
-    this.loginAgent.setText(login.userAgent());
+    this.adminId.setText(admin.id().toString());
+    this.adminIdName.setText(admin.idName().get().toString());
+    this.adminRealName.setText(admin.realName().get().toString());
   }
 }

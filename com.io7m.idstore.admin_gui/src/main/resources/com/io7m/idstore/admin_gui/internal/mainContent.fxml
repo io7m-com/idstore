@@ -11,6 +11,9 @@
           <Tab text="%tab.profile">
             <fx:include source="tabProfile.fxml" />
           </Tab>
+          <Tab text="%tab.admins">
+            <fx:include source="tabAdmins.fxml" />
+          </Tab>
           <Tab text="%tab.audit">
             <fx:include source="tabAudit.fxml" />
           </Tab>

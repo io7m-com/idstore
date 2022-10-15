@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.admin_gui.internal.users;
+package com.io7m.idstore.admin_gui.internal.login;
 
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.model.IdLogin;
@@ -26,28 +26,28 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 /**
- * A user cell.
+ * A login cell.
  */
 
-public final class IdAGUserLoginHistoryCell extends ListCell<IdLogin>
+public final class IdAGLoginHistoryCell extends ListCell<IdLogin>
 {
   private final Pane root;
-  private final IdAGUserLoginHistoryCellController controller;
+  private final IdAGLoginHistoryCellController controller;
 
   /**
-   * A user cell.
+   * A login cell.
    *
    * @param strings The string resources
    */
 
-  public IdAGUserLoginHistoryCell(
+  public IdAGLoginHistoryCell(
     final IdAGStrings strings)
   {
     try {
       final FXMLLoader loader =
         new FXMLLoader(
-          IdAGUserLoginHistoryCell.class.getResource(
-            "/com/io7m/idstore/admin_gui/internal/userLoginHistoryCell.fxml"));
+          IdAGLoginHistoryCell.class.getResource(
+            "/com/io7m/idstore/admin_gui/internal/loginHistoryCell.fxml"));
       loader.setResources(strings.resources());
 
       this.root = loader.load();

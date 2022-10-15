@@ -14,7 +14,6 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.server.internal.admin;
 
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
@@ -24,6 +23,10 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.internal.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminDelete;
+
+import java.util.Objects;
+
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.OPERATION_NOT_PERMITTED;
 
 /**
  * IdACmdAdminDelete
@@ -58,8 +61,13 @@ public final class IdACmdAdminDelete
     final var admins =
       transaction.queries(IdDatabaseAdminsQueriesType.class);
 
+    if (Objects.equals(admin.id(), command.adminId())) {
+      throw context.failFormatted(
+        400, OPERATION_NOT_PERMITTED, "errorDeleteSelf");
+    }
+
     transaction.adminIdSet(admin.id());
-    admins.adminDelete(admin.id());
+    admins.adminDelete(command.adminId());
     return new IdAResponseAdminDelete(context.requestId());
   }
 }
