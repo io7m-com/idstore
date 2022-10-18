@@ -27,6 +27,7 @@ import java.net.http.HttpClient;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NOT_LOGGED_IN;
 
@@ -83,10 +84,8 @@ public final class IdUClientProtocolHandlerDisconnected
 
   private IdUClientException notLoggedIn()
   {
-    return new IdUClientException(
-      NOT_LOGGED_IN,
-      this.strings.format("notLoggedIn")
-    );
+    final var msg = this.strings.format("notLoggedIn");
+    return new IdUClientException(Optional.empty(), NOT_LOGGED_IN, msg, msg);
   }
 
   @Override

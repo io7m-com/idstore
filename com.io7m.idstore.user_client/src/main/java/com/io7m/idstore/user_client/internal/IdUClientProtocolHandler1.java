@@ -57,12 +57,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.user_client.internal.IdUCompression.decompressResponse;
 import static java.net.http.HttpResponse.BodyHandlers;
+import static java.util.Optional.empty;
 
 /**
  * The version 1 protocol handler.
@@ -169,15 +171,18 @@ public final class IdUClientProtocolHandler1
           .orElse("application/octet-stream");
 
       final var expectedContentType = IdUCB1Messages.contentType();
+      final var str = this.strings();
       if (!contentType.equals(expectedContentType)) {
         throw new IdUClientException(
+          empty(),
           PROTOCOL_ERROR,
-          this.strings()
+          str
             .format(
               "errorContentType",
               commandType,
               expectedContentType,
-              contentType)
+              contentType),
+          str.format("errorReasonContentType")
         );
       }
 
@@ -186,14 +191,16 @@ public final class IdUClientProtocolHandler1
 
       if (!(responseMessage instanceof IdUResponseType)) {
         throw new IdUClientException(
+          empty(),
           PROTOCOL_ERROR,
-          this.strings()
+          str
             .format(
               "errorResponseType",
               "(unavailable)",
               commandType,
               IdUResponseType.class,
-              responseMessage.getClass())
+              responseMessage.getClass()),
+          str.format("errorReasonResponseType")
         );
       }
 
@@ -214,36 +221,40 @@ public final class IdUClientProtocolHandler1
         }
 
         throw new IdUClientException(
+          Optional.of(responseActual.requestId()),
           new IdErrorCode(error.errorCode()),
-          this.strings()
+          str
             .format(
               "errorResponse",
               error.requestId(),
               commandType,
               Integer.valueOf(response.statusCode()),
               error.errorCode(),
-              error.message())
+              error.message()),
+          error.message()
         );
       }
 
       if (!Objects.equals(responseActual.getClass(), responseClass)) {
         throw new IdUClientException(
+          Optional.of(responseActual.requestId()),
           PROTOCOL_ERROR,
-          this.strings()
+          str
             .format(
               "errorResponseType",
               responseActual.requestId(),
               commandType,
               responseClass,
-              responseMessage.getClass())
+              responseMessage.getClass()),
+          str.format("errorReasonResponseType")
         );
       }
 
       return responseClass.cast(responseMessage);
     } catch (final IOException e) {
-      throw new IdUClientException(IO_ERROR, e);
+      throw new IdUClientException(empty(), IO_ERROR, e, e.getMessage());
     } catch (final IdProtocolException e) {
-      throw new IdUClientException(PROTOCOL_ERROR, e);
+      throw new IdUClientException(empty(), PROTOCOL_ERROR, e, e.getMessage());
     }
   }
 
@@ -365,11 +376,4 @@ public final class IdUClientProtocolHandler1
     }
     return "com.io7m.idstore.user_client/%s".formatted(version);
   }
-
-  interface FunctionType<A, B, E extends Exception>
-  {
-    B apply(A x)
-      throws E;
-  }
-
 }
