@@ -76,35 +76,24 @@
 
   <build>
     <plugins>
+      <!-- Generate Cedarbridge code. -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>com.io7m.cedarbridge</groupId>
-            <artifactId>com.io7m.cedarbridge.cmdline</artifactId>
-            <version>${com.io7m.cedarbridge.version}</version>
-          </dependency>
-        </dependencies>
+        <groupId>com.io7m.cedarbridge</groupId>
+        <artifactId>com.io7m.cedarbridge.maven_plugin</artifactId>
+        <version>${com.io7m.cedarbridge.version}</version>
         <executions>
           <execution>
             <id>generate-cedarbridge-code</id>
             <goals>
-              <goal>java</goal>
+              <goal>compile</goal>
             </goals>
             <phase>generate-sources</phase>
             <configuration>
-              <includePluginDependencies>true</includePluginDependencies>
-              <mainClass>com.io7m.cedarbridge.cmdline.MainExitless</mainClass>
-              <arguments>
-                <argument>compile</argument>
-                <argument>--output-directory</argument>
-                <argument>${project.build.directory}/generated-sources/cedarbridge</argument>
-                <argument>--language</argument>
-                <argument>Java 17+</argument>
-                <argument>--file</argument>
-                <argument>${project.basedir}/src/main/resources/com/io7m/idstore/protocol/admin/cb/Admin.cbs</argument>
-              </arguments>
+              <outputDirectory>${project.build.directory}/generated-sources/cedarbridge</outputDirectory>
+              <languageName>Java 17+</languageName>
+              <files>
+                <file>${project.basedir}/src/main/resources/com/io7m/idstore/protocol/admin/cb/Admin.cbs</file>
+              </files>
             </configuration>
           </execution>
         </executions>
