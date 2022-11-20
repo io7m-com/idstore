@@ -18,6 +18,7 @@
 package com.io7m.idstore.admin_gui.internal.main;
 
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
+import com.io7m.idstore.admin_gui.internal.admins.IdAGAdminsController;
 import com.io7m.idstore.admin_gui.internal.audit.IdAGAuditController;
 import com.io7m.idstore.admin_gui.internal.profile.IdAGProfileController;
 import com.io7m.idstore.admin_gui.internal.users.IdAGUsersController;
@@ -60,6 +61,9 @@ public final class IdAGMainControllerFactory
     return switch (param.getCanonicalName()) {
       case "com.io7m.idstore.admin_gui.internal.users.IdAGUsersController" -> {
         yield new IdAGUsersController(this.services, this.configuration);
+      }
+      case "com.io7m.idstore.admin_gui.internal.admins.IdAGAdminsController" -> {
+        yield new IdAGAdminsController(this.services, this.configuration);
       }
       case "com.io7m.idstore.admin_gui.internal.audit.IdAGAuditController" -> {
         yield new IdAGAuditController(this.services, this.configuration);

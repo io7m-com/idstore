@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.admin_gui.internal.users;
+package com.io7m.idstore.admin_gui.internal.login;
 
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.model.IdLogin;
@@ -28,7 +28,7 @@ import java.util.Objects;
  * A factory of user login history cells.
  */
 
-public final class IsAGUserLoginHistoryCellFactory
+public final class IsAGLoginHistoryCellFactory
   implements Callback<
   ListView<IdLogin>,
   ListCell<IdLogin>>
@@ -41,7 +41,7 @@ public final class IsAGUserLoginHistoryCellFactory
    * @param inStrings The string resources
    */
 
-  public IsAGUserLoginHistoryCellFactory(
+  public IsAGLoginHistoryCellFactory(
     final IdAGStrings inStrings)
   {
     this.strings = Objects.requireNonNull(inStrings, "inStrings");
@@ -51,6 +51,6 @@ public final class IsAGUserLoginHistoryCellFactory
   public ListCell<IdLogin> call(
     final ListView<IdLogin> param)
   {
-    return new IdAGUserLoginHistoryCell(this.strings);
+    return new IdAGLoginHistoryCell(this.strings);
   }
 }

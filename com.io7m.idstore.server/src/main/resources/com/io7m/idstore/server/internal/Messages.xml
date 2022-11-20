@@ -52,4 +52,5 @@
   <entry key="passwordUpdateSuccess">Password updated successfully.</entry>
 
   <entry key="errorSearchStart">You must begin a search before you can fetch the next or previous pages.</entry>
+  <entry key="errorDeleteSelf">You cannot delete your own account.</entry>
 </properties>

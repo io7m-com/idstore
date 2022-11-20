@@ -20,6 +20,8 @@ import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdException;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * The type of client exceptions.
@@ -27,51 +29,96 @@ import java.util.Objects;
 
 public final class IdUClientException extends IdException
 {
+  private final String reason;
+  private final Optional<UUID> requestId;
+
   /**
    * Construct an exception.
    *
-   * @param errorCode The error code
-   * @param message The message
+   * @param inRequestId The request ID
+   * @param errorCode   The error code
+   * @param message     The message
+   * @param inReason    The error reason
    */
 
   public IdUClientException(
+    final Optional<UUID> inRequestId,
     final IdErrorCode errorCode,
-    final String message)
+    final String message,
+    final String inReason)
   {
     super(errorCode, Objects.requireNonNull(message, "message"));
+    this.requestId =
+      Objects.requireNonNull(inRequestId, "requestId");
+    this.reason =
+      Objects.requireNonNull(inReason, "reason");
   }
 
   /**
    * Construct an exception.
    *
-   * @param errorCode The error code
-   * @param message The message
-   * @param cause   The cause
+   * @param inRequestId The request ID
+   * @param errorCode   The error code
+   * @param message     The message
+   * @param cause       The cause
+   * @param inReason    The error reason
    */
 
   public IdUClientException(
+    final Optional<UUID> inRequestId,
     final IdErrorCode errorCode,
     final String message,
-    final Throwable cause)
+    final Throwable cause,
+    final String inReason)
   {
     super(
       errorCode,
       Objects.requireNonNull(message, "message"),
       Objects.requireNonNull(cause, "cause")
     );
+    this.requestId =
+      Objects.requireNonNull(inRequestId, "requestId");
+    this.reason =
+      Objects.requireNonNull(inReason, "reason");
   }
 
   /**
    * Construct an exception.
    *
-   * @param errorCode The error code
-   * @param cause The cause
+   * @param inRequestId The request ID
+   * @param errorCode   The error code
+   * @param cause       The cause
+   * @param inReason    The error reason
    */
 
   public IdUClientException(
+    final Optional<UUID> inRequestId,
     final IdErrorCode errorCode,
-    final Throwable cause)
+    final Throwable cause,
+    final String inReason)
   {
     super(errorCode, Objects.requireNonNull(cause, "cause"));
+    this.requestId =
+      Objects.requireNonNull(inRequestId, "requestId");
+    this.reason =
+      Objects.requireNonNull(inReason, "reason");
+  }
+
+  /**
+   * @return The ID associated with the request, if the server returned one
+   */
+
+  public Optional<UUID> requestId()
+  {
+    return this.requestId;
+  }
+
+  /**
+   * @return The error reason
+   */
+
+  public String reason()
+  {
+    return this.reason;
   }
 }

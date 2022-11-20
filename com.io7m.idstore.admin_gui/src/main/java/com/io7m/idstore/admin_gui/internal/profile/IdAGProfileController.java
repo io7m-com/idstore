@@ -140,12 +140,7 @@ public final class IdAGProfileController
 
       }
       case CONNECTION_SUCCEEDED -> {
-        final var future = this.client.self();
-        future.whenComplete((newAdmin, exception) -> {
-          if (newAdmin != null) {
-            this.onAdminReceived(newAdmin);
-          }
-        });
+        this.onAdminReceived(this.client.self());
       }
 
       case CONNECTED -> {

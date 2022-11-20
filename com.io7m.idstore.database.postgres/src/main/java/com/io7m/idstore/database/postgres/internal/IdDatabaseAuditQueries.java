@@ -40,6 +40,7 @@ import java.util.UUID;
 
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
 import static com.io7m.idstore.database.postgres.internal.Tables.AUDIT;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.DB_STATEMENT;
 
 final class IdDatabaseAuditQueries
   extends IdBaseQueries
@@ -117,7 +118,10 @@ final class IdDatabaseAuditQueries
           List.of(new JQField(AUDIT.ID, JQOrder.ASCENDING)),
           List.of(allConditions),
           List.of(),
-          Integer.toUnsignedLong(parameters.limit())
+          Integer.toUnsignedLong(parameters.limit()),
+          statement -> {
+            querySpan.setAttribute(DB_STATEMENT, statement.toString());
+          }
         );
 
       return new AuditEventsSearch(baseTable, pages);
@@ -204,6 +208,8 @@ final class IdDatabaseAuditQueries
         } else {
           select = query.limit(Long.valueOf(page.limit()));
         }
+
+        querySpan.setAttribute(DB_STATEMENT, query.toString());
 
         final var items =
           select.fetch().map(record -> {

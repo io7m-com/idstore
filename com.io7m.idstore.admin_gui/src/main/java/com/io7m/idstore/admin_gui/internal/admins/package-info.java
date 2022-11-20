@@ -14,24 +14,8 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
-package com.io7m.idstore.protocol.api;
-
 /**
- * An interface describing types that can be converted to model types.
- *
- * @param <M> The type of model type
+ * Identity server (Admin UI tool [internals])
  */
 
-public interface IdProtocolToModelType<M>
-{
-  /**
-   * @return This value as a model value
-   *
-   * @throws IdProtocolException On errors
-   */
-
-  @IdProtocolToModel
-  M toModel()
-    throws IdProtocolException;
-}
+package com.io7m.idstore.admin_gui.internal.admins;

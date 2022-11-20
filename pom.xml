@@ -8,12 +8,12 @@
   <parent>
     <groupId>com.io7m.primogenitor</groupId>
     <artifactId>com.io7m.primogenitor.full</artifactId>
-    <version>7.1.1</version>
+    <version>7.4.0</version>
   </parent>
 
   <groupId>com.io7m.idstore</groupId>
   <artifactId>com.io7m.idstore</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.4</version>
 
   <packaging>pom</packaging>
   <name>com.io7m.idstore</name>
@@ -48,7 +48,7 @@
 
   <properties>
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
-    <com.io7m.cedarbridge.version>0.0.10</com.io7m.cedarbridge.version>
+    <com.io7m.cedarbridge.version>0.0.11</com.io7m.cedarbridge.version>
     <com.io7m.cxbutton.version>0.0.3</com.io7m.cxbutton.version>
     <com.io7m.dixmont.version>0.0.2</com.io7m.dixmont.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
@@ -56,18 +56,19 @@
     <com.io7m.jqpage.version>0.0.2</com.io7m.jqpage.version>
     <com.io7m.jvindicator.version>0.0.1</com.io7m.jvindicator.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
-    <com.io7m.trasco.version>0.0.5</com.io7m.trasco.version>
+    <com.io7m.trasco.version>0.0.6</com.io7m.trasco.version>
     <com.io7m.verdant.version>0.0.1</com.io7m.verdant.version>
-    <io7m.api.previousVersion>0.0.3</io7m.api.previousVersion>
-    <jackson.version>2.13.4</jackson.version>
-    <jetty.version>11.0.11</jetty.version>
-    <jooq.version>3.17.4</jooq.version>
-    <logback.version>1.4.1</logback.version>
-    <opentelemetry.version>1.18.0</opentelemetry.version>
-    <org.javafx.version>18.0.1</org.javafx.version>
+    <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
+    <io7m.api.previousVersion>0.0.4-SNAPSHOT</io7m.api.previousVersion>
+    <jackson.version>2.14.0</jackson.version>
+    <jetty.version>11.0.12</jetty.version>
+    <jooq.version>3.17.5</jooq.version>
+    <logback.version>1.4.5</logback.version>
+    <opentelemetry.version>1.20.1</opentelemetry.version>
+    <org.javafx.version>19</org.javafx.version>
     <org.jline.version>3.21.0</org.jline.version>
-    <slf4j.version>2.0.1</slf4j.version>
-    <testcontainers.version>1.17.3</testcontainers.version>
+    <slf4j.version>2.0.4</slf4j.version>
+    <testcontainers.version>1.17.6</testcontainers.version>
   </properties>
 
   <licenses>
@@ -137,12 +138,12 @@
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
-        <version>5.9.0</version>
+        <version>5.9.1</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-engine</artifactId>
-        <version>5.9.0</version>
+        <version>5.9.1</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -162,12 +163,12 @@
       <dependency>
         <groupId>net.jqwik</groupId>
         <artifactId>jqwik-api</artifactId>
-        <version>1.6.5</version>
+        <version>1.7.1</version>
       </dependency>
       <dependency>
         <groupId>net.jqwik</groupId>
         <artifactId>jqwik-engine</artifactId>
-        <version>1.6.5</version>
+        <version>1.7.1</version>
       </dependency>
       <dependency>
         <groupId>biz.aQute.bnd</groupId>
@@ -332,7 +333,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>4.8.0</version>
+        <version>4.9.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.jlexing</groupId>
@@ -482,12 +483,7 @@
       <dependency>
         <groupId>com.io7m.primogenitor</groupId>
         <artifactId>com.io7m.primogenitor.support</artifactId>
-        <version>7.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.io7m.xstructural</groupId>
-        <artifactId>com.io7m.xstructural.cmdline</artifactId>
-        <version>1.7.1</version>
+        <version>7.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -502,7 +498,7 @@
       <dependency>
         <groupId>com.github.ben-manes.caffeine</groupId>
         <artifactId>caffeine</artifactId>
-        <version>3.0.6</version>
+        <version>3.1.1</version>
       </dependency>
       <dependency>
         <groupId>io.opentelemetry</groupId>
@@ -519,7 +515,7 @@
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
-        <version>1.7.10</version>
+        <version>1.7.21</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.verdant</groupId>

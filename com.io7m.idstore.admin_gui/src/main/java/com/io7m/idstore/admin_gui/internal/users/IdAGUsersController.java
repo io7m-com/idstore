@@ -21,6 +21,7 @@ import com.io7m.idstore.admin_gui.internal.IdAGCSS;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientService;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus;
+import com.io7m.idstore.admin_gui.internal.login.IsAGLoginHistoryCellFactory;
 import com.io7m.idstore.admin_gui.internal.main.IdAGMainScreenController;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
@@ -248,7 +249,7 @@ public final class IdAGUsersController implements Initializable
       });
 
     this.loginHistoryList.setCellFactory(
-      new IsAGUserLoginHistoryCellFactory(this.strings));
+      new IsAGLoginHistoryCellFactory(this.strings));
     this.loginHistoryList.setItems(this.userLoginHistory);
     this.loginHistoryList.setFixedCellSize(24.0);
     this.loginHistoryList.getSelectionModel().setSelectionMode(SINGLE);

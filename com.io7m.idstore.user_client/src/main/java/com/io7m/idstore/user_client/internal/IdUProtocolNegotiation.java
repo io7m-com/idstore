@@ -47,6 +47,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NO_SUPPORTED_PRO
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.user_client.internal.IdUCompression.decompressResponse;
 import static java.net.http.HttpResponse.BodyHandlers.ofByteArray;
+import static java.util.Optional.empty;
 
 /**
  * Functions to negotiate protocols.
@@ -79,16 +80,15 @@ public final class IdUProtocolNegotiation
     try {
       response = httpClient.send(request, ofByteArray());
     } catch (final IOException e) {
-      throw new IdUClientException(IO_ERROR, e);
+      throw new IdUClientException(empty(), IO_ERROR, e, e.getMessage());
     }
 
     LOG.debug("server: status {}", response.statusCode());
 
     if (response.statusCode() >= 400) {
-      throw new IdUClientException(
-        HTTP_ERROR,
-        strings.format("httpError", Integer.valueOf(response.statusCode()))
-      );
+      final var msg =
+        strings.format("httpError", Integer.valueOf(response.statusCode()));
+      throw new IdUClientException(empty(), HTTP_ERROR, msg, msg);
     }
 
     final var protocols =
@@ -99,9 +99,9 @@ public final class IdUProtocolNegotiation
       final var body = decompressResponse(response, response.headers());
       message = protocols.parse(base, body);
     } catch (final VProtocolException e) {
-      throw new IdUClientException(PROTOCOL_ERROR, e);
+      throw new IdUClientException(empty(), PROTOCOL_ERROR, e, e.getMessage());
     } catch (final IOException e) {
-      throw new IdUClientException(IO_ERROR, e);
+      throw new IdUClientException(empty(), IO_ERROR, e, e.getMessage());
     }
 
     return message.protocols()
@@ -180,7 +180,12 @@ public final class IdUProtocolNegotiation
         List.of(IdUCB1Messages.protocolId().toString())
       );
     } catch (final GenProtocolException e) {
-      throw new IdUClientException(NO_SUPPORTED_PROTOCOLS, e.getMessage(), e);
+      throw new IdUClientException(
+        empty(),
+        NO_SUPPORTED_PROTOCOLS,
+        e.getMessage(),
+        e,
+        e.getMessage());
     }
 
     final var serverEndpoint =

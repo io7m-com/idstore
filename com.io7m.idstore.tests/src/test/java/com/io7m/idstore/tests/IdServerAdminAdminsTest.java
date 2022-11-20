@@ -19,6 +19,7 @@ package com.io7m.idstore.tests;
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
+import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminPermissionSet;
@@ -44,6 +45,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.OPERATION_NOT_PERMITTED;
 import static com.io7m.idstore.model.IdAdminColumn.BY_IDNAME;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -749,6 +751,65 @@ public final class IdServerAdminAdminsTest extends IdWithServerContract
     ));
 
     this.client.login("other", "12345678", this.serverAdminAPIURL());
+  }
+
+  /**
+   * Deleting admins works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminDelete()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin0 =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var admin1 =
+      this.serverCreateAdmin(admin0, "other");
+
+    this.client.login(
+      "admin",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    assertTrue(this.client.adminGet(admin1).isPresent());
+    this.client.adminDelete(admin1);
+    assertTrue(this.client.adminGet(admin1).isEmpty());
+  }
+
+  /**
+   * An admin can't delete itself.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminDeleteSelf()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin0 =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var admin1 =
+      this.serverCreateAdmin(admin0, "other");
+
+    this.client.login(
+      "other",
+      "12345678",
+      this.serverAdminAPIURL()
+    );
+
+    final var ex =
+      assertThrows(IdAClientException.class, () -> {
+        this.client.adminDelete(admin1);
+      });
+
+    assertEquals(OPERATION_NOT_PERMITTED, ex.errorCode());
   }
 
   private static void checkItems(

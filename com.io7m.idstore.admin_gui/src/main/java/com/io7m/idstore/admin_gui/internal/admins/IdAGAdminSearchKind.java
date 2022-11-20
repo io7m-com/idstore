@@ -15,23 +15,10 @@
  */
 
 
-package com.io7m.idstore.protocol.api;
+package com.io7m.idstore.admin_gui.internal.admins;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-/**
- * An annotation that indicates that a method converts a versioned value
- * to a model value.
- */
-
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface IdProtocolToModel
+enum IdAGAdminSearchKind
 {
-
+  BY_DETAILS,
+  BY_EMAIL
 }

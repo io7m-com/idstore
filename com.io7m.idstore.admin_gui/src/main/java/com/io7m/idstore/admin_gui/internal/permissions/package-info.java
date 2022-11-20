@@ -14,24 +14,8 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
-package com.io7m.idstore.protocol.api;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * An annotation that indicates that a method converts a model value from a
- * versioned value.
+ * Identity server (Admin UI tool [internals])
  */
 
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface IdProtocolFromModel
-{
-
-}
+package com.io7m.idstore.admin_gui.internal.permissions;
