@@ -39,6 +39,9 @@ import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerType;
+import com.io7m.jmulticlose.core.CloseableCollection;
+import com.io7m.jmulticlose.core.CloseableCollectionType;
+import com.io7m.jmulticlose.core.ClosingResourceFailedException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
@@ -71,6 +74,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.io7m.idstore.database.api.IdDatabaseCreate.CREATE_DATABASE;
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.database.api.IdDatabaseUpgrade.UPGRADE_DATABASE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers(disabledWithoutDocker = true)
 public abstract class IdWithServerContract
@@ -79,7 +83,7 @@ public abstract class IdWithServerContract
     LoggerFactory.getLogger(IdWithServerContract.class);
 
   @Container
-  private final PostgreSQLContainer<?> container =
+  private static final PostgreSQLContainer<?> CONTAINER =
     new PostgreSQLContainer<>("postgres")
       .withDatabaseName("postgres")
       .withUsername("postgres")
@@ -93,6 +97,7 @@ public abstract class IdWithServerContract
   private SMTPServer smtp;
   private ConcurrentLinkedQueue<MimeMessage> emailsReceived;
   private IdFakeClock clock;
+  private CloseableCollectionType<ClosingResourceFailedException> resources;
 
   protected final IdFakeClock clock()
   {
@@ -138,11 +143,6 @@ public abstract class IdWithServerContract
         return userId;
       }
     }
-  }
-
-  public final PostgreSQLContainer<?> container()
-  {
-    return this.container;
   }
 
   public final IdServerType server()
@@ -201,15 +201,20 @@ public abstract class IdWithServerContract
         })
         .build();
     this.smtp.start();
+
+    this.resources.add(this.server);
+    this.resources.add(() -> {
+      this.smtp.stop();
+    });
   }
 
   private void waitForDatabaseToStart()
-    throws InterruptedException, TimeoutException
+    throws Exception
   {
     LOG.debug("waiting for database to start");
     final var timeWait = Duration.ofSeconds(60L);
     final var timeThen = Instant.now();
-    while (!this.container.isRunning()) {
+    while (!CONTAINER.isRunning()) {
       Thread.sleep(1L);
       final var timeNow = Instant.now();
       if (Duration.between(timeThen, timeNow).compareTo(timeWait) > 0) {
@@ -217,6 +222,35 @@ public abstract class IdWithServerContract
         throw new TimeoutException("Timed out waiting for database to start");
       }
     }
+
+    this.resources = CloseableCollection.create();
+    this.resources.add(() -> {
+      CONTAINER.execInContainer("dropdb", "postgres");
+    });
+
+    CONTAINER.addEnv("PGPASSWORD", "12345678");
+
+    final var r0 =
+      CONTAINER.execInContainer(
+        "dropdb",
+        "-w",
+        "-U",
+        "postgres",
+        "postgres"
+      );
+    LOG.debug("stderr: {}", r0.getStderr());
+
+    final var r1 =
+      CONTAINER.execInContainer(
+        "createdb",
+        "-w",
+        "-U",
+        "postgres",
+        "postgres"
+      );
+
+    LOG.debug("stderr: {}", r0.getStderr());
+    assertEquals(0, r1.getExitCode());
     LOG.debug("database started");
   }
 
@@ -225,9 +259,7 @@ public abstract class IdWithServerContract
     throws Exception
   {
     LOG.debug("serverTearDown");
-
-    this.server.close();
-    this.smtp.stop();
+    this.resources.close();
   }
 
   private IdServerType createServer()
@@ -238,8 +270,8 @@ public abstract class IdWithServerContract
       new IdDatabaseConfiguration(
         "postgres",
         "12345678",
-        this.container.getContainerIpAddress(),
-        this.container.getFirstMappedPort().intValue(),
+        CONTAINER.getContainerIpAddress(),
+        CONTAINER.getFirstMappedPort().intValue(),
         "postgres",
         CREATE_DATABASE,
         UPGRADE_DATABASE,

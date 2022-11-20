@@ -41,15 +41,17 @@ import com.io7m.jmulticlose.core.ClosingResourceFailedException;
 import io.opentelemetry.api.OpenTelemetry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.io.IOException;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseCreate.CREATE_DATABASE;
@@ -62,11 +64,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Testcontainers(disabledWithoutDocker = true)
 public abstract class IdWithDatabaseContract
 {
+  private static final Logger LOG =
+    LoggerFactory.getLogger(IdWithDatabaseContract.class);
+
   protected static final IdDatabases DATABASES =
     new IdDatabases();
 
   @Container
-  private final PostgreSQLContainer<?> container =
+  private static final PostgreSQLContainer<?> CONTAINER =
     new PostgreSQLContainer<>(DockerImageName.parse("postgres").withTag("14.4"))
       .withDatabaseName("postgres")
       .withUsername("postgres")
@@ -151,8 +156,36 @@ public abstract class IdWithDatabaseContract
 
   @BeforeEach
   public final void withDatabaseSetup()
+    throws Exception
   {
     this.resources = CloseableCollection.create();
+    this.resources.add(() -> {
+      CONTAINER.execInContainer("dropdb", "postgres");
+    });
+
+    CONTAINER.addEnv("PGPASSWORD", "12345678");
+
+    final var r0 =
+      CONTAINER.execInContainer(
+        "dropdb",
+        "-w",
+        "-U",
+        "postgres",
+        "postgres"
+      );
+    LOG.debug("stderr: {}", r0.getStderr());
+
+    final var r1 =
+      CONTAINER.execInContainer(
+        "createdb",
+        "-w",
+        "-U",
+        "postgres",
+        "postgres"
+      );
+
+    LOG.debug("stderr: {}", r0.getStderr());
+    assertEquals(0, r1.getExitCode());
   }
 
   @AfterEach
@@ -169,7 +202,7 @@ public abstract class IdWithDatabaseContract
 
   protected final boolean containerIsRunning()
   {
-    return this.container.isRunning();
+    return CONTAINER.isRunning();
   }
 
   private IdDatabaseType databaseOf(
@@ -212,7 +245,7 @@ public abstract class IdWithDatabaseContract
     throws IdDatabaseException
   {
     if (this.database == null) {
-      this.database = this.databaseOf(this.container);
+      this.database = this.databaseOf(this.CONTAINER);
     }
 
     final var connection =

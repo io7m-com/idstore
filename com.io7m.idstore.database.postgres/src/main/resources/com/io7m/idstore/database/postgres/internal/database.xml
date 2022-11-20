@@ -8,6 +8,9 @@
     </Comment>
 
     <Statement><![CDATA[
+drop role if exists idstore;
+]]></Statement>
+    <Statement><![CDATA[
 create role idstore with nosuperuser nocreatedb nocreaterole noinherit nologin;
 ]]></Statement>
 
@@ -15,6 +18,9 @@ create role idstore with nosuperuser nocreatedb nocreaterole noinherit nologin;
       The idstore_none role is a no-privilege role that cannot perform any actions.
     </Comment>
 
+    <Statement><![CDATA[
+drop role if exists idstore_none;
+]]></Statement>
     <Statement><![CDATA[
 create role idstore_none with nosuperuser nocreatedb nocreaterole noinherit nologin;
 ]]></Statement>

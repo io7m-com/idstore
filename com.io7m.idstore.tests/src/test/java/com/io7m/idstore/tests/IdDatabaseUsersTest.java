@@ -62,9 +62,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Testcontainers(disabledWithoutDocker = true)
 public final class IdDatabaseUsersTest extends IdWithDatabaseContract
 {
-  private static final Logger LOG =
-    LoggerFactory.getLogger(IdDatabaseUsersTest.class);
-
   /**
    * Setting the transaction user to a nonexistent user fails.
    *
