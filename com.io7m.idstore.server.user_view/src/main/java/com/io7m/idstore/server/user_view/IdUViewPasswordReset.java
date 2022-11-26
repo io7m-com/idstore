@@ -17,10 +17,9 @@
 package com.io7m.idstore.server.user_view;
 
 import com.io7m.idstore.server.http.IdCommonInstrumentedServlet;
-import com.io7m.idstore.server.service.branding.IdServerBrandingService;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.templating.IdFMPasswordResetData;
-import com.io7m.idstore.server.service.templating.IdFMTemplateService;
+import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import freemarker.template.TemplateException;
@@ -53,9 +52,9 @@ public final class IdUViewPasswordReset extends IdCommonInstrumentedServlet
     super(inServices);
 
     this.branding =
-      inServices.requireService(IdServerBrandingService.class);
+      inServices.requireService(IdServerBrandingServiceType.class);
     this.template =
-      inServices.requireService(IdFMTemplateService.class)
+      inServices.requireService(IdFMTemplateServiceType.class)
         .pagePasswordResetTemplate();
   }
 

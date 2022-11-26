@@ -25,12 +25,11 @@ import com.io7m.idstore.server.controller.user.IdUCmdPasswordUpdate;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
 import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.http.IdRequestUserAgents;
-import com.io7m.idstore.server.service.branding.IdServerBrandingService;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionMessage;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
-import com.io7m.idstore.server.service.templating.IdFMTemplateService;
+import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import com.io7m.jvindicator.core.Vindication;
@@ -64,9 +63,9 @@ public final class IdUViewPasswordUpdateRun extends IdUViewAuthenticatedServlet
     super(inServices);
 
     this.branding =
-      inServices.requireService(IdServerBrandingService.class);
+      inServices.requireService(IdServerBrandingServiceType.class);
     this.msgTemplate =
-      inServices.requireService(IdFMTemplateService.class)
+      inServices.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
   }
 

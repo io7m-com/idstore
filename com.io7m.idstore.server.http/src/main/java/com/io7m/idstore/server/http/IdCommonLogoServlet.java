@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.server.http;
 
-import com.io7m.idstore.server.service.branding.IdServerBrandingService;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +44,7 @@ public final class IdCommonLogoServlet extends IdCommonInstrumentedServlet
     super(Objects.requireNonNull(inServices, "services"));
 
     this.branding =
-      inServices.requireService(IdServerBrandingService.class);
+      inServices.requireService(IdServerBrandingServiceType.class);
   }
 
   @Override

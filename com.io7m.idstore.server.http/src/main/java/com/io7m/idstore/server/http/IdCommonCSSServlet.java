@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.server.http;
 
-import com.io7m.idstore.server.service.branding.IdServerBrandingService;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +48,7 @@ public final class IdCommonCSSServlet extends IdCommonInstrumentedServlet
     super(Objects.requireNonNull(inServices, "services"));
 
     this.branding =
-      inServices.requireService(IdServerBrandingService.class);
+      inServices.requireService(IdServerBrandingServiceType.class);
   }
 
   @Override
@@ -67,7 +66,7 @@ public final class IdCommonCSSServlet extends IdCommonInstrumentedServlet
     if (Objects.equals(stripped, "reset.css")) {
       servletResponse.setStatus(200);
       servletResponse.setContentType("text/css; charset=utf-8");
-      try (var stream = IdCommonCSSServlet.class.getResourceAsStream("/com/io7m/idstore/server/internal/reset.css")) {
+      try (var stream = IdCommonCSSServlet.class.getResourceAsStream("/com/io7m/idstore/server/http/reset.css")) {
         try (var output = servletResponse.getOutputStream()) {
           stream.transferTo(output);
           output.flush();

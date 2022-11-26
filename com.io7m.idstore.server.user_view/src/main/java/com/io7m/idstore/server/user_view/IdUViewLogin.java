@@ -17,13 +17,14 @@
 package com.io7m.idstore.server.user_view;
 
 import com.io7m.idstore.database.api.IdDatabaseType;
+import com.io7m.idstore.server.controller.IdServerStrings;
+import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUserLoginService;
 import com.io7m.idstore.server.http.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.http.IdRequestUniqueIDs;
-import com.io7m.idstore.server.service.branding.IdServerBrandingService;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.templating.IdFMLoginData;
-import com.io7m.idstore.server.service.templating.IdFMTemplateService;
+import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import freemarker.template.TemplateException;
@@ -52,6 +53,7 @@ public final class IdUViewLogin extends IdCommonInstrumentedServlet
   private final IdDatabaseType database;
   private final IdServerBrandingServiceType branding;
   private final IdUserLoginService logins;
+  private final IdServerStrings strings;
 
   /**
    * The login form.
@@ -67,12 +69,14 @@ public final class IdUViewLogin extends IdCommonInstrumentedServlet
     this.database =
       inServices.requireService(IdDatabaseType.class);
     this.branding =
-      inServices.requireService(IdServerBrandingService.class);
+      inServices.requireService(IdServerBrandingServiceType.class);
     this.logins =
       inServices.requireService(IdUserLoginService.class);
+    this.strings =
+      inServices.requireService(IdServerStrings.class);
 
     this.template =
-      inServices.requireService(IdFMTemplateService.class)
+      inServices.requireService(IdFMTemplateServiceType.class)
         .pageLoginTemplate();
   }
 
@@ -103,15 +107,29 @@ public final class IdUViewLogin extends IdCommonInstrumentedServlet
         metadata.put(userAgent(), requestUserAgent(request));
         metadata.put(remoteHost(), request.getRemoteAddr());
 
-        this.logins.userLogin(
-          transaction,
-          IdRequestUniqueIDs.requestIdFor(request),
-          username,
-          password,
-          metadata
-        );
+        final IdUserLoginService.IdUserLoggedIn loggedIn;
+        try {
+          loggedIn = this.logins.userLogin(
+            transaction,
+            IdRequestUniqueIDs.requestIdFor(request),
+            username,
+            password,
+            metadata
+          );
+        } catch (final IdCommandExecutionFailure e) {
+          session.setAttribute(
+            "ErrorMessage",
+            this.strings.format("errorInvalidUsernamePassword")
+          );
+
+          servletResponse.setStatus(401);
+          this.showForm(servletResponse, session);
+          return;
+        }
 
         transaction.commit();
+        session.setAttribute("ID", loggedIn.session().id());
+        servletResponse.sendRedirect("/");
       }
     } catch (final Exception e) {
       throw new ServletException(e);

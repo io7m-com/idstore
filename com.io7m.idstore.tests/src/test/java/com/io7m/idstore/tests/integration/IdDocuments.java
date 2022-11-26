@@ -15,7 +15,7 @@
  */
 
 
-package com.io7m.idstore.tests;
+package com.io7m.idstore.tests.integration;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

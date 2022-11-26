@@ -20,15 +20,13 @@ package com.io7m.idstore.server.user_view;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetService;
 import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetServiceType;
 import com.io7m.idstore.server.http.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.http.IdRequestUserAgents;
-import com.io7m.idstore.server.service.branding.IdServerBrandingService;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
-import com.io7m.idstore.server.service.templating.IdFMTemplateService;
+import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import com.io7m.jvindicator.core.Vindication;
@@ -64,13 +62,13 @@ public final class IdUViewPasswordResetConfirmRun
     super(inServices);
 
     this.userPasswordResets =
-      inServices.requireService(IdUserPasswordResetService.class);
+      inServices.requireService(IdUserPasswordResetServiceType.class);
     this.strings =
       inServices.requireService(IdServerStrings.class);
     this.branding =
-      inServices.requireService(IdServerBrandingService.class);
+      inServices.requireService(IdServerBrandingServiceType.class);
     this.errorTemplate =
-      inServices.requireService(IdFMTemplateService.class)
+      inServices.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
   }
 

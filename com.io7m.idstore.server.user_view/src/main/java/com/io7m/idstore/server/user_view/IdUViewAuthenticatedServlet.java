@@ -23,13 +23,12 @@ import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.http.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.http.IdRequestUniqueIDs;
-import com.io7m.idstore.server.service.branding.IdServerBrandingService;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
-import com.io7m.idstore.server.service.templating.IdFMTemplateService;
+import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import freemarker.template.TemplateException;
@@ -81,9 +80,9 @@ public abstract class IdUViewAuthenticatedServlet
     this.userSessions =
       inServices.requireService(IdSessionUserService.class);
     this.branding =
-      inServices.requireService(IdServerBrandingService.class);
+      inServices.requireService(IdServerBrandingServiceType.class);
     this.template =
-      inServices.requireService(IdFMTemplateService.class)
+      inServices.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
   }
 

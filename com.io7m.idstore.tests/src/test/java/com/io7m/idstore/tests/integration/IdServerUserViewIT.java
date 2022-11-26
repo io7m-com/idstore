@@ -14,13 +14,13 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.tests;
+package com.io7m.idstore.tests.integration;
 
+import com.io7m.idstore.tests.server.IdWithServerContract;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.CookieManager;
@@ -30,17 +30,19 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import static java.net.http.HttpClient.Redirect.ALWAYS;
+import static java.net.http.HttpClient.Redirect.NEVER;
 import static java.net.http.HttpRequest.BodyPublishers.ofString;
+import static java.net.http.HttpResponse.BodyHandlers.discarding;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public final class IdServerUserViewTest extends IdWithServerContract
+@Tag("integration")
+@Tag("user-view")
+public final class IdServerUserViewIT extends IdWithServerContract
 {
-  private static final Logger LOG =
-    LoggerFactory.getLogger(IdServerUserViewTest.class);
-
   private HttpClient httpClient;
   private CookieManager cookies;
+  private HttpClient httpClientWithoutRedirects;
 
   @BeforeEach
   public void setup()
@@ -51,6 +53,12 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.httpClient =
       HttpClient.newBuilder()
         .followRedirects(ALWAYS)
+        .cookieHandler(this.cookies)
+        .build();
+
+    this.httpClientWithoutRedirects =
+      HttpClient.newBuilder()
+        .followRedirects(NEVER)
         .cookieHandler(this.cookies)
         .build();
   }
@@ -129,6 +137,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     this.serverCreateUser(admin, "someone");
 
     this.login();
+    this.logout();
   }
 
   /**
@@ -947,6 +956,184 @@ public final class IdServerUserViewTest extends IdWithServerContract
       "idstore: Error");
   }
 
+  /**
+   * Resetting a password works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testResetPasswordWorks()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/password-reset", "idstore: Reset password.");
+
+    this.openPage(
+      "/password-reset-run?username=someone&email=someone@example.com",
+      "idstore: Password Reset"
+    );
+
+    final var mail =
+      this.emailsReceived().poll();
+    final var token =
+      mail.getHeader("X-IDStore-PasswordReset-Token")[0];
+
+    this.openPage(
+      "/password-reset-confirm?token=%s".formatted(token),
+      "idstore: Reset password."
+    );
+
+    this.openPage(
+      "/password-reset-confirm-run?password0=abc&password1=abc&token=%s"
+        .formatted(token),
+      "idstore: Password Reset"
+    );
+
+    this.loginWith("someone", "abc");
+  }
+
+  /**
+   * Resetting a password fails with a bad token.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testResetPasswordBadToken0()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/password-reset", "idstore: Reset password.");
+
+    this.openPage(
+      "/password-reset-run?username=someone&email=someone@example.com",
+      "idstore: Password Reset"
+    );
+
+    final var mail =
+      this.emailsReceived().poll();
+    final var token =
+      mail.getHeader("X-IDStore-PasswordReset-Token")[0];
+
+    this.openPage(
+      "/password-reset-confirm?token=%s".formatted(token),
+      "idstore: Reset password."
+    );
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL(
+        "/password-reset-confirm-run?password0=abc&password1=abc&token=%s"
+          .formatted(new StringBuilder(token).reverse()))),
+      400,
+      "idstore: Error"
+    );
+  }
+
+  /**
+   * Resetting a password fails with a bad token.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testResetPasswordBadToken1()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/password-reset", "idstore: Reset password.");
+
+    this.openPage(
+      "/password-reset-run?username=someone&email=someone@example.com",
+      "idstore: Password Reset"
+    );
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL(
+        "/password-reset-confirm-run?password0=abc&password1=abc&token=%s"
+          .formatted("not%20token"))),
+      400,
+      "idstore: Error"
+    );
+  }
+
+  /**
+   * Resetting a password fails with a bad username.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testResetPasswordBadUsername0()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/password-reset", "idstore: Reset password.");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL(
+        "/password-reset-run?username=not%20user")),
+      400,
+      "idstore: Error"
+    );
+  }
+
+  /**
+   * Resetting a password fails with a bad email address.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testResetPasswordBadEmail0()
+    throws Exception
+  {
+    this.serverStartIfNecessary();
+
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+    final var userId =
+      this.serverCreateUser(admin, "someone");
+
+    this.login();
+    this.openPage("/password-reset", "idstore: Reset password.");
+
+    this.expectError(
+      HttpRequest.newBuilder(this.viewURL(
+        "/password-reset-run?email=email@example")),
+      400,
+      "idstore: Error"
+    );
+  }
+
   private void expectError(
     final HttpRequest.Builder newBuilder,
     final int expected,
@@ -954,8 +1141,7 @@ public final class IdServerUserViewTest extends IdWithServerContract
     throws IOException, InterruptedException
   {
     final var req =
-      newBuilder
-        .build();
+      newBuilder.build();
     final var res =
       this.httpClient.send(req, new IdXHTMLBodyHandler());
     assertEquals(expected, res.statusCode());
@@ -1005,13 +1191,32 @@ public final class IdServerUserViewTest extends IdWithServerContract
     return this.serverUserViewURL().resolve(str);
   }
 
+  private void logout()
+    throws IOException, InterruptedException
+  {
+    final var req =
+      HttpRequest.newBuilder(this.viewURL("/logout"))
+        .build();
+    final var res =
+      this.httpClientWithoutRedirects.send(req, discarding());
+    assertEquals(302, res.statusCode());
+  }
+
   private void login()
+    throws IOException, InterruptedException
+  {
+    this.loginWith("someone", "12345678");
+  }
+
+  private void loginWith(
+    final String username,
+    final String password)
     throws IOException, InterruptedException
   {
     {
       final var req =
         HttpRequest.newBuilder(this.viewURL("/login"))
-          .POST(ofString("username=someone&password=12345678"))
+          .POST(ofString("username=%s&password=%s".formatted(username, password)))
           .header("Content-Type", "application/x-www-form-urlencoded")
           .build();
       final var res =

@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.tests;
+package com.io7m.idstore.tests.server;
 
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
@@ -40,6 +40,8 @@ import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerSessionConfiguration;
 import com.io7m.idstore.server.api.IdServerType;
 import com.io7m.idstore.server.vanilla.IdServers;
+import com.io7m.idstore.tests.IdFakeClock;
+import com.io7m.idstore.tests.IdTestDirectories;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.jmulticlose.core.ClosingResourceFailedException;

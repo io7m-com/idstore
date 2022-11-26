@@ -36,6 +36,8 @@ import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerException;
 import com.io7m.idstore.server.api.IdServerType;
 import com.io7m.idstore.server.controller.IdServerStrings;
+import com.io7m.idstore.server.controller.admin.IdAdminLoginService;
+import com.io7m.idstore.server.controller.user.IdUserLoginService;
 import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetService;
 import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetServiceType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingService;
@@ -183,17 +185,42 @@ public final class IdServer implements IdServerType
       );
     services.register(IdServerMailServiceType.class, mailService);
 
+    final var sessionAdminService =
+      new IdSessionAdminService(
+      this.telemetry.openTelemetry(),
+      this.configuration.sessions().adminSessionExpiration()
+      );
+
     services.register(
       IdSessionAdminService.class,
-      new IdSessionAdminService(
-        this.telemetry.openTelemetry(),
-        this.configuration.sessions().adminSessionExpiration())
+      sessionAdminService
     );
+
+    final var sessionUserService =
+      new IdSessionUserService(
+      this.telemetry.openTelemetry(),
+      this.configuration.sessions().userSessionExpiration()
+      );
+
     services.register(
       IdSessionUserService.class,
-      new IdSessionUserService(
-        this.telemetry.openTelemetry(),
-        this.configuration.sessions().userSessionExpiration())
+      sessionUserService
+    );
+
+    final var config = new IdServerConfigurationService(this.configuration);
+    services.register(IdServerConfigurationService.class, config);
+
+    final var clock = new IdServerClock(this.configuration.clock());
+    services.register(IdServerClock.class, clock);
+
+    services.register(
+      IdUserLoginService.class,
+      new IdUserLoginService(clock, strings, sessionUserService, config)
+    );
+
+    services.register(
+      IdAdminLoginService.class,
+      new IdAdminLoginService(clock, strings, sessionAdminService)
     );
 
     final var templates = IdFMTemplateService.create();
@@ -213,12 +240,6 @@ public final class IdServer implements IdServerType
     final var idU1Messages = new IdUCB1Messages();
     services.register(IdUCB1Messages.class, idU1Messages);
     services.register(IdUCB1Sends.class, new IdUCB1Sends(idU1Messages));
-
-    final var clock = new IdServerClock(this.configuration.clock());
-    services.register(IdServerClock.class, clock);
-
-    final var config = new IdServerConfigurationService(this.configuration);
-    services.register(IdServerConfigurationService.class, config);
 
     final var userPasswordRateLimitService =
       IdRateLimitPasswordResetService.create(
