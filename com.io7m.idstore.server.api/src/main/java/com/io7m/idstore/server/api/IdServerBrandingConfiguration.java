@@ -37,9 +37,8 @@ import java.util.Optional;
 @JsonDeserialize
 @JsonSerialize
 public record IdServerBrandingConfiguration(
-  @JsonProperty(value = "ProductTitle", required = false)
-  @JsonInclude(value = JsonInclude.Include.NON_ABSENT)
-  Optional<String> productTitle,
+  @JsonProperty(value = "ProductTitle", required = true)
+  String productTitle,
   @JsonProperty(value = "Logo", required = false)
   @JsonInclude(value = JsonInclude.Include.NON_ABSENT)
   Optional<Path> logo,

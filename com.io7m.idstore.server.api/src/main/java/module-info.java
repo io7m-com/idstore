@@ -38,5 +38,4 @@ module com.io7m.idstore.server.api
     to com.fasterxml.jackson.databind;
 
   exports com.io7m.idstore.server.api;
-  exports com.io7m.idstore.server.api.events;
 }

@@ -29,12 +29,13 @@ import java.util.Optional;
  * The server configuration file.
  *
  * @param brandingConfiguration The branding configuration
- * @param mailConfiguration     The mail configuration
- * @param httpConfiguration     The HTTP configuration
  * @param databaseConfiguration The database configuration
  * @param historyConfiguration  The history configuration
+ * @param httpConfiguration     The HTTP configuration
+ * @param mailConfiguration     The mail configuration
  * @param openTelemetry         The OpenTelemetry configuration
  * @param rateLimit             The rate limiting configuration
+ * @param sessionConfiguration  The session configuration
  */
 
 @JsonDeserialize
@@ -50,6 +51,8 @@ public record IdServerConfigurationFile(
   IdServerDatabaseConfiguration databaseConfiguration,
   @JsonProperty(value = "History", required = true)
   IdServerHistoryConfiguration historyConfiguration,
+  @JsonProperty(value = "Sessions", required = true)
+  IdServerSessionConfiguration sessionConfiguration,
   @JsonProperty(value = "RateLimiting", required = true)
   IdServerRateLimitConfiguration rateLimit,
   @JsonInclude(JsonInclude.Include.NON_ABSENT)
@@ -61,12 +64,13 @@ public record IdServerConfigurationFile(
    * The server configuration file.
    *
    * @param brandingConfiguration The branding configuration
-   * @param mailConfiguration     The mail configuration
-   * @param httpConfiguration     The HTTP configuration
    * @param databaseConfiguration The database configuration
    * @param historyConfiguration  The history configuration
+   * @param httpConfiguration     The HTTP configuration
+   * @param mailConfiguration     The mail configuration
    * @param openTelemetry         The OpenTelemetry configuration
    * @param rateLimit             The rate limiting configuration
+   * @param sessionConfiguration  The session configuration
    */
 
   @JsonCreator
@@ -76,6 +80,7 @@ public record IdServerConfigurationFile(
     Objects.requireNonNull(mailConfiguration, "mailConfiguration");
     Objects.requireNonNull(httpConfiguration, "httpConfiguration");
     Objects.requireNonNull(databaseConfiguration, "databaseConfiguration");
+    Objects.requireNonNull(sessionConfiguration, "sessionConfiguration");
     Objects.requireNonNull(historyConfiguration, "historyConfiguration");
     Objects.requireNonNull(rateLimit, "rateLimit");
     Objects.requireNonNull(openTelemetry, "openTelemetry");

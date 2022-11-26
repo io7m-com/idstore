@@ -72,7 +72,7 @@ public final class IdPasswordAlgorithmRedacted
     return new IdPassword(
       this,
       "0",
-      "0"
+      "DEADBEEF"
     );
   }
 
