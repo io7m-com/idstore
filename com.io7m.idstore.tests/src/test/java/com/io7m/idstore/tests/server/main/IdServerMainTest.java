@@ -14,10 +14,10 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
-package com.io7m.idstore.tests;
+package com.io7m.idstore.tests.server.main;
 
 import com.io7m.idstore.server.main.IdServerMain;
+import com.io7m.idstore.tests.IdTestDirectories;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -86,7 +86,7 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testUser()
+  public void testUserCreate0()
     throws Exception
   {
     assertTrue(this.containerIsRunning());
@@ -149,6 +149,65 @@ public final class IdDatabaseUsersTest extends IdWithDatabaseContract
     assertEquals("someone@example.com", user.emails().first().value());
     assertEquals(now.toEpochSecond(), user.timeCreated().toEpochSecond());
     assertEquals(now.toEpochSecond(), user.timeUpdated().toEpochSecond());
+
+    checkAuditLog(
+      transaction,
+      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
+      new ExpectedEvent("USER_CREATED", user.id().toString())
+    );
+  }
+
+  /**
+   * Creating a user works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserCreate1()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var adminId =
+      this.databaseCreateAdminInitial(
+        "admin",
+        "12345678"
+      );
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+
+    transaction.adminIdSet(adminId);
+
+    final var users =
+      transaction.queries(IdDatabaseUsersQueriesType.class);
+
+    final var password =
+      databaseGenerateBadPassword();
+
+    var user =
+      users.userCreate(
+        new IdName("someone"),
+        new IdRealName("someone"),
+        new IdEmail("someone@example.com"),
+        password
+      );
+
+    assertEquals("someone", user.realName().value());
+    assertEquals("someone@example.com", user.emails().first().value());
+
+    user = users.userGet(user.id()).orElseThrow();
+    assertEquals("someone", user.realName().value());
+    assertEquals("someone@example.com", user.emails().first().value());
+
+    user = users.userGetForEmail(new IdEmail("someone@example.com")).orElseThrow();
+    assertEquals("someone", user.realName().value());
+    assertEquals("someone@example.com", user.emails().first().value());
+
+    user = users.userGetForName(new IdName("someone")).orElseThrow();
+    assertEquals("someone", user.realName().value());
+    assertEquals("someone@example.com", user.emails().first().value());
 
     checkAuditLog(
       transaction,

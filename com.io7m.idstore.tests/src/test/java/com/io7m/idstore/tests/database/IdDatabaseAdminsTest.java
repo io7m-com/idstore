@@ -93,7 +93,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdmin()
+  public void testAdminCreate0()
     throws Exception
   {
     assertTrue(this.containerIsRunning());
@@ -157,6 +157,60 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
       transaction,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("ADMIN_CREATED", reqId.toString())
+    );
+  }
+
+  /**
+   * Creating an admin works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminCreate1()
+    throws Exception
+  {
+    assertTrue(this.containerIsRunning());
+
+    final var transaction =
+      this.transactionOf(IDSTORE);
+    final var admins =
+      transaction.queries(IdDatabaseAdminsQueriesType.class);
+    final var adminId =
+      this.databaseCreateAdminInitial("admin", "12345678");
+    final var password =
+      createBadPassword();
+
+    transaction.adminIdSet(adminId);
+
+    var admin =
+      admins.adminCreate(
+        new IdName("someone"),
+        new IdRealName("Someone R. Admin"),
+        new IdEmail("someone@example.com"),
+        password,
+        Set.of()
+      );
+
+    assertEquals("someone", admin.idName().value());
+    assertEquals("someone@example.com", admin.emails().first().value());
+
+    admin = admins.adminGet(admin.id()).orElseThrow();
+    assertEquals("someone", admin.idName().value());
+    assertEquals("someone@example.com", admin.emails().first().value());
+
+    admin = admins.adminGetForEmail(new IdEmail("someone@example.com")).orElseThrow();
+    assertEquals("someone", admin.idName().value());
+    assertEquals("someone@example.com", admin.emails().first().value());
+
+    admin = admins.adminGetForName(new IdName("someone")).orElseThrow();
+    assertEquals("someone", admin.idName().value());
+    assertEquals("someone@example.com", admin.emails().first().value());
+
+    checkAuditLog(
+      transaction,
+      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
+      new ExpectedEvent("ADMIN_CREATED", admin.id().toString())
     );
   }
 
