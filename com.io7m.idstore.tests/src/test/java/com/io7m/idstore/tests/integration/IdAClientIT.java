@@ -15,7 +15,7 @@
  */
 
 
-package com.io7m.idstore.tests;
+package com.io7m.idstore.tests.integration;
 
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientException;
@@ -38,6 +38,7 @@ import com.io7m.verdant.core.VProtocols;
 import com.io7m.verdant.core.cb.VProtocolMessages;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.matchers.Times;
@@ -55,7 +56,9 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class IdAClientTest
+@Tag("integration")
+@Tag("admin-client")
+public final class IdAClientIT
 {
   private ClientAndServer mockServer;
   private IdACB1Messages messages;

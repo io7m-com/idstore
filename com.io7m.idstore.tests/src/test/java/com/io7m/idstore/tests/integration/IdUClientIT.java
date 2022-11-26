@@ -15,7 +15,7 @@
  */
 
 
-package com.io7m.idstore.tests;
+package com.io7m.idstore.tests.integration;
 
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -37,6 +37,7 @@ import com.io7m.verdant.core.VProtocols;
 import com.io7m.verdant.core.cb.VProtocolMessages;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.matchers.Times;
@@ -55,7 +56,9 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class IdUClientTest
+@Tag("integration")
+@Tag("user-client")
+public final class IdUClientIT
 {
   private ClientAndServer mockServer;
   private IdUCB1Messages messages;
@@ -105,7 +108,7 @@ public final class IdUClientTest
       this.versionMessages.serialize(this.versions, 1);
 
     this.mockServer =
-      ClientAndServer.startClientAndServer(Integer.valueOf(60000));
+      ClientAndServer.startClientAndServer(Integer.valueOf(60001));
   }
 
   @AfterEach
@@ -175,7 +178,7 @@ public final class IdUClientTest
     this.client.login(
       "someone",
       "whatever",
-      URI.create("http://localhost:60000/"),
+      URI.create("http://localhost:60001/"),
       Map.of()
     );
 
@@ -227,7 +230,7 @@ public final class IdUClientTest
     this.client.login(
       "someone",
       "whatever",
-      URI.create("http://localhost:60000/"),
+      URI.create("http://localhost:60001/"),
       Map.of()
     );
 
@@ -282,7 +285,7 @@ public final class IdUClientTest
     this.client.login(
       "someone",
       "whatever",
-      URI.create("http://localhost:60000/"),
+      URI.create("http://localhost:60001/"),
       Map.of()
     );
 
