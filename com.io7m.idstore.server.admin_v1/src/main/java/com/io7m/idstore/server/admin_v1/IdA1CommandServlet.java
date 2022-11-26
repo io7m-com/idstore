@@ -63,7 +63,6 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
   private final IdACB1Messages messages;
   private final IdACommandExecutor executor;
   private final IdServiceDirectoryType services;
-  private final IdSessionAdminService sessions;
 
   /**
    * A servlet for executing a single command.
@@ -84,8 +83,6 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
       inServices.requireService(IdRequestLimits.class);
     this.messages =
       inServices.requireService(IdACB1Messages.class);
-    this.sessions =
-      inServices.requireService(IdSessionAdminService.class);
     this.executor =
       new IdACommandExecutor();
   }

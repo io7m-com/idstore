@@ -33,6 +33,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
+import com.io7m.idstore.tests.server.IdWithServerContract;
 import com.io7m.verdant.core.VProtocolSupported;
 import com.io7m.verdant.core.VProtocols;
 import com.io7m.verdant.core.cb.VProtocolMessages;
@@ -58,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Tag("integration")
 @Tag("admin-client")
-public final class IdAClientIT
+public final class IdAClientIT extends IdWithServerContract
 {
   private ClientAndServer mockServer;
   private IdACB1Messages messages;
@@ -292,5 +293,24 @@ public final class IdAClientIT
       assertThrows(IdAClientException.class, () -> this.client.adminSelf());
 
     assertEquals(PROTOCOL_ERROR, ex.errorCode());
+  }
+
+  /**
+   * Logging in and seeing oneself works.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testLoginLogout()
+    throws Exception
+  {
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    this.client.login("admin", "12345678", this.serverAdminAPIURL());
+
+    final var self = this.client.adminSelf();
+    assertEquals(admin, self.id());
   }
 }

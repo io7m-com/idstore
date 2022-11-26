@@ -118,6 +118,9 @@ public final class IdA1Login extends IdCommonInstrumentedServlet
 
           transaction.commit();
 
+          request.getSession(true)
+            .setAttribute("ID", loggedIn.session().id());
+
           this.sendLoginResponse(
             request,
             response,
