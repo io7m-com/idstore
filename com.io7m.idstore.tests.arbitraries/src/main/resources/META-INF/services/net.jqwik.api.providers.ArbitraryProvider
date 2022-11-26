@@ -16,7 +16,6 @@ com.io7m.idstore.tests.arbitraries.IdArbLoginProvider
 com.io7m.idstore.tests.arbitraries.IdArbOffsetDateTimeProvider
 com.io7m.idstore.tests.arbitraries.IdArbPasswordProvider
 com.io7m.idstore.tests.arbitraries.IdArbRealNameProvider
-com.io7m.idstore.tests.arbitraries.IdArbSubsetMatchProvider
 com.io7m.idstore.tests.arbitraries.IdArbTimeRangeProvider
 com.io7m.idstore.tests.arbitraries.IdArbTokenProvider
 com.io7m.idstore.tests.arbitraries.IdArbUMessageProvider

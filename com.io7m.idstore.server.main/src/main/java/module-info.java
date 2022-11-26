@@ -25,9 +25,35 @@ open module com.io7m.idstore.server.main
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
+  requires com.io7m.idstore.database.api;
+  requires com.io7m.idstore.database.postgres;
+  requires com.io7m.idstore.error_codes;
   requires com.io7m.idstore.model;
+  requires com.io7m.idstore.protocol.admin;
+  requires com.io7m.idstore.protocol.admin.cb;
+  requires com.io7m.idstore.protocol.api;
+  requires com.io7m.idstore.protocol.user;
+  requires com.io7m.idstore.protocol.user.cb;
+  requires com.io7m.idstore.server.admin_v1;
   requires com.io7m.idstore.server.api;
-  requires com.io7m.idstore.server;
+  requires com.io7m.idstore.server.controller;
+  requires com.io7m.idstore.server.http;
+  requires com.io7m.idstore.server.security;
+  requires com.io7m.idstore.server.service.branding;
+  requires com.io7m.idstore.server.service.clock;
+  requires com.io7m.idstore.server.service.configuration;
+  requires com.io7m.idstore.server.service.mail;
+  requires com.io7m.idstore.server.service.ratelimit;
+  requires com.io7m.idstore.server.service.reqlimit;
+  requires com.io7m.idstore.server.service.sessions;
+  requires com.io7m.idstore.server.service.telemetry.api;
+  requires com.io7m.idstore.server.service.telemetry.otp;
+  requires com.io7m.idstore.server.service.templating;
+  requires com.io7m.idstore.server.service.verdant;
+  requires com.io7m.idstore.server.user_v1;
+  requires com.io7m.idstore.server.user_view;
+  requires com.io7m.idstore.server.vanilla;
+  requires com.io7m.idstore.services.api;
 
   requires jul.to.slf4j;
   requires org.slf4j;

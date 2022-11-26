@@ -21,7 +21,12 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.server</artifactId>
+      <artifactId>com.io7m.idstore.server.vanilla</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.server.service.telemetry.otp</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

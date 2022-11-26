@@ -125,6 +125,7 @@ public final class IdServerConfigurations
       file.httpConfiguration().userAPIService(),
       file.httpConfiguration().userViewService(),
       file.httpConfiguration().adminAPIService(),
+      file.sessionConfiguration(),
       file.brandingConfiguration(),
       file.historyConfiguration(),
       file.rateLimit(),

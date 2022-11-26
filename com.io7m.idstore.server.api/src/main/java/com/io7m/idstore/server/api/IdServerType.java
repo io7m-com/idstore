@@ -20,11 +20,9 @@ import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
-import com.io7m.idstore.server.api.events.IdServerEventType;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.Flow;
 
 /**
  * A server instance.
@@ -46,12 +44,6 @@ public interface IdServerType extends AutoCloseable
    */
 
   IdDatabaseType database();
-
-  /**
-   * @return An observable stream of server events
-   */
-
-  Flow.Publisher<IdServerEventType> events();
 
   @Override
   void close()

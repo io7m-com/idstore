@@ -2,86 +2,15 @@
 
 <configuration xmlns="http://ch.qos.logback/xml/ns/logback"
                debug="false">
-
-  <variable name="IDSTORE_LOG_DIRECTORY"
-            value="${idstore.requestLogDirectory:-.}"/>
-
   <appender name="STDERR"
             class="ch.qos.logback.core.ConsoleAppender">
-    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-      <layout class="com.io7m.idstore.server.logging.IdLoggingPatternLayout"/>
+    <encoder>
+      <pattern>idstore: %logger{128}: %level: %msg%n</pattern>
     </encoder>
     <target>System.err</target>
   </appender>
 
-  <appender name="USER_API_REQUEST_LOG"
-            class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-      <layout class="com.io7m.idstore.server.logging.IdLoggingHTTPRequestLayout"/>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${IDSTORE_LOG_DIRECTORY}/user_api_%d.log</fileNamePattern>
-    </rollingPolicy>
-  </appender>
-
-  <appender name="USER_VIEW_REQUEST_LOG"
-            class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-      <layout class="com.io7m.idstore.server.logging.IdLoggingHTTPRequestLayout"/>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${IDSTORE_LOG_DIRECTORY}/user_view_%d.log</fileNamePattern>
-    </rollingPolicy>
-  </appender>
-
-  <logger name="com.io7m.idstore.server.requestLog.user_api"
-          level="TRACE"
-          additivity="false">
-    <appender-ref ref="USER_API_REQUEST_LOG"/>
-  </logger>
-
-  <logger name="com.io7m.idstore.server.requestLog.user_view"
-          level="TRACE"
-          additivity="false">
-    <appender-ref ref="USER_VIEW_REQUEST_LOG"/>
-  </logger>
-
-  <appender name="ADMIN_API_REQUEST_LOG"
-            class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-      <layout class="com.io7m.idstore.server.logging.IdLoggingHTTPRequestLayout"/>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${IDSTORE_LOG_DIRECTORY}/admin_api_%d.log</fileNamePattern>
-    </rollingPolicy>
-  </appender>
-
-  <logger name="com.io7m.idstore.server.requestLog.admin_api"
-          level="TRACE"
-          additivity="false">
-    <appender-ref ref="ADMIN_API_REQUEST_LOG"/>
-  </logger>
-
-  <logger name="org.eclipse.jetty.server.Server"
-          level="ERROR"/>
-  <logger name="org.eclipse.jetty.server.handler.ContextHandler"
-          level="ERROR"/>
-  <logger name="org.eclipse.jetty.util.ssl.SslContextFactory"
-          level="ERROR"/>
-  <logger name="org.eclipse.jetty.server.AbstractConnector"
-          level="ERROR"/>
-  <logger name="org.eclipse.jetty" level="INFO"/>
-
-  <logger name="com.github.dockerjava"
-          level="ERROR"/>
-  <logger name="org.testcontainers"
-          level="ERROR"/>
-  <logger name="com.zaxxer.hikari"
-          level="INFO"/>
-  <logger name="com.io7m.blackthorne"
-          level="INFO"/>
-
-  <root level="TRACE">
+  <root level="ERROR">
     <appender-ref ref="STDERR"/>
   </root>
 

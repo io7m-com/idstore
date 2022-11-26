@@ -105,11 +105,16 @@ public final class IdServiceDirectory implements IdServiceDirectoryType
     Objects.requireNonNull(clazz, "clazz");
 
     return this.optionalService(clazz)
-      .orElseThrow(() -> new IdServiceException(
-        String.format(
-          "No implementations available of type %s",
-          clazz.getCanonicalName())
-      ));
+      .orElseThrow(() -> {
+        final var exception =
+          new IdServiceException(
+            String.format(
+              "No implementations available of type %s",
+              clazz.getCanonicalName())
+          );
+        LOG.error("requested missing service: ", exception);
+        return exception;
+      });
   }
 
   @Override
