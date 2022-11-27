@@ -16,10 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.time.Duration;
 import java.util.Objects;
 
@@ -32,12 +28,8 @@ import java.util.Objects;
  *                                   resets
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerRateLimitConfiguration(
-  @JsonProperty(value = "EmailVerificationRateLimit", required = true)
   Duration emailVerificationRateLimit,
-  @JsonProperty(value = "PasswordResetRateLimit", required = true)
   Duration passwordResetRateLimit)
   implements IdServerJSONConfigurationElementType
 {

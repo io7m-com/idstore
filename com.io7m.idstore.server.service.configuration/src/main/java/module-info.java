@@ -25,5 +25,11 @@ module com.io7m.idstore.server.service.configuration
 
   requires transitive com.io7m.idstore.server.api;
 
+  requires jakarta.xml.bind;
+  requires com.io7m.cxbutton.core;
+
+  opens com.io7m.idstore.server.service.configuration.jaxb
+    to jakarta.xml.bind;
+
   exports com.io7m.idstore.server.service.configuration;
 }

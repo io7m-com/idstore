@@ -19,6 +19,7 @@ package com.io7m.idstore.tests.server.api;
 
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import com.io7m.idstore.server.api.IdServerConfigurations;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.tests.IdTestDirectories;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,14 +59,18 @@ public final class IdServerConfigurationsTest
       IdTestDirectories.resourceOf(
         IdServerConfigurationsTest.class,
         this.directory,
-        "server-config-0.json"
+        "server-config-0.xml"
       );
+
+    final var configFile =
+      new IdServerConfigurationFiles()
+        .parse(file);
 
     final var configuration =
       IdServerConfigurations.ofFile(
         Locale.getDefault(),
         Clock.systemUTC(),
-        file
+        configFile
       );
   }
 
@@ -77,16 +82,13 @@ public final class IdServerConfigurationsTest
       IdTestDirectories.resourceOf(
         IdServerConfigurationsTest.class,
         this.directory,
-        "server-config-1.json"
+        "server-config-1.xml"
       );
 
     final var ex =
-      assertThrows(ValueInstantiationException.class, () -> {
-        IdServerConfigurations.ofFile(
-          Locale.getDefault(),
-          Clock.systemUTC(),
-          file
-        );
+      assertThrows(IllegalArgumentException.class, () -> {
+        new IdServerConfigurationFiles()
+          .parse(file);
       });
 
     assertTrue(ex.getMessage().contains("51000"));

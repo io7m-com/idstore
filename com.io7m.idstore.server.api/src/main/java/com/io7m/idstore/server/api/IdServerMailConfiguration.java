@@ -16,10 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.io7m.idstore.model.IdEmail;
 
 import java.time.Duration;
@@ -35,17 +31,10 @@ import java.util.Optional;
  * @param verificationExpiration      The maximum age of email verifications
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerMailConfiguration(
-  @JsonProperty(value = "Transport", required = true)
   IdServerMailTransportConfigurationType transportConfiguration,
-  @JsonProperty(value = "Authentication")
-  @JsonInclude(JsonInclude.Include.NON_ABSENT)
   Optional<IdServerMailAuthenticationConfiguration> authenticationConfiguration,
-  @JsonProperty(value = "Sender", required = true)
   String senderAddress,
-  @JsonProperty(value = "VerificationExpiration", required = true)
   Duration verificationExpiration)
   implements IdServerJSONConfigurationElementType
 {

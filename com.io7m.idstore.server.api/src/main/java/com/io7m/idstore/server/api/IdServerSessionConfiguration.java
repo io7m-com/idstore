@@ -16,10 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.time.Duration;
 import java.util.Objects;
 
@@ -31,12 +27,8 @@ import java.util.Objects;
  *                               sessions
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerSessionConfiguration(
-  @JsonProperty(value = "UserSessionExpiration", required = true)
   Duration userSessionExpiration,
-  @JsonProperty(value = "AdminSessionExpiration", required = true)
   Duration adminSessionExpiration)
 {
   /**

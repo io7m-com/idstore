@@ -16,11 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,19 +29,10 @@ import java.util.Optional;
  * @param scheme       The color scheme
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerBrandingConfiguration(
-  @JsonProperty(value = "ProductTitle", required = true)
   String productTitle,
-  @JsonProperty(value = "Logo", required = false)
-  @JsonInclude(value = JsonInclude.Include.NON_ABSENT)
   Optional<Path> logo,
-  @JsonProperty(value = "LoginExtraXHTML", required = false)
-  @JsonInclude(value = JsonInclude.Include.NON_ABSENT)
   Optional<Path> loginExtra,
-  @JsonProperty(value = "ColorScheme", required = false)
-  @JsonInclude(value = JsonInclude.Include.NON_ABSENT)
   Optional<IdServerColorScheme> scheme)
 {
   /**

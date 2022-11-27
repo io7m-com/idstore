@@ -16,17 +16,10 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
-
 /**
  * The type of JSON configuration elements.
  */
 
-@JsonPropertyOrder({"%Schema"})
 public sealed interface IdServerJSONConfigurationElementType
   permits IdServerConfigurationFile,
   IdServerDatabaseConfiguration,
@@ -38,14 +31,5 @@ public sealed interface IdServerJSONConfigurationElementType
   IdServerMailTransportConfigurationType,
   IdServerRateLimitConfiguration
 {
-  /**
-   * @return The schema identifier
-   */
 
-  @JsonProperty(value = "%Schema", required = false, access = READ_ONLY)
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  default String schemaId()
-  {
-    return IdServerConfigurationFiles.SCHEMA_ID;
-  }
 }

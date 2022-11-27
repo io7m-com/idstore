@@ -17,11 +17,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.Objects;
 
 /**
@@ -42,13 +37,8 @@ import java.util.Objects;
  * @param port The port
  */
 
-@JsonDeserialize
-@JsonSerialize
-@JsonTypeName("SMTP")
 public record IdServerMailTransportSMTP(
-  @JsonProperty(value = "Host", required = true)
   String host,
-  @JsonProperty(value = "Port", required = true)
   int port)
   implements IdServerMailTransportConfigurationType
 {

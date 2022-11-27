@@ -39,6 +39,7 @@ import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetServic
 import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetServiceType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
@@ -123,14 +124,18 @@ public final class IdUserPasswordResetServiceTest
       IdTestDirectories.resourceOf(
         IdServerConfigurationsTest.class,
         this.directory,
-        "server-config-0.json"
+        "server-config-0.xml"
       );
+
+    final var configFile =
+      new IdServerConfigurationFiles()
+        .parse(file);
 
     this.configuration =
       IdServerConfigurations.ofFile(
         Locale.getDefault(),
         Clock.systemUTC(),
-        file
+        configFile
       );
 
     this.telemetry =

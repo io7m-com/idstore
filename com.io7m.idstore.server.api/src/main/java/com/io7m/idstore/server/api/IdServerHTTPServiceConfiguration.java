@@ -16,10 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.net.URI;
 import java.util.Objects;
 
@@ -31,14 +27,9 @@ import java.util.Objects;
  * @param externalAddress   The externally visible address
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerHTTPServiceConfiguration(
-  @JsonProperty(value = "ListenAddress", required = true)
   String listenAddress,
-  @JsonProperty(value = "ListenPort", required = true)
   int listenPort,
-  @JsonProperty(value = "ExternalAddress", required = true)
   URI externalAddress)
   implements IdServerJSONConfigurationElementType
 {

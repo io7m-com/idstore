@@ -16,11 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 /**
  * Configuration information related to keeping history.
  *
@@ -28,12 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @param adminLoginHistoryLimit The limit on the number of admin login records
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerHistoryConfiguration(
-  @JsonProperty(value = "UserLoginHistoryLimit", required = true)
   int userLoginHistoryLimit,
-  @JsonProperty(value = "AdminLoginHistoryLimit", required = true)
   int adminLoginHistoryLimit)
   implements IdServerJSONConfigurationElementType
 {
@@ -53,11 +44,8 @@ public record IdServerHistoryConfiguration(
    *                               records
    */
 
-  @JsonCreator
   public IdServerHistoryConfiguration(
-    @JsonProperty(value = "UserLoginHistoryLimit", required = true)
     final int userLoginHistoryLimit,
-    @JsonProperty(value = "AdminLoginHistoryLimit", required = true)
     final int adminLoginHistoryLimit)
   {
     this.userLoginHistoryLimit =

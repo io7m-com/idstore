@@ -16,12 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -38,25 +32,14 @@ import java.util.Optional;
  * @param sessionConfiguration  The session configuration
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerConfigurationFile(
-  @JsonProperty(value = "Branding", required = true)
   IdServerBrandingConfiguration brandingConfiguration,
-  @JsonProperty(value = "Mail", required = true)
   IdServerMailConfiguration mailConfiguration,
-  @JsonProperty(value = "HTTP", required = true)
   IdServerHTTPConfiguration httpConfiguration,
-  @JsonProperty(value = "Database", required = true)
   IdServerDatabaseConfiguration databaseConfiguration,
-  @JsonProperty(value = "History", required = true)
   IdServerHistoryConfiguration historyConfiguration,
-  @JsonProperty(value = "Sessions", required = true)
   IdServerSessionConfiguration sessionConfiguration,
-  @JsonProperty(value = "RateLimiting", required = true)
   IdServerRateLimitConfiguration rateLimit,
-  @JsonInclude(JsonInclude.Include.NON_ABSENT)
-  @JsonProperty(value = "OpenTelemetry")
   Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
   implements IdServerJSONConfigurationElementType
 {
@@ -73,7 +56,6 @@ public record IdServerConfigurationFile(
    * @param sessionConfiguration  The session configuration
    */
 
-  @JsonCreator
   public IdServerConfigurationFile
   {
     Objects.requireNonNull(brandingConfiguration, "brandingConfiguration");

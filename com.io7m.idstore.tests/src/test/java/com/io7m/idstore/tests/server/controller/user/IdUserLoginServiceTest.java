@@ -34,6 +34,7 @@ import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUserLoginService;
 import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.idstore.tests.IdFakeClock;
@@ -122,14 +123,18 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
       IdTestDirectories.resourceOf(
         IdServerConfigurationsTest.class,
         this.directory,
-        "server-config-0.json"
+        "server-config-0.xml"
       );
+
+    final var configFile =
+      new IdServerConfigurationFiles()
+        .parse(file);
 
     final var configuration =
       IdServerConfigurations.ofFile(
         Locale.getDefault(),
         Clock.systemUTC(),
-        file
+        configFile
       );
 
     this.clock =

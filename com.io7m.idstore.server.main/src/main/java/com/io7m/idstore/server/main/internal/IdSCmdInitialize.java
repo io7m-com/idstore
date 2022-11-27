@@ -25,6 +25,7 @@ import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.api.IdServerFactoryType;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.nio.file.Path;
@@ -107,11 +108,15 @@ public final class IdSCmdInitialize extends CLPAbstractCommand
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
 
+    final var configFile =
+      new IdServerConfigurationFiles()
+        .parse(this.configurationFile);
+
     final var configuration =
       IdServerConfigurations.ofFile(
         Locale.getDefault(),
         Clock.systemUTC(),
-        this.configurationFile
+        configFile
       );
 
     final var servers =

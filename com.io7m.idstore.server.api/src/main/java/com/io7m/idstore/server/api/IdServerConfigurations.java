@@ -20,8 +20,6 @@ package com.io7m.idstore.server.api;
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseFactoryType;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -52,35 +50,6 @@ public final class IdServerConfigurations
    * @param locale The locale
    * @param clock  The clock
    * @param file   The file
-   *
-   * @return A server configuration
-   *
-   * @throws IOException On errors
-   */
-
-  public static IdServerConfiguration ofFile(
-    final Locale locale,
-    final Clock clock,
-    final Path file)
-    throws IOException
-  {
-    Objects.requireNonNull(locale, "locale");
-    Objects.requireNonNull(clock, "clock");
-    Objects.requireNonNull(file, "file");
-
-    return ofFile(
-      locale,
-      clock,
-      new IdServerConfigurationFiles().parse(file)
-    );
-  }
-
-  /**
-   * Read a server configuration from the given file.
-   *
-   * @param locale        The locale
-   * @param clock         The clock
-   * @param file          The file
    *
    * @return A server configuration
    */

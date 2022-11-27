@@ -30,6 +30,7 @@ import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
@@ -118,14 +119,18 @@ public abstract class IdUCmdAbstractContract
       IdTestDirectories.resourceOf(
         IdServerConfigurationsTest.class,
         this.directory,
-        "server-config-0.json"
+        "server-config-0.xml"
       );
+
+    final var configFile =
+      new IdServerConfigurationFiles()
+        .parse(file);
 
     final var configuration =
       IdServerConfigurations.ofFile(
         Locale.getDefault(),
         Clock.systemUTC(),
-        file
+        configFile
       );
 
     this.services =

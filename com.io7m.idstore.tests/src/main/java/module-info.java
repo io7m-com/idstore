@@ -52,10 +52,7 @@ open module com.io7m.idstore.tests
   requires com.io7m.idstore.user_client;
   requires com.io7m.idstore.user_client.api;
 
-  requires com.fasterxml.jackson.core;
-  requires com.fasterxml.jackson.databind;
   requires com.io7m.cxbutton.core;
-  requires com.io7m.dixmont.colors;
   requires com.io7m.jmulticlose.core;
   requires com.io7m.verdant.core.cb;
   requires com.io7m.verdant.core;

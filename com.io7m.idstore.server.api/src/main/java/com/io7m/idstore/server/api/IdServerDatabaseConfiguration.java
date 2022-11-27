@@ -16,10 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.Objects;
 
 /**
@@ -35,24 +31,14 @@ import java.util.Objects;
  * @param upgrade      {@code true} if the database schema should be upgraded
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerDatabaseConfiguration(
-  @JsonProperty(value = "Kind", required = true)
   IdServerDatabaseKind kind,
-  @JsonProperty(value = "User", required = true)
   String user,
-  @JsonProperty(value = "Password", required = true)
   String password,
-  @JsonProperty(value = "Host", required = true)
   String address,
-  @JsonProperty(value = "Port", required = true)
   int port,
-  @JsonProperty(value = "Name", required = true)
   String databaseName,
-  @JsonProperty(value = "Create", required = true)
   boolean create,
-  @JsonProperty(value = "Upgrade", required = true)
   boolean upgrade)
   implements IdServerJSONConfigurationElementType
 {
