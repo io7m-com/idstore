@@ -88,7 +88,7 @@ public final class IdServer implements IdServerType
 {
   private final IdServerConfiguration configuration;
   private CloseableCollectionType<IdServerException> resources;
-  private final AtomicBoolean closed;
+  private final AtomicBoolean stopped;
   private IdServerTelemetryServiceType telemetry;
   private IdDatabaseType database;
 
@@ -105,65 +105,71 @@ public final class IdServer implements IdServerType
       Objects.requireNonNull(inConfiguration, "configuration");
     this.resources =
       createResourceCollection();
-    this.closed =
-      new AtomicBoolean(false);
+    this.stopped =
+      new AtomicBoolean(true);
   }
 
   @Override
   public void start()
     throws IdServerException
   {
-    this.closed.set(false);
-    this.resources = createResourceCollection();
-    this.telemetry = this.createTelemetry();
-
-    final var startupSpan =
-      this.telemetry.tracer()
-        .spanBuilder("IdServer.start")
-        .setSpanKind(SpanKind.INTERNAL)
-        .startSpan();
-
     try {
-      this.database =
-        this.resources.add(this.createDatabase(this.telemetry.openTelemetry()));
-      final var services =
-        this.resources.add(this.createServiceDirectory(this.database));
+      if (this.stopped.compareAndSet(true, false)) {
+        this.resources = createResourceCollection();
+        this.telemetry = this.createTelemetry();
 
-      final Server userView = IdUVServer.createUserViewServer(services);
-      this.resources.add(userView::stop);
+        final var startupSpan =
+          this.telemetry.tracer()
+            .spanBuilder("IdServer.start")
+            .setSpanKind(SpanKind.INTERNAL)
+            .startSpan();
 
-      final Server userAPI = IdU1Server.createUserAPIServer(services);
-      this.resources.add(userAPI::stop);
+        try {
+          this.database =
+            this.resources.add(this.createDatabase(this.telemetry.openTelemetry()));
+          final var services =
+            this.resources.add(this.createServiceDirectory(this.database));
 
-      final Server adminAPI = IdA1Server.createAdminAPIServer(services);
-      this.resources.add(adminAPI::stop);
-    } catch (final IdDatabaseException e) {
-      startupSpan.recordException(e);
+          final Server userView = IdUVServer.createUserViewServer(services);
+          this.resources.add(userView::stop);
 
-      try {
-        this.close();
-      } catch (final IdServerException ex) {
-        e.addSuppressed(ex);
+          final Server userAPI = IdU1Server.createUserAPIServer(services);
+          this.resources.add(userAPI::stop);
+
+          final Server adminAPI = IdA1Server.createAdminAPIServer(services);
+          this.resources.add(adminAPI::stop);
+        } catch (final IdDatabaseException e) {
+          startupSpan.recordException(e);
+
+          try {
+            this.close();
+          } catch (final IdServerException ex) {
+            e.addSuppressed(ex);
+          }
+          throw new IdServerException(
+            new IdErrorCode("database"),
+            e.getMessage(),
+            e);
+        } catch (final Exception e) {
+          startupSpan.recordException(e);
+
+          try {
+            this.close();
+          } catch (final IdServerException ex) {
+            e.addSuppressed(ex);
+          }
+          throw new IdServerException(
+            new IdErrorCode("startup"),
+            e.getMessage(),
+            e
+          );
+        } finally {
+          startupSpan.end();
+        }
       }
-      throw new IdServerException(
-        new IdErrorCode("database"),
-        e.getMessage(),
-        e);
-    } catch (final Exception e) {
-      startupSpan.recordException(e);
-
-      try {
-        this.close();
-      } catch (final IdServerException ex) {
-        e.addSuppressed(ex);
-      }
-      throw new IdServerException(
-        new IdErrorCode("startup"),
-        e.getMessage(),
-        e
-      );
-    } finally {
-      startupSpan.end();
+    } catch (final Throwable e) {
+      this.close();
+      throw e;
     }
   }
 
@@ -318,7 +324,7 @@ public final class IdServer implements IdServerType
   @Override
   public IdDatabaseType database()
   {
-    if (this.closed.get()) {
+    if (this.stopped.get()) {
       throw new IllegalStateException("Server is not started.");
     }
 
@@ -329,7 +335,7 @@ public final class IdServer implements IdServerType
   public void close()
     throws IdServerException
   {
-    if (this.closed.compareAndSet(false, true)) {
+    if (this.stopped.compareAndSet(false, true)) {
       this.resources.close();
     }
   }
@@ -349,58 +355,62 @@ public final class IdServer implements IdServerType
     Objects.requireNonNull(adminRealName, "adminRealName");
     Objects.requireNonNull(adminPassword, "adminPassword");
 
-    try {
-      this.resources.close();
-      this.closed.set(false);
-      this.resources = createResourceCollection();
-      this.telemetry = this.createTelemetry();
+    if (this.stopped.compareAndSet(true, false)) {
+      try {
+        this.resources = createResourceCollection();
+        this.telemetry = this.createTelemetry();
 
-      final var baseConfiguration =
-        this.configuration.databaseConfiguration();
+        final var baseConfiguration =
+          this.configuration.databaseConfiguration();
 
-      final var setupConfiguration =
-        new IdDatabaseConfiguration(
-          baseConfiguration.user(),
-          baseConfiguration.password(),
-          baseConfiguration.address(),
-          baseConfiguration.port(),
-          baseConfiguration.databaseName(),
-          IdDatabaseCreate.CREATE_DATABASE,
-          IdDatabaseUpgrade.UPGRADE_DATABASE,
-          baseConfiguration.clock()
-        );
-
-      final var db =
-        this.resources.add(
-          this.configuration.databases()
-            .open(
-              setupConfiguration,
-              this.telemetry.openTelemetry(),
-              event -> {
-              }));
-
-      final var password =
-        IdPasswordAlgorithmPBKDF2HmacSHA256.create()
-          .createHashed(adminPassword);
-
-      try (var connection = db.openConnection(IDSTORE)) {
-        try (var transaction = connection.openTransaction()) {
-          final var admins =
-            transaction.queries(IdDatabaseAdminsQueriesType.class);
-
-          admins.adminCreateInitial(
-            adminId.orElse(UUID.randomUUID()),
-            adminName,
-            adminRealName,
-            adminEmail,
-            OffsetDateTime.now(baseConfiguration.clock()),
-            password
+        final var setupConfiguration =
+          new IdDatabaseConfiguration(
+            baseConfiguration.user(),
+            baseConfiguration.password(),
+            baseConfiguration.address(),
+            baseConfiguration.port(),
+            baseConfiguration.databaseName(),
+            IdDatabaseCreate.CREATE_DATABASE,
+            IdDatabaseUpgrade.UPGRADE_DATABASE,
+            baseConfiguration.clock()
           );
-          transaction.commit();
+
+        final var db =
+          this.resources.add(
+            this.configuration.databases()
+              .open(
+                setupConfiguration,
+                this.telemetry.openTelemetry(),
+                event -> {
+                }));
+
+        final var password =
+          IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+            .createHashed(adminPassword);
+
+        try (var connection = db.openConnection(IDSTORE)) {
+          try (var transaction = connection.openTransaction()) {
+            final var admins =
+              transaction.queries(IdDatabaseAdminsQueriesType.class);
+
+            admins.adminCreateInitial(
+              adminId.orElse(UUID.randomUUID()),
+              adminName,
+              adminRealName,
+              adminEmail,
+              OffsetDateTime.now(baseConfiguration.clock()),
+              password
+            );
+            transaction.commit();
+          }
         }
+      } catch (final IdDatabaseException | IdPasswordException e) {
+        throw new IdServerException(e.errorCode(), e.getMessage(), e);
+      } finally {
+        this.close();
       }
-    } catch (final IdDatabaseException | IdPasswordException e) {
-      throw new IdServerException(e.errorCode(), e.getMessage(), e);
+    } else {
+      throw new IllegalStateException("Server must be closed before setup.");
     }
   }
 

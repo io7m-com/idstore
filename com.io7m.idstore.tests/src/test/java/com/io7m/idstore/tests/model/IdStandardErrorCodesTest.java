@@ -19,7 +19,6 @@ package com.io7m.idstore.tests.model;
 
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdStandardErrorCodes;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

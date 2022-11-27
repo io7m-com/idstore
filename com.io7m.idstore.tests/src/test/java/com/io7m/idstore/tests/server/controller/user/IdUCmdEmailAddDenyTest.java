@@ -18,7 +18,6 @@ package com.io7m.idstore.tests.server.controller.user;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.model.IdEmailVerification;
-import com.io7m.idstore.model.IdEmailVerificationResolution;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddDeny;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddDeny;

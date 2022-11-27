@@ -18,7 +18,6 @@
 package com.io7m.idstore.tests.server.controller.user;
 
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
-import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdUser;
@@ -28,7 +27,6 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.controller.user.IdUCmdPasswordUpdate;
 import com.io7m.junreachable.UnreachableCodeException;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.Optional;
 

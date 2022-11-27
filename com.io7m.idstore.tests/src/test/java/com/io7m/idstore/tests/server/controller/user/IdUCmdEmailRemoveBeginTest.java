@@ -18,10 +18,7 @@ package com.io7m.idstore.tests.server.controller.user;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.model.IdEmail;
-import com.io7m.idstore.model.IdEmailOwner;
 import com.io7m.idstore.model.IdEmailVerification;
-import com.io7m.idstore.model.IdNonEmptyList;
-import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveBegin;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
@@ -30,13 +27,11 @@ import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;

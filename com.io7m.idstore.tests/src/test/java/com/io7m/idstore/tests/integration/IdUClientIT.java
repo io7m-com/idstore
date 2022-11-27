@@ -17,8 +17,6 @@
 
 package com.io7m.idstore.tests.integration;
 
-import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;

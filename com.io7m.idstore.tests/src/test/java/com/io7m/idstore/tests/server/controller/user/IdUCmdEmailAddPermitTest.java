@@ -33,7 +33,6 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATI
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_NONEXISTENT;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_ADD;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_REMOVE;
-import static com.io7m.idstore.model.IdEmailVerificationResolution.DENIED;
 import static com.io7m.idstore.model.IdEmailVerificationResolution.PERMITTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

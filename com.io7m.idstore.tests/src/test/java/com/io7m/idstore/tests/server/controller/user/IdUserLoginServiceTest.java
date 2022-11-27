@@ -57,7 +57,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;

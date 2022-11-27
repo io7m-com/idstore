@@ -17,39 +17,38 @@
 package com.io7m.idstore.tests.database;
 
 import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
+import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdTimeRange;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.tests.database.IdDatabaseExtension.databaseCreateAdminInitial;
 import static java.time.OffsetDateTime.now;
 import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers(disabledWithoutDocker = true)
-public final class IdDatabaseAuditTest extends IdWithDatabaseContract
+@ExtendWith(IdDatabaseExtension.class)
+public final class IdDatabaseAuditTest
 {
   @Test
-  public void testAuditQuery0()
+  public void testAuditQuery0(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var audit =
-      transaction.queries(IdDatabaseAuditQueriesType.class);
-
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
-    
+      databaseCreateAdminInitial(t, "admin", "12345678");
+
+    final var audit =
+      t.queries(IdDatabaseAuditQueriesType.class);
+
     final var then = now();
     audit.auditPut(adminId, then.plusSeconds(1), "ET_0", "E0");
     audit.auditPut(adminId, then.plusSeconds(2), "ET_0", "E1");
@@ -61,7 +60,7 @@ public final class IdDatabaseAuditTest extends IdWithDatabaseContract
     audit.auditPut(adminId, then.plusSeconds(8), "ET_2", "G7");
     audit.auditPut(adminId, then.plusSeconds(9), "ET_2", "G8");
 
-    transaction.commit();
+    t.commit();
 
     final var parameters =
       new IdAuditSearchParameters(
@@ -109,18 +108,15 @@ public final class IdDatabaseAuditTest extends IdWithDatabaseContract
   }
 
   @Test
-  public void testAuditQuery1()
+  public void testAuditQuery1(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var audit =
-      transaction.queries(IdDatabaseAuditQueriesType.class);
-
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
+
+    final var audit =
+      t.queries(IdDatabaseAuditQueriesType.class);
 
     final var then = now();
     audit.auditPut(adminId, then.plusSeconds(1), "ET_0", "E0");
@@ -133,7 +129,7 @@ public final class IdDatabaseAuditTest extends IdWithDatabaseContract
     audit.auditPut(adminId, then.plusSeconds(8), "ET_2", "G7");
     audit.auditPut(adminId, then.plusSeconds(9), "ET_2", "G8");
 
-    transaction.commit();
+    t.commit();
 
     final var parameters =
       new IdAuditSearchParameters(
@@ -184,18 +180,15 @@ public final class IdDatabaseAuditTest extends IdWithDatabaseContract
   }
 
   @Test
-  public void testAuditQuery2()
+  public void testAuditQuery2(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var audit =
-      transaction.queries(IdDatabaseAuditQueriesType.class);
-
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
+
+    final var audit =
+      t.queries(IdDatabaseAuditQueriesType.class);
 
     final var then = now();
     audit.auditPut(adminId, then.plusSeconds(1), "ET_0", "E0");
@@ -208,7 +201,7 @@ public final class IdDatabaseAuditTest extends IdWithDatabaseContract
     audit.auditPut(adminId, then.plusSeconds(8), "ET_2", "G7");
     audit.auditPut(adminId, then.plusSeconds(9), "ET_2", "G8");
 
-    transaction.commit();
+    t.commit();
 
     final var parameters =
       new IdAuditSearchParameters(
@@ -259,18 +252,15 @@ public final class IdDatabaseAuditTest extends IdWithDatabaseContract
   }
 
   @Test
-  public void testAuditSearchPaging()
+  public void testAuditSearchPaging(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var audit =
-      transaction.queries(IdDatabaseAuditQueriesType.class);
-
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
+
+    final var audit =
+      t.queries(IdDatabaseAuditQueriesType.class);
 
     final var then = now();
     for (int index = 0; index < 533; ++index) {
@@ -282,7 +272,7 @@ public final class IdDatabaseAuditTest extends IdWithDatabaseContract
       );
     }
 
-    transaction.commit();
+    t.commit();
 
     final var parameters =
       new IdAuditSearchParameters(
@@ -402,8 +392,12 @@ public final class IdDatabaseAuditTest extends IdWithDatabaseContract
         item.time().withNano(0);
 
       assertEquals(timeCoarse.plusSeconds(index), itemTimeCoarse);
-      assertEquals(String.format("ET_%04d", Integer.valueOf(index)), item.type());
-      assertEquals(String.format("E_%04d", Integer.valueOf(index)), item.message());
+      assertEquals(
+        String.format("ET_%04d", Integer.valueOf(index)),
+        item.type());
+      assertEquals(
+        String.format("E_%04d", Integer.valueOf(index)),
+        item.message());
       ++index;
     }
   }

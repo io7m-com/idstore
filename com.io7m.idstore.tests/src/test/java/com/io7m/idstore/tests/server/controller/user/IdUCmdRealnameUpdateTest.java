@@ -18,26 +18,17 @@
 package com.io7m.idstore.tests.server.controller.user;
 
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
-import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
-import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.controller.user.IdUCmdPasswordUpdate;
 import com.io7m.idstore.server.controller.user.IdUCmdRealNameUpdate;
-import com.io7m.junreachable.UnreachableCodeException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_MISMATCH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
