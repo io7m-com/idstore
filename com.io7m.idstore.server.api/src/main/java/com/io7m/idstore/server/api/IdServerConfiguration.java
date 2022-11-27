@@ -29,18 +29,18 @@ import java.util.Optional;
  * The configuration for a server.
  *
  * @param adminApiAddress       The admin API address
+ * @param branding              The branding configuration
  * @param clock                 The clock
  * @param databaseConfiguration The database configuration for the server
- * @param databases             The factory of databases that will be used for
- *                              the server
- * @param locale                The locale
- * @param userApiAddress        The user API address
- * @param userViewAddress       The user view address
- * @param mailConfiguration     The mail server configuration
- * @param branding              The branding configuration
+ * @param databases             The factory of databases that will be used for the server
  * @param history               The history configuration
+ * @param locale                The locale
+ * @param mailConfiguration     The mail server configuration
  * @param openTelemetry         The OpenTelemetry configuration
  * @param rateLimit             The rate limiting configuration
+ * @param sessions              The session configuration
+ * @param userApiAddress        The user API address
+ * @param userViewAddress       The user view address
  */
 
 public record IdServerConfiguration(
@@ -52,6 +52,7 @@ public record IdServerConfiguration(
   IdServerHTTPServiceConfiguration userApiAddress,
   IdServerHTTPServiceConfiguration userViewAddress,
   IdServerHTTPServiceConfiguration adminApiAddress,
+  IdServerSessionConfiguration sessions,
   IdServerBrandingConfiguration branding,
   IdServerHistoryConfiguration history,
   IdServerRateLimitConfiguration rateLimit,
@@ -61,34 +62,35 @@ public record IdServerConfiguration(
    * The configuration for a server.
    *
    * @param adminApiAddress       The admin API address
+   * @param branding              The branding configuration
    * @param clock                 The clock
    * @param databaseConfiguration The database configuration for the server
-   * @param databases             The factory of databases that will be used for
-   *                              the server
-   * @param locale                The locale
-   * @param userApiAddress        The user API address
-   * @param userViewAddress       The user view address
-   * @param mailConfiguration     The mail server configuration
-   * @param branding              The branding configuration
+   * @param databases             The factory of databases that will be used for the server
    * @param history               The history configuration
+   * @param locale                The locale
+   * @param mailConfiguration     The mail server configuration
    * @param openTelemetry         The OpenTelemetry configuration
    * @param rateLimit             The rate limiting configuration
+   * @param sessions              The session configuration
+   * @param userApiAddress        The user API address
+   * @param userViewAddress       The user view address
    */
 
   public IdServerConfiguration
   {
     Objects.requireNonNull(adminApiAddress, "adminApiAddress");
+    Objects.requireNonNull(branding, "branding");
     Objects.requireNonNull(clock, "clock");
     Objects.requireNonNull(databaseConfiguration, "databaseConfiguration");
     Objects.requireNonNull(databases, "databases");
+    Objects.requireNonNull(history, "history");
     Objects.requireNonNull(locale, "locale");
     Objects.requireNonNull(mailConfiguration, "mailConfiguration");
-    Objects.requireNonNull(userApiAddress, "userApiAddress");
-    Objects.requireNonNull(userViewAddress, "userViewAddress");
-    Objects.requireNonNull(branding, "branding");
-    Objects.requireNonNull(history, "history");
     Objects.requireNonNull(openTelemetry, "openTelemetry");
     Objects.requireNonNull(rateLimit, "rateLimit");
+    Objects.requireNonNull(sessions, "sessions");
+    Objects.requireNonNull(userApiAddress, "userApiAddress");
+    Objects.requireNonNull(userViewAddress, "userViewAddress");
   }
 
   /**

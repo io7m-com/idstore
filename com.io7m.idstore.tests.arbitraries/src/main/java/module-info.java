@@ -32,12 +32,12 @@ import com.io7m.idstore.tests.arbitraries.IdArbLoginProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbOffsetDateTimeProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbPasswordProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbRealNameProvider;
-import com.io7m.idstore.tests.arbitraries.IdArbSubsetMatchProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbTimeRangeProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbTokenProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUMessageProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbURIProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUUIDProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbUserCreateProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUserOrderingProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUserProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbUserSearchByEmailParametersProvider;
@@ -81,12 +81,12 @@ module com.io7m.idstore.tests.arbitraries
       IdArbOffsetDateTimeProvider,
       IdArbPasswordProvider,
       IdArbRealNameProvider,
-      IdArbSubsetMatchProvider,
       IdArbTimeRangeProvider,
       IdArbTokenProvider,
       IdArbUMessageProvider,
       IdArbURIProvider,
       IdArbUUIDProvider,
+      IdArbUserCreateProvider,
       IdArbUserOrderingProvider,
       IdArbUserProvider,
       IdArbUserSearchByEmailParametersProvider,

@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:c="urn:com.io7m.idstore:configuration:1"
+        targetNamespace="urn:com.io7m.idstore:configuration:1">
+
+  <simpleType name="ColorComponent">
+    <annotation>
+      <documentation>
+        The type of a component within a color.
+      </documentation>
+    </annotation>
+    <restriction base="double">
+      <minInclusive value="0.0"/>
+      <maxInclusive value="1.0"/>
+    </restriction>
+  </simpleType>
+
+  <complexType name="ColorType">
+    <annotation>
+      <documentation>
+        An RGB color.
+      </documentation>
+    </annotation>
+
+    <attribute name="Red"
+               type="c:ColorComponent"
+               use="required"/>
+    <attribute name="Green"
+               type="c:ColorComponent"
+               use="required"/>
+    <attribute name="Blue"
+               type="c:ColorComponent"
+               use="required"/>
+  </complexType>
+
+  <element name="ErrorBorderColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the border around error messages on web pages.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="HeaderBackgroundColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the web page header background.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="HeaderLinkColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the web page header links.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="HeaderTextColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the web page header text.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="MainBackgroundColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the web page main background.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="MainLinkColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the web page main links on web pages.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="MainMessageBorderColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the border around non-error messages on web pages.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="MainTableBorderColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for table borders on web pages.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="MainTextColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the main text on web pages.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="TextColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the button text.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="BodyColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the button body.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="BorderColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the button border.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="EmbossEColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the east-facing emboss.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="EmbossSColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the south-facing emboss.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="EmbossWColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the west-facing emboss.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="EmbossNColor"
+           type="c:ColorType">
+    <annotation>
+      <documentation>
+        The color used for the north-facing emboss.
+      </documentation>
+    </annotation>
+  </element>
+
+  <complexType name="ButtonStateColors">
+    <annotation>
+      <documentation>
+        The colors used for a particular button state.
+      </documentation>
+    </annotation>
+    <sequence>
+      <element ref="c:BodyColor"/>
+      <element ref="c:BorderColor"/>
+      <element ref="c:EmbossEColor"/>
+      <element ref="c:EmbossNColor"/>
+      <element ref="c:EmbossSColor"/>
+      <element ref="c:EmbossWColor"/>
+      <element ref="c:TextColor"/>
+    </sequence>
+  </complexType>
+
+  <element name="Enabled"
+           type="c:ButtonStateColors">
+    <annotation>
+      <documentation>
+        The colors used when the button is in the unpressed, enabled state.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="Disabled"
+           type="c:ButtonStateColors">
+    <annotation>
+      <documentation>
+        The colors used when the button is in the disabled state.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="Pressed"
+           type="c:ButtonStateColors">
+    <annotation>
+      <documentation>
+        The colors used when the button is in the pressed state.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="Hover"
+           type="c:ButtonStateColors">
+    <annotation>
+      <documentation>
+        The colors used when the button is in the hover state.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="ButtonColors">
+    <annotation>
+      <documentation>
+        The colors used for all button states.
+      </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="c:Disabled"/>
+        <element ref="c:Enabled"/>
+        <element ref="c:Hover"/>
+        <element ref="c:Pressed"/>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="ColorScheme">
+    <complexType>
+      <sequence>
+        <element ref="c:ButtonColors"/>
+        <element ref="c:ErrorBorderColor"/>
+        <element ref="c:HeaderBackgroundColor"/>
+        <element ref="c:HeaderLinkColor"/>
+        <element ref="c:HeaderTextColor"/>
+        <element ref="c:MainBackgroundColor"/>
+        <element ref="c:MainLinkColor"/>
+        <element ref="c:MainMessageBorderColor"/>
+        <element ref="c:MainTableBorderColor"/>
+        <element ref="c:MainTextColor"/>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="Branding">
+    <complexType>
+      <sequence>
+        <element ref="c:ColorScheme"
+                 minOccurs="0"
+                 maxOccurs="1"/>
+      </sequence>
+
+      <attribute name="ProductTitle"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The product title that will be used in web pages and emails.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Logo"
+                 use="optional"
+                 type="anyURI">
+        <annotation>
+          <documentation>
+            A file that contains a logo image used in web pages.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="LoginExtra"
+                 use="optional"
+                 type="anyURI">
+        <annotation>
+          <documentation>
+            A file that contains XHTML text that will be inserted into login web pages.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <complexType name="MailTransportType">
+    <annotation>
+      <documentation>
+        The base type of mail transport configurations.
+      </documentation>
+    </annotation>
+  </complexType>
+
+  <complexType name="SMTPType">
+    <annotation>
+      <documentation>
+        Settings for communicating over SMTP without encryption.
+      </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="c:MailTransportType">
+        <attribute name="Host"
+                   type="anyURI"
+                   use="required"/>
+        <attribute name="Port"
+                   type="unsignedInt"
+                   use="required"/>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="SMTPTLSType">
+    <annotation>
+      <documentation>
+        Settings for communicating over SMTP_TLS.
+      </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="c:MailTransportType">
+        <attribute name="Host"
+                   type="anyURI"
+                   use="required"/>
+        <attribute name="Port"
+                   type="unsignedInt"
+                   use="required"/>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="SMTPSType">
+    <annotation>
+      <documentation>
+        Settings for communicating over SMTPS.
+      </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="c:MailTransportType">
+        <attribute name="Host"
+                   type="anyURI"
+                   use="required"/>
+        <attribute name="Port"
+                   type="unsignedInt"
+                   use="required"/>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="SMTP"
+           type="c:SMTPType"/>
+  <element name="SMTPTLS"
+           type="c:SMTPTLSType"/>
+  <element name="SMTPS"
+           type="c:SMTPSType"/>
+
+  <element name="MailAuthentication">
+    <annotation>
+      <documentation>
+        The mail server authentication configuration.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <attribute name="Username"
+                 type="string"
+                 use="required">
+        <annotation>
+          <documentation>
+            The username that will be used to authenticate to the mail server.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Password"
+                 type="string"
+                 use="required">
+        <annotation>
+          <documentation>
+            The password that will be used to authenticate to the mail server.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="Mail">
+    <annotation>
+      <documentation>
+        The mail server configuration.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <sequence>
+        <choice minOccurs="1"
+                maxOccurs="1">
+          <element ref="c:SMTP"/>
+          <element ref="c:SMTPS"/>
+          <element ref="c:SMTPTLS"/>
+        </choice>
+        <element ref="c:MailAuthentication"
+                 minOccurs="0"
+                 maxOccurs="1"/>
+      </sequence>
+
+      <attribute name="SenderAddress"
+                 type="string"
+                 use="required"/>
+      <attribute name="VerificationExpiration"
+                 type="duration"
+                 use="required"/>
+    </complexType>
+  </element>
+
+  <element name="History">
+    <annotation>
+      <documentation>
+        Retention settings for logins.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <attribute name="UserLoginHistoryLimit"
+                 type="unsignedInt"
+                 use="required">
+        <annotation>
+          <documentation>
+            The number of login records to store for users.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AdminLoginHistoryLimit"
+                 type="unsignedInt"
+                 use="required">
+        <annotation>
+          <documentation>
+            The number of login records to store for admins.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <complexType name="HTTPServiceType">
+    <attribute name="ListenAddress"
+               use="required"
+               type="string">
+      <annotation>
+        <documentation>
+          The address upon which this HTTP service will listen.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="ListenPort"
+               use="required"
+               type="unsignedInt">
+      <annotation>
+        <documentation>
+          The port upon which this HTTP service will listen.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="ExternalURI"
+               use="required"
+               type="anyURI">
+      <annotation>
+        <documentation>
+          The external URI by which this HTTP service will be accessible. This is used in emails and web pages and is
+          primarily useful when the HTTP service will be used behind a reverse proxy.
+        </documentation>
+      </annotation>
+    </attribute>
+  </complexType>
+
+  <element name="HTTPServiceAdminAPI"
+           type="c:HTTPServiceType">
+    <annotation>
+      <documentation>
+        Configuration for the Admin API service.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="HTTPServiceUserAPI"
+           type="c:HTTPServiceType">
+    <annotation>
+      <documentation>
+        Configuration for the User API service.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="HTTPServiceUserView"
+           type="c:HTTPServiceType">
+    <annotation>
+      <documentation>
+        Configuration for the User view service.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="HTTPServices">
+    <annotation>
+      <documentation>
+        Configuration for HTTP services.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <sequence>
+        <element ref="c:HTTPServiceAdminAPI"/>
+        <element ref="c:HTTPServiceUserAPI"/>
+        <element ref="c:HTTPServiceUserView"/>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="Sessions">
+    <complexType>
+      <attribute name="UserSessionExpiration"
+                 type="duration"
+                 use="required">
+        <annotation>
+          <documentation>
+            The maximum age of idle user sessions before they are considered expired and deleted.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AdminSessionExpiration"
+                 type="duration"
+                 use="required">
+        <annotation>
+          <documentation>
+            The maximum age of idle admin sessions before they are considered expired and deleted.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="Database">
+    <annotation>
+      <documentation>
+        Configuration for the database service.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <attribute name="Kind"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The kind of the remote database, such as POSTGRESQL.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Name"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The name of the database.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="User"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The username that will be used to connect to the database.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Password"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The password that will be used to connect to the database.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Address"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The address of the database.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Port"
+                 use="required"
+                 type="unsignedInt">
+        <annotation>
+          <documentation>
+            The port used to connect to the database.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Create"
+                 use="required"
+                 type="boolean">
+        <annotation>
+          <documentation>
+            Should the database be created if it does not already exist?
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Upgrade"
+                 use="required"
+                 type="boolean">
+        <annotation>
+          <documentation>
+            Should the database schema be upgraded if the schema version is older than the current application?
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="RateLimiting">
+    <annotation>
+      <documentation>
+        Configuration information for request rate limiting.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <attribute name="EmailVerificationRateLimit"
+                 type="duration"
+                 use="required">
+        <annotation>
+          <documentation>
+            Email verifications for various operations cannot be prompted more frequently than this duration.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PasswordResetRateLimit"
+                 type="duration"
+                 use="required">
+        <annotation>
+          <documentation>
+            Passwords cannot be reset more frequently than this duration.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="OpenTelemetry">
+    <annotation>
+      <documentation>
+        Configuration information for OpenTelemetry.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <attribute name="LogicalServiceName"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The logical name of the service as it will appear in OpenTelemetry.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OTELCollectorAddress"
+                 use="required"
+                 type="anyURI">
+        <annotation>
+          <documentation>
+            The URI of the OTEL collector that will receive telemetry.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="Configuration">
+    <annotation>
+      <documentation>
+        The main server configuration element.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <sequence>
+        <element ref="c:Branding"/>
+        <element ref="c:Database"/>
+        <element ref="c:HTTPServices"/>
+        <element ref="c:History"/>
+        <element ref="c:Mail"/>
+        <element ref="c:OpenTelemetry"
+                 minOccurs="0"
+                 maxOccurs="1"/>
+        <element ref="c:RateLimiting"/>
+        <element ref="c:Sessions"/>
+      </sequence>
+    </complexType>
+  </element>
+
+</schema>

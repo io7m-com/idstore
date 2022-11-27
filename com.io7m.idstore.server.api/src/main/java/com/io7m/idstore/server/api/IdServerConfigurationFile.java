@@ -16,12 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,31 +23,23 @@ import java.util.Optional;
  * The server configuration file.
  *
  * @param brandingConfiguration The branding configuration
- * @param mailConfiguration     The mail configuration
- * @param httpConfiguration     The HTTP configuration
  * @param databaseConfiguration The database configuration
  * @param historyConfiguration  The history configuration
+ * @param httpConfiguration     The HTTP configuration
+ * @param mailConfiguration     The mail configuration
  * @param openTelemetry         The OpenTelemetry configuration
  * @param rateLimit             The rate limiting configuration
+ * @param sessionConfiguration  The session configuration
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerConfigurationFile(
-  @JsonProperty(value = "Branding", required = true)
   IdServerBrandingConfiguration brandingConfiguration,
-  @JsonProperty(value = "Mail", required = true)
   IdServerMailConfiguration mailConfiguration,
-  @JsonProperty(value = "HTTP", required = true)
   IdServerHTTPConfiguration httpConfiguration,
-  @JsonProperty(value = "Database", required = true)
   IdServerDatabaseConfiguration databaseConfiguration,
-  @JsonProperty(value = "History", required = true)
   IdServerHistoryConfiguration historyConfiguration,
-  @JsonProperty(value = "RateLimiting", required = true)
+  IdServerSessionConfiguration sessionConfiguration,
   IdServerRateLimitConfiguration rateLimit,
-  @JsonInclude(JsonInclude.Include.NON_ABSENT)
-  @JsonProperty(value = "OpenTelemetry")
   Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
   implements IdServerJSONConfigurationElementType
 {
@@ -61,21 +47,22 @@ public record IdServerConfigurationFile(
    * The server configuration file.
    *
    * @param brandingConfiguration The branding configuration
-   * @param mailConfiguration     The mail configuration
-   * @param httpConfiguration     The HTTP configuration
    * @param databaseConfiguration The database configuration
    * @param historyConfiguration  The history configuration
+   * @param httpConfiguration     The HTTP configuration
+   * @param mailConfiguration     The mail configuration
    * @param openTelemetry         The OpenTelemetry configuration
    * @param rateLimit             The rate limiting configuration
+   * @param sessionConfiguration  The session configuration
    */
 
-  @JsonCreator
   public IdServerConfigurationFile
   {
     Objects.requireNonNull(brandingConfiguration, "brandingConfiguration");
     Objects.requireNonNull(mailConfiguration, "mailConfiguration");
     Objects.requireNonNull(httpConfiguration, "httpConfiguration");
     Objects.requireNonNull(databaseConfiguration, "databaseConfiguration");
+    Objects.requireNonNull(sessionConfiguration, "sessionConfiguration");
     Objects.requireNonNull(historyConfiguration, "historyConfiguration");
     Objects.requireNonNull(rateLimit, "rateLimit");
     Objects.requireNonNull(openTelemetry, "openTelemetry");

@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>0.0.4</version>
+    <version>0.0.6</version>
   </parent>
 
   <artifactId>com.io7m.idstore.documentation</artifactId>
@@ -72,11 +72,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.protocol.api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.server</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -261,7 +256,7 @@
             <configuration>
               <excludes>module-info.java</excludes>
               <includeGroupIds>${project.groupId}</includeGroupIds>
-              <includes>**/*.schema.json</includes>
+              <includes>**/*.xsd</includes>
               <classifier>sources</classifier>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
               <outputDirectory>${project.build.directory}/documentation</outputDirectory>
@@ -277,7 +272,7 @@
             <configuration>
               <excludes>module-info.java</excludes>
               <includeGroupIds>${project.groupId}</includeGroupIds>
-              <includes>**/*.schema.json</includes>
+              <includes>**/*.xsd</includes>
               <classifier>sources</classifier>
               <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
               <outputDirectory>${project.build.directory}/epub</outputDirectory>

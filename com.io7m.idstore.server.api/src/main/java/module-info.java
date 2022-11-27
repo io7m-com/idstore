@@ -25,12 +25,7 @@ module com.io7m.idstore.server.api
 
   requires transitive com.io7m.idstore.database.api;
 
-  requires com.io7m.dixmont.colors;
   requires com.io7m.cxbutton.core;
-
-  requires com.fasterxml.jackson.databind;
-  requires com.fasterxml.jackson.datatype.jsr310;
-  requires com.fasterxml.jackson.datatype.jdk8;
 
   uses com.io7m.idstore.database.api.IdDatabaseFactoryType;
 
@@ -38,5 +33,4 @@ module com.io7m.idstore.server.api
     to com.fasterxml.jackson.databind;
 
   exports com.io7m.idstore.server.api;
-  exports com.io7m.idstore.server.api.events;
 }

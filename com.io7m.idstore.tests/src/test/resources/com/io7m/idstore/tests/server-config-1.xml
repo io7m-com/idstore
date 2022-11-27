@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Configuration xmlns="urn:com.io7m.idstore:configuration:1">
+
+  <Branding ProductTitle="idstore">
+    <ColorScheme>
+      <ButtonColors>
+        <Disabled>
+          <BodyColor Red="0.101"
+                     Green="0.309"
+                     Blue="0.45"/>
+          <BorderColor Red="0"
+                       Green="0"
+                       Blue="0"/>
+          <EmbossEColor Red="0.175"
+                        Green="0.527"
+                        Blue="0.765"/>
+          <EmbossNColor Red="0.175"
+                        Green="0.527"
+                        Blue="0.765"/>
+          <EmbossSColor Red="0.07"
+                        Green="0.214"
+                        Blue="0.316"/>
+          <EmbossWColor Red="0.07"
+                        Green="0.214"
+                        Blue="0.316"/>
+          <TextColor Red="0"
+                     Green="0"
+                     Blue="0"/>
+        </Disabled>
+        <Enabled>
+          <BodyColor Red="0.101"
+                     Green="0.309"
+                     Blue="0.45"/>
+          <BorderColor Red="0"
+                       Green="0"
+                       Blue="0"/>
+          <EmbossEColor Red="0.175"
+                        Green="0.527"
+                        Blue="0.765"/>
+          <EmbossNColor Red="0.175"
+                        Green="0.527"
+                        Blue="0.765"/>
+          <EmbossSColor Red="0.07"
+                        Green="0.214"
+                        Blue="0.316"/>
+          <EmbossWColor Red="0.07"
+                        Green="0.214"
+                        Blue="0.316"/>
+          <TextColor Red="0"
+                     Green="0"
+                     Blue="0"/>
+        </Enabled>
+        <Hover>
+          <BodyColor Red="0.125"
+                     Green="0.371"
+                     Blue="0.539"/>
+          <BorderColor Red="0"
+                       Green="0"
+                       Blue="0"/>
+          <EmbossEColor Red="0.175"
+                        Green="0.527"
+                        Blue="0.765"/>
+          <EmbossNColor Red="0.175"
+                        Green="0.527"
+                        Blue="0.765"/>
+          <EmbossSColor Red="0.07"
+                        Green="0.214"
+                        Blue="0.316"/>
+          <EmbossWColor Red="0.07"
+                        Green="0.214"
+                        Blue="0.316"/>
+          <TextColor Red="0"
+                     Green="0"
+                     Blue="0"/>
+        </Hover>
+        <Pressed>
+          <BodyColor Red="0.093"
+                     Green="0.277"
+                     Blue="0.406"/>
+          <BorderColor Red="0"
+                       Green="0"
+                       Blue="0"/>
+          <EmbossEColor Red="0.07"
+                        Green="0.214"
+                        Blue="0.316"/>
+          <EmbossNColor Red="0.07"
+                        Green="0.214"
+                        Blue="0.316"/>
+          <EmbossSColor Red="0.125"
+                        Green="0.371"
+                        Blue="0.539"/>
+          <EmbossWColor Red="0.125"
+                        Green="0.371"
+                        Blue="0.539"/>
+          <TextColor Red="0"
+                     Green="0"
+                     Blue="0"/>
+        </Pressed>
+      </ButtonColors>
+
+      <ErrorBorderColor Red="1"
+                        Green="0"
+                        Blue="0"/>
+
+      <HeaderBackgroundColor Red="0.184"
+                             Green="0.184"
+                             Blue="0.184"/>
+
+      <HeaderLinkColor Red="1"
+                       Green="1"
+                       Blue="1"/>
+
+      <HeaderTextColor Red="1"
+                       Green="1"
+                       Blue="1"/>
+
+      <MainBackgroundColor Red="0.101"
+                           Green="0.309"
+                           Blue="0.45"/>
+
+      <MainLinkColor Red="1"
+                     Green="1"
+                     Blue="1"/>
+
+      <MainMessageBorderColor Red="0.1875"
+                              Green="0.558"
+                              Blue="0.8125"/>
+
+      <MainTableBorderColor Red="0.1875"
+                            Green="0.558"
+                            Blue="0.8125"/>
+
+      <MainTextColor Red="1"
+                     Green="1"
+                     Blue="1"/>
+    </ColorScheme>
+  </Branding>
+
+  <Database Kind="POSTGRESQL"
+            Name="postgres"
+            User="postgres"
+            Password="12345678"
+            Address="localhost"
+            Port="54322"
+            Create="true"
+            Upgrade="true"/>
+
+  <HTTPServices>
+    <HTTPServiceAdminAPI ListenAddress="localhost"
+                         ListenPort="51000"
+                         ExternalURI="http://localhost:51000/"/>
+    <HTTPServiceUserAPI ListenAddress="localhost"
+                        ListenPort="51000"
+                        ExternalURI="http://localhost:51000/"/>
+    <HTTPServiceUserView ListenAddress="localhost"
+                         ListenPort="50001"
+                         ExternalURI="http://localhost:50001/"/>
+  </HTTPServices>
+
+  <History UserLoginHistoryLimit="100"
+           AdminLoginHistoryLimit="10000"/>
+
+  <Mail SenderAddress="no-reply@example.com"
+        VerificationExpiration="PT24H">
+    <SMTP Host="mail.example.com"
+          Port="25"/>
+  </Mail>
+
+  <RateLimiting EmailVerificationRateLimit="PT10M"
+                PasswordResetRateLimit="PT10M"/>
+
+  <Sessions UserSessionExpiration="PT30M"
+            AdminSessionExpiration="PT30M"/>
+
+</Configuration>

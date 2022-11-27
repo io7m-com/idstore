@@ -7,7 +7,16 @@
 
   <Subsection title="Overview">
     <Paragraph>
-      The <Term type="package">idstore</Term> server is configured using a single JSON-formatted configuration file.
+      The <Term type="package">idstore</Term> server is configured using a single XML-formatted configuration file.
+      The format has a fully documented <Link target="a0e7a56c-e2d3-4b33-b558-85bb13c5844c">schema</Link> and so
+      configuration files can be independently validated and benefit from autocompletion in most modern IDEs.
+    </Paragraph>
+
+    <Paragraph>
+      The configuration file must consist of a single top-level <Term type="expression">Configuration</Term>
+      element in the <Term type="expression">urn:com.io7m.idstore:configuration:1</Term> namespace. In modern IDEs,
+      simply creating a file containing this element will immediately fill in all the other required child
+      elements.
     </Paragraph>
   </Subsection>
 
@@ -25,18 +34,19 @@
         <Term type="expression">SMTP_TLS</Term>, or <Term type="expression">SMTPS</Term>.
       </Paragraph>
       <Paragraph>
-        The <Term type="expression">Host</Term> and <Term type="expression">Port</Term> properties specify the host and
+        The <Term type="expression">Host</Term> and <Term type="expression">Port</Term> attributes specify the host and
         port of the upstream MTA.
       </Paragraph>
     </Subsection>
-    <Subsection title="Sender">
+    <Subsection title="SenderAddress">
       <Paragraph>
-        The <Term type="expression">Sender</Term> property specifies the address that will be used on outgoing mail.
+        The <Term type="expression">SenderAddress</Term> attribute specifies the address that will be used on outgoing
+        mail.
       </Paragraph>
     </Subsection>
     <Subsection title="VerificationExpiration">
       <Paragraph>
-        The <Term type="expression">VerificationExpiration</Term> property specifies how long links sent in emails will
+        The <Term type="expression">VerificationExpiration</Term> attribute specifies how long links sent in emails will
         take to expire. These links are currently used for password resets, and email verification. The property must be
         formatted as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration
         string</LinkExternal>.
@@ -48,15 +58,11 @@
       </Paragraph>
       <FormalItem title="Example">
         <Verbatim><![CDATA[
-"Mail": {
-  "Transport": {
-    "Type": "SMTP",
-    "Host": "mail.example.com",
-    "Port": 25
-  },
-  "Sender": "no-reply@example.com",
-  "VerificationExpiration": "PT24H"
-}
+<Mail SenderAddress="no-reply@example.com"
+      VerificationExpiration="PT24H">
+  <SMTP Host="mail.example.com"
+        Port="25"/>
+</Mail>
 ]]></Verbatim>
       </FormalItem>
     </Subsection>
@@ -68,73 +74,58 @@
         The <Term type="expression">HTTP</Term> section of the configuration file configures the various HTTP services.
       </Paragraph>
     </Subsection>
-    <Subsection title="AdminAPIService">
+    <Subsection title="HTTPServiceAdminAPI">
       <Paragraph>
         The configuration for the Admin API service.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ListenAddress</Term>
-        and <Term type="expression">ListenPort</Term> properties specify the address and port to which to the HTTP
+        and <Term type="expression">ListenPort</Term> attributes specify the address and port to which to the HTTP
         service will bind. It is recommended that the service be bound to
         <Term type="expression">localhost</Term>
         and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
         provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>.
       </Paragraph>
       <Paragraph>
-        The <Term type="expression">ExternalAddress</Term> property specifies the external address that clients will
+        The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
         use to connect to this server. This value is used in, for example, password reset emails to provide URLs that
         users can follow to reset their passwords.
       </Paragraph>
-      <Paragraph>
-        The <Term type="expression">SessionExpiration</Term> property, if present, specifies the duration after which
-        idle sessions on the server will expire. The value must be expressed
-        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
-      </Paragraph>
     </Subsection>
-    <Subsection title="UserAPIService">
+    <Subsection title="HTTPServiceUserAPI">
       <Paragraph>
         The configuration for the User API service.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ListenAddress</Term>
-        and <Term type="expression">ListenPort</Term> properties specify the address and port to which to the HTTP
+        and <Term type="expression">ListenPort</Term> attributes specify the address and port to which to the HTTP
         service will bind. It is recommended that the service be bound to
         <Term type="expression">localhost</Term>
         and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
         provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>.
       </Paragraph>
       <Paragraph>
-        The <Term type="expression">ExternalAddress</Term> property specifies the external address that clients will
+        The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
         use to connect to this server. This value is used in, for example, password reset emails to provide URLs that
         users can follow to reset their passwords.
       </Paragraph>
-      <Paragraph>
-        The <Term type="expression">SessionExpiration</Term> property, if present, specifies the duration after which
-        idle sessions on the server will expire. The value must be expressed
-        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
-      </Paragraph>
     </Subsection>
-    <Subsection title="UserViewService">
+    <Subsection title="HTTPServiceUserView">
       <Paragraph>
         The configuration for the User View service.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ListenAddress</Term>
-        and <Term type="expression">ListenPort</Term> properties specify the address and port to which to the HTTP
+        and <Term type="expression">ListenPort</Term> attributes specify the address and port to which to the HTTP
         service will bind. It is recommended that the service be bound to
         <Term type="expression">localhost</Term>
         and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
         provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>.
       </Paragraph>
       <Paragraph>
-        The <Term type="expression">ExternalAddress</Term> property specifies the external address that clients will
+        The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
         use to connect to this server. This value is used in, for example, password reset emails to provide URLs that
         users can follow to reset their passwords.
-      </Paragraph>
-      <Paragraph>
-        The <Term type="expression">SessionExpiration</Term> property, if present, specifies the duration after which
-        idle sessions on the server will expire. The value must be expressed
-        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
       </Paragraph>
     </Subsection>
     <Subsection title="Example">
@@ -143,24 +134,49 @@
       </Paragraph>
       <FormalItem title="Example">
         <Verbatim><![CDATA[
-"HTTP": {
-  "AdminAPIService": {
-    "ListenAddress": "localhost",
-    "ListenPort": 51000,
-    "ExternalAddress": "https://admin.idstore.example.com/",
-    "SessionExpiration": "PT30M"
-  },
-  "UserAPIService": {
-    "ListenAddress": "localhost",
-    "ListenPort": 50000,
-    "ExternalAddress": "https://user.idstore.example.com/"
-  },
-  "UserViewService": {
-    "ListenAddress": "localhost",
-    "ListenPort": 50001,
-    "ExternalAddress": "https://idstore.example.com/"
-  }
-}
+<HTTPServices>
+  <HTTPServiceAdminAPI ListenAddress="localhost"
+                       ListenPort="51000"
+                       ExternalURI="http://localhost:51000/"/>
+  <HTTPServiceUserAPI ListenAddress="localhost"
+                      ListenPort="50000"
+                      ExternalURI="http://localhost:50000/"/>
+  <HTTPServiceUserView ListenAddress="localhost"
+                       ListenPort="50001"
+                       ExternalURI="http://localhost:50001/"/>
+</HTTPServices>
+]]></Verbatim>
+      </FormalItem>
+    </Subsection>
+  </Subsection>
+
+  <Subsection title="Sessions">
+    <Subsection title="Overview">
+      <Paragraph>
+        The <Term type="expression">Sessions</Term> section of the configuration file specifies parameters for
+        controlling session expiration.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Sessions">
+      <Paragraph>
+        The <Term type="expression">UserSessionExpiration</Term> attribute specifies the duration after which
+        idle user sessions on the server will expire. The value must be expressed
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="expression">AdminSessionExpiration</Term> attribute specifies the duration after which
+        idle admin sessions on the server will expire. The value must be expressed
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Example">
+      <Paragraph>
+        An example session configuration:
+      </Paragraph>
+      <FormalItem title="Example">
+        <Verbatim><![CDATA[
+<Sessions UserSessionExpiration="PT30M"
+          AdminSessionExpiration="PT30M"/>
 ]]></Verbatim>
       </FormalItem>
     </Subsection>
@@ -179,10 +195,8 @@
       </Paragraph>
       <FormalItem title="Example">
         <Verbatim><![CDATA[
-"History": {
-  "UserLoginHistoryLimit": 100,
-  "AdminLoginHistoryLimit": 10000
-}
+<History UserLoginHistoryLimit="100"
+         AdminLoginHistoryLimit="10000"/>
 ]]></Verbatim>
       </FormalItem>
     </Subsection>
@@ -200,16 +214,14 @@
       </Paragraph>
       <FormalItem title="Example">
         <Verbatim><![CDATA[
-"Database": {
-  "Kind": "POSTGRESQL",
-  "User": "postgres",
-  "Password": "notarealpassword",
-  "Host": "localhost",
-  "Port": 54322,
-  "Name": "postgres",
-  "Create": true,
-  "Upgrade": true
-}
+<Database Kind="POSTGRESQL"
+          Name="postgres"
+          User="postgres"
+          Password="12345678"
+          Address="localhost"
+          Port="54322"
+          Create="true"
+          Upgrade="true"/>
 ]]></Verbatim>
       </FormalItem>
     </Subsection>
@@ -225,13 +237,13 @@
         be sent every ten minutes for a given client can reduce the possible damage.
       </Paragraph>
       <Paragraph>
-        The <Term type="expression">EmailVerificationRateLimit</Term> property specifies the minimum duration that
-        must elapse between any two email verification requests for a given user. The property must be specified
+        The <Term type="expression">EmailVerificationRateLimit</Term> attribute specifies the minimum duration that
+        must elapse between any two email verification requests for a given user. The attribute must be specified
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
       </Paragraph>
       <Paragraph>
-        The <Term type="expression">PasswordResetRateLimit</Term> property specifies the minimum duration that
-        must elapse between any two password reset requests from a single IP address. The property must be specified
+        The <Term type="expression">PasswordResetRateLimit</Term> attribute specifies the minimum duration that
+        must elapse between any two password reset requests from a single IP address. The attribute must be specified
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
       </Paragraph>
     </Subsection>
@@ -241,10 +253,8 @@
       </Paragraph>
       <FormalItem title="Example">
         <Verbatim><![CDATA[
-"RateLimiting": {
-    "EmailVerificationRateLimit": "PT10M",
-    "PasswordResetRateLimit": "PT10M"
-}
+<RateLimiting EmailVerificationRateLimit="PT10M"
+              PasswordResetRateLimit="PT10M"/>
 ]]></Verbatim>
       </FormalItem>
     </Subsection>
@@ -264,10 +274,8 @@
       </Paragraph>
       <FormalItem title="Example">
         <Verbatim><![CDATA[
-"OpenTelemetry": {
-  "LogicalServiceName": "idstore",
-  "OTELCollectorAddress": "http://telemetry.example.com:4317"
-}
+<OpenTelemetry LogicalServiceName="idstore"
+               OTELCollectorAddress="http://localhost:4317"/>
 ]]></Verbatim>
       </FormalItem>
     </Subsection>
@@ -285,70 +293,152 @@
       </Paragraph>
       <FormalItem title="Example">
         <Verbatim><![CDATA[
-"Branding": {
-  "ColorScheme": {
-    "ButtonColors": {
-      "Enabled": {
-        "TextColor": "#ffffff",
-        "BodyColor": "#1a4f73",
-        "BorderColor": "#000000",
-        "EmbossEColor": "#2d87c4",
-        "EmbossNColor": "#2d87c4",
-        "EmbossSColor": "#123751",
-        "EmbossWColor": "#123751"
-      },
-      "Disabled": {
-        "TextColor": "#ffffff",
-        "BodyColor": "#1a4f73",
-        "BorderColor": "#000000",
-        "EmbossEColor": "#2d87c4",
-        "EmbossNColor": "#2d87c4",
-        "EmbossSColor": "#123751",
-        "EmbossWColor": "#123751"
-      },
-      "Hover": {
-        "TextColor": "#ffffff",
-        "BodyColor": "#205f8a",
-        "BorderColor": "#000000",
-        "EmbossEColor": "#2d87c4",
-        "EmbossNColor": "#2d87c4",
-        "EmbossSColor": "#123751",
-        "EmbossWColor": "#123751"
-      },
-      "Pressed": {
-        "TextColor": "#ffffff",
-        "BodyColor": "#184768",
-        "BorderColor": "#000000",
-        "EmbossEColor": "#123751",
-        "EmbossNColor": "#123751",
-        "EmbossSColor": "#205f8a",
-        "EmbossWColor": "#205f8a"
-      }
-    },
+<Branding ProductTitle="idstore">
+  <ColorScheme>
+    <ButtonColors>
+      <Disabled>
+        <BodyColor Red="0.101"
+                   Green="0.309"
+                   Blue="0.45"/>
+        <BorderColor Red="0"
+                     Green="0"
+                     Blue="0"/>
+        <EmbossEColor Red="0.175"
+                      Green="0.527"
+                      Blue="0.765"/>
+        <EmbossNColor Red="0.175"
+                      Green="0.527"
+                      Blue="0.765"/>
+        <EmbossSColor Red="0.07"
+                      Green="0.214"
+                      Blue="0.316"/>
+        <EmbossWColor Red="0.07"
+                      Green="0.214"
+                      Blue="0.316"/>
+        <TextColor Red="0"
+                   Green="0"
+                   Blue="0"/>
+      </Disabled>
+      <Enabled>
+        <BodyColor Red="0.101"
+                   Green="0.309"
+                   Blue="0.45"/>
+        <BorderColor Red="0"
+                     Green="0"
+                     Blue="0"/>
+        <EmbossEColor Red="0.175"
+                      Green="0.527"
+                      Blue="0.765"/>
+        <EmbossNColor Red="0.175"
+                      Green="0.527"
+                      Blue="0.765"/>
+        <EmbossSColor Red="0.07"
+                      Green="0.214"
+                      Blue="0.316"/>
+        <EmbossWColor Red="0.07"
+                      Green="0.214"
+                      Blue="0.316"/>
+        <TextColor Red="0"
+                   Green="0"
+                   Blue="0"/>
+      </Enabled>
+      <Hover>
+        <BodyColor Red="0.125"
+                   Green="0.371"
+                   Blue="0.539"/>
+        <BorderColor Red="0"
+                     Green="0"
+                     Blue="0"/>
+        <EmbossEColor Red="0.175"
+                      Green="0.527"
+                      Blue="0.765"/>
+        <EmbossNColor Red="0.175"
+                      Green="0.527"
+                      Blue="0.765"/>
+        <EmbossSColor Red="0.07"
+                      Green="0.214"
+                      Blue="0.316"/>
+        <EmbossWColor Red="0.07"
+                      Green="0.214"
+                      Blue="0.316"/>
+        <TextColor Red="0"
+                   Green="0"
+                   Blue="0"/>
+      </Hover>
+      <Pressed>
+        <BodyColor Red="0.093"
+                   Green="0.277"
+                   Blue="0.406"/>
+        <BorderColor Red="0"
+                     Green="0"
+                     Blue="0"/>
+        <EmbossEColor Red="0.07"
+                      Green="0.214"
+                      Blue="0.316"/>
+        <EmbossNColor Red="0.07"
+                      Green="0.214"
+                      Blue="0.316"/>
+        <EmbossSColor Red="0.125"
+                      Green="0.371"
+                      Blue="0.539"/>
+        <EmbossWColor Red="0.125"
+                      Green="0.371"
+                      Blue="0.539"/>
+        <TextColor Red="0"
+                   Green="0"
+                   Blue="0"/>
+      </Pressed>
+    </ButtonColors>
 
-    "ErrorBorderColor": "#ff0000",
-    "HeaderBackgroundColor": "#2f2f2f",
-    "HeaderLinkColor": "#ffffff",
-    "HeaderTextColor": "#ffffff",
-    "MainBackgroundColor": "#1a4f73",
-    "MainLinkColor": "#ffffff",
-    "MainMessageBorderColor": "#308fd0",
-    "MainTableBorderColor": "#308fd0",
-    "MainTextColor": "#ffffff"
-  }
-}
+    <ErrorBorderColor Red="1"
+                      Green="0"
+                      Blue="0"/>
+
+    <HeaderBackgroundColor Red="0.184"
+                           Green="0.184"
+                           Blue="0.184"/>
+
+    <HeaderLinkColor Red="1"
+                     Green="1"
+                     Blue="1"/>
+
+    <HeaderTextColor Red="1"
+                     Green="1"
+                     Blue="1"/>
+
+    <MainBackgroundColor Red="0.101"
+                         Green="0.309"
+                         Blue="0.45"/>
+
+    <MainLinkColor Red="1"
+                   Green="1"
+                   Blue="1"/>
+
+    <MainMessageBorderColor Red="0.1875"
+                            Green="0.558"
+                            Blue="0.8125"/>
+
+    <MainTableBorderColor Red="0.1875"
+                          Green="0.558"
+                          Blue="0.8125"/>
+
+    <MainTextColor Red="1"
+                   Green="1"
+                   Blue="1"/>
+  </ColorScheme>
+</Branding>
 ]]></Verbatim>
       </FormalItem>
     </Subsection>
   </Subsection>
 
-  <Subsection title="Schema">
+  <Subsection title="Schema" id="a0e7a56c-e2d3-4b33-b558-85bb13c5844c">
     <Paragraph>
-      The JSON schema for the configuration file is as follows:
+      The XSD schema for the configuration file is as follows:
     </Paragraph>
     <FormalItem title="Schema">
       <Verbatim>
-        <xi:include href="com/io7m/idstore/server/api/configuration.schema.json"
+        <xi:include href="com/io7m/idstore/server/service/configuration/configuration.xsd"
                     parse="text"/>
       </Verbatim>
     </FormalItem>

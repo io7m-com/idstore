@@ -28,6 +28,8 @@ public interface IdServerFactoryType
    * @param configuration The server configuration
    *
    * @return A new server
+   *
+   * @throws IdServerException On errors
    */
 
   IdServerType createServer(

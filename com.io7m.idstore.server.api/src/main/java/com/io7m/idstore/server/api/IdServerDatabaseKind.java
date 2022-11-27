@@ -16,15 +16,10 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 /**
  * The kind of underlying database.
  */
 
-@JsonDeserialize
-@JsonSerialize
 public enum IdServerDatabaseKind
 {
   /**

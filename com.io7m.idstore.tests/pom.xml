@@ -9,7 +9,7 @@
   <parent>
     <groupId>com.io7m.idstore</groupId>
     <artifactId>com.io7m.idstore</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.6</version>
   </parent>
   <artifactId>com.io7m.idstore.tests</artifactId>
 
@@ -71,11 +71,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.protocol.api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.server</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -163,6 +158,10 @@
       <groupId>org.mock-server</groupId>
       <artifactId>mockserver-netty</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-css</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -179,6 +178,29 @@
             org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED
           </argLine>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>run-it</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+            <configuration>
+              <argLine>
+                ${argLine}
+                --add-opens
+                org.junit.platform.commons/org.junit.platform.commons.logging=ALL-UNNAMED
+                --add-opens
+                org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED
+              </argLine>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- Determine test coverage -->

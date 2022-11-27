@@ -2,6 +2,8 @@
   "%Schema": "https://www.io7m.com/idstore/server-configuration-1.json",
 
   "Branding": {
+    "ProductTitle": "idstore",
+
     "ColorScheme": {
       "ButtonColors": {
         "Enabled": {
@@ -62,6 +64,11 @@
     },
     "Sender": "no-reply@example.com",
     "VerificationExpiration": "PT24H"
+  },
+
+  "Sessions": {
+    "UserSessionExpiration": "PT30M",
+    "AdminSessionExpiration": "PT30M"
   },
 
   "HTTP": {

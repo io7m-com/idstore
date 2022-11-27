@@ -16,10 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.Objects;
 import java.util.Set;
 
@@ -31,14 +27,9 @@ import java.util.Set;
  * @param userViewService  The user view service
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerHTTPConfiguration(
-  @JsonProperty(value = "AdminAPIService", required = true)
   IdServerHTTPServiceConfiguration adminAPIService,
-  @JsonProperty(value = "UserAPIService", required = true)
   IdServerHTTPServiceConfiguration userAPIService,
-  @JsonProperty(value = "UserViewService", required = true)
   IdServerHTTPServiceConfiguration userViewService)
   implements IdServerJSONConfigurationElementType
 {

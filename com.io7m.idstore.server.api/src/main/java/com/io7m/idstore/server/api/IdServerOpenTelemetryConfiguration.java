@@ -16,10 +16,6 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.net.URI;
 import java.util.Objects;
 
@@ -30,12 +26,8 @@ import java.util.Objects;
  * @param collectorAddress   The address of the OTEL collector
  */
 
-@JsonDeserialize
-@JsonSerialize
 public record IdServerOpenTelemetryConfiguration(
-  @JsonProperty(value = "LogicalServiceName", required = true)
   String logicalServiceName,
-  @JsonProperty(value = "OTELCollectorAddress", required = true)
   URI collectorAddress)
 {
   /**

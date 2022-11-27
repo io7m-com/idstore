@@ -17,23 +17,10 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 /**
  * The type of mail transport configurations.
  */
 
-@JsonTypeInfo(
-  use = JsonTypeInfo.Id.NAME,
-  include = JsonTypeInfo.As.PROPERTY,
-  property = "Type"
-)
-@JsonSubTypes({
-  @JsonSubTypes.Type(value = IdServerMailTransportSMTP.class),
-  @JsonSubTypes.Type(value = IdServerMailTransportSMTP_TLS.class),
-  @JsonSubTypes.Type(value = IdServerMailTransportSMTPS.class)
-})
 public sealed interface IdServerMailTransportConfigurationType
   extends IdServerJSONConfigurationElementType
   permits IdServerMailTransportSMTP,

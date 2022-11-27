@@ -125,11 +125,15 @@
     },
 
     "Branding": {
+      "ProductTitle": {
+        "type": "string"
+      },
       "ColorScheme": {
         "$ref": "#/$defs/ColorScheme"
       },
       "required": [
-        "ColorScheme"
+        "ColorScheme",
+        "ProductTitle"
       ]
     },
 
@@ -155,9 +159,6 @@
         "type": "number"
       },
       "ExternalAddress": {
-        "type": "string"
-      },
-      "SessionExpiration": {
         "type": "string"
       },
       "required": [
@@ -331,6 +332,10 @@
       ]
     },
 
+    "Sessions": {
+
+    },
+
     "Configuration": {
       "%Schema": {
         "$ref": "#/$defs/%Schema"
@@ -356,6 +361,9 @@
       "RateLimiting": {
         "$ref": "#/$defs/RateLimiting"
       },
+      "Sessions": {
+        "$ref": "#/$defs/Sessions"
+      },
       "required": [
         "%Schema",
         "Branding",
@@ -364,7 +372,8 @@
         "History",
         "Mail",
         "OpenTelemetry",
-        "RateLimiting"
+        "RateLimiting",
+        "Sessions"
       ]
     }
   },

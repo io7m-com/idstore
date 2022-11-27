@@ -16,12 +16,8 @@
 
 package com.io7m.idstore.server.api;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.io7m.cxbutton.core.CxButtonCSS;
 import com.io7m.cxbutton.core.CxButtonColors;
-import com.io7m.dixmont.colors.DmColor;
 
 import java.util.Objects;
 
@@ -40,29 +36,17 @@ import java.util.Objects;
  * @param mainTextColor          The main text color
  */
 
-@JsonSerialize
-@JsonDeserialize
 public record IdServerColorScheme(
-  @JsonProperty(value = "ButtonColors", required = true)
   CxButtonColors buttonColors,
-  @JsonProperty(value = "ErrorBorderColor", required = true)
-  DmColor errorBorderColor,
-  @JsonProperty(value = "HeaderBackgroundColor", required = true)
-  DmColor headerBackgroundColor,
-  @JsonProperty(value = "HeaderLinkColor", required = true)
-  DmColor headerLinkColor,
-  @JsonProperty(value = "HeaderTextColor", required = true)
-  DmColor headerTextColor,
-  @JsonProperty(value = "MainBackgroundColor", required = true)
-  DmColor mainBackgroundColor,
-  @JsonProperty(value = "MainLinkColor", required = true)
-  DmColor mainLinkColor,
-  @JsonProperty(value = "MainMessageBorderColor", required = true)
-  DmColor mainMessageBorderColor,
-  @JsonProperty(value = "MainTableBorderColor", required = true)
-  DmColor mainTableBorderColor,
-  @JsonProperty(value = "MainTextColor", required = true)
-  DmColor mainTextColor
+  IdColor errorBorderColor,
+  IdColor headerBackgroundColor,
+  IdColor headerLinkColor,
+  IdColor headerTextColor,
+  IdColor mainBackgroundColor,
+  IdColor mainLinkColor,
+  IdColor mainMessageBorderColor,
+  IdColor mainTableBorderColor,
+  IdColor mainTextColor
 )
 {
   /**
@@ -106,8 +90,8 @@ public record IdServerColorScheme(
    * An ocean blue colour.
    */
 
-  public static final DmColor OCEAN_BLUE =
-    new DmColor(0.105, 0.313, 0.454);
+  public static final IdColor OCEAN_BLUE =
+    new IdColor(0.105, 0.313, 0.454);
 
   /**
    * @return The default color scheme
@@ -117,15 +101,15 @@ public record IdServerColorScheme(
   {
     return new IdServerColorScheme(
       CxButtonCSS.defaultColors(),
-      new DmColor(1.0, 0.0, 0.0),
-      new DmColor(0.2, 0.2, 0.2),
-      new DmColor(1.0, 0.596, 0.2),
-      new DmColor(1.0, 1.0, 1.0),
-      new DmColor(1.0, 1.0, 1.0),
-      new DmColor(0.0, 0.0, 1.0),
-      new DmColor(0.8, 0.8, 0.8),
-      new DmColor(0.5, 0.5, 0.5),
-      new DmColor(0.0, 0.0, 0.0)
+      new IdColor(1.0, 0.0, 0.0),
+      new IdColor(0.2, 0.2, 0.2),
+      new IdColor(1.0, 0.596, 0.2),
+      new IdColor(1.0, 1.0, 1.0),
+      new IdColor(1.0, 1.0, 1.0),
+      new IdColor(0.0, 0.0, 1.0),
+      new IdColor(0.8, 0.8, 0.8),
+      new IdColor(0.5, 0.5, 0.5),
+      new IdColor(0.0, 0.0, 0.0)
     );
   }
 }
