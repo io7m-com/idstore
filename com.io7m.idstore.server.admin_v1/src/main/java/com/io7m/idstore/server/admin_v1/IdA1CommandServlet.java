@@ -31,7 +31,6 @@ import com.io7m.idstore.server.http.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
-import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
 import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import io.opentelemetry.api.trace.Span;
 import jakarta.servlet.http.HttpServletRequest;
