@@ -45,8 +45,10 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers(disabledWithoutDocker = true)
@@ -73,8 +75,11 @@ public final class IdServerTest
     final var server =
       this.createServer(databaseConfiguration);
 
+    assertTrue(server.isClosed());
     server.start();
+    assertFalse(server.isClosed());
     server.close();
+    assertTrue(server.isClosed());
     server.setup(
       Optional.empty(),
       new IdName("x"),
@@ -82,26 +87,39 @@ public final class IdServerTest
       new IdRealName("Ex"),
       "12345678"
     );
+    assertTrue(server.isClosed());
     server.start();
+    assertFalse(server.isClosed());
     server.close();
+    assertTrue(server.isClosed());
+  }
 
-    final var threadNames =
-      Thread.getAllStackTraces()
-        .keySet()
-        .stream()
-        .map(Thread::getName)
-        .collect(Collectors.toUnmodifiableSet());
+  /**
+   * Trying to call setup() when the server is already running is incorrect.
+   */
 
-    for (final var name : threadNames) {
-      System.out.printf("threadNames: %s%n", name);
+  @Test
+  public void testSetupAfterStart(
+    final IdDatabaseConfiguration databaseConfiguration)
+    throws IdServerException
+  {
+    try (var server = this.createServer(databaseConfiguration)) {
+      assertTrue(server.isClosed());
+      server.start();
+
+      final IdServerException ex =
+        assertThrows(IdServerException.class, () -> {
+          server.setup(
+            Optional.empty(),
+            new IdName("x"),
+            new IdEmail("x@example.com"),
+            new IdRealName("Ex"),
+            "12345678"
+          );
+        });
+
+      assertEquals("server-misuse", ex.errorCode().id());
     }
-
-    final var hikari =
-      threadNames.stream()
-        .filter(name -> name.contains("HikariPool"))
-        .count();
-
-    assertTrue(hikari <= 2L);
   }
 
   private IdServerType createServer(

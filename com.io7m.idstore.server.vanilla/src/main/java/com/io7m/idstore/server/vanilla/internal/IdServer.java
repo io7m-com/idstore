@@ -332,6 +332,12 @@ public final class IdServer implements IdServerType
   }
 
   @Override
+  public boolean isClosed()
+  {
+    return this.stopped.get();
+  }
+
+  @Override
   public void close()
     throws IdServerException
   {
@@ -410,7 +416,10 @@ public final class IdServer implements IdServerType
         this.close();
       }
     } else {
-      throw new IllegalStateException("Server must be closed before setup.");
+      throw new IdServerException(
+        new IdErrorCode("server-misuse"),
+        "Server must be closed before setup."
+      );
     }
   }
 

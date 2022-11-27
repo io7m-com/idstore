@@ -31,7 +31,8 @@ import java.util.UUID;
 public interface IdServerType extends AutoCloseable
 {
   /**
-   * Start the server instance.
+   * Start the server instance. Can be called multiple times redundantly,
+   * and can be called before or after #close() has been called.
    *
    * @throws IdServerException On errors
    */
@@ -44,6 +45,15 @@ public interface IdServerType extends AutoCloseable
    */
 
   IdDatabaseType database();
+
+  /**
+   * @return {@code true} if the server is closed
+   *
+   * @see #start()
+   * @see #close()
+   */
+
+  boolean isClosed();
 
   @Override
   void close()
