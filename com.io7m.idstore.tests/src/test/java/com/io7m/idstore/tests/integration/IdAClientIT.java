@@ -37,22 +37,33 @@ import com.io7m.idstore.tests.server.IdWithServerContract;
 import com.io7m.verdant.core.VProtocolSupported;
 import com.io7m.verdant.core.VProtocols;
 import com.io7m.verdant.core.cb.VProtocolMessages;
+import net.jqwik.api.Arbitraries;
+import net.jqwik.api.providers.TypeUsage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.matchers.Times;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NOT_LOGGED_IN;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -302,7 +313,7 @@ public final class IdAClientIT extends IdWithServerContract
    */
 
   @Test
-  public void testLoginLogout()
+  public void testLoginSelf()
     throws Exception
   {
     final var admin =
@@ -312,5 +323,176 @@ public final class IdAClientIT extends IdWithServerContract
 
     final var self = this.client.adminSelf();
     assertEquals(admin, self.id());
+
+    this.client.close();
+    this.client.login("admin", "12345678", this.serverAdminAPIURL());
+  }
+
+  /**
+   * Logging in with the wrong password fails.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testLoginWrongPassword()
+    throws Exception
+  {
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    final var ex =
+      assertThrows(IdAClientException.class, () -> {
+        this.client.login("admin", "1234", this.serverAdminAPIURL());
+      });
+
+    assertEquals(AUTHENTICATION_ERROR, ex.errorCode());
+  }
+
+  /**
+   * Every method that requires a login throws an exception if the user is not
+   * logged in.
+   *
+   * @return The tests
+   */
+
+  @TestFactory
+  public Stream<DynamicTest> testDisconnected()
+  {
+    return disconnectionRelevantMethodsOf(IdAClientType.class)
+      .map(this::disconnectedOf);
+  }
+
+  private DynamicTest disconnectedOf(
+    final Method method)
+  {
+    return DynamicTest.dynamicTest(
+      "testDisconnected_%s".formatted(method.getName()),
+      () -> {
+        final var parameterTypes =
+          method.getGenericParameterTypes();
+        final var parameters =
+          new Object[parameterTypes.length];
+
+        for (var index = 0; index < parameterTypes.length; ++index) {
+          final var pType = parameterTypes[index];
+          if (pType instanceof ParameterizedType param) {
+            final List<TypeUsage> typeArgs =
+              Arrays.stream(param.getActualTypeArguments())
+                .map(TypeUsage::forType)
+                .toList();
+
+            final var typeArgsArray = new TypeUsage[typeArgs.size()];
+            typeArgs.toArray(typeArgsArray);
+
+            final var mainType =
+              TypeUsage.of((Class<?>) param.getRawType(), typeArgsArray);
+
+            parameters[index] = Arbitraries.defaultFor(mainType).sample();
+          } else if (pType instanceof Class<?> clazz) {
+            parameters[index] = Arbitraries.defaultFor(clazz).sample();
+          }
+        }
+
+        try {
+          method.invoke(this.client, parameters);
+        } catch (final IllegalAccessException | IllegalArgumentException e) {
+          throw new RuntimeException(e);
+        } catch (final InvocationTargetException e) {
+          if (e.getCause() instanceof IdAClientException ex) {
+            if (Objects.equals(ex.errorCode(), NOT_LOGGED_IN)) {
+              return;
+            }
+          }
+          throw e;
+        }
+      });
+  }
+
+  private static Stream<Method> disconnectionRelevantMethodsOf(
+    final Class<? extends IdAClientType> clazz)
+  {
+    return Stream.of(clazz.getMethods())
+      .filter(IdAClientIT::isDisconnectionRelevantMethod);
+  }
+
+  private static boolean isDisconnectionRelevantMethod(
+    final Method m)
+  {
+    return switch (m.getName()) {
+      case "toString",
+        "equals",
+        "hashCode",
+        "getClass",
+        "close",
+        "login",
+        "notify",
+        "wait",
+        "notifyAll" -> false;
+      default -> true;
+    };
+  }
+
+  /**
+   * A smoke test that simply calls every method with random arguments.
+   *
+   * @return The tests
+   */
+
+  @TestFactory
+  public Stream<DynamicTest> testSmoke()
+    throws Exception
+  {
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
+
+    return disconnectionRelevantMethodsOf(IdAClientType.class)
+      .map(this::smokeOf);
+  }
+
+  private DynamicTest smokeOf(
+    final Method method)
+  {
+    return DynamicTest.dynamicTest(
+      "testSmoke_%s".formatted(method.getName()),
+      () -> {
+        final var parameterTypes =
+          method.getGenericParameterTypes();
+        final var parameters =
+          new Object[parameterTypes.length];
+
+        for (var index = 0; index < parameterTypes.length; ++index) {
+          final var pType = parameterTypes[index];
+          if (pType instanceof ParameterizedType param) {
+            final List<TypeUsage> typeArgs =
+              Arrays.stream(param.getActualTypeArguments())
+                .map(TypeUsage::forType)
+                .toList();
+
+            final var typeArgsArray = new TypeUsage[typeArgs.size()];
+            typeArgs.toArray(typeArgsArray);
+
+            final var mainType =
+              TypeUsage.of((Class<?>) param.getRawType(), typeArgsArray);
+
+            parameters[index] = Arbitraries.defaultFor(mainType).sample();
+          } else if (pType instanceof Class<?> clazz) {
+            parameters[index] = Arbitraries.defaultFor(clazz).sample();
+          }
+        }
+
+        this.client.login("admin", "12345678", this.serverAdminAPIURL());
+
+        try {
+          method.invoke(this.client, parameters);
+        } catch (final IllegalAccessException | IllegalArgumentException e) {
+          throw e;
+        } catch (final InvocationTargetException e) {
+          if (e.getCause() instanceof IdAClientException ex) {
+            return;
+          }
+          throw e;
+        }
+      });
   }
 }

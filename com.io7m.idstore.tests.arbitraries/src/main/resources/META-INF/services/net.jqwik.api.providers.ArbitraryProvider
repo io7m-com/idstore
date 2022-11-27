@@ -21,6 +21,7 @@ com.io7m.idstore.tests.arbitraries.IdArbTokenProvider
 com.io7m.idstore.tests.arbitraries.IdArbUMessageProvider
 com.io7m.idstore.tests.arbitraries.IdArbURIProvider
 com.io7m.idstore.tests.arbitraries.IdArbUUIDProvider
+com.io7m.idstore.tests.arbitraries.IdArbUserCreateProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserOrderingProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserProvider
 com.io7m.idstore.tests.arbitraries.IdArbUserSearchByEmailParametersProvider
