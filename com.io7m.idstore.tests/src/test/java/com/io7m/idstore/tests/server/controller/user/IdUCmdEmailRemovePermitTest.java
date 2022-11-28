@@ -20,14 +20,9 @@ import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdToken;
-import com.io7m.idstore.protocol.user.IdUCommandEmailAddPermit;
-import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
-import com.io7m.idstore.protocol.user.IdUResponseEmailAddPermit;
 import com.io7m.idstore.protocol.user.IdUResponseEmailRemovePermit;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.controller.user.IdUCmdEmailAddPermit;
-import com.io7m.idstore.server.controller.user.IdUCmdEmailRemoveDeny;
 import com.io7m.idstore.server.controller.user.IdUCmdEmailRemovePermit;
 import org.junit.jupiter.api.Test;
 

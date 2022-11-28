@@ -17,7 +17,6 @@
 
 package com.io7m.idstore.tests.server.api;
 
-import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.tests.IdTestDirectories;

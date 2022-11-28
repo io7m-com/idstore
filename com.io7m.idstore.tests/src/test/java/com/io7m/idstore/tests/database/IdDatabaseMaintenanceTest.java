@@ -18,6 +18,7 @@ package com.io7m.idstore.tests.database;
 
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseMaintenanceQueriesType;
+import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
@@ -25,37 +26,39 @@ import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdEmailVerificationOperation;
 import com.io7m.idstore.model.IdToken;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Optional;
 
-import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.tests.database.IdDatabaseExtension.databaseCreateAdminInitial;
+import static com.io7m.idstore.tests.database.IdDatabaseExtension.databaseCreateUserInitial;
+import static com.io7m.idstore.tests.database.IdDatabaseExtension.timeNow;
 import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers(disabledWithoutDocker = true)
+@ExtendWith(IdDatabaseExtension.class)
 public final class IdDatabaseMaintenanceTest
-  extends IdWithDatabaseContract
 {
   @Test
-  public void testExpiration()
+  public void testExpiration(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
     final var admin =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
     final var user =
-      this.databaseCreateUserInitial(admin, "someone", "12345678");
+      databaseCreateUserInitial(t, admin, "someone", "12345678");
 
-    final var transaction =
-      this.transactionOf(IDSTORE);
     final var emails =
-      transaction.queries(IdDatabaseEmailsQueriesType.class);
+      t.queries(IdDatabaseEmailsQueriesType.class);
     final var users =
-      transaction.queries(IdDatabaseUsersQueriesType.class);
+      t.queries(IdDatabaseUsersQueriesType.class);
     final var maintenance =
-      transaction.queries(IdDatabaseMaintenanceQueriesType.class);
+      t.queries(IdDatabaseMaintenanceQueriesType.class);
 
-    transaction.userIdSet(user);
+    t.userIdSet(user);
 
     final var emailToken = IdToken.generate();
     emails.emailVerificationCreate(
@@ -68,7 +71,7 @@ public final class IdDatabaseMaintenanceTest
       )
     );
 
-    transaction.adminIdSet(admin);
+    t.adminIdSet(admin);
 
     users.userBanCreate(
       new IdBan(user, "Spite", Optional.of(

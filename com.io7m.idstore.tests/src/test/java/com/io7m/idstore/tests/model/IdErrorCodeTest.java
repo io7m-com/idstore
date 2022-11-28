@@ -17,8 +17,6 @@
 package com.io7m.idstore.tests.model;
 
 import com.io7m.idstore.error_codes.IdErrorCode;
-import com.io7m.idstore.model.IdEmail;
-import com.io7m.idstore.model.IdValidityException;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 

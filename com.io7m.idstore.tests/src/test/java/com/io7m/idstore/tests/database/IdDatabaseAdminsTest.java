@@ -19,6 +19,7 @@ package com.io7m.idstore.tests.database;
 
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdAdminPermissionSet;
@@ -33,7 +34,9 @@ import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
+import com.io7m.idstore.tests.database.IdDatabaseExtension.ExpectedEvent;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.ArrayList;
@@ -44,7 +47,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_EMAIL;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_ID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_ID_NAME;
@@ -55,6 +57,11 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIR
 import static com.io7m.idstore.model.IdAdminColumn.BY_IDNAME;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
+import static com.io7m.idstore.tests.database.IdDatabaseExtension.checkAuditLog;
+import static com.io7m.idstore.tests.database.IdDatabaseExtension.databaseCreateAdminInitial;
+import static com.io7m.idstore.tests.database.IdDatabaseExtension.databaseGenerateBadPassword;
+import static com.io7m.idstore.tests.database.IdDatabaseExtension.databaseGenerateDifferentBadPassword;
+import static com.io7m.idstore.tests.database.IdDatabaseExtension.timeNow;
 import static java.time.OffsetDateTime.now;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -62,26 +69,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers(disabledWithoutDocker = true)
-public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
+@ExtendWith(IdDatabaseExtension.class)
+public final class IdDatabaseAdminsTest
 {
   /**
-   * Setting the transaction admin to a nonexistent admin fails.
+   * Setting the t admin to a nonexistent admin fails.
    *
    * @throws Exception On errors
    */
 
   @Test
-  public void testAdminSetNonexistent()
+  public void testAdminSetNonexistent(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
+    final var adminId =
+      databaseCreateAdminInitial(t, "admin", "12345678");
 
     final var ex =
       assertThrows(IdDatabaseException.class, () -> {
-        transaction.adminIdSet(randomUUID());
+        t.adminIdSet(randomUUID());
       });
     assertEquals(ADMIN_NONEXISTENT, ex.errorCode());
   }
@@ -93,17 +100,14 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminCreate0()
+  public void testAdminCreate0(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
+    final var admins =
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var reqId =
       randomUUID();
@@ -113,7 +117,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     final var password =
       createBadPassword();
 
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     var admin =
       admins.adminCreate(
@@ -154,7 +158,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     assertEquals(now.toEpochSecond(), admin.timeUpdated().toEpochSecond());
 
     checkAuditLog(
-      transaction,
+      t,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("ADMIN_CREATED", reqId.toString())
     );
@@ -167,21 +171,18 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminCreate1()
+  public void testAdminCreate1(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
+    final var admins =
+      t.queries(IdDatabaseAdminsQueriesType.class);
     final var password =
       createBadPassword();
 
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     var admin =
       admins.adminCreate(
@@ -208,7 +209,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     assertEquals("someone@example.com", admin.emails().first().value());
 
     checkAuditLog(
-      transaction,
+      t,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("ADMIN_CREATED", admin.id().toString())
     );
@@ -221,17 +222,14 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminNotInitial()
+  public void testAdminNotInitial(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
+    final var admins =
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var reqId =
       randomUUID();
@@ -241,7 +239,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     final var password =
       createBadPassword();
 
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var ex =
       assertThrows(IdDatabaseException.class, () -> {
@@ -265,15 +263,14 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminRequiresAdmin()
+  public void testAdminRequiresAdmin(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
+    final var adminId =
+      databaseCreateAdminInitial(t, "admin", "12345678");
     final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var reqId =
       randomUUID();
@@ -305,17 +302,14 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminDuplicateId()
+  public void testAdminDuplicateId(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
+    final var admins =
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var reqId =
       randomUUID();
@@ -325,7 +319,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     final var password =
       createBadPassword();
 
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var admin =
       admins.adminCreate(
@@ -361,17 +355,14 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminDuplicateEmail()
+  public void testAdminDuplicateEmail(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
+    final var admins =
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var reqId =
       randomUUID();
@@ -381,7 +372,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     final var password =
       createBadPassword();
 
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var admin =
       admins.adminCreate(
@@ -417,17 +408,14 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminDuplicateName()
+  public void testAdminDuplicateName(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
+    final var admins =
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var reqId =
       randomUUID();
@@ -437,7 +425,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     final var password =
       createBadPassword();
 
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var admin =
       admins.adminCreate(
@@ -473,17 +461,14 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminLogin()
+  public void testAdminLogin(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
-    final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
     final var adminId =
-      this.databaseCreateAdminInitial("admin", "12345678");
+      databaseCreateAdminInitial(t, "admin", "12345678");
+    final var admins =
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var id =
       randomUUID();
@@ -493,7 +478,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     final var password =
       createBadPassword();
 
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var admin =
       admins.adminCreate(
@@ -515,7 +500,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     );
 
     checkAuditLog(
-      transaction,
+      t,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("ADMIN_CREATED", id.toString()),
       new ExpectedEvent("ADMIN_LOGGED_IN", "127.0.0.1")
@@ -529,15 +514,14 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminLoginNonexistent()
+  public void testAdminLoginNonexistent(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
-    final var transaction =
-      this.transactionOf(IDSTORE);
+    final var adminId =
+      databaseCreateAdminInitial(t, "admin", "12345678");
     final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var ex =
       assertThrows(IdDatabaseException.class, () -> {
@@ -588,24 +572,17 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminUpdate()
+  public void testAdminUpdate(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
     final var adminId =
-      this.databaseCreateAdminInitial(
-        "admin",
-        "12345678"
-      );
+      databaseCreateAdminInitial(t, "admin", "12345678");
 
-    final var transaction =
-      this.transactionOf(IDSTORE);
-
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var reqId =
       randomUUID();
@@ -632,7 +609,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     assertEquals(now.toEpochSecond(), admin.timeUpdated().toEpochSecond());
     assertEquals(password, admin.password());
 
-    transaction.adminIdSet(admin.id());
+    t.adminIdSet(admin.id());
 
     final var otherPassword = databaseGenerateDifferentBadPassword();
     admins.adminUpdate(
@@ -655,7 +632,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     assertEquals(IdAdminPermissionSet.empty(), admin.permissions());
 
     checkAuditLog(
-      transaction,
+      t,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("ADMIN_CREATED", admin.id().toString())
     );
@@ -668,24 +645,17 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminUpdateNonexistent()
+  public void testAdminUpdateNonexistent(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
     final var adminId =
-      this.databaseCreateAdminInitial(
-        "admin",
-        "12345678"
-      );
+      databaseCreateAdminInitial(t, "admin", "12345678");
 
-    final var transaction =
-      this.transactionOf(IDSTORE);
-
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var reqId =
       randomUUID();
@@ -712,7 +682,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     assertEquals(now.toEpochSecond(), admin.timeUpdated().toEpochSecond());
     assertEquals(password, admin.password());
 
-    transaction.adminIdSet(admin.id());
+    t.adminIdSet(admin.id());
 
     final var ex =
       assertThrows(IdDatabaseException.class, () -> {
@@ -736,24 +706,17 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminEmailAddresses()
+  public void testAdminEmailAddresses(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
     final var adminId =
-      this.databaseCreateAdminInitial(
-        "admin",
-        "12345678"
-      );
+      databaseCreateAdminInitial(t, "admin", "12345678");
 
-    final var transaction =
-      this.transactionOf(IDSTORE);
-
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var reqId =
       randomUUID();
@@ -800,24 +763,17 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminDelete()
+  public void testAdminDelete(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
     final var adminId =
-      this.databaseCreateAdminInitial(
-        "admin",
-        "12345678"
-      );
+      databaseCreateAdminInitial(t, "admin", "12345678");
 
-    final var transaction =
-      this.transactionOf(IDSTORE);
-
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var reqId =
       randomUUID();
@@ -866,7 +822,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     }
 
     checkAuditLog(
-      transaction,
+      t,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("ADMIN_CREATED", admin.id().toString()),
       new ExpectedEvent("ADMIN_EMAIL_REMOVED", reqId + "|someone@example.com"),
@@ -881,29 +837,22 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminBan()
+  public void testAdminBan(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
     final var adminId =
-      this.databaseCreateAdminInitial(
-        "admin",
-        "12345678"
-      );
+      databaseCreateAdminInitial(t, "admin", "12345678");
 
-    final var transaction =
-      this.transactionOf(IDSTORE);
-
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var now =
       timeNow();
 
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var ban = new IdBan(adminId, "No reason.", Optional.of(now));
     admins.adminBanCreate(ban);
@@ -912,7 +861,7 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
     assertEquals(Optional.empty(), admins.adminBanGet(adminId));
 
     checkAuditLog(
-      transaction,
+      t,
       new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
       new ExpectedEvent("ADMIN_BANNED", adminId.toString()),
       new ExpectedEvent("ADMIN_BAN_REMOVED", adminId.toString())
@@ -926,24 +875,17 @@ public final class IdDatabaseAdminsTest extends IdWithDatabaseContract
    */
 
   @Test
-  public void testAdminSearchByEmailPaged()
+  public void testAdminSearchByEmailPaged(
+    final IdDatabaseTransactionType t)
     throws Exception
   {
-    assertTrue(this.containerIsRunning());
-
     final var adminId =
-      this.databaseCreateAdminInitial(
-        "admin",
-        "12345678"
-      );
+      databaseCreateAdminInitial(t, "admin", "12345678");
 
-    final var transaction =
-      this.transactionOf(IDSTORE);
-
-    transaction.adminIdSet(adminId);
+    t.adminIdSet(adminId);
 
     final var admins =
-      transaction.queries(IdDatabaseAdminsQueriesType.class);
+      t.queries(IdDatabaseAdminsQueriesType.class);
 
     final var now =
       now();
