@@ -184,6 +184,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
         transaction.commit();
       }
     } catch (final IdCommandExecutionFailure e) {
+      Span.current().setAttribute("idstore.errorCode", e.errorCode().id());
       sends.send(
         servletResponse,
         e.httpStatusCode(),
