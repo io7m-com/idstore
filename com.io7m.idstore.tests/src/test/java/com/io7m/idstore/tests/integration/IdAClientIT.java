@@ -20,6 +20,8 @@ package com.io7m.idstore.tests.integration;
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
+import com.io7m.idstore.error_codes.IdErrorCode;
+import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdEmail;
@@ -59,12 +61,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NOT_LOGGED_IN;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -450,6 +455,13 @@ public final class IdAClientIT extends IdWithServerContract
       .map(this::smokeOf);
   }
 
+  private static final Set<IdErrorCode> ALLOWED_SMOKE_CODES =
+    Set.of(
+      ADMIN_NONEXISTENT,
+      USER_NONEXISTENT,
+      PROTOCOL_ERROR
+    );
+
   private DynamicTest smokeOf(
     final Method method)
   {
@@ -489,7 +501,9 @@ public final class IdAClientIT extends IdWithServerContract
           throw e;
         } catch (final InvocationTargetException e) {
           if (e.getCause() instanceof IdAClientException ex) {
-            return;
+            if (ALLOWED_SMOKE_CODES.contains(ex.errorCode())) {
+              return;
+            }
           }
           throw e;
         }

@@ -64,12 +64,15 @@ public final class IdArbAuditSearchParametersProvider
 
     final var a =
       Combinators.combine(t, s, s, s, i).as((t0, ss0, ss1, ss2, in) -> {
+        final var size = in.intValue();
+        assert size >= 0;
+        assert size <= 65535;
         return new IdAuditSearchParameters(
           t0,
           Optional.of(ss0),
           Optional.of(ss1),
           Optional.of(ss2),
-          in.intValue()
+          size
         );
       });
 

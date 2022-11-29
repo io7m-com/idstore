@@ -103,8 +103,7 @@ public final class IdDatabaseExtension
   {
     if (!this.started) {
       this.started = true;
-      // Your "before all tests" startup logic goes here
-      // The following line registers a callback hook when the root test context is shut down
+
       context.getRoot()
         .getStore(GLOBAL)
         .put("com.io7m.idstore.tests.database.IdDatabaseExtension", this);
