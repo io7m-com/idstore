@@ -82,7 +82,7 @@
     <opentelemetry.version>1.20.1</opentelemetry.version>
     <org.javafx.version>19</org.javafx.version>
     <org.jline.version>3.21.0</org.jline.version>
-    <slf4j.version>2.0.4</slf4j.version>
+    <slf4j.version>2.0.5</slf4j.version>
     <testcontainers.version>1.17.6</testcontainers.version>
   </properties>
 
@@ -188,7 +188,7 @@
       <dependency>
         <groupId>biz.aQute.bnd</groupId>
         <artifactId>biz.aQute.bndlib</artifactId>
-        <version>6.3.1</version>
+        <version>6.4.0</version>
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>
@@ -328,7 +328,7 @@
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.5.0</version>
+        <version>42.5.1</version>
       </dependency>
       <dependency>
         <groupId>com.zaxxer</groupId>
@@ -403,7 +403,7 @@
       <dependency>
         <groupId>com.github.davidmoten</groupId>
         <artifactId>subethasmtp</artifactId>
-        <version>6.0.4</version>
+        <version>6.0.5</version>
         <exclusions>
           <exclusion>
             <groupId>com.google.code.findbugs</groupId>
@@ -484,7 +484,7 @@
       <dependency>
         <groupId>com.github.ben-manes.caffeine</groupId>
         <artifactId>caffeine</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.2</version>
         <exclusions>
           <exclusion>
             <groupId>org.checkerframework</groupId>
@@ -511,7 +511,7 @@
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
-        <version>1.7.21</version>
+        <version>1.7.22</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.verdant</groupId>
