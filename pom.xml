@@ -71,6 +71,7 @@
     <com.io7m.jqpage.version>0.0.2</com.io7m.jqpage.version>
     <com.io7m.jvindicator.version>0.0.1</com.io7m.jvindicator.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
+    <com.io7m.quixote.version>0.0.1</com.io7m.quixote.version>
     <com.io7m.trasco.version>0.0.6</com.io7m.trasco.version>
     <com.io7m.verdant.version>0.0.1</com.io7m.verdant.version>
     <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
@@ -533,11 +534,6 @@
         <version>${com.io7m.jvindicator.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.mock-server</groupId>
-        <artifactId>mockserver-netty</artifactId>
-        <version>5.14.0</version>
-      </dependency>
-      <dependency>
         <groupId>com.io7m.jqpage</groupId>
         <artifactId>com.io7m.jqpage.core</artifactId>
         <version>${com.io7m.jqpage.version}</version>
@@ -562,6 +558,11 @@
         <groupId>com.sun.xml.bind</groupId>
         <artifactId>jaxb-impl</artifactId>
         <version>4.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.quixote</groupId>
+        <artifactId>com.io7m.quixote.core</artifactId>
+        <version>${com.io7m.quixote.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

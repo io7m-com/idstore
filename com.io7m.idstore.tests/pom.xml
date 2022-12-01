@@ -155,12 +155,12 @@
       <artifactId>jul-to-slf4j</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mock-server</groupId>
-      <artifactId>mockserver-netty</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-css</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.quixote</groupId>
+      <artifactId>com.io7m.quixote.core</artifactId>
     </dependency>
   </dependencies>
 
