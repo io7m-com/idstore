@@ -55,7 +55,7 @@ import com.io7m.idstore.server.service.configuration.jaxb.SMTPSType;
 import com.io7m.idstore.server.service.configuration.jaxb.SMTPTLSType;
 import com.io7m.idstore.server.service.configuration.jaxb.SMTPType;
 import com.io7m.idstore.server.service.configuration.jaxb.Sessions;
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import org.xml.sax.SAXException;
@@ -80,7 +80,7 @@ import static com.io7m.idstore.server.api.IdServerDatabaseKind.POSTGRESQL;
  */
 
 public final class IdServerConfigurationFiles
-  implements IdServiceType
+  implements RPServiceType
 {
   /**
    * The Public API v1 message protocol.

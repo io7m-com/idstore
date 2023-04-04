@@ -23,7 +23,7 @@ import com.io7m.idstore.server.http.IdPlainErrorHandler;
 import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.http.IdServletHolders;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
@@ -62,7 +62,7 @@ public final class IdUVServer
    */
 
   public static Server createUserViewServer(
-    final IdServiceDirectoryType services)
+    final RPServiceDirectoryType services)
     throws Exception
   {
     final var configurationService =
@@ -137,7 +137,7 @@ public final class IdUVServer
   }
 
   private static ServletContextHandler createServletHolders(
-    final IdServiceDirectoryType services)
+    final RPServiceDirectoryType services)
   {
     final var servletHolders =
       new IdServletHolders(services);

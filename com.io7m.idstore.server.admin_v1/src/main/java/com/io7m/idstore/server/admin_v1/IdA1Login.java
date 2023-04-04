@@ -32,7 +32,7 @@ import com.io7m.idstore.server.http.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -69,7 +69,7 @@ public final class IdA1Login extends IdCommonInstrumentedServlet
    */
 
   public IdA1Login(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     super(Objects.requireNonNull(inServices, "services"));
 

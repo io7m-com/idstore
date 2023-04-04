@@ -17,7 +17,7 @@
 
 package com.io7m.idstore.tests.server.service;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  * @param <T> The type of service
  */
 
-public abstract class IdServiceContract<T extends IdServiceType>
+public abstract class IdServiceContract<T extends RPServiceType>
 {
   protected abstract T createInstanceA();
 

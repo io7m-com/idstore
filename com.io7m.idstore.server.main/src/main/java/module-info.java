@@ -53,7 +53,7 @@ open module com.io7m.idstore.server.main
   requires com.io7m.idstore.server.user_v1;
   requires com.io7m.idstore.server.user_view;
   requires com.io7m.idstore.server.vanilla;
-  requires com.io7m.idstore.services.api;
+  requires com.io7m.repetoir.core;
 
   requires jul.to.slf4j;
   requires org.slf4j;

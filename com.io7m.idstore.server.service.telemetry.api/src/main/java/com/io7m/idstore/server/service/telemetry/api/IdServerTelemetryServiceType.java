@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.server.service.telemetry.api;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Tracer;
 
@@ -24,7 +24,7 @@ import io.opentelemetry.api.trace.Tracer;
  * The type of server telemetry services.
  */
 
-public interface IdServerTelemetryServiceType extends IdServiceType
+public interface IdServerTelemetryServiceType extends RPServiceType
 {
   /**
    * @return The main tracer

@@ -27,8 +27,8 @@ import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.http.IdRequestUserAgents;
 import com.io7m.idstore.server.service.sessions.IdSessionMessage;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import com.io7m.jvindicator.core.Vindication;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,7 +50,7 @@ public final class IdUViewEmailAddRun extends IdUViewAuthenticatedServlet
    */
 
   public IdUViewEmailAddRun(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     super(inServices);
   }

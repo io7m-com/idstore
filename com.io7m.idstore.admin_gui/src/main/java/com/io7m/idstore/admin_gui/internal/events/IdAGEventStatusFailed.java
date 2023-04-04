@@ -17,8 +17,8 @@
 package com.io7m.idstore.admin_gui.internal.events;
 
 import com.io7m.jaffirm.core.Preconditions;
-import com.io7m.taskrecorder.core.TRFailed;
 import com.io7m.taskrecorder.core.TRTask;
+import com.io7m.taskrecorder.core.TRTaskFailed;
 
 import java.util.Objects;
 
@@ -40,7 +40,7 @@ public record IdAGEventStatusFailed(TRTask<?> task)
     Objects.requireNonNull(task, "task");
 
     Preconditions.checkPreconditionV(
-      task.resolution() instanceof TRFailed,
+      task.resolution() instanceof TRTaskFailed,
       "Task resolution %s must be 'Failed'",
       task.resolution()
     );

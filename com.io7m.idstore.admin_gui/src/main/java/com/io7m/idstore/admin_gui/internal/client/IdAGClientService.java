@@ -44,8 +44,9 @@ import com.io7m.idstore.model.IdUserCreate;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
-import com.io7m.idstore.services.api.IdServiceType;
-import com.io7m.taskrecorder.core.TRTask;
+import com.io7m.repetoir.core.RPServiceType;
+import com.io7m.taskrecorder.core.TRTaskRecorder;
+import com.io7m.taskrecorder.core.TRTaskRecorderType;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -70,7 +71,7 @@ import static com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus.DISCON
  * A client service.
  */
 
-public final class IdAGClientService implements IdServiceType, Closeable
+public final class IdAGClientService implements RPServiceType, Closeable
 {
   private static final Logger LOG =
     LoggerFactory.getLogger(IdAGClientService.class);
@@ -230,21 +231,22 @@ public final class IdAGClientService implements IdServiceType, Closeable
 
     final var future = new CompletableFuture<IdAdmin>();
     this.executor.submit(() -> {
-      final var task =
-        TRTask.create(LOG, eventConnecting.message());
-
-      try {
-        this.self = this.client.login(username, password, this.serverLatest);
-        future.complete(this.self);
-        task.setSucceeded();
-        this.publishEvent(eventConnectionOK);
-        this.publishEvent(eventConnected);
-      } catch (final Exception e) {
-        future.completeExceptionally(e);
-        final var text =
-          this.strings.format("client.connectionFailed", e.getMessage());
-        task.setFailed(text, e);
-        this.publishEvent(new IdAGClientEventConnectionFailed(task, text));
+      try (var recorder = TRTaskRecorder.<Object>create(LOG, eventConnecting.message())) {
+        try {
+          this.self = this.client.login(username, password, this.serverLatest);
+          future.complete(this.self);
+          recorder.setTaskSucceeded("OK", new Object());
+          this.publishEvent(eventConnectionOK);
+          this.publishEvent(eventConnected);
+        } catch (final Exception e) {
+          future.completeExceptionally(e);
+          final var text =
+            this.strings.format("client.connectionFailed", e.getMessage());
+          recorder.setTaskFailed(text, Optional.of(e));
+          this.publishEvent(
+            new IdAGClientEventConnectionFailed(recorder.toTask(), text)
+          );
+        }
       }
     });
     return future;
@@ -259,11 +261,11 @@ public final class IdAGClientService implements IdServiceType, Closeable
     });
   }
 
-  private TRTask<?> requestStart()
+  private TRTaskRecorderType<?> requestStart()
   {
     final var message = this.strings.format("client.requesting");
     this.publishEvent(new IdAGClientEventRequesting(message));
-    return TRTask.create(LOG, message);
+    return TRTaskRecorder.create(LOG, message);
   }
 
   /**
@@ -377,11 +379,13 @@ public final class IdAGClientService implements IdServiceType, Closeable
   }
 
   private Exception requestFailed(
-    final TRTask<?> task,
+    final TRTaskRecorderType<?> task,
     final Exception e)
   {
-    task.setFailed(e.getMessage(), e);
-    this.publishEvent(new IdAGClientEventRequestFailed(task, e.getMessage()));
+    task.setTaskFailed(e.getMessage(), Optional.of(e));
+    this.publishEvent(
+      new IdAGClientEventRequestFailed(task.toTask(), e.getMessage())
+    );
     return e;
   }
 

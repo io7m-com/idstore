@@ -27,7 +27,7 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Map;
 import java.util.Objects;
@@ -41,7 +41,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
  * A service that handles the logic for admin logins.
  */
 
-public final class IdAdminLoginService implements IdServiceType
+public final class IdAdminLoginService implements RPServiceType
 {
   private final IdServerClock clock;
   private final IdServerStrings strings;

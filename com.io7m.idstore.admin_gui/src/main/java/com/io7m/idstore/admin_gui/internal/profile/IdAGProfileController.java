@@ -25,7 +25,7 @@ import com.io7m.idstore.admin_gui.internal.users.IdAGUserEmailAddController;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdEmail;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -48,7 +48,7 @@ import java.util.UUID;
 public final class IdAGProfileController
   implements Initializable
 {
-  private final IdServiceDirectoryType services;
+  private final RPServiceDirectoryType services;
   private final IdAGConfiguration configuration;
   private final IdAGClientService client;
   private final ObservableList<IdAdminPermission> permissions;
@@ -72,7 +72,7 @@ public final class IdAGProfileController
    */
 
   public IdAGProfileController(
-    final IdServiceDirectoryType inServices,
+    final RPServiceDirectoryType inServices,
     final IdAGConfiguration inConfiguration)
   {
     this.services =

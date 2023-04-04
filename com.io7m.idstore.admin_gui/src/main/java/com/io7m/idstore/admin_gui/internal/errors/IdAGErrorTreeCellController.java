@@ -17,10 +17,10 @@
 
 package com.io7m.idstore.admin_gui.internal.errors;
 
-import com.io7m.taskrecorder.core.TRFailed;
 import com.io7m.taskrecorder.core.TRStep;
-import com.io7m.taskrecorder.core.TRStepType;
+import com.io7m.taskrecorder.core.TRStepFailed;
 import com.io7m.taskrecorder.core.TRTask;
+import com.io7m.taskrecorder.core.TRTaskItemType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -61,28 +61,22 @@ public final class IdAGErrorTreeCellController implements Initializable
    */
 
   public void setItem(
-    final TRStepType item)
+    final TRTaskItemType item)
   {
-    if (item.resolution() instanceof TRFailed) {
-      // this.stepIcon.setImage(this.icons.icon(ERROR_16));
-    } else {
-      // this.stepIcon.setImage(this.icons.icon(TASK_16));
-    }
-
-    if (item instanceof TRTask task) {
+    if (item instanceof TRTask<?> task) {
       this.stepResolution.setVisible(false);
       this.stepException.setVisible(false);
-      this.stepTitle.setText(item.name());
+      this.stepTitle.setText(item.description());
       return;
     }
 
     if (item instanceof TRStep step) {
       this.stepResolution.setVisible(true);
-      this.stepTitle.setText(item.name());
+      this.stepTitle.setText(step.description());
       this.stepResolution.setText(step.resolution().message());
 
       this.stepException.setVisible(false);
-      if (step.resolution() instanceof TRFailed failed) {
+      if (step.resolution() instanceof TRStepFailed failed) {
         failed.exception().ifPresent(exception -> {
           final var bytes = new ByteArrayOutputStream();
           try (var stream = new PrintStream(bytes, true, UTF_8)) {

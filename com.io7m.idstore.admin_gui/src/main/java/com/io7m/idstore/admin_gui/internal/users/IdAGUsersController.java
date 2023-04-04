@@ -34,7 +34,7 @@ import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserCreate;
 import com.io7m.idstore.model.IdUserSummary;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -76,7 +76,7 @@ import static javafx.scene.control.SelectionMode.SINGLE;
 public final class IdAGUsersController implements Initializable
 {
   private final IdAGConfiguration configuration;
-  private final IdServiceDirectoryType mainServices;
+  private final RPServiceDirectoryType mainServices;
   private final IdAGStrings strings;
   private final IdAGClientService client;
   private final ObservableList<IdAGUser> users;
@@ -120,7 +120,7 @@ public final class IdAGUsersController implements Initializable
    */
 
   public IdAGUsersController(
-    final IdServiceDirectoryType inMainServices,
+    final RPServiceDirectoryType inMainServices,
     final IdAGConfiguration inConfiguration)
   {
     this.configuration =

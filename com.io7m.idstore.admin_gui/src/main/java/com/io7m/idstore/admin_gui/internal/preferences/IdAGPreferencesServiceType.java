@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.admin_gui.internal.preferences;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -29,7 +29,7 @@ import java.util.function.Function;
  * The preferences service.
  */
 
-public interface IdAGPreferencesServiceType extends IdServiceType
+public interface IdAGPreferencesServiceType extends RPServiceType
 {
   /**
    * @return The current preferences

@@ -17,8 +17,8 @@
 
 package com.io7m.idstore.server.controller;
 
-import com.io7m.idstore.services.api.IdServiceType;
 import com.io7m.jxtrand.vanilla.JXTAbstractStrings;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  */
 
 public final class IdServerStrings extends JXTAbstractStrings
-  implements IdServiceType
+  implements RPServiceType
 {
   private static final Pattern WHITESPACE =
     Pattern.compile("\\s+");

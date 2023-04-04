@@ -17,7 +17,7 @@
 
 package com.io7m.idstore.server.service.reqlimit;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.input.BoundedInputStream;
 
@@ -30,7 +30,7 @@ import java.util.function.Function;
  * Methods to handle request size limits.
  */
 
-public final class IdRequestLimits implements IdServiceType
+public final class IdRequestLimits implements RPServiceType
 {
   private final Function<Long, String> requestTooLargeMessage;
 

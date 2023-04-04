@@ -18,7 +18,7 @@ package com.io7m.idstore.server.user_v1;
 
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.server.service.verdant.IdVerdantMessages;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import com.io7m.verdant.core.VProtocolException;
 import com.io7m.verdant.core.VProtocolSupported;
 import com.io7m.verdant.core.VProtocols;
@@ -48,7 +48,7 @@ public final class IdU1Versions extends HttpServlet
    */
 
   public IdU1Versions(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     this.messages =
       inServices.requireService(IdVerdantMessages.class);

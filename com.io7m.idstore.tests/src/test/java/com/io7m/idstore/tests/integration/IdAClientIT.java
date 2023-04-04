@@ -21,7 +21,6 @@ import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.error_codes.IdErrorCode;
-import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdEmail;
@@ -36,6 +35,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.tests.server.IdWithServerContract;
+import com.io7m.quixote.core.QWebServerType;
+import com.io7m.quixote.core.QWebServers;
 import com.io7m.verdant.core.VProtocolSupported;
 import com.io7m.verdant.core.VProtocols;
 import com.io7m.verdant.core.cb.VProtocolMessages;
@@ -47,10 +48,6 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import org.mockserver.integration.ClientAndServer;
-import org.mockserver.matchers.Times;
-import org.mockserver.model.HttpRequest;
-import org.mockserver.model.HttpResponse;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -77,7 +74,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Tag("admin-client")
 public final class IdAClientIT extends IdWithServerContract
 {
-  private ClientAndServer mockServer;
   private IdACB1Messages messages;
   private IdAdmin admin;
   private IdAClients clients;
@@ -85,6 +81,7 @@ public final class IdAClientIT extends IdWithServerContract
   private VProtocols versions;
   private VProtocolMessages versionMessages;
   private byte[] versionHeader;
+  private QWebServerType webServer;
 
   @BeforeEach
   public void setup()
@@ -124,16 +121,15 @@ public final class IdAClientIT extends IdWithServerContract
       VProtocolMessages.create();
     this.versionHeader =
       this.versionMessages.serialize(this.versions, 1);
-
-    this.mockServer =
-      ClientAndServer.startClientAndServer(Integer.valueOf(60000));
+    this.webServer =
+      QWebServers.createServer(60000);
   }
 
   @AfterEach
   public void tearDown()
     throws Exception
   {
-    this.mockServer.close();
+    this.webServer.close();
     this.client.close();
   }
 
@@ -147,52 +143,44 @@ public final class IdAClientIT extends IdWithServerContract
   public void testCommandRetry()
     throws Exception
   {
-    this.mockServer.when(
-      HttpRequest.request()
-        .withPath("/")
-    ).respond(
-      HttpResponse.response()
-        .withBody(this.versionHeader)
-        .withHeader("Content-Type", "application/verdant+cedarbridge")
-    );
+    this.webServer.addResponse()
+      .forPath("/")
+      .withStatus(200)
+      .withContentType("application/verdant+cedarbridge")
+      .withFixedData(this.versionHeader);
 
-    this.mockServer.when(
-      HttpRequest.request()
-        .withPath("/v1/login")
-    ).respond(
-      HttpResponse.response()
-        .withBody(this.messages.serialize(new IdAResponseLogin(
-          UUID.randomUUID(),
-          this.admin)))
-        .withHeader("Content-Type", IdACB1Messages.contentType())
-    );
+    this.webServer.addResponse()
+      .forPath("/v1/login")
+      .withStatus(200)
+      .withContentType(IdACB1Messages.contentType())
+      .withFixedData(this.messages.serialize(
+        new IdAResponseLogin(UUID.randomUUID(), this.admin)));
 
-    this.mockServer.when(
-      HttpRequest.request()
-        .withPath("/v1/command"),
-      Times.exactly(1)
-    ).respond(
-      HttpResponse.response()
-        .withStatusCode(401)
-        .withBody(this.messages.serialize(
+    this.webServer.addResponse()
+      .forPath("/v1/command")
+      .withStatus(401)
+      .withContentType(IdACB1Messages.contentType())
+      .withFixedData(
+        this.messages.serialize(
           new IdAResponseError(
-            UUID.randomUUID(),
-            AUTHENTICATION_ERROR.id(),
-            "error")))
-        .withHeader("Content-Type", IdACB1Messages.contentType())
-    );
+            UUID.randomUUID(), AUTHENTICATION_ERROR.id(), "error"))
+      );
 
-    this.mockServer.when(
-      HttpRequest.request()
-        .withPath("/v1/command"),
-      Times.exactly(1)
-    ).respond(
-      HttpResponse.response()
-        .withStatusCode(200)
-        .withBody(this.messages.serialize(
-          new IdAResponseAdminSelf(UUID.randomUUID(), this.admin)))
-        .withHeader("Content-Type", IdACB1Messages.contentType())
-    );
+    this.webServer.addResponse()
+      .forPath("/v1/login")
+      .withStatus(200)
+      .withContentType(IdACB1Messages.contentType())
+      .withFixedData(this.messages.serialize(
+        new IdAResponseLogin(UUID.randomUUID(), this.admin)));
+
+    this.webServer.addResponse()
+      .forPath("/v1/command")
+      .withStatus(200)
+      .withContentType(IdACB1Messages.contentType())
+      .withFixedData(
+        this.messages.serialize(
+          new IdAResponseAdminSelf(UUID.randomUUID(), this.admin))
+      );
 
     this.client.login(
       "someone",
@@ -214,36 +202,24 @@ public final class IdAClientIT extends IdWithServerContract
   public void testServerReturnsNonResponse()
     throws Exception
   {
-    this.mockServer.when(
-      HttpRequest.request()
-        .withPath("/")
-    ).respond(
-      HttpResponse.response()
-        .withBody(this.versionHeader)
-        .withHeader("Content-Type", "application/verdant+cedarbridge")
-    );
+    this.webServer.addResponse()
+      .forPath("/")
+      .withStatus(200)
+      .withContentType("application/verdant+cedarbridge")
+      .withFixedData(this.versionHeader);
 
-    this.mockServer.when(
-      HttpRequest.request()
-        .withPath("/v1/login")
-    ).respond(
-      HttpResponse.response()
-        .withBody(this.messages.serialize(new IdAResponseLogin(
-          UUID.randomUUID(),
-          this.admin)))
-        .withHeader("Content-Type", IdACB1Messages.contentType())
-    );
+    this.webServer.addResponse()
+      .forPath("/v1/login")
+      .withStatus(200)
+      .withContentType(IdACB1Messages.contentType())
+      .withFixedData(this.messages.serialize(
+        new IdAResponseLogin(UUID.randomUUID(), this.admin)));
 
-    this.mockServer.when(
-      HttpRequest.request()
-        .withPath("/v1/command"),
-      Times.exactly(1)
-    ).respond(
-      HttpResponse.response()
-        .withStatusCode(200)
-        .withBody(this.messages.serialize(new IdACommandAdminSelf()))
-        .withHeader("Content-Type", IdACB1Messages.contentType())
-    );
+    this.webServer.addResponse()
+      .forPath("/v1/command")
+      .withStatus(200)
+      .withContentType(IdACB1Messages.contentType())
+      .withFixedData(this.messages.serialize(new IdACommandAdminSelf()));
 
     this.client.login(
       "someone",
@@ -267,37 +243,25 @@ public final class IdAClientIT extends IdWithServerContract
   public void testServerReturnsWrongResponse()
     throws Exception
   {
-    this.mockServer.when(
-      HttpRequest.request()
-        .withPath("/")
-    ).respond(
-      HttpResponse.response()
-        .withBody(this.versionHeader)
-        .withHeader("Content-Type", "application/verdant+cedarbridge")
-    );
+    this.webServer.addResponse()
+      .forPath("/")
+      .withStatus(200)
+      .withContentType("application/verdant+cedarbridge")
+      .withFixedData(this.versionHeader);
 
-    this.mockServer.when(
-      HttpRequest.request()
-        .withPath("/v1/login")
-    ).respond(
-      HttpResponse.response()
-        .withBody(this.messages.serialize(new IdAResponseLogin(
-          UUID.randomUUID(),
-          this.admin)))
-        .withHeader("Content-Type", IdACB1Messages.contentType())
-    );
+    this.webServer.addResponse()
+      .forPath("/v1/login")
+      .withStatus(200)
+      .withContentType(IdACB1Messages.contentType())
+      .withFixedData(this.messages.serialize(
+        new IdAResponseLogin(UUID.randomUUID(), this.admin)));
 
-    this.mockServer.when(
-      HttpRequest.request()
-        .withPath("/v1/command"),
-      Times.exactly(1)
-    ).respond(
-      HttpResponse.response()
-        .withStatusCode(200)
-        .withBody(this.messages.serialize(
-          new IdAResponseUserBanDelete(UUID.randomUUID())))
-        .withHeader("Content-Type", IdACB1Messages.contentType())
-    );
+    this.webServer.addResponse()
+      .forPath("/v1/command")
+      .withStatus(200)
+      .withContentType(IdACB1Messages.contentType())
+      .withFixedData(this.messages.serialize(
+        new IdAResponseUserBanDelete(UUID.randomUUID())));
 
     this.client.login(
       "someone",

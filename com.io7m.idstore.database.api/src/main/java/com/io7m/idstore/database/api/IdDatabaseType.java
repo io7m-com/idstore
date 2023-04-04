@@ -16,13 +16,13 @@
 
 package com.io7m.idstore.database.api;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 /**
  * An open database.
  */
 
-public interface IdDatabaseType extends AutoCloseable, IdServiceType
+public interface IdDatabaseType extends AutoCloseable, RPServiceType
 {
   @Override
   void close()

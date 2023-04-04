@@ -19,7 +19,7 @@ package com.io7m.idstore.server.user_view;
 import com.io7m.idstore.server.http.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,7 +42,7 @@ public final class IdUViewLogout extends IdCommonInstrumentedServlet
    */
 
   public IdUViewLogout(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     super(Objects.requireNonNull(inServices, "services"));
 

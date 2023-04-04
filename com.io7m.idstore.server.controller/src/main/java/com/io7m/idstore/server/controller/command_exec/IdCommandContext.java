@@ -33,7 +33,7 @@ import com.io7m.idstore.server.security.IdSecurityException;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.sessions.IdSessionType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.trace.Tracer;
 
 import java.time.OffsetDateTime;
@@ -56,7 +56,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_
 
 public abstract class IdCommandContext<E extends IdProtocolMessageType, S extends IdSessionType>
 {
-  private final IdServiceDirectoryType services;
+  private final RPServiceDirectoryType services;
   private final UUID requestId;
   private final IdDatabaseTransactionType transaction;
   private final IdServerClock clock;
@@ -79,7 +79,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    */
 
   public IdCommandContext(
-    final IdServiceDirectoryType inServices,
+    final RPServiceDirectoryType inServices,
     final UUID inRequestId,
     final IdDatabaseTransactionType inTransaction,
     final S inSession,
@@ -139,7 +139,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    * @return The service directory used during execution
    */
 
-  public final IdServiceDirectoryType services()
+  public final RPServiceDirectoryType services()
   {
     return this.services;
   }

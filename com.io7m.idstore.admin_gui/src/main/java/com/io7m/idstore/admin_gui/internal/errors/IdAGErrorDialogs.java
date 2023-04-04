@@ -20,7 +20,7 @@ package com.io7m.idstore.admin_gui.internal.errors;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGCSS;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 import com.io7m.taskrecorder.core.TRTask;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -37,7 +37,7 @@ import static javafx.stage.Modality.APPLICATION_MODAL;
  * A service for creating error dialogs.
  */
 
-public final class IdAGErrorDialogs implements IdServiceType
+public final class IdAGErrorDialogs implements RPServiceType
 {
   private final IdAGStrings strings;
   private final IdAGConfiguration configuration;

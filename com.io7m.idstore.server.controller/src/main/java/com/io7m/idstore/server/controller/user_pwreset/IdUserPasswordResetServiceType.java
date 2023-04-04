@@ -19,7 +19,7 @@ package com.io7m.idstore.server.controller.user_pwreset;
 
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,7 +28,7 @@ import java.util.UUID;
  * The user password reset service.
  */
 
-public interface IdUserPasswordResetServiceType extends IdServiceType
+public interface IdUserPasswordResetServiceType extends RPServiceType
 {
   /**
    * Start a password reset.

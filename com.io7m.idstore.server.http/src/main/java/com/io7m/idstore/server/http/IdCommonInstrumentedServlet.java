@@ -18,7 +18,7 @@
 package com.io7m.idstore.server.http;
 
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.trace.SpanKind;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -49,7 +49,7 @@ public abstract class IdCommonInstrumentedServlet extends HttpServlet
   private final IdServerTelemetryServiceType telemetry;
 
   protected IdCommonInstrumentedServlet(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     this.telemetry =
       inServices.requireService(IdServerTelemetryServiceType.class);

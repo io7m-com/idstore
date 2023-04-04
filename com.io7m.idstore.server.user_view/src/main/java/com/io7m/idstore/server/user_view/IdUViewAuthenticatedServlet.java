@@ -30,7 +30,7 @@ import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,7 +52,7 @@ public abstract class IdUViewAuthenticatedServlet
 {
   private final IdServerStrings strings;
   private final IdDatabaseType database;
-  private final IdServiceDirectoryType services;
+  private final RPServiceDirectoryType services;
   private final IdSessionUserService userSessions;
   private final IdFMTemplateType<IdFMMessageData> template;
   private final IdServerBrandingServiceType branding;
@@ -67,7 +67,7 @@ public abstract class IdUViewAuthenticatedServlet
    */
 
   protected IdUViewAuthenticatedServlet(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     super(Objects.requireNonNull(inServices, "inServices"));
 
@@ -192,7 +192,7 @@ public abstract class IdUViewAuthenticatedServlet
     return this.database;
   }
 
-  protected final IdServiceDirectoryType services()
+  protected final RPServiceDirectoryType services()
   {
     return this.services;
   }

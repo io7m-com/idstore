@@ -33,7 +33,7 @@ import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -68,7 +68,7 @@ import static javafx.scene.control.SelectionMode.SINGLE;
 public final class IdAGAdminsController implements Initializable
 {
   private final IdAGConfiguration configuration;
-  private final IdServiceDirectoryType mainServices;
+  private final RPServiceDirectoryType mainServices;
   private final IdAGStrings strings;
   private final IdAGClientService client;
   private final ObservableList<IdAGAdmin> admins;
@@ -105,7 +105,7 @@ public final class IdAGAdminsController implements Initializable
    */
 
   public IdAGAdminsController(
-    final IdServiceDirectoryType inMainServices,
+    final RPServiceDirectoryType inMainServices,
     final IdAGConfiguration inConfiguration)
   {
     this.configuration =

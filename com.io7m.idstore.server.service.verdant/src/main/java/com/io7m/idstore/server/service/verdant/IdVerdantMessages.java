@@ -17,7 +17,7 @@
 
 package com.io7m.idstore.server.service.verdant;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 import com.io7m.verdant.core.VProtocolException;
 import com.io7m.verdant.core.VProtocols;
 import com.io7m.verdant.core.cb.VProtocolMessages;
@@ -28,7 +28,7 @@ import java.net.URI;
  * Service wrapper for Verdant messages.
  */
 
-public final class IdVerdantMessages implements IdServiceType
+public final class IdVerdantMessages implements RPServiceType
 {
   private final VProtocolMessages messages;
 

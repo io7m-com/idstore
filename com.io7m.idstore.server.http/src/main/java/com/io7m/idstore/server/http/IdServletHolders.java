@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.server.http;
 
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.Servlet;
 
 import java.util.Objects;
@@ -28,7 +28,7 @@ import java.util.function.Function;
 
 public final class IdServletHolders
 {
-  private final IdServiceDirectoryType services;
+  private final RPServiceDirectoryType services;
 
   /**
    * Servlet holder functions used to inject dependencies into servlets.
@@ -37,7 +37,7 @@ public final class IdServletHolders
    */
 
   public IdServletHolders(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     this.services =
       Objects.requireNonNull(inServices, "services");
@@ -56,7 +56,7 @@ public final class IdServletHolders
 
   public <T extends Servlet> IdServletHolder<T> create(
     final Class<T> clazz,
-    final Function<IdServiceDirectoryType, T> servlets)
+    final Function<RPServiceDirectoryType, T> servlets)
   {
     Objects.requireNonNull(clazz, "clazz");
     Objects.requireNonNull(servlets, "servlets");

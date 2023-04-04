@@ -62,9 +62,10 @@ import com.io7m.idstore.server.service.verdant.IdVerdantMessages;
 import com.io7m.idstore.server.user_v1.IdU1Server;
 import com.io7m.idstore.server.user_v1.IdUCB1Sends;
 import com.io7m.idstore.server.user_view.IdUVServer;
-import com.io7m.idstore.services.api.IdServiceDirectory;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
+import com.io7m.repetoir.core.RPServiceDirectory;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.SpanKind;
 import org.eclipse.jetty.server.Server;
@@ -173,11 +174,11 @@ public final class IdServer implements IdServerType
     }
   }
 
-  private IdServiceDirectory createServiceDirectory(
+  private RPServiceDirectoryType createServiceDirectory(
     final IdDatabaseType newDatabase)
     throws IOException
   {
-    final var services = new IdServiceDirectory();
+    final var services = new RPServiceDirectory();
     services.register(IdServerTelemetryServiceType.class, this.telemetry);
     services.register(IdDatabaseType.class, newDatabase);
 

@@ -19,7 +19,7 @@ package com.io7m.idstore.server.admin_v1;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.server.http.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.service.verdant.IdVerdantMessages;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import com.io7m.verdant.core.VProtocolException;
 import com.io7m.verdant.core.VProtocolSupported;
 import com.io7m.verdant.core.VProtocols;
@@ -49,7 +49,7 @@ public final class IdA1Versions extends IdCommonInstrumentedServlet
    */
 
   public IdA1Versions(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     super(Objects.requireNonNull(inServices, "services"));
 

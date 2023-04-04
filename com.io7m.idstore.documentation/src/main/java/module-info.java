@@ -54,7 +54,7 @@ open module com.io7m.idstore.documentation
   requires com.io7m.idstore.server.user_v1;
   requires com.io7m.idstore.server.user_view;
   requires com.io7m.idstore.server.vanilla;
-  requires com.io7m.idstore.services.api;
+  requires com.io7m.repetoir.core;
   requires com.io7m.idstore.user_client;
   requires com.io7m.idstore.user_client.api;
 

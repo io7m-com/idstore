@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.admin_gui.internal;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,7 +26,7 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 
 public final class IdAGBackgroundSchedulerService
-  implements IdServiceType, AutoCloseable
+  implements RPServiceType, AutoCloseable
 {
   private final ScheduledExecutorService executor;
 

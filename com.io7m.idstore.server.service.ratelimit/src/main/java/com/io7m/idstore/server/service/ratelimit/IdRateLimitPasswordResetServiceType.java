@@ -17,13 +17,13 @@
 
 package com.io7m.idstore.server.service.ratelimit;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 /**
  * A rate limiting service for password resets.
  */
 
-public interface IdRateLimitPasswordResetServiceType extends IdServiceType
+public interface IdRateLimitPasswordResetServiceType extends RPServiceType
 {
   /**
    * @param host The host performing the action

@@ -22,7 +22,7 @@ import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.util.UUID;
  * Convenient functions to send messages.
  */
 
-public final class IdACB1Sends implements IdServiceType
+public final class IdACB1Sends implements RPServiceType
 {
   private final IdACB1Messages messages;
 

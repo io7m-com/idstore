@@ -32,7 +32,7 @@ import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.http.IdRequestUserAgents;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.trace.Span;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,7 +54,7 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
   private final IdRequestLimits limits;
   private final IdUCB1Messages messages;
   private final IdUCommandExecutor executor;
-  private final IdServiceDirectoryType services;
+  private final RPServiceDirectoryType services;
 
   /**
    * A servlet for executing a single command.
@@ -63,7 +63,7 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
    */
 
   public IdU1CommandServlet(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     super(inServices);
 

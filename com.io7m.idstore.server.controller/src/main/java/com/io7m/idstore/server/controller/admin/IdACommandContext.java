@@ -21,7 +21,7 @@ import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.controller.command_exec.IdCommandContext;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -49,7 +49,7 @@ public final class IdACommandContext
    */
 
   public IdACommandContext(
-    final IdServiceDirectoryType inServices,
+    final RPServiceDirectoryType inServices,
     final UUID inRequestId,
     final IdDatabaseTransactionType inTransaction,
     final IdSessionAdmin inSession,
