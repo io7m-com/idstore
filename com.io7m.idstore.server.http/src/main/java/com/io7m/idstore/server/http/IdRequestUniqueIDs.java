@@ -18,7 +18,7 @@
 package com.io7m.idstore.server.http;
 
 import com.io7m.idstore.server.service.clock.IdServerClock;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.eclipse.jetty.server.HttpChannel;
 import org.eclipse.jetty.server.Request;
@@ -41,7 +41,7 @@ public final class IdRequestUniqueIDs implements HttpChannel.Listener
    */
 
   public IdRequestUniqueIDs(
-    final IdServiceDirectoryType services)
+    final RPServiceDirectoryType services)
   {
     Objects.requireNonNull(services, "services");
 

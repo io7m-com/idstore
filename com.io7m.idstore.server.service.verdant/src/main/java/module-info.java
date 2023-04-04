@@ -23,7 +23,7 @@ module com.io7m.idstore.server.service.verdant
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires com.io7m.idstore.services.api;
+  requires com.io7m.repetoir.core;
   requires com.io7m.verdant.core.cb;
   requires com.io7m.verdant.core;
 

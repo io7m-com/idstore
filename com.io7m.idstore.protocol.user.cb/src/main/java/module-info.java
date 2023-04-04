@@ -29,7 +29,7 @@ module com.io7m.idstore.protocol.user.cb
   requires transitive com.io7m.cedarbridge.runtime.api;
   requires transitive com.io7m.idstore.protocol.user;
   requires transitive com.io7m.idstore.protocol.api;
-  requires transitive com.io7m.idstore.services.api;
+  requires transitive com.io7m.repetoir.core;
 
   exports com.io7m.idstore.protocol.user.cb;
 }

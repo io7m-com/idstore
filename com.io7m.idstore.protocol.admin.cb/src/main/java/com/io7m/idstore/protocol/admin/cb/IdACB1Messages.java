@@ -22,11 +22,11 @@ import com.io7m.cedarbridge.runtime.bssio.CBSerializationContextBSSIO;
 import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessagesType;
-import com.io7m.idstore.services.api.IdServiceType;
 import com.io7m.jbssio.api.BSSReaderProviderType;
 import com.io7m.jbssio.api.BSSWriterProviderType;
 import com.io7m.jbssio.vanilla.BSSReaders;
 import com.io7m.jbssio.vanilla.BSSWriters;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
  */
 
 public final class IdACB1Messages
-  implements IdProtocolMessagesType<IdAMessageType>, IdServiceType
+  implements IdProtocolMessagesType<IdAMessageType>, RPServiceType
 {
   private static final ProtocolIdA1 PROTOCOL = new ProtocolIdA1();
 

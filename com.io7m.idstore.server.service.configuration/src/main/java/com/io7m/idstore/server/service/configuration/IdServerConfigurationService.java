@@ -17,7 +17,7 @@
 package com.io7m.idstore.server.service.configuration;
 
 import com.io7m.idstore.server.api.IdServerConfiguration;
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Objects;
 
@@ -25,7 +25,7 @@ import java.util.Objects;
  * A service that exposes configuration information.
  */
 
-public final class IdServerConfigurationService implements IdServiceType
+public final class IdServerConfigurationService implements RPServiceType
 {
   private final IdServerConfiguration configuration;
 

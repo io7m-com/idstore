@@ -22,7 +22,7 @@ import com.io7m.idstore.admin_gui.internal.admins.IdAGAdminsController;
 import com.io7m.idstore.admin_gui.internal.audit.IdAGAuditController;
 import com.io7m.idstore.admin_gui.internal.profile.IdAGProfileController;
 import com.io7m.idstore.admin_gui.internal.users.IdAGUsersController;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import javafx.util.Callback;
 
 import java.util.Objects;
@@ -34,7 +34,7 @@ import java.util.Objects;
 public final class IdAGMainControllerFactory
   implements Callback<Class<?>, Object>
 {
-  private final IdServiceDirectoryType services;
+  private final RPServiceDirectoryType services;
   private final IdAGConfiguration configuration;
 
   /**
@@ -45,7 +45,7 @@ public final class IdAGMainControllerFactory
    */
 
   public IdAGMainControllerFactory(
-    final IdServiceDirectoryType inServices,
+    final RPServiceDirectoryType inServices,
     final IdAGConfiguration inConfiguration)
   {
     this.services =

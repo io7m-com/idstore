@@ -21,7 +21,7 @@ open module com.io7m.idstore.admin.gui
 
   requires com.io7m.idstore.admin_client.api;
   requires com.io7m.idstore.admin_client;
-  requires com.io7m.idstore.services.api;
+  requires com.io7m.repetoir.core;
   requires com.io7m.jade.api;
   requires com.io7m.jaffirm.core;
   requires com.io7m.jproperties.core;

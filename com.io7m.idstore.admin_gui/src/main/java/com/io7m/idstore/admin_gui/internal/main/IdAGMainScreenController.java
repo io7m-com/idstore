@@ -35,9 +35,11 @@ import com.io7m.idstore.admin_gui.internal.events.IdAGEventType;
 import com.io7m.idstore.admin_gui.internal.login.IdAGLoginController;
 import com.io7m.idstore.admin_gui.internal.services.IdAGBootEvent;
 import com.io7m.idstore.admin_gui.internal.services.IdAGBootServices;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
-import com.io7m.taskrecorder.core.TRFailed;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import com.io7m.taskrecorder.core.TRTask;
+import com.io7m.taskrecorder.core.TRTaskFailed;
+import com.io7m.taskrecorder.core.TRTaskRecorder;
+import com.io7m.taskrecorder.core.TRTaskSucceeded;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -85,8 +87,8 @@ public final class IdAGMainScreenController implements Initializable
   @FXML private MenuItem mainConnectMenuItem;
   @FXML private AnchorPane mainContent;
 
-  private volatile IdServiceDirectoryType services;
-  private volatile TRTask<IdServiceDirectoryType> task;
+  private volatile RPServiceDirectoryType services;
+  private volatile TRTask<RPServiceDirectoryType> task;
   private volatile IdAGClientService client;
   private volatile IdAGEventBus events;
   private Image iconError;
@@ -143,20 +145,26 @@ public final class IdAGMainScreenController implements Initializable
       this.task = bootTask;
       if (exception != null) {
         LOG.debug("services failed: ", exception);
-        this.task = TRTask.create(LOG, "Booting application...");
-        this.task.setFailed(exception.getMessage(), Optional.of(exception));
+        try (var recorder =
+               TRTaskRecorder.<RPServiceDirectoryType>create(
+                 LOG, "Booting application...")) {
+          recorder.setTaskFailed(exception.getMessage(), Optional.of(exception));
+          this.task = recorder.toTask();
+        }
         this.onBootFailed();
         return;
       }
 
       final var resolution = bootTask.resolution();
-      if (resolution instanceof TRFailed failed) {
+      if (resolution instanceof TRTaskFailed<?> failed) {
         LOG.debug("services failed: {}", failed);
         this.onBootFailed();
         return;
       }
 
-      this.services = bootTask.result().orElseThrow();
+      if (resolution instanceof TRTaskSucceeded<RPServiceDirectoryType> succeeded) {
+        this.services = succeeded.result();
+      }
 
       Platform.runLater(() -> {
         try {

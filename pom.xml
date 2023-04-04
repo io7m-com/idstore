@@ -55,7 +55,6 @@
     <module>com.io7m.idstore.server.user_v1</module>
     <module>com.io7m.idstore.server.user_view</module>
     <module>com.io7m.idstore.server.vanilla</module>
-    <module>com.io7m.idstore.services.api</module>
     <module>com.io7m.idstore.tests.arbitraries</module>
     <module>com.io7m.idstore.tests</module>
     <module>com.io7m.idstore.user_client.api</module>
@@ -76,13 +75,13 @@
     <com.io7m.verdant.version>0.0.1</com.io7m.verdant.version>
     <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
     <io7m.api.previousVersion>0.0.9-SNAPSHOT</io7m.api.previousVersion>
-    <jetty.version>11.0.12</jetty.version>
-    <jooq.version>3.17.5</jooq.version>
+    <jetty.version>11.0.13</jetty.version>
+    <jooq.version>3.17.6</jooq.version>
     <logback.version>1.4.5</logback.version>
-    <opentelemetry.version>1.20.1</opentelemetry.version>
+    <opentelemetry.version>1.21.0</opentelemetry.version>
     <org.javafx.version>19</org.javafx.version>
     <org.jline.version>3.21.0</org.jline.version>
-    <slf4j.version>2.0.5</slf4j.version>
+    <slf4j.version>2.0.6</slf4j.version>
     <testcontainers.version>1.17.6</testcontainers.version>
   </properties>
 
@@ -313,12 +312,12 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>4.9.0</version>
+        <version>4.10.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.jlexing</groupId>
         <artifactId>com.io7m.jlexing.core</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -563,6 +562,11 @@
         <groupId>com.io7m.quixote</groupId>
         <artifactId>com.io7m.quixote.core</artifactId>
         <version>${com.io7m.quixote.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.repetoir</groupId>
+        <artifactId>com.io7m.repetoir.core</artifactId>
+        <version>0.0.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -20,11 +20,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.services.api</artifactId>
-      <version>${project.version}</version>
+      <groupId>com.io7m.repetoir</groupId>
+      <artifactId>com.io7m.repetoir.core</artifactId>
     </dependency>
-
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>

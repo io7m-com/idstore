@@ -16,8 +16,8 @@
 
 package com.io7m.idstore.admin_gui.internal;
 
-import com.io7m.idstore.services.api.IdServiceType;
 import com.io7m.jxtrand.api.JXTStringsType;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
  * The string resource service.
  */
 
-public final class IdAGStrings implements JXTStringsType, IdServiceType
+public final class IdAGStrings implements JXTStringsType, RPServiceType
 {
   private final ResourceBundle resources;
 

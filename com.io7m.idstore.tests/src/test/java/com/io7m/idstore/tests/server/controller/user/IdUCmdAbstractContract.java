@@ -39,10 +39,10 @@ import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
-import com.io7m.idstore.services.api.IdServiceDirectory;
 import com.io7m.idstore.tests.IdFakeClock;
 import com.io7m.idstore.tests.IdTestDirectories;
 import com.io7m.idstore.tests.server.api.IdServerConfigurationsTest;
+import com.io7m.repetoir.core.RPServiceDirectory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
@@ -57,7 +57,7 @@ import java.util.UUID;
 
 public abstract class IdUCmdAbstractContract
 {
-  private IdServiceDirectory services;
+  private RPServiceDirectory services;
   private IdDatabaseTransactionType transaction;
   private IdFakeClock clock;
   private IdServerClock serverClock;
@@ -134,7 +134,7 @@ public abstract class IdUCmdAbstractContract
       );
 
     this.services =
-      new IdServiceDirectory();
+      new RPServiceDirectory();
     this.transaction =
       Mockito.mock(IdDatabaseTransactionType.class);
 
@@ -205,7 +205,7 @@ public abstract class IdUCmdAbstractContract
     this.services.close();
   }
 
-  protected final IdServiceDirectory services()
+  protected final RPServiceDirectory services()
   {
     return this.services;
   }

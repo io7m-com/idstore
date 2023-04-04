@@ -36,7 +36,7 @@ module com.io7m.idstore.server.controller
   requires com.io7m.idstore.server.service.ratelimit;
   requires com.io7m.idstore.server.service.telemetry.api;
   requires com.io7m.idstore.server.service.templating;
-  requires com.io7m.idstore.services.api;
+  requires com.io7m.repetoir.core;
   requires com.io7m.jaffirm.core;
   requires com.io7m.jdeferthrow.core;
   requires com.io7m.jxtrand.vanilla;

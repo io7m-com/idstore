@@ -29,7 +29,7 @@ import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
@@ -68,7 +68,7 @@ public abstract class IdU1AuthenticatedServlet
    */
 
   protected IdU1AuthenticatedServlet(
-    final IdServiceDirectoryType services)
+    final RPServiceDirectoryType services)
   {
     super(Objects.requireNonNull(services, "services"));
 

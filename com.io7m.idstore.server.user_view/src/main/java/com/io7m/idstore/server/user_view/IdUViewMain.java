@@ -24,7 +24,7 @@ import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.server.service.templating.IdFMUserSelfData;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,7 +50,7 @@ public final class IdUViewMain extends IdUViewAuthenticatedServlet
    */
 
   public IdUViewMain(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     super(inServices);
 

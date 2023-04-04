@@ -17,7 +17,7 @@
 package com.io7m.idstore.server.http;
 
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -43,7 +43,7 @@ public final class IdCommonCSSServlet extends IdCommonInstrumentedServlet
    */
 
   public IdCommonCSSServlet(
-    final IdServiceDirectoryType inServices)
+    final RPServiceDirectoryType inServices)
   {
     super(Objects.requireNonNull(inServices, "services"));
 

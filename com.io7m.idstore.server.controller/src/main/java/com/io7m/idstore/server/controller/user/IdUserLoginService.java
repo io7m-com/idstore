@@ -29,7 +29,7 @@ import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Map;
 import java.util.Objects;
@@ -43,7 +43,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT
  * A service that handles the logic for user logins.
  */
 
-public final class IdUserLoginService implements IdServiceType
+public final class IdUserLoginService implements RPServiceType
 {
   private final IdServerClock clock;
   private final IdServerStrings strings;

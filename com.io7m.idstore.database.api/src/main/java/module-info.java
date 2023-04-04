@@ -25,7 +25,7 @@ module com.io7m.idstore.database.api
 
   requires transitive com.io7m.idstore.model;
   requires transitive com.io7m.idstore.error_codes;
-  requires transitive com.io7m.idstore.services.api;
+  requires transitive com.io7m.repetoir.core;
 
   requires io.opentelemetry.api;
   requires io.opentelemetry.context;

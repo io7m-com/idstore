@@ -23,7 +23,7 @@ module com.io7m.idstore.server.service.clock
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires transitive com.io7m.idstore.services.api;
+  requires transitive com.io7m.repetoir.core;
 
   exports com.io7m.idstore.server.service.clock;
 }

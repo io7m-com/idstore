@@ -21,11 +21,6 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.services.api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.database.api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -35,6 +30,10 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.io7m.repetoir</groupId>
+      <artifactId>com.io7m.repetoir.core</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>

@@ -17,7 +17,7 @@
 
 package com.io7m.idstore.server.service.branding;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Optional;
 
@@ -25,7 +25,7 @@ import java.util.Optional;
  * The service that supplies branding information.
  */
 
-public interface IdServerBrandingServiceType extends IdServiceType
+public interface IdServerBrandingServiceType extends RPServiceType
 {
   /**
    * @return The bytes of an SVG logo image

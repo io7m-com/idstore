@@ -18,7 +18,7 @@
 package com.io7m.idstore.server.service.mail;
 
 import com.io7m.idstore.model.IdEmail;
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 import io.opentelemetry.api.trace.Span;
 
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
  * A mail service.
  */
 
-public interface IdServerMailServiceType extends IdServiceType, AutoCloseable
+public interface IdServerMailServiceType extends RPServiceType, AutoCloseable
 {
   /**
    * Send a message to the given target address.

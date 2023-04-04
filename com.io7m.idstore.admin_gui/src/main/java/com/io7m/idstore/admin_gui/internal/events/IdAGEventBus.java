@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.admin_gui.internal.events;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Objects;
 import java.util.concurrent.Flow;
@@ -26,7 +26,7 @@ import java.util.concurrent.SubmissionPublisher;
  * The main application event bus.
  */
 
-public final class IdAGEventBus implements IdServiceType
+public final class IdAGEventBus implements RPServiceType
 {
   private final SubmissionPublisher<IdAGEventType> events;
 

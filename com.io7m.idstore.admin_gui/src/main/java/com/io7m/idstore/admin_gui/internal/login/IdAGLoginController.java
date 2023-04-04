@@ -25,8 +25,8 @@ import com.io7m.idstore.admin_gui.internal.preferences.IdAGPreferenceServerBookm
 import com.io7m.idstore.admin_gui.internal.preferences.IdAGPreferenceServerUsernamePassword;
 import com.io7m.idstore.admin_gui.internal.preferences.IdAGPreferences;
 import com.io7m.idstore.admin_gui.internal.preferences.IdAGPreferencesServiceType;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
 import com.io7m.junreachable.UnreachableCodeException;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -64,7 +64,7 @@ public final class IdAGLoginController implements Initializable
 
   private final IdAGConfiguration configuration;
   private final Stage stage;
-  private final IdServiceDirectoryType mainServices;
+  private final RPServiceDirectoryType mainServices;
   private final IdAGPreferencesServiceType preferences;
   private final IdAGStrings strings;
   private final IdAGClientService client;
@@ -95,7 +95,7 @@ public final class IdAGLoginController implements Initializable
    */
 
   public IdAGLoginController(
-    final IdServiceDirectoryType inMainServices,
+    final RPServiceDirectoryType inMainServices,
     final IdAGConfiguration inConfiguration,
     final Stage inStage)
   {

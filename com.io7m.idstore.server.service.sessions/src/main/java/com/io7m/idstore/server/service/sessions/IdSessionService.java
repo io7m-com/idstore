@@ -19,8 +19,8 @@ package com.io7m.idstore.server.service.sessions;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.io7m.idstore.services.api.IdServiceType;
 import com.io7m.jaffirm.core.Preconditions;
+import com.io7m.repetoir.core.RPServiceType;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.metrics.ObservableLongMeasurement;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ import java.util.function.BiFunction;
  */
 
 public abstract class IdSessionService<S extends IdSessionType>
-  implements IdServiceType
+  implements RPServiceType
 {
   private final ObservableLongMeasurement sessionsGauge;
   private final Cache<IdSessionSecretIdentifier, S> sessions;

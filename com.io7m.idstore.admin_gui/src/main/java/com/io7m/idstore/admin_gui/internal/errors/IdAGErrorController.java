@@ -20,8 +20,8 @@ import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.main.IdAGScreenControllerType;
 import com.io7m.taskrecorder.core.TRStep;
-import com.io7m.taskrecorder.core.TRStepType;
 import com.io7m.taskrecorder.core.TRTask;
+import com.io7m.taskrecorder.core.TRTaskItemType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
@@ -48,7 +48,7 @@ public final class IdAGErrorController
   @FXML private ImageView errorIcon;
   @FXML private Label errorTaskTitle;
   @FXML private Label errorTaskMessage;
-  @FXML private TreeView<TRStepType> errorDetails;
+  @FXML private TreeView<TRTaskItemType> errorDetails;
 
   /**
    * A controller for the error screen.
@@ -75,16 +75,16 @@ public final class IdAGErrorController
       Objects.requireNonNull(inStage, "stage");
   }
 
-  private static TreeItem<TRStepType> buildTree(
-    final TRStepType node)
+  private static TreeItem<TRTaskItemType> buildTree(
+    final TRTaskItemType node)
   {
     if (node instanceof TRStep step) {
       return new TreeItem<>(step);
     }
 
     if (node instanceof TRTask<?> task) {
-      final var taskNode = new TreeItem<TRStepType>(task);
-      for (final var step : task.steps()) {
+      final var taskNode = new TreeItem<TRTaskItemType>(task);
+      for (final var step : task.items()) {
         taskNode.getChildren().add(buildTree(step));
       }
       return taskNode;
@@ -98,7 +98,7 @@ public final class IdAGErrorController
     final URL location,
     final ResourceBundle resources)
   {
-    this.errorTaskTitle.setText(this.task.name());
+    this.errorTaskTitle.setText(this.task.description());
     this.errorTaskMessage.setText(firstLineOf(this.task.resolution().message()));
 
     this.errorDetails.setCellFactory(param -> {

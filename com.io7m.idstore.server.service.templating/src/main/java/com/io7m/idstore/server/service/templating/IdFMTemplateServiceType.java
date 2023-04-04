@@ -17,13 +17,13 @@
 
 package com.io7m.idstore.server.service.templating;
 
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceType;
 
 /**
  * A service supplying freemarker templates.
  */
 
-public interface IdFMTemplateServiceType extends IdServiceType
+public interface IdFMTemplateServiceType extends RPServiceType
 {
   /**
    * @return The login form template

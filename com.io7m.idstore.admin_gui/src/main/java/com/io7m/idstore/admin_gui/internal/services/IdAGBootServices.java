@@ -26,10 +26,12 @@ import com.io7m.idstore.admin_gui.internal.errors.IdAGErrorDialogs;
 import com.io7m.idstore.admin_gui.internal.events.IdAGEventBus;
 import com.io7m.idstore.admin_gui.internal.preferences.IdAGPreferencesService;
 import com.io7m.idstore.admin_gui.internal.preferences.IdAGPreferencesServiceType;
-import com.io7m.idstore.services.api.IdServiceDirectory;
-import com.io7m.idstore.services.api.IdServiceDirectoryType;
-import com.io7m.idstore.services.api.IdServiceType;
+import com.io7m.repetoir.core.RPServiceDirectory;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
+import com.io7m.repetoir.core.RPServiceType;
 import com.io7m.taskrecorder.core.TRTask;
+import com.io7m.taskrecorder.core.TRTaskRecorder;
+import com.io7m.taskrecorder.core.TRTaskSucceeded;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,13 +68,13 @@ public final class IdAGBootServices
    * @return A new service directory
    */
 
-  public static CompletableFuture<TRTask<IdServiceDirectoryType>> create(
+  public static CompletableFuture<TRTask<RPServiceDirectoryType>> create(
     final IdAGConfiguration configuration,
     final IdAGStrings strings,
     final Consumer<IdAGBootEvent> bootEvents)
   {
     final var future =
-      new CompletableFuture<TRTask<IdServiceDirectoryType>>();
+      new CompletableFuture<TRTask<RPServiceDirectoryType>>();
 
     final var thread = new Thread(() -> {
       try {
@@ -88,16 +90,16 @@ public final class IdAGBootServices
     return future;
   }
 
-  private static TRTask<IdServiceDirectoryType> createServices(
+  private static TRTask<RPServiceDirectoryType> createServices(
     final IdAGConfiguration configuration,
     final IdAGStrings strings,
     final Consumer<IdAGBootEvent> bootEvents)
     throws Exception
   {
     final var services =
-      new IdServiceDirectory();
+      new RPServiceDirectory();
     final var creators =
-      new ArrayList<EIBootService<? extends IdServiceType>>();
+      new ArrayList<EIBootService<? extends RPServiceType>>();
     final var eventBus =
       new IdAGEventBus();
     final var clients =
@@ -162,7 +164,10 @@ public final class IdAGBootServices
     ));
 
     final var recorder =
-      TRTask.<IdServiceDirectoryType>create(LOG, "Booting application...");
+      TRTaskRecorder.<RPServiceDirectoryType>create(
+        LOG,
+        "Booting application..."
+      );
 
     final var size = creators.size();
     for (var index = 0; index < size; ++index) {
@@ -173,25 +178,25 @@ public final class IdAGBootServices
       bootEvents.accept(new IdAGBootEvent(creator.message(), progress));
 
       try {
-        final var clazz = (Class<IdServiceType>) creator.clazz;
+        final var clazz = (Class<RPServiceType>) creator.clazz;
         final var service = creator.creator.create();
         services.register(clazz, service);
       } catch (final Exception e) {
-        recorder.setFailed(e.getMessage(), Optional.of(e));
+        recorder.setTaskFailed(e.getMessage(), Optional.of(e));
         throw e;
       }
     }
 
     if (debugFailBoot()) {
-      recorder.setFailed("Failed due to debug option!");
-      return recorder;
+      recorder.setTaskFailed("Failed due to debug option!");
+      return recorder.toTask();
     }
 
     bootEvents.accept(
       new IdAGBootEvent(IdAGApplication.appVersionedTitle(strings), 1.0)
     );
-    recorder.setResult(services);
-    return recorder;
+    recorder.setTaskResolution(new TRTaskSucceeded<>("OK", services));
+    return recorder.toTask();
   }
 
   private static boolean debugFailBoot()
@@ -208,13 +213,13 @@ public final class IdAGBootServices
     return Objects.equals(property, "TASK");
   }
 
-  private interface EIBootServiceCreatorType<T extends IdServiceType>
+  private interface EIBootServiceCreatorType<T extends RPServiceType>
   {
     T create()
       throws Exception;
   }
 
-  private record EIBootService<T extends IdServiceType>(
+  private record EIBootService<T extends RPServiceType>(
     String message,
     Class<T> clazz,
     EIBootServiceCreatorType<T> creator)
