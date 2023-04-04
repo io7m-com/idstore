@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>0.0.9-SNAPSHOT</version>
+    <version>0.0.9</version>
   </parent>
 
   <artifactId>com.io7m.idstore.protocol.user.cb</artifactId>
