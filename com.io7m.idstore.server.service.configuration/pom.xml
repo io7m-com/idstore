@@ -33,6 +33,7 @@
       <groupId>com.io7m.cxbutton</groupId>
       <artifactId>com.io7m.cxbutton.core</artifactId>
     </dependency>
+
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
