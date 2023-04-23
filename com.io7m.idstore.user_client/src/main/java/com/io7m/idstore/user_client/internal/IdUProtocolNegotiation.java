@@ -47,6 +47,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NO_SUPPORTED_PRO
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.user_client.internal.IdUCompression.decompressResponse;
 import static java.net.http.HttpResponse.BodyHandlers.ofByteArray;
+import static java.util.Objects.requireNonNullElse;
 import static java.util.Optional.empty;
 
 /**
@@ -80,7 +81,12 @@ public final class IdUProtocolNegotiation
     try {
       response = httpClient.send(request, ofByteArray());
     } catch (final IOException e) {
-      throw new IdUClientException(empty(), IO_ERROR, e, e.getMessage());
+      throw new IdUClientException(
+        empty(),
+        IO_ERROR,
+        e,
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName())
+      );
     }
 
     LOG.debug("server: status {}", response.statusCode());
@@ -101,7 +107,12 @@ public final class IdUProtocolNegotiation
     } catch (final VProtocolException e) {
       throw new IdUClientException(empty(), PROTOCOL_ERROR, e, e.getMessage());
     } catch (final IOException e) {
-      throw new IdUClientException(empty(), IO_ERROR, e, e.getMessage());
+      throw new IdUClientException(
+        empty(),
+        IO_ERROR,
+        e,
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName())
+      );
     }
 
     return message.protocols()

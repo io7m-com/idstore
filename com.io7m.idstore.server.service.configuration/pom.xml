@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>0.0.9</version>
+    <version>0.0.10</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.service.configuration</artifactId>
@@ -33,6 +33,7 @@
       <groupId>com.io7m.cxbutton</groupId>
       <artifactId>com.io7m.cxbutton.core</artifactId>
     </dependency>
+
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
