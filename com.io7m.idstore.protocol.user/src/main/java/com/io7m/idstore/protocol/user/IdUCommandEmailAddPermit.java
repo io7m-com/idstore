@@ -41,4 +41,10 @@ public record IdUCommandEmailAddPermit(
   {
     Objects.requireNonNull(token, "email");
   }
+
+  @Override
+  public Class<IdUResponseEmailAddPermit> responseClass()
+  {
+    return IdUResponseEmailAddPermit.class;
+  }
 }

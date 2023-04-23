@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.tests.arbitraries;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
@@ -281,7 +282,7 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
     final var s0 =
       Arbitraries.strings();
     final var s1 =
-      Arbitraries.strings();
+      Arbitraries.defaultFor(IdErrorCode.class);
 
     final var s2 =
       Arbitraries.strings();

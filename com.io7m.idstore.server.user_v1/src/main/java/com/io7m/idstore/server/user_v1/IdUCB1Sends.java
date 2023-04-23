@@ -81,7 +81,7 @@ public final class IdUCB1Sends implements RPServiceType
       new IdUResponseError(
         requestId,
         message,
-        errorCode.id(),
+        errorCode,
         attributes,
         remediatingAction
       )

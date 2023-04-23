@@ -29,12 +29,14 @@ module com.io7m.idstore.user_client
   requires com.io7m.idstore.protocol.user.cb;
   requires com.io7m.idstore.protocol.user;
 
+  requires com.io7m.genevan.core;
+  requires com.io7m.jmulticlose.core;
+  requires com.io7m.junreachable.core;
   requires com.io7m.jxtrand.vanilla;
+  requires com.io7m.verdant.core.cb;
+  requires com.io7m.verdant.core;
   requires java.net.http;
   requires org.slf4j;
-  requires com.io7m.genevan.core;
-  requires com.io7m.verdant.core;
-  requires com.io7m.verdant.core.cb;
 
   opens com.io7m.idstore.user_client.internal
     to com.io7m.jxtrand.vanilla;

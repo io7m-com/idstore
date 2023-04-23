@@ -16,37 +16,23 @@
 
 package com.io7m.idstore.user_client.api;
 
-import com.io7m.idstore.model.IdUser;
-
-import java.io.Closeable;
-import java.net.URI;
-import java.util.Map;
+import com.io7m.hibiscus.api.HBClientType;
+import com.io7m.idstore.protocol.user.IdUCommandType;
+import com.io7m.idstore.protocol.user.IdUResponseError;
+import com.io7m.idstore.protocol.user.IdUResponseType;
 
 /**
  * The type of clients.
  */
 
 public interface IdUClientType
-  extends Closeable, IdUClientUsersType
+  extends HBClientType<
+  IdUClientException,
+  IdUCommandType<?>,
+  IdUResponseType,
+  IdUResponseError,
+  IdUClientEventType,
+  IdUClientCredentials>
 {
-  /**
-   * Log in.
-   *
-   * @param user     The admin username
-   * @param password The password
-   * @param base     The base URI
-   * @param metadata Optional metadata to be included with the request
-   *
-   * @return The logged-in user
-   *
-   * @throws IdUClientException   On errors
-   * @throws InterruptedException On interruption
-   */
 
-  IdUser login(
-    String user,
-    String password,
-    URI base,
-    Map<String, String> metadata)
-    throws IdUClientException, InterruptedException;
 }

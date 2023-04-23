@@ -16,6 +16,8 @@
 
 package com.io7m.idstore.protocol.user;
 
+import com.io7m.hibiscus.api.HBResponseType;
+
 import java.util.UUID;
 
 /**
@@ -23,7 +25,7 @@ import java.util.UUID;
  */
 
 public sealed interface IdUResponseType
-  extends IdUMessageType
+  extends IdUMessageType, HBResponseType
   permits IdUResponseEmailAddBegin,
   IdUResponseEmailAddDeny,
   IdUResponseEmailAddPermit,

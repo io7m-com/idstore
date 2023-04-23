@@ -16,26 +16,25 @@
 
 package com.io7m.idstore.user_client.api;
 
-import java.util.Locale;
+import com.io7m.hibiscus.api.HBClientFactoryType;
+import com.io7m.idstore.protocol.user.IdUCommandType;
+import com.io7m.idstore.protocol.user.IdUResponseError;
+import com.io7m.idstore.protocol.user.IdUResponseType;
 
 /**
  * A factory of clients.
  */
 
 public interface IdUClientFactoryType
+  extends HBClientFactoryType<
+  IdUClientException,
+  IdUClientConfiguration,
+  IdUCommandType<?>,
+  IdUResponseType,
+  IdUResponseError,
+  IdUClientEventType,
+  IdUClientCredentials,
+  IdUClientType>
 {
-  /**
-   * Create a new client.
-   *
-   * @param locale The locale for messages
-   *
-   * @return A new client
-   *
-   * @throws IdUClientException    On errors
-   * @throws InterruptedException On interruption
-   */
 
-  IdUClientType create(
-    Locale locale)
-    throws IdUClientException, InterruptedException;
 }

@@ -26,7 +26,6 @@ import java.util.Objects;
  * @param realName The real name
  */
 
-
 public record IdUCommandRealnameUpdate(
   IdRealName realName)
   implements IdUCommandType<IdUResponseUserUpdate>
@@ -40,5 +39,11 @@ public record IdUCommandRealnameUpdate(
   public IdUCommandRealnameUpdate
   {
     Objects.requireNonNull(realName, "realName");
+  }
+
+  @Override
+  public Class<IdUResponseUserUpdate> responseClass()
+  {
+    return IdUResponseUserUpdate.class;
   }
 }

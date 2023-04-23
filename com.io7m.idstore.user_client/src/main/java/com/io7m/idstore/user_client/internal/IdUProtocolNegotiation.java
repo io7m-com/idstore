@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,7 +14,6 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.user_client.internal;
 
 import com.io7m.genevan.core.GenProtocolException;
@@ -24,6 +23,7 @@ import com.io7m.genevan.core.GenProtocolSolved;
 import com.io7m.genevan.core.GenProtocolSolver;
 import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
+import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.verdant.core.VProtocolException;
 import com.io7m.verdant.core.VProtocols;
@@ -38,7 +38,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -167,7 +166,7 @@ public final class IdUProtocolNegotiation
   /**
    * Negotiate a protocol handler.
    *
-   * @param locale     The locale
+   * @param configuration     The configuration
    * @param httpClient The HTTP client
    * @param strings    The string resources
    * @param base       The base URI
@@ -178,21 +177,21 @@ public final class IdUProtocolNegotiation
    * @throws InterruptedException On interruption
    */
 
-  public static IdUClientProtocolHandlerType negotiateProtocolHandler(
-    final Locale locale,
+  public static IdUHandlerType negotiateProtocolHandler(
+    final IdUClientConfiguration configuration,
     final HttpClient httpClient,
     final IdUStrings strings,
     final URI base)
     throws IdUClientException, InterruptedException
   {
-    Objects.requireNonNull(locale, "locale");
+    Objects.requireNonNull(configuration, "configuration");
     Objects.requireNonNull(httpClient, "httpClient");
     Objects.requireNonNull(strings, "strings");
     Objects.requireNonNull(base, "base");
 
     final var clientSupports =
       List.of(
-        new IdUClientProtocolHandlers1()
+        new IdUHandlers1()
       );
 
     final var serverProtocols =
@@ -201,10 +200,10 @@ public final class IdUProtocolNegotiation
     LOG.debug("server supports {} protocols", serverProtocols.size());
 
     final var solver =
-      GenProtocolSolver.<IdUClientProtocolHandlerFactoryType, IdUServerEndpoint>create(
-        locale);
+      GenProtocolSolver.<IdUHandlerFactoryType, IdUServerEndpoint>
+        create(configuration.locale());
 
-    final GenProtocolSolved<IdUClientProtocolHandlerFactoryType, IdUServerEndpoint> solved;
+    final GenProtocolSolved<IdUHandlerFactoryType, IdUServerEndpoint> solved;
     try {
       solved = solver.solve(
         serverProtocols,
@@ -238,6 +237,7 @@ public final class IdUProtocolNegotiation
     );
 
     return solved.clientHandler().createHandler(
+      configuration,
       httpClient,
       strings,
       target

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,37 +16,33 @@
 
 package com.io7m.idstore.user_client.internal;
 
-import com.io7m.idstore.user_client.api.IdUClientException;
-import com.io7m.idstore.user_client.api.IdUClientUsersType;
+import com.io7m.genevan.core.GenProtocolClientHandlerType;
+import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 
 import java.net.URI;
-import java.util.Map;
+import java.net.http.HttpClient;
 
 /**
- * A versioned protocol handler.
+ * The type of protocol handler factories.
  */
 
-public interface IdUClientProtocolHandlerType
-  extends IdUClientUsersType
+public interface IdUHandlerFactoryType
+  extends GenProtocolClientHandlerType
 {
   /**
-   * Attempt to log in.
+   * Create a new handler.
    *
-   * @param user     The user
-   * @param password The password
-   * @param base     The base URI
-   * @param metadata Optional metadata properties to include with the request
+   * @param configuration The configuration
+   * @param inHttpClient  The underlying HTTP client
+   * @param inStrings     The string resources
+   * @param baseURI       The base URI negotiated by the server
    *
-   * @return A new protocol handler
-   *
-   * @throws IdUClientException   On errors
-   * @throws InterruptedException On interruption
+   * @return A new handler
    */
 
-  IdUNewHandler login(
-    String user,
-    String password,
-    URI base,
-    Map<String, String> metadata)
-    throws IdUClientException, InterruptedException;
+  IdUHandlerType createHandler(
+    IdUClientConfiguration configuration,
+    HttpClient inHttpClient,
+    IdUStrings inStrings,
+    URI baseURI);
 }

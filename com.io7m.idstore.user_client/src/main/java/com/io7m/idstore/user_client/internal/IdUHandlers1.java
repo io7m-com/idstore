@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,12 +14,12 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.user_client.internal;
 
 import com.io7m.genevan.core.GenProtocolIdentifier;
 import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
+import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -31,25 +31,16 @@ import static java.math.BigInteger.ZERO;
  * The factory of version 1 protocol handlers.
  */
 
-public final class IdUClientProtocolHandlers1
-  implements IdUClientProtocolHandlerFactoryType
+public final class IdUHandlers1
+  implements IdUHandlerFactoryType
 {
   /**
    * The factory of version 1 protocol handlers.
    */
 
-  public IdUClientProtocolHandlers1()
+  public IdUHandlers1()
   {
 
-  }
-
-  @Override
-  public IdUClientProtocolHandlerType createHandler(
-    final HttpClient inHttpClient,
-    final IdUStrings inStrings,
-    final URI inBase)
-  {
-    return new IdUClientProtocolHandler1(inHttpClient, inStrings, inBase);
   }
 
   @Override
@@ -59,5 +50,15 @@ public final class IdUClientProtocolHandlers1
       IdUCB1Messages.protocolId().toString(),
       new GenProtocolVersion(ONE, ZERO)
     );
+  }
+
+  @Override
+  public IdUHandlerType createHandler(
+    final IdUClientConfiguration configuration,
+    final HttpClient inHttpClient,
+    final IdUStrings inStrings,
+    final URI inBaseURI)
+  {
+    return new IdUHandler1(configuration, inStrings, inHttpClient, inBaseURI);
   }
 }

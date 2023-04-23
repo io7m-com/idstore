@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,37 +14,31 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.protocol.user;
+package com.io7m.idstore.user_client.api;
 
-import com.io7m.idstore.model.IdEmail;
+import com.io7m.hibiscus.api.HBConfigurationType;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
- * A request to add an email address.
+ * The user client configuration.
  *
- * @param email The email address
+ * @param locale The locale
  */
 
-
-public record IdUCommandEmailAddBegin(
-  IdEmail email)
-  implements IdUCommandType<IdUResponseEmailAddBegin>
+public record IdUClientConfiguration(
+  Locale locale)
+  implements HBConfigurationType
 {
   /**
-   * A request to add an email address.
+   * The user client configuration.
    *
-   * @param email The email address
+   * @param locale The locale
    */
 
-  public IdUCommandEmailAddBegin
+  public IdUClientConfiguration
   {
-    Objects.requireNonNull(email, "email");
-  }
-
-  @Override
-  public Class<IdUResponseEmailAddBegin> responseClass()
-  {
-    return IdUResponseEmailAddBegin.class;
+    Objects.requireNonNull(locale, "locale");
   }
 }

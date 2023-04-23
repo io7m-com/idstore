@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,37 +14,30 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.protocol.user;
+package com.io7m.idstore.user_client.internal;
 
-import com.io7m.idstore.model.IdEmail;
-
-import java.util.Objects;
+import java.util.UUID;
 
 /**
- * A request to add an email address.
- *
- * @param email The email address
+ * UUID functions.
  */
 
-
-public record IdUCommandEmailAddBegin(
-  IdEmail email)
-  implements IdUCommandType<IdUResponseEmailAddBegin>
+public final class IdUUUIDs
 {
-  /**
-   * A request to add an email address.
-   *
-   * @param email The email address
-   */
+  private static final UUID NULL_UUID =
+    UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-  public IdUCommandEmailAddBegin
+  private IdUUUIDs()
   {
-    Objects.requireNonNull(email, "email");
+
   }
 
-  @Override
-  public Class<IdUResponseEmailAddBegin> responseClass()
+  /**
+   * @return The null UUID
+   */
+
+  public static UUID nullUUID()
   {
-    return IdUResponseEmailAddBegin.class;
+    return NULL_UUID;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,17 +16,16 @@
 
 package com.io7m.idstore.user_client;
 
+import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientFactoryType;
 import com.io7m.idstore.user_client.api.IdUClientType;
 import com.io7m.idstore.user_client.internal.IdUClient;
-import com.io7m.idstore.user_client.internal.IdUClientProtocolHandlerDisconnected;
 import com.io7m.idstore.user_client.internal.IdUStrings;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.CookieManager;
 import java.net.http.HttpClient;
-import java.util.Locale;
 
 /**
  * The default client factory.
@@ -43,13 +42,25 @@ public final class IdUClients implements IdUClientFactoryType
 
   }
 
+  /**
+   * Open a new client.
+   *
+   * @param configuration The client configuration
+   *
+   * @return A new client
+   */
+
   @Override
-  public IdUClientType create(final Locale locale)
+  public IdUClientType open(
+    final IdUClientConfiguration configuration)
   {
     final var cookieJar =
       new CookieManager();
+    final var locale =
+      configuration.locale();
 
     final IdUStrings strings;
+
     try {
       strings = new IdUStrings(locale);
     } catch (final IOException e) {
@@ -61,11 +72,6 @@ public final class IdUClients implements IdUClientFactoryType
         .cookieHandler(cookieJar)
         .build();
 
-    return new IdUClient(
-      locale,
-      strings,
-      httpClient,
-      new IdUClientProtocolHandlerDisconnected(locale, strings, httpClient)
-    );
+    return IdUClient.open(configuration, strings, httpClient);
   }
 }

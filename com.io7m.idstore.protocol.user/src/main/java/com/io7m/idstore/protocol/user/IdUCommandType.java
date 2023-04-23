@@ -17,6 +17,8 @@
 
 package com.io7m.idstore.protocol.user;
 
+import com.io7m.hibiscus.api.HBCommandType;
+
 /**
  * The type of commands in the User protocol.
  *
@@ -24,7 +26,7 @@ package com.io7m.idstore.protocol.user;
  */
 
 public sealed interface IdUCommandType<R extends IdUResponseType>
-  extends IdUMessageType
+  extends IdUMessageType, HBCommandType
   permits IdUCommandEmailAddBegin,
   IdUCommandEmailAddDeny,
   IdUCommandEmailAddPermit,
@@ -36,5 +38,9 @@ public sealed interface IdUCommandType<R extends IdUResponseType>
   IdUCommandRealnameUpdate,
   IdUCommandUserSelf
 {
+  /**
+   * @return The response class associated with a successful command execution
+   */
 
+  Class<R> responseClass();
 }

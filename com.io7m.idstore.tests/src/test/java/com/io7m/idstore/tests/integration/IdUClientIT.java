@@ -32,6 +32,8 @@ import com.io7m.idstore.protocol.user.IdUResponseUserSelf;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.tests.server.IdWithServerContract;
 import com.io7m.idstore.user_client.IdUClients;
+import com.io7m.idstore.user_client.api.IdUClientConfiguration;
+import com.io7m.idstore.user_client.api.IdUClientCredentials;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.idstore.user_client.api.IdUClientType;
 import com.io7m.quixote.core.QWebServerType;
@@ -105,7 +107,7 @@ public final class IdUClientIT extends IdWithServerContract
     this.clients =
       new IdUClients();
     this.client =
-      this.clients.create(Locale.ROOT);
+      this.clients.open(new IdUClientConfiguration(Locale.ROOT));
 
     this.messages =
       new IdUCB1Messages();
@@ -170,7 +172,7 @@ public final class IdUClientIT extends IdWithServerContract
           new IdUResponseError(
             UUID.randomUUID(),
             "error",
-            AUTHENTICATION_ERROR.id(),
+            AUTHENTICATION_ERROR,
             Map.of(),
             Optional.empty()))
       );
@@ -194,14 +196,20 @@ public final class IdUClientIT extends IdWithServerContract
       );
 
     this.client.login(
-      "someone",
-      "whatever",
-      URI.create("http://localhost:60001/"),
-      Map.of()
+      new IdUClientCredentials(
+        "someone",
+        "whatever",
+        URI.create("http://localhost:60001/"),
+        Map.of()
+      )
     );
 
-    final var result = this.client.userSelf();
-    assertEquals(this.user.id(), result.id());
+    final var result =
+      this.client.execute(new IdUCommandUserSelf())
+        .map(IdUResponseUserSelf.class::cast)
+        .orElseThrow(e -> new IllegalStateException());
+
+    assertEquals(this.user.id(), result.user().id());
   }
 
   /**
@@ -236,14 +244,25 @@ public final class IdUClientIT extends IdWithServerContract
       .withFixedData(this.messages.serialize(new IdUCommandUserSelf()));
 
     this.client.login(
-      "someone",
-      "whatever",
-      URI.create("http://localhost:60001/"),
-      Map.of()
+      new IdUClientCredentials(
+        "someone",
+        "whatever",
+        URI.create("http://localhost:60001/"),
+        Map.of()
+      )
     );
 
     final var ex =
-      assertThrows(IdUClientException.class, () -> this.client.userSelf());
+      assertThrows(IdUClientException.class, () -> {
+        this.client.execute(new IdUCommandUserSelf())
+          .orElseThrow(e -> new IdUClientException(
+            e.message(),
+            e.errorCode(),
+            e.attributes(),
+            e.remediatingAction(),
+            Optional.of(e.requestId())
+          ));
+      });
 
     assertEquals(PROTOCOL_ERROR, ex.errorCode());
   }
@@ -282,14 +301,25 @@ public final class IdUClientIT extends IdWithServerContract
       );
 
     this.client.login(
-      "someone",
-      "whatever",
-      URI.create("http://localhost:60001/"),
-      Map.of()
+      new IdUClientCredentials(
+        "someone",
+        "whatever",
+        URI.create("http://localhost:60001/"),
+        Map.of()
+      )
     );
 
     final var ex =
-      assertThrows(IdUClientException.class, () -> this.client.userSelf());
+      assertThrows(IdUClientException.class, () -> {
+        this.client.execute(new IdUCommandUserSelf())
+          .orElseThrow(e -> new IdUClientException(
+            e.message(),
+            e.errorCode(),
+            e.attributes(),
+            e.remediatingAction(),
+            Optional.of(e.requestId())
+          ));
+      });
 
     assertEquals(PROTOCOL_ERROR, ex.errorCode());
   }
@@ -438,7 +468,14 @@ public final class IdUClientIT extends IdWithServerContract
           }
         }
 
-        this.client.login("someone", "12345678", this.serverUserAPIURL(), Map.of());
+        this.client.login(
+          new IdUClientCredentials(
+            "someone",
+            "12345678",
+            this.serverUserAPIURL(),
+            Map.of()
+          )
+        );
 
         try {
           method.invoke(this.client, parameters);

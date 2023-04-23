@@ -83,7 +83,7 @@ import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
- * The basic server frontend.
+ * The internal server frontend.
  */
 
 public final class IdServer implements IdServerType
@@ -95,7 +95,7 @@ public final class IdServer implements IdServerType
   private IdDatabaseType database;
 
   /**
-   * The basic server frontend.
+   * The internal server frontend.
    *
    * @param inConfiguration The server configuration
    */

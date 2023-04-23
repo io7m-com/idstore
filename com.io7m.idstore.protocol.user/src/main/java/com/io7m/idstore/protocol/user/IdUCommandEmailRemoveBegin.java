@@ -26,7 +26,6 @@ import java.util.Objects;
  * @param email The email address
  */
 
-
 public record IdUCommandEmailRemoveBegin(
   IdEmail email)
   implements IdUCommandType<IdUResponseEmailRemoveBegin>
@@ -40,5 +39,11 @@ public record IdUCommandEmailRemoveBegin(
   public IdUCommandEmailRemoveBegin
   {
     Objects.requireNonNull(email, "email");
+  }
+
+  @Override
+  public Class<IdUResponseEmailRemoveBegin> responseClass()
+  {
+    return IdUResponseEmailRemoveBegin.class;
   }
 }

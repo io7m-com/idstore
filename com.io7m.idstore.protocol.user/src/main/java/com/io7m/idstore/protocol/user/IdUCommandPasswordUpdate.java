@@ -21,7 +21,7 @@ import java.util.Objects;
 /**
  * A request to change the user's password.
  *
- * @param password The password
+ * @param password        The password
  * @param passwordConfirm The password confirmation
  */
 
@@ -33,7 +33,7 @@ public record IdUCommandPasswordUpdate(
   /**
    * A request to change the user's password.
    *
-   * @param password The password
+   * @param password        The password
    * @param passwordConfirm The password confirmation
    */
 
@@ -41,5 +41,11 @@ public record IdUCommandPasswordUpdate(
   {
     Objects.requireNonNull(password, "password");
     Objects.requireNonNull(passwordConfirm, "passwordConfirm");
+  }
+
+  @Override
+  public Class<IdUResponseUserUpdate> responseClass()
+  {
+    return IdUResponseUserUpdate.class;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,31 +16,31 @@
 
 package com.io7m.idstore.user_client.internal;
 
-import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.protocol.user.IdUResponseLogin;
 
 import java.util.Objects;
 
 /**
  * A newly negotiated protocol handler.
  *
- * @param userLoggedIn The user that logged in
- * @param handler       The protocol handler
+ * @param response The successful login
+ * @param handler  The protocol handler
  */
 
 public record IdUNewHandler(
-  IdUser userLoggedIn,
-  IdUClientProtocolHandlerType handler)
+  IdUResponseLogin response,
+  IdUHandlerType handler)
 {
   /**
    * A newly negotiated protocol handler.
    *
-   * @param userLoggedIn The user that logged in
-   * @param handler       The protocol handler
+   * @param response The successful login
+   * @param handler  The protocol handler
    */
 
   public IdUNewHandler
   {
-    Objects.requireNonNull(userLoggedIn, "userLoggedIn");
+    Objects.requireNonNull(response, "userLoggedIn");
     Objects.requireNonNull(handler, "handler");
   }
 }

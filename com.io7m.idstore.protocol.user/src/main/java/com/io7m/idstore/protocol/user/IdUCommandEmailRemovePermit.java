@@ -26,7 +26,6 @@ import java.util.Objects;
  * @param token The email address
  */
 
-
 public record IdUCommandEmailRemovePermit(
   IdToken token)
   implements IdUCommandType<IdUResponseEmailRemovePermit>
@@ -40,5 +39,11 @@ public record IdUCommandEmailRemovePermit(
   public IdUCommandEmailRemovePermit
   {
     Objects.requireNonNull(token, "email");
+  }
+
+  @Override
+  public Class<IdUResponseEmailRemovePermit> responseClass()
+  {
+    return IdUResponseEmailRemovePermit.class;
   }
 }

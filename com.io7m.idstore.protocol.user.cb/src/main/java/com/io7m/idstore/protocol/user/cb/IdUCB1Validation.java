@@ -18,6 +18,7 @@ package com.io7m.idstore.protocol.user.cb;
 
 import com.io7m.cedarbridge.runtime.api.CBMap;
 import com.io7m.cedarbridge.runtime.api.CBString;
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordException;
@@ -173,7 +174,7 @@ public final class IdUCB1Validation
   {
     return new IdU1ResponseError(
       toWireUUID(error.requestId()),
-      new CBString(error.errorCode()),
+      new CBString(error.errorCode().id()),
       new CBString(error.message()),
       new CBMap<>(
         error.attributes()
@@ -313,7 +314,7 @@ public final class IdUCB1Validation
     return new IdUResponseError(
       fromWireUUID(error.fieldRequestId()),
       error.fieldMessage().value(),
-      error.fieldErrorCode().value(),
+      new IdErrorCode(error.fieldErrorCode().value()),
       error.fieldAttributes()
         .values()
         .entrySet()

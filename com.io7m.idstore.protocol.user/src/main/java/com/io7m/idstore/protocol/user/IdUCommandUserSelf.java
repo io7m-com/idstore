@@ -23,5 +23,9 @@ package com.io7m.idstore.protocol.user;
 public record IdUCommandUserSelf()
   implements IdUCommandType<IdUResponseUserSelf>
 {
-
+  @Override
+  public Class<IdUResponseUserSelf> responseClass()
+  {
+    return IdUResponseUserSelf.class;
+  }
 }

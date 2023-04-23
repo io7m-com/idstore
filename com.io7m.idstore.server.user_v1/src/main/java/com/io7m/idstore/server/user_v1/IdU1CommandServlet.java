@@ -160,7 +160,7 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
       final IdUResponseType result = this.executor.execute(context, command);
       sends.send(servletResponse, 200, result);
       if (result instanceof IdUResponseError error) {
-        Span.current().setAttribute("idstore.errorCode", error.errorCode());
+        Span.current().setAttribute("idstore.errorCode", error.errorCode().id());
       } else {
         transaction.commit();
       }
@@ -171,8 +171,8 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
         e.httpStatusCode(),
         new IdUResponseError(
           e.requestId(),
-          e.errorCode().id(),
           e.getMessage(),
+          e.errorCode(),
           e.attributes(),
           e.remediatingAction()
         ));

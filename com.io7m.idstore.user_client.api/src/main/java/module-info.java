@@ -23,7 +23,8 @@ module com.io7m.idstore.user_client.api
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires transitive com.io7m.idstore.model;
+  requires transitive com.io7m.hibiscus.api;
+  requires transitive com.io7m.idstore.protocol.user;
 
   exports com.io7m.idstore.user_client.api;
 }

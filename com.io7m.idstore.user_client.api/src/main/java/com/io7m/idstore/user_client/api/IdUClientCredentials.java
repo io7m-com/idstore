@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,45 +14,44 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.protocol.user;
+package com.io7m.idstore.user_client.api;
 
-import com.io7m.idstore.model.IdName;
+import com.io7m.hibiscus.api.HBCredentialsType;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 
 /**
- * A request to log in.
+ * The client credentials.
  *
- * @param userName The username
- * @param password The password
- * @param metadata Extra metadata included with the request
+ * @param userName   The username
+ * @param password   The password
+ * @param baseURI    The base URI
+ * @param attributes The attributes
  */
 
-public record IdUCommandLogin(
-  IdName userName,
+public record IdUClientCredentials(
+  String userName,
   String password,
-  Map<String, String> metadata)
-  implements IdUCommandType<IdUResponseLogin>
+  URI baseURI,
+  Map<String, String> attributes)
+  implements HBCredentialsType
 {
   /**
-   * A request to log in.
+   * The client credentials.
    *
-   * @param userName The username
-   * @param password The password
-   * @param metadata Extra metadata included with the request
+   * @param userName   The username
+   * @param password   The password
+   * @param baseURI    The base URI
+   * @param attributes The attributes
    */
 
-  public IdUCommandLogin
+  public IdUClientCredentials
   {
     Objects.requireNonNull(userName, "userName");
     Objects.requireNonNull(password, "password");
-    Objects.requireNonNull(metadata, "metadata");
-  }
-
-  @Override
-  public Class<IdUResponseLogin> responseClass()
-  {
-    return IdUResponseLogin.class;
+    Objects.requireNonNull(baseURI, "baseURI");
+    Objects.requireNonNull(attributes, "attributes");
   }
 }

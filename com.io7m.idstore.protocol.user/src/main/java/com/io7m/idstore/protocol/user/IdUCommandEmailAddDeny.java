@@ -41,4 +41,10 @@ public record IdUCommandEmailAddDeny(
   {
     Objects.requireNonNull(token, "email");
   }
+
+  @Override
+  public Class<IdUResponseEmailAddDeny> responseClass()
+  {
+    return IdUResponseEmailAddDeny.class;
+  }
 }

@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.protocol.user;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.seltzer.api.SStructuredErrorType;
 
 import java.util.Map;
@@ -36,10 +37,10 @@ import java.util.UUID;
 public record IdUResponseError(
   UUID requestId,
   String message,
-  String errorCode,
+  IdErrorCode errorCode,
   Map<String, String> attributes,
   Optional<String> remediatingAction)
-  implements IdUResponseType, SStructuredErrorType<String>
+  implements IdUResponseType, SStructuredErrorType<IdErrorCode>
 {
   /**
    * An error response.

@@ -10,6 +10,7 @@ com.io7m.idstore.tests.arbitraries.IdArbAuditSearchParametersProvider
 com.io7m.idstore.tests.arbitraries.IdArbBanProvider
 com.io7m.idstore.tests.arbitraries.IdArbEmailProvider
 com.io7m.idstore.tests.arbitraries.IdArbHashProvider
+com.io7m.idstore.tests.arbitraries.IdArbIdErrorCodeProvider
 com.io7m.idstore.tests.arbitraries.IdArbIdNameProvider
 com.io7m.idstore.tests.arbitraries.IdArbInetAddressProvider
 com.io7m.idstore.tests.arbitraries.IdArbLoginProvider

@@ -25,6 +25,7 @@ module com.io7m.idstore.protocol.user
 
   requires transitive com.io7m.idstore.model;
   requires transitive com.io7m.idstore.protocol.api;
+  requires transitive com.io7m.hibiscus.api;
 
   exports com.io7m.idstore.protocol.user;
 }
