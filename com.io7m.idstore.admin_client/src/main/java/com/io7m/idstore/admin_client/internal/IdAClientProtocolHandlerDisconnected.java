@@ -41,6 +41,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -100,8 +101,11 @@ public final class IdAClientProtocolHandlerDisconnected
   private IdAClientException notLoggedIn()
   {
     return new IdAClientException(
+      this.strings.format("notLoggedIn"),
       NOT_LOGGED_IN,
-      this.strings.format("notLoggedIn")
+      Map.of(),
+      Optional.empty(),
+      Optional.empty()
     );
   }
 

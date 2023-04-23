@@ -174,15 +174,14 @@ public final class IdUClientProtocolHandler1
       final var str = this.strings();
       if (!contentType.equals(expectedContentType)) {
         throw new IdUClientException(
-          empty(),
+          str.format("errorReasonContentType"),
           PROTOCOL_ERROR,
-          str
-            .format(
-              "errorContentType",
-              commandType,
-              expectedContentType,
-              contentType),
-          str.format("errorReasonContentType")
+          Map.ofEntries(
+            Map.entry("Expected", expectedContentType),
+            Map.entry("Received", contentType)
+          ),
+          empty(),
+          empty()
         );
       }
 
@@ -191,16 +190,14 @@ public final class IdUClientProtocolHandler1
 
       if (!(responseMessage instanceof IdUResponseType)) {
         throw new IdUClientException(
-          empty(),
+          str.format("errorReasonResponseType"),
           PROTOCOL_ERROR,
-          str
-            .format(
-              "errorResponseType",
-              "(unavailable)",
-              commandType,
-              IdUResponseType.class,
-              responseMessage.getClass()),
-          str.format("errorReasonResponseType")
+          Map.ofEntries(
+            Map.entry("Expected", IdUResponseType.class.getSimpleName()),
+            Map.entry("Received", responseMessage.getClass().getSimpleName())
+          ),
+          empty(),
+          empty()
         );
       }
 
@@ -221,40 +218,46 @@ public final class IdUClientProtocolHandler1
         }
 
         throw new IdUClientException(
-          Optional.of(responseActual.requestId()),
+          error.message(),
           new IdErrorCode(error.errorCode()),
-          str
-            .format(
-              "errorResponse",
-              error.requestId(),
-              commandType,
-              Integer.valueOf(response.statusCode()),
-              error.errorCode(),
-              error.message()),
-          error.message()
+          error.attributes(),
+          error.remediatingAction(),
+          Optional.of(error.requestId())
         );
       }
 
       if (!Objects.equals(responseActual.getClass(), responseClass)) {
         throw new IdUClientException(
-          Optional.of(responseActual.requestId()),
+          str.format("errorReasonResponseType"),
           PROTOCOL_ERROR,
-          str
-            .format(
-              "errorResponseType",
-              responseActual.requestId(),
-              commandType,
-              responseClass,
-              responseMessage.getClass()),
-          str.format("errorReasonResponseType")
+          Map.ofEntries(
+            Map.entry("Expected", responseClass.getSimpleName()),
+            Map.entry("Received", responseActual.getClass().getSimpleName())
+          ),
+          empty(),
+          empty()
         );
       }
 
       return responseClass.cast(responseMessage);
     } catch (final IOException e) {
-      throw new IdUClientException(empty(), IO_ERROR, e, e.getMessage());
+      throw new IdUClientException(
+        Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        IO_ERROR,
+        Map.of(),
+        empty(),
+        empty()
+      );
     } catch (final IdProtocolException e) {
-      throw new IdUClientException(empty(), PROTOCOL_ERROR, e, e.getMessage());
+      throw new IdUClientException(
+        e.getMessage(),
+        e,
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction(),
+        empty()
+      );
     }
   }
 

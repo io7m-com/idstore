@@ -96,7 +96,9 @@ public final class IdACmdAdminUpdate
         throw new IdDatabaseException(
           strings.format("adminIdNameDuplicate", command.idName()),
           e,
-          SQL_ERROR_UNIQUE
+          SQL_ERROR_UNIQUE,
+          e.attributes(),
+          e.remediatingAction()
         );
       }
       throw e;

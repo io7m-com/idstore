@@ -57,7 +57,9 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -163,7 +165,12 @@ public final class IdAClientIT extends IdWithServerContract
       .withFixedData(
         this.messages.serialize(
           new IdAResponseError(
-            UUID.randomUUID(), AUTHENTICATION_ERROR.id(), "error"))
+            UUID.randomUUID(),
+            "error",
+            AUTHENTICATION_ERROR.id(),
+            Map.of(),
+            Optional.empty()
+          ))
       );
 
     this.webServer.addResponse()

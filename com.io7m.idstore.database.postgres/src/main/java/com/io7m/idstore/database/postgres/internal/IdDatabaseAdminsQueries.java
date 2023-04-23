@@ -88,7 +88,9 @@ final class IdDatabaseAdminsQueries
   static final Supplier<IdDatabaseException> ADMIN_DOES_NOT_EXIST = () -> {
     return new IdDatabaseException(
       "Admin does not exist",
-      ADMIN_NONEXISTENT
+      ADMIN_NONEXISTENT,
+      Map.of(),
+      Optional.empty()
     );
   };
 
@@ -144,7 +146,9 @@ final class IdDatabaseAdminsQueries
     return new IdDatabaseException(
       exception.getMessage(),
       exception,
-      PASSWORD_ERROR
+      PASSWORD_ERROR,
+      exception.attributes(),
+      exception.remediatingAction()
     );
   }
 
@@ -198,7 +202,9 @@ final class IdDatabaseAdminsQueries
       if (existing.isNotEmpty()) {
         throw new IdDatabaseException(
           "Admin already exists",
-          ADMIN_NOT_INITIAL
+          ADMIN_NOT_INITIAL,
+          Map.of(),
+          Optional.empty()
         );
       }
 
@@ -283,7 +289,9 @@ final class IdDatabaseAdminsQueries
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "Admin ID already exists",
-            ADMIN_DUPLICATE_ID
+            ADMIN_DUPLICATE_ID,
+            Map.of("Admin ID", id.toString()),
+            Optional.empty()
           );
         }
       }
@@ -294,7 +302,9 @@ final class IdDatabaseAdminsQueries
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "Admin ID name already exists",
-            ADMIN_DUPLICATE_ID_NAME
+            ADMIN_DUPLICATE_ID_NAME,
+            Map.of("Admin Name", idName.value()),
+            Optional.empty()
           );
         }
       }
@@ -310,7 +320,9 @@ final class IdDatabaseAdminsQueries
           if (existing.isAdmin()) {
             throw new IdDatabaseException(
               "Email already exists",
-              ADMIN_DUPLICATE_EMAIL
+              ADMIN_DUPLICATE_EMAIL,
+              Map.of("Email", email.value()),
+              Optional.empty()
             );
           }
         }

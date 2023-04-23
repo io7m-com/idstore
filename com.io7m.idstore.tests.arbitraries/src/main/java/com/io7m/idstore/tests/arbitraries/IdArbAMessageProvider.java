@@ -331,7 +331,18 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
     final var s1 =
       Arbitraries.strings();
 
-    return Combinators.combine(id, s0, s1).as(IdAResponseError::new);
+    final var s2 =
+      Arbitraries.strings();
+    final var s3 =
+      Arbitraries.strings();
+    final var ms =
+      Arbitraries.maps(s2, s3);
+
+    final var os =
+      Arbitraries.strings()
+        .optional();
+
+    return Combinators.combine(id, s0, s1, ms, os).as(IdAResponseError::new);
   }
 
   /**

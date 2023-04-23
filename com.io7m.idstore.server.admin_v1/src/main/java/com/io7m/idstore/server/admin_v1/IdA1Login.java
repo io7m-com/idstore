@@ -33,12 +33,14 @@ import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
+import com.io7m.seltzer.api.SStructuredError;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_METHOD_ERROR;
@@ -96,9 +98,11 @@ public final class IdA1Login extends IdCommonInstrumentedServlet
     try {
       if (!Objects.equals(request.getMethod(), "POST")) {
         throw new IdHTTPErrorStatusException(
-          METHOD_NOT_ALLOWED_405,
+          this.strings.format("methodNotAllowed"),
           HTTP_METHOD_ERROR,
-          this.strings.format("methodNotAllowed")
+          Map.of(),
+          Optional.empty(),
+          METHOD_NOT_ALLOWED_405
         );
       }
 
@@ -134,32 +138,34 @@ public final class IdA1Login extends IdCommonInstrumentedServlet
         response,
         IdRequestUniqueIDs.requestIdFor(request),
         e.httpStatusCode(),
-        e.errorCode(),
-        e.getMessage()
+        e
       );
     } catch (final IdHTTPErrorStatusException e) {
       this.errors.sendError(
         response,
         IdRequestUniqueIDs.requestIdFor(request),
-        e.statusCode(),
-        e.errorCode(),
-        e.getMessage()
+        e.httpStatusCode(),
+        e
       );
     } catch (final IdException e) {
       this.errors.sendError(
         response,
         IdRequestUniqueIDs.requestIdFor(request),
         INTERNAL_SERVER_ERROR_500,
-        e.errorCode(),
-        e.getMessage()
+        e
       );
     } catch (final Exception e) {
       this.errors.sendError(
         response,
         IdRequestUniqueIDs.requestIdFor(request),
         INTERNAL_SERVER_ERROR_500,
-        IO_ERROR,
-        e.getMessage()
+        new SStructuredError<>(
+          IO_ERROR,
+          e.getMessage(),
+          Map.of(),
+          Optional.empty(),
+          Optional.of(e)
+        )
       );
     }
   }
@@ -201,24 +207,30 @@ public final class IdA1Login extends IdCommonInstrumentedServlet
       }
     } catch (final IdProtocolException e) {
       throw new IdHTTPErrorStatusException(
-        BAD_REQUEST_400,
-        PROTOCOL_ERROR,
         e.getMessage(),
-        e
+        e,
+        PROTOCOL_ERROR,
+        Map.of(),
+        Optional.empty(),
+        BAD_REQUEST_400
       );
     } catch (final IdRequestLimitExceeded e) {
       throw new IdHTTPErrorStatusException(
-        PAYLOAD_TOO_LARGE_413,
-        PROTOCOL_ERROR,
         e.getMessage(),
-        e
+        e,
+        PROTOCOL_ERROR,
+        Map.of(),
+        Optional.empty(),
+        PAYLOAD_TOO_LARGE_413
       );
     }
 
     throw new IdHTTPErrorStatusException(
-      BAD_REQUEST_400,
+      this.strings.format("expectedCommand", "CommandLogin"),
       PROTOCOL_ERROR,
-      this.strings.format("expectedCommand", "CommandLogin")
+      Map.of(),
+      Optional.empty(),
+      BAD_REQUEST_400
     );
   }
 }

@@ -78,7 +78,9 @@ public final class IdACmdAdminEmailAdd
         throw new IdDatabaseException(
           strings.format("emailDuplicate"),
           e,
-          SQL_ERROR_UNIQUE
+          SQL_ERROR_UNIQUE,
+          e.attributes(),
+          e.remediatingAction()
         );
       }
       throw e;

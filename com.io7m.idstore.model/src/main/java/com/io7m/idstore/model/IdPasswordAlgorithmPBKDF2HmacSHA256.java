@@ -22,7 +22,9 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HexFormat;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 import static java.util.Locale.ROOT;
@@ -139,7 +141,13 @@ public final class IdPasswordAlgorithmPBKDF2HmacSHA256
       }
       return result == 0;
     } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-      throw new IdPasswordException(PASSWORD_ERROR, e.getMessage(), e);
+      throw new IdPasswordException(
+        e.getMessage(),
+        e,
+        PASSWORD_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 
@@ -172,7 +180,13 @@ public final class IdPasswordAlgorithmPBKDF2HmacSHA256
         passwordSalt.toUpperCase(ROOT)
       );
     } catch (final NoSuchAlgorithmException | InvalidKeySpecException e) {
-      throw new IdPasswordException(PASSWORD_ERROR, e.getMessage(), e);
+      throw new IdPasswordException(
+        e.getMessage(),
+        e,
+        PASSWORD_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 

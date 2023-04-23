@@ -34,6 +34,7 @@ import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
 import java.time.Clock;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,6 +51,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_UNSET;
 import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.DB_SYSTEM;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.DbSystemValues.POSTGRESQL;
+import static java.util.Objects.requireNonNullElse;
 import static org.jooq.SQLDialect.POSTGRES;
 
 final class IdDatabaseTransaction
@@ -146,7 +148,9 @@ final class IdDatabaseTransaction
 
     throw new IdDatabaseException(
       "Unsupported query type: %s".formatted(qClass),
-      SQL_ERROR_UNSUPPORTED_QUERY_CLASS
+      SQL_ERROR_UNSUPPORTED_QUERY_CLASS,
+      Map.of(),
+      Optional.empty()
     );
   }
 
@@ -174,7 +178,13 @@ final class IdDatabaseTransaction
         .counterTransactionRollbacks()
         .add(1L);
     } catch (final SQLException e) {
-      throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        SQL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 
@@ -188,7 +198,13 @@ final class IdDatabaseTransaction
         .counterTransactionCommits()
         .add(1L);
     } catch (final SQLException e) {
-      throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        SQL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 
@@ -226,14 +242,22 @@ final class IdDatabaseTransaction
       if (userOpt.isEmpty()) {
         throw new IdDatabaseException(
           "No such user: %s".formatted(userId),
-          USER_NONEXISTENT
+          USER_NONEXISTENT,
+          Map.of("User ID", userId.toString()),
+          Optional.empty()
         );
       }
 
       this.currentUserId = userId;
       this.currentAdminId = null;
     } catch (final DataAccessException e) {
-      throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        SQL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 
@@ -244,7 +268,9 @@ final class IdDatabaseTransaction
     return Optional.ofNullable(this.currentUserId).orElseThrow(() -> {
       return new IdDatabaseException(
         "A user must be set before calling this method.",
-        USER_UNSET
+        USER_UNSET,
+        Map.of(),
+        Optional.of("Set a user.")
       );
     });
   }
@@ -269,14 +295,22 @@ final class IdDatabaseTransaction
       if (adminOpt.isEmpty()) {
         throw new IdDatabaseException(
           "No such admin: %s".formatted(adminId),
-          ADMIN_NONEXISTENT
+          ADMIN_NONEXISTENT,
+          Map.of("Admin ID", adminId.toString()),
+          Optional.empty()
         );
       }
 
       this.currentAdminId = adminId;
       this.currentUserId = null;
     } catch (final DataAccessException e) {
-      throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        SQL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 
@@ -287,7 +321,9 @@ final class IdDatabaseTransaction
     return Optional.ofNullable(this.currentAdminId).orElseThrow(() -> {
       return new IdDatabaseException(
         "A admin must be set before calling this method.",
-        ADMIN_UNSET
+        ADMIN_UNSET,
+        Map.of(),
+        Optional.of("Set an admin.")
       );
     });
   }
@@ -301,7 +337,9 @@ final class IdDatabaseTransaction
       .orElseThrow(() -> {
         return new IdDatabaseException(
           "A user or admin must be set before calling this method.",
-          ADMIN_OR_USER_UNSET
+          ADMIN_OR_USER_UNSET,
+          Map.of(),
+          Optional.of("Set an admin or user.")
         );
       });
   }

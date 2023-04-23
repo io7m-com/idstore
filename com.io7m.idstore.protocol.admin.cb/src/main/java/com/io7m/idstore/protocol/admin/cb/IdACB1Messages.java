@@ -30,10 +30,13 @@ import com.io7m.repetoir.core.RPServiceType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
+import static java.util.Objects.requireNonNullElse;
 
 /**
  * The protocol messages for Admin v1 Cedarbridge.
@@ -120,7 +123,13 @@ public final class IdACB1Messages
         (ProtocolIdA1v1Type) this.serializer.deserialize(context)
       );
     } catch (final IOException e) {
-      throw new IdProtocolException(IO_ERROR, e.getMessage(), e);
+      throw new IdProtocolException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        IO_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 
@@ -137,7 +146,13 @@ public final class IdACB1Messages
       this.serializer.serialize(context, this.validator.convertToWire(message));
       return output.toByteArray();
     } catch (final IOException e) {
-      throw new IdProtocolException(IO_ERROR, e.getMessage(), e);
+      throw new IdProtocolException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        IO_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 

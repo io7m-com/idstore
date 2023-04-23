@@ -39,6 +39,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.io7m.idstore.admin_client.internal.IdACompression.decompressResponse;
@@ -47,6 +48,8 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NO_SUPPORTED_PROTOCOLS;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static java.net.http.HttpResponse.BodyHandlers.ofByteArray;
+import static java.util.Objects.requireNonNullElse;
+import static java.util.Optional.empty;
 
 /**
  * Functions to negotiate protocols.
@@ -79,15 +82,30 @@ public final class IdAProtocolNegotiation
     try {
       response = httpClient.send(request, ofByteArray());
     } catch (final IOException e) {
-      throw new IdAClientException(IO_ERROR, e);
+      throw new IdAClientException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        IO_ERROR,
+        Map.of(),
+        empty(),
+        empty()
+      );
     }
 
     LOG.debug("server: status {}", response.statusCode());
 
     if (response.statusCode() >= 400) {
+      final var msg =
+        strings.format("httpError", Integer.valueOf(response.statusCode()));
+
       throw new IdAClientException(
+        msg,
         HTTP_ERROR,
-        strings.format("httpError", Integer.valueOf(response.statusCode()))
+        Map.ofEntries(
+          Map.entry("Status", Integer.toString(response.statusCode()))
+        ),
+        empty(),
+        empty()
       );
     }
 
@@ -99,9 +117,23 @@ public final class IdAProtocolNegotiation
       final var body = decompressResponse(response, response.headers());
       message = protocols.parse(base, body);
     } catch (final VProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
+      throw new IdAClientException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        PROTOCOL_ERROR,
+        Map.of(),
+        empty(),
+        empty()
+      );
     } catch (final IOException e) {
-      throw new IdAClientException(IO_ERROR, e);
+      throw new IdAClientException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        IO_ERROR,
+        Map.of(),
+        empty(),
+        empty()
+      );
     }
 
     return message.protocols()
@@ -180,7 +212,14 @@ public final class IdAProtocolNegotiation
         List.of(IdACB1Messages.protocolId().toString())
       );
     } catch (final GenProtocolException e) {
-      throw new IdAClientException(NO_SUPPORTED_PROTOCOLS, e.getMessage(), e);
+      throw new IdAClientException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        NO_SUPPORTED_PROTOCOLS,
+        Map.of(),
+        empty(),
+        empty()
+      );
     }
 
     final var serverEndpoint =

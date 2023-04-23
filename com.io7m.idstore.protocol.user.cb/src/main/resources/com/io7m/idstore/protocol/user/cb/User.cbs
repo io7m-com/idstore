@@ -153,6 +153,10 @@
   [field errorCode cb:String]
   [documentation message "The error message."]
   [field message cb:String]
+  [documentation attributes "The error attributes."]
+  [field attributes [cb:Map cb:String cb:String]]
+  [documentation remediatingAction "The remediating action, if any."]
+  [field remediatingAction [cb:Option cb:String]]
 ]
 
 [documentation IdU1ResponseLogin "A response to IdU1CommandLogin."]

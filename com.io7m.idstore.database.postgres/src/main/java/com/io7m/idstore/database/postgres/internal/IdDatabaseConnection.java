@@ -25,8 +25,11 @@ import io.opentelemetry.context.Context;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
+import static java.util.Objects.requireNonNullElse;
 
 record IdDatabaseConnection(
   IdDatabase database,
@@ -59,7 +62,13 @@ record IdDatabaseConnection(
     } catch (final SQLException e) {
       transactionSpan.recordException(e);
       transactionSpan.end();
-      throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        SQL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 
@@ -73,7 +82,13 @@ record IdDatabaseConnection(
       }
     } catch (final SQLException e) {
       this.connectionSpan.recordException(e);
-      throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        SQL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     } finally {
       this.connectionSpan.end();
     }

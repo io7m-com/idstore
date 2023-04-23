@@ -38,7 +38,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
@@ -95,17 +97,20 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
       }
     } catch (final IdProtocolException e) {
       throw new IdHTTPErrorStatusException(
-        BAD_REQUEST_400,
-        PROTOCOL_ERROR,
         e.getMessage(),
-        e
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction(),
+        BAD_REQUEST_400
       );
     }
 
     throw new IdHTTPErrorStatusException(
-      BAD_REQUEST_400,
+      this.strings().format("expectedCommand", "IdU1CommandType"),
       PROTOCOL_ERROR,
-      this.strings().format("expectedCommand", "IdU1CommandType")
+      Map.of(),
+      Optional.empty(),
+      BAD_REQUEST_400
     );
   }
 
@@ -167,7 +172,9 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
         new IdUResponseError(
           e.requestId(),
           e.errorCode().id(),
-          e.getMessage()
+          e.getMessage(),
+          e.attributes(),
+          e.remediatingAction()
         ));
     }
   }

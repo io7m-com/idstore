@@ -19,6 +19,7 @@ package com.io7m.idstore.user_client.api;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdException;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,79 +30,50 @@ import java.util.UUID;
 
 public final class IdUClientException extends IdException
 {
-  private final String reason;
   private final Optional<UUID> requestId;
 
   /**
    * Construct an exception.
    *
-   * @param inRequestId The request ID
-   * @param errorCode   The error code
-   * @param message     The message
-   * @param inReason    The error reason
+   * @param message             The message
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
+   * @param inRequestId         The request ID
    */
 
   public IdUClientException(
-    final Optional<UUID> inRequestId,
-    final IdErrorCode errorCode,
     final String message,
-    final String inReason)
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction,
+    final Optional<UUID> inRequestId)
   {
-    super(errorCode, Objects.requireNonNull(message, "message"));
-    this.requestId =
-      Objects.requireNonNull(inRequestId, "requestId");
-    this.reason =
-      Objects.requireNonNull(inReason, "reason");
+    super(message, inErrorCode, inAttributes, inRemediatingAction);
+    this.requestId = Objects.requireNonNull(inRequestId, "requestId");
   }
 
   /**
    * Construct an exception.
    *
-   * @param inRequestId The request ID
-   * @param errorCode   The error code
-   * @param message     The message
-   * @param cause       The cause
-   * @param inReason    The error reason
+   * @param message             The message
+   * @param cause               The cause
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
+   * @param inRequestId         The request ID
    */
 
   public IdUClientException(
-    final Optional<UUID> inRequestId,
-    final IdErrorCode errorCode,
     final String message,
     final Throwable cause,
-    final String inReason)
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction,
+    final Optional<UUID> inRequestId)
   {
-    super(
-      errorCode,
-      Objects.requireNonNull(message, "message"),
-      Objects.requireNonNull(cause, "cause")
-    );
-    this.requestId =
-      Objects.requireNonNull(inRequestId, "requestId");
-    this.reason =
-      Objects.requireNonNull(inReason, "reason");
-  }
-
-  /**
-   * Construct an exception.
-   *
-   * @param inRequestId The request ID
-   * @param errorCode   The error code
-   * @param cause       The cause
-   * @param inReason    The error reason
-   */
-
-  public IdUClientException(
-    final Optional<UUID> inRequestId,
-    final IdErrorCode errorCode,
-    final Throwable cause,
-    final String inReason)
-  {
-    super(errorCode, Objects.requireNonNull(cause, "cause"));
-    this.requestId =
-      Objects.requireNonNull(inRequestId, "requestId");
-    this.reason =
-      Objects.requireNonNull(inReason, "reason");
+    super(message, cause, inErrorCode, inAttributes, inRemediatingAction);
+    this.requestId = Objects.requireNonNull(inRequestId, "requestId");
   }
 
   /**
@@ -111,14 +83,5 @@ public final class IdUClientException extends IdException
   public Optional<UUID> requestId()
   {
     return this.requestId;
-  }
-
-  /**
-   * @return The error reason
-   */
-
-  public String reason()
-  {
-    return this.reason;
   }
 }

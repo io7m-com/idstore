@@ -19,7 +19,9 @@ package com.io7m.idstore.model;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 
@@ -89,7 +91,13 @@ public sealed interface IdPasswordAlgorithmType
       rng.nextBytes(salt);
       return this.createHashed(passwordText, salt);
     } catch (final NoSuchAlgorithmException e) {
-      throw new IdPasswordException(PASSWORD_ERROR, e.getMessage(), e);
+      throw new IdPasswordException(
+        e.getMessage(),
+        e,
+        PASSWORD_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 

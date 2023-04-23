@@ -27,6 +27,7 @@ import com.io7m.idstore.model.IdEmailVerificationResolution;
 import com.io7m.idstore.model.IdToken;
 import org.jooq.exception.DataAccessException;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -126,7 +127,9 @@ final class IdDatabaseEmailsQueries
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "Email verification token already exists.",
-            EMAIL_VERIFICATION_DUPLICATE
+            EMAIL_VERIFICATION_DUPLICATE,
+            Map.of("Token", verification.token().value()),
+            Optional.of("Use a different token.")
           );
         }
       }

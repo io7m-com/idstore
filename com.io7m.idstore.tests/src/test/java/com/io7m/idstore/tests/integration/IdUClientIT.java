@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -167,7 +168,11 @@ public final class IdUClientIT extends IdWithServerContract
       .withFixedData(
         this.messages.serialize(
           new IdUResponseError(
-            UUID.randomUUID(), AUTHENTICATION_ERROR.id(), "error"))
+            UUID.randomUUID(),
+            "error",
+            AUTHENTICATION_ERROR.id(),
+            Map.of(),
+            Optional.empty()))
       );
 
     this.webServer.addResponse()

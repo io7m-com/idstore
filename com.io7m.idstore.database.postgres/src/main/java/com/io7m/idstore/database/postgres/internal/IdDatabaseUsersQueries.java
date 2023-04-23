@@ -89,7 +89,9 @@ final class IdDatabaseUsersQueries
   static final Supplier<IdDatabaseException> USER_DOES_NOT_EXIST = () -> {
     return new IdDatabaseException(
       "User does not exist",
-      USER_NONEXISTENT
+      USER_NONEXISTENT,
+      Map.of(),
+      Optional.empty()
     );
   };
 
@@ -129,7 +131,9 @@ final class IdDatabaseUsersQueries
     return new IdDatabaseException(
       exception.getMessage(),
       exception,
-      PASSWORD_ERROR
+      PASSWORD_ERROR,
+      exception.attributes(),
+      exception.remediatingAction()
     );
   }
 
@@ -185,7 +189,9 @@ final class IdDatabaseUsersQueries
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "User ID already exists",
-            USER_DUPLICATE_ID
+            USER_DUPLICATE_ID,
+            Map.of("User ID", id.toString()),
+            Optional.empty()
           );
         }
       }
@@ -196,7 +202,9 @@ final class IdDatabaseUsersQueries
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "User ID name already exists",
-            USER_DUPLICATE_ID_NAME
+            USER_DUPLICATE_ID_NAME,
+            Map.of("User Name", idName.value()),
+            Optional.empty()
           );
         }
       }
@@ -212,7 +220,9 @@ final class IdDatabaseUsersQueries
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "Email already exists",
-            USER_DUPLICATE_EMAIL
+            USER_DUPLICATE_EMAIL,
+            Map.of("Email", email.value()),
+            Optional.empty()
           );
         }
       }
@@ -662,7 +672,9 @@ final class IdDatabaseUsersQueries
       if (existing.isPresent()) {
         throw new IdDatabaseException(
           "Email %s already exists.".formatted(email),
-          EMAIL_DUPLICATE
+          EMAIL_DUPLICATE,
+          Map.of("Email", email.value()),
+          Optional.empty()
         );
       }
 

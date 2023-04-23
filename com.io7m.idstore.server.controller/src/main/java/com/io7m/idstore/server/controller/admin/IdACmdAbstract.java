@@ -72,7 +72,15 @@ public abstract class IdACmdAbstract<
     } catch (final IdProtocolException e) {
       throw context.failProtocol(e);
     } catch (final IdException e) {
-      throw context.fail(500, e.errorCode(), e.getMessage());
+      throw new IdCommandExecutionFailure(
+        e.getMessage(),
+        e,
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction(),
+        context.requestId(),
+        500
+      );
     }
   }
 

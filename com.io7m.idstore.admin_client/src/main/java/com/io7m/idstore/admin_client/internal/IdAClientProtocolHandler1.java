@@ -123,6 +123,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -132,6 +133,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_E
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static java.net.http.HttpResponse.BodyHandlers;
+import static java.util.Optional.empty;
 
 /**
  * The version 1 protocol handler.
@@ -236,15 +238,18 @@ public final class IdAClientProtocolHandler1
           .orElse("application/octet-stream");
 
       final var expectedContentType = IdACB1Messages.contentType();
+
+      final var str = this.strings();
       if (!contentType.equals(expectedContentType)) {
         throw new IdAClientException(
+          str.format("errorReasonContentType"),
           PROTOCOL_ERROR,
-          this.strings()
-            .format(
-              "errorContentType",
-              commandType,
-              expectedContentType,
-              contentType)
+          Map.ofEntries(
+            Map.entry("Expected", expectedContentType),
+            Map.entry("Received", contentType)
+          ),
+          empty(),
+          empty()
         );
       }
 
@@ -253,14 +258,14 @@ public final class IdAClientProtocolHandler1
 
       if (!(responseMessage instanceof final IdAResponseType responseActual)) {
         throw new IdAClientException(
+          str.format("errorReasonResponseType"),
           PROTOCOL_ERROR,
-          this.strings()
-            .format(
-              "errorResponseType",
-              "(unavailable)",
-              commandType,
-              IdAResponseType.class,
-              responseMessage.getClass())
+          Map.ofEntries(
+            Map.entry("Expected", IdAResponseType.class.getSimpleName()),
+            Map.entry("Received", responseMessage.getClass().getSimpleName())
+          ),
+          empty(),
+          empty()
         );
       }
 
@@ -280,36 +285,46 @@ public final class IdAClientProtocolHandler1
         }
 
         throw new IdAClientException(
+          error.message(),
           new IdErrorCode(error.errorCode()),
-          this.strings()
-            .format(
-              "errorResponse",
-              error.requestId(),
-              commandType,
-              Integer.valueOf(response.statusCode()),
-              error.errorCode(),
-              error.message())
+          error.attributes(),
+          error.remediatingAction(),
+          Optional.of(error.requestId())
         );
       }
 
       if (!Objects.equals(responseActual.getClass(), responseClass)) {
         throw new IdAClientException(
+          str.format("errorReasonResponseType"),
           PROTOCOL_ERROR,
-          this.strings()
-            .format(
-              "errorResponseType",
-              responseActual.requestId(),
-              commandType,
-              responseClass,
-              responseMessage.getClass())
+          Map.ofEntries(
+            Map.entry("Expected", responseClass.getSimpleName()),
+            Map.entry("Received", responseActual.getClass().getSimpleName())
+          ),
+          empty(),
+          empty()
         );
       }
 
       return responseClass.cast(responseMessage);
-    } catch (final IdProtocolException e) {
-      throw new IdAClientException(PROTOCOL_ERROR, e);
     } catch (final IOException e) {
-      throw new IdAClientException(IO_ERROR, e);
+      throw new IdAClientException(
+        Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        IO_ERROR,
+        Map.of(),
+        empty(),
+        empty()
+      );
+    } catch (final IdProtocolException e) {
+      throw new IdAClientException(
+        e.getMessage(),
+        e,
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction(),
+        empty()
+      );
     }
   }
 

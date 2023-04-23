@@ -85,7 +85,13 @@ public final class IdUClientProtocolHandlerDisconnected
   private IdUClientException notLoggedIn()
   {
     final var msg = this.strings.format("notLoggedIn");
-    return new IdUClientException(Optional.empty(), NOT_LOGGED_IN, msg, msg);
+    return new IdUClientException(
+      msg,
+      NOT_LOGGED_IN,
+      Map.of(),
+      Optional.empty(),
+      Optional.empty()
+    );
   }
 
   @Override

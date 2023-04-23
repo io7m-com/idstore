@@ -92,7 +92,9 @@ public final class IdACmdUserUpdate
         throw new IdDatabaseException(
           strings.format("userIdNameDuplicate", command.idName()),
           e,
-          SQL_ERROR_UNIQUE
+          SQL_ERROR_UNIQUE,
+          e.attributes(),
+          e.remediatingAction()
         );
       }
       throw e;

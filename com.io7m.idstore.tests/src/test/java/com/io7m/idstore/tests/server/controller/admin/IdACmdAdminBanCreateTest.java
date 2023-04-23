@@ -27,6 +27,7 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
@@ -99,7 +100,7 @@ public final class IdACmdAdminBanCreateTest
     final var admins =
       mock(IdDatabaseAdminsQueriesType.class);
 
-    doThrow(new IdDatabaseException("", ADMIN_NONEXISTENT))
+    doThrow(new IdDatabaseException("", ADMIN_NONEXISTENT, Map.of(), empty()))
       .when(admins)
       .adminBanCreate(Mockito.any());
 

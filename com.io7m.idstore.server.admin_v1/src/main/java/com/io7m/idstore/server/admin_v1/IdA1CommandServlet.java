@@ -19,6 +19,7 @@ package com.io7m.idstore.server.admin_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.database.api.IdDatabaseType;
+import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
@@ -39,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -110,17 +112,21 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
       }
     } catch (final IdProtocolException e) {
       throw new IdHTTPErrorStatusException(
-        BAD_REQUEST_400,
-        PROTOCOL_ERROR,
         e.getMessage(),
-        e
+        e,
+        PROTOCOL_ERROR,
+        e.attributes(),
+        e.remediatingAction(),
+        BAD_REQUEST_400
       );
     }
 
     throw new IdHTTPErrorStatusException(
-      BAD_REQUEST_400,
+      this.strings().format("expectedCommand", "IdA1CommandType"),
       PROTOCOL_ERROR,
-      this.strings().format("expectedCommand", "IdA1CommandType")
+      Map.of(),
+      Optional.empty(),
+      BAD_REQUEST_400
     );
   }
 
@@ -185,16 +191,30 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
       }
     } catch (final IdCommandExecutionFailure e) {
       Span.current().setAttribute("idstore.errorCode", e.errorCode().id());
-      sends.send(
+      sends.sendError(
         servletResponse,
+        e.requestId(),
         e.httpStatusCode(),
-        new IdAResponseError(e.requestId(), e.errorCode().id(), e.getMessage())
+        e
+      );
+    } catch (final IdException e) {
+      sends.sendError(
+        servletResponse,
+        requestId,
+        500,
+        e
       );
     } catch (final Exception e) {
       sends.send(
         servletResponse,
         500,
-        new IdAResponseError(requestId, IO_ERROR.id(), e.getMessage())
+        new IdAResponseError(
+          requestId,
+          IO_ERROR.id(),
+          e.getMessage(),
+          Map.of(),
+          Optional.empty()
+        )
       );
     }
   }

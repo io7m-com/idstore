@@ -22,7 +22,9 @@ import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import org.jooq.exception.DataAccessException;
 import org.postgresql.util.PSQLState;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIRED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.OPERATION_NOT_PERMITTED;
@@ -58,11 +60,23 @@ public final class IdDatabaseExceptions
 
     final IdDatabaseException result = switch (e.sqlState()) {
       case "42501" -> {
-        yield new IdDatabaseException(m, e, OPERATION_NOT_PERMITTED);
+        yield new IdDatabaseException(
+          m,
+          e,
+          OPERATION_NOT_PERMITTED,
+          Map.of(),
+          Optional.empty()
+        );
       }
 
       case "ID001" -> {
-        yield new IdDatabaseException(m, e, EMAIL_ONE_REQUIRED);
+        yield new IdDatabaseException(
+          m,
+          e,
+          EMAIL_ONE_REQUIRED,
+          Map.of(),
+          Optional.empty()
+        );
       }
 
       default -> {
@@ -77,16 +91,34 @@ public final class IdDatabaseExceptions
         if (actual != null) {
           yield switch (actual) {
             case FOREIGN_KEY_VIOLATION -> {
-              yield new IdDatabaseException(m, e, SQL_ERROR_FOREIGN_KEY);
+              yield new IdDatabaseException(
+                m,
+                e,
+                SQL_ERROR_FOREIGN_KEY,
+                Map.of(),
+                Optional.empty()
+              );
             }
             case UNIQUE_VIOLATION -> {
-              yield new IdDatabaseException(m, e, SQL_ERROR_UNIQUE);
+              yield new IdDatabaseException(
+                m,
+                e,
+                SQL_ERROR_UNIQUE,
+                Map.of(),
+                Optional.empty()
+              );
             }
-            default -> new IdDatabaseException(m, e, SQL_ERROR);
+            default -> new IdDatabaseException(
+              m,
+              e,
+              SQL_ERROR,
+              Map.of(),
+              Optional.empty());
           };
         }
 
-        yield new IdDatabaseException(m, e, SQL_ERROR);
+        yield new IdDatabaseException(
+          m, e, SQL_ERROR, Map.of(), Optional.empty());
       }
     };
 

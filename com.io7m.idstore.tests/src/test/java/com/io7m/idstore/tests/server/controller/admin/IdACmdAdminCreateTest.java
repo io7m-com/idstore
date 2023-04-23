@@ -31,6 +31,7 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -145,7 +146,7 @@ public final class IdACmdAdminCreateTest
     final var admins =
       mock(IdDatabaseAdminsQueriesType.class);
 
-    Mockito.doThrow(new IdDatabaseException("", ADMIN_DUPLICATE))
+    Mockito.doThrow(new IdDatabaseException("", ADMIN_DUPLICATE, Map.of(), empty()))
       .when(admins)
       .adminCreate(
         any(),

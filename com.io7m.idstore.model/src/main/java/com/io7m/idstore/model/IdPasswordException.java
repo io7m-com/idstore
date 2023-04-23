@@ -19,7 +19,8 @@ package com.io7m.idstore.model;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdException;
 
-import java.util.Objects;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * An exception raised by a password hashing algorithm.
@@ -30,33 +31,38 @@ public final class IdPasswordException extends IdException
   /**
    * Construct an exception.
    *
-   * @param errorCode The error code
-   * @param message The message
+   * @param message             The message
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
    */
 
   public IdPasswordException(
-    final IdErrorCode errorCode,
-    final String message)
+    final String message,
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction)
   {
-    super(errorCode, Objects.requireNonNull(message, "message"));
+    super(message, inErrorCode, inAttributes, inRemediatingAction);
   }
 
   /**
    * Construct an exception.
    *
-   * @param errorCode The error code
-   * @param message The message
-   * @param cause   The cause
+   * @param message             The message
+   * @param cause               The cause
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
    */
 
   public IdPasswordException(
-    final IdErrorCode errorCode,
     final String message,
-    final Throwable cause)
+    final Throwable cause,
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction)
   {
-    super(
-      errorCode,
-      Objects.requireNonNull(message, "message"),
-      Objects.requireNonNull(cause, "cause"));
+    super(message, cause, inErrorCode, inAttributes, inRemediatingAction);
   }
 }

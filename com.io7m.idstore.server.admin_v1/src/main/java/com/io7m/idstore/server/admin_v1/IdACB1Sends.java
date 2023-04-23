@@ -23,6 +23,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.repetoir.core.RPServiceType;
+import com.io7m.seltzer.api.SStructuredErrorType;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
@@ -55,8 +56,7 @@ public final class IdACB1Sends implements RPServiceType
    * @param response   The servlet response
    * @param requestId  The request ID
    * @param statusCode The HTTP status code
-   * @param errorCode  The error code
-   * @param message    The message
+   * @param error      The error
    *
    * @throws IOException On errors
    */
@@ -65,14 +65,19 @@ public final class IdACB1Sends implements RPServiceType
     final HttpServletResponse response,
     final UUID requestId,
     final int statusCode,
-    final IdErrorCode errorCode,
-    final String message)
+    final SStructuredErrorType<IdErrorCode> error)
     throws IOException
   {
     this.send(
       response,
       statusCode,
-      new IdAResponseError(requestId, errorCode.id(), message)
+      new IdAResponseError(
+        requestId,
+        error.message(),
+        error.errorCode().id(),
+        error.attributes(),
+        error.remediatingAction()
+      )
     );
   }
 

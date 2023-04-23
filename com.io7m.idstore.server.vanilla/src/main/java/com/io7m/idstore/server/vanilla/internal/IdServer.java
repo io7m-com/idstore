@@ -72,6 +72,7 @@ import org.eclipse.jetty.server.Server;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -148,9 +149,12 @@ public final class IdServer implements IdServerType
             e.addSuppressed(ex);
           }
           throw new IdServerException(
-            new IdErrorCode("database"),
             e.getMessage(),
-            e);
+            e,
+            new IdErrorCode("database"),
+            Map.of(),
+            Optional.empty()
+          );
         } catch (final Exception e) {
           startupSpan.recordException(e);
 
@@ -160,9 +164,11 @@ public final class IdServer implements IdServerType
             e.addSuppressed(ex);
           }
           throw new IdServerException(
-            new IdErrorCode("startup"),
             e.getMessage(),
-            e
+            e,
+            new IdErrorCode("startup"),
+            Map.of(),
+            Optional.empty()
           );
         } finally {
           startupSpan.end();
@@ -194,8 +200,8 @@ public final class IdServer implements IdServerType
 
     final var sessionAdminService =
       new IdSessionAdminService(
-      this.telemetry.openTelemetry(),
-      this.configuration.sessions().adminSessionExpiration()
+        this.telemetry.openTelemetry(),
+        this.configuration.sessions().adminSessionExpiration()
       );
 
     services.register(
@@ -205,8 +211,8 @@ public final class IdServer implements IdServerType
 
     final var sessionUserService =
       new IdSessionUserService(
-      this.telemetry.openTelemetry(),
-      this.configuration.sessions().userSessionExpiration()
+        this.telemetry.openTelemetry(),
+        this.configuration.sessions().userSessionExpiration()
       );
 
     services.register(
@@ -412,14 +418,21 @@ public final class IdServer implements IdServerType
           }
         }
       } catch (final IdDatabaseException | IdPasswordException e) {
-        throw new IdServerException(e.errorCode(), e.getMessage(), e);
+        throw new IdServerException(
+          e.getMessage(),
+          e.errorCode(),
+          e.attributes(),
+          e.remediatingAction()
+        );
       } finally {
         this.close();
       }
     } else {
       throw new IdServerException(
+        "Server must be closed before setup.",
         new IdErrorCode("server-misuse"),
-        "Server must be closed before setup."
+        Map.of(),
+        Optional.empty()
       );
     }
   }
@@ -429,8 +442,10 @@ public final class IdServer implements IdServerType
     return CloseableCollection.create(
       () -> {
         return new IdServerException(
+          "Server creation failed.",
           new IdErrorCode("server-creation"),
-          "Server creation failed."
+          Map.of(),
+          Optional.empty()
         );
       }
     );

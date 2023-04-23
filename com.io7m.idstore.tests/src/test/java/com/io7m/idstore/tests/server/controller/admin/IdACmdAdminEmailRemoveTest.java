@@ -27,9 +27,12 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Map;
+
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
+import static java.util.Optional.empty;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -128,7 +131,7 @@ public final class IdACmdAdminEmailRemoveTest
     final var admins =
       mock(IdDatabaseAdminsQueriesType.class);
 
-    Mockito.doThrow(new IdDatabaseException("", SQL_ERROR))
+    Mockito.doThrow(new IdDatabaseException("", SQL_ERROR, Map.of(), empty()))
       .when(admins)
       .adminEmailRemove(any(), any());
 

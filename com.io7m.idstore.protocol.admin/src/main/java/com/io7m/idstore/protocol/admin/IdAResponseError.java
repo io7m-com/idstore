@@ -16,35 +16,57 @@
 
 package com.io7m.idstore.protocol.admin;
 
+import com.io7m.seltzer.api.SStructuredErrorType;
+
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * An error response.
  *
- * @param requestId The request ID
- * @param errorCode The error code
- * @param message   The humanly-readable error message
+ * @param requestId         The request ID
+ * @param errorCode         The error code
+ * @param message           The humanly-readable error message
+ * @param attributes        The error attributes
+ * @param remediatingAction The remediating action, if any
  */
 
 public record IdAResponseError(
   UUID requestId,
+  String message,
   String errorCode,
-  String message)
-  implements IdAResponseType
+  Map<String, String> attributes,
+  Optional<String> remediatingAction)
+  implements IdAResponseType, SStructuredErrorType<String>
 {
   /**
    * An error response.
    *
-   * @param requestId The request ID
-   * @param errorCode The error code
-   * @param message   The humanly-readable error message
+   * @param requestId         The request ID
+   * @param errorCode         The error code
+   * @param message           The humanly-readable error message
+   * @param attributes        The error attributes
+   * @param remediatingAction The remediating action, if any
    */
 
   public IdAResponseError
   {
     Objects.requireNonNull(requestId, "requestId");
-    Objects.requireNonNull(errorCode, "errorCode");
     Objects.requireNonNull(message, "message");
+    Objects.requireNonNull(errorCode, "errorCode");
+    Objects.requireNonNull(attributes, "attributes");
+    Objects.requireNonNull(remediatingAction, "remediatingAction");
+  }
+
+  /**
+   * @return The associated exception, if any
+   */
+
+  @Override
+  public Optional<Throwable> exception()
+  {
+    return Optional.empty();
   }
 }

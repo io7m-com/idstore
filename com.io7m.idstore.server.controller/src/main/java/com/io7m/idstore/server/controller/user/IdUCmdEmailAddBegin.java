@@ -42,6 +42,7 @@ import io.opentelemetry.api.trace.Span;
 
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
@@ -171,9 +172,11 @@ public final class IdUCmdEmailAddBegin
       throw new IdCommandExecutionFailure(
         e.getMessage(),
         e,
+        IO_ERROR,
+        Map.of(),
+        Optional.empty(),
         context.requestId(),
-        500,
-        IO_ERROR
+        500
       );
     }
 
@@ -237,9 +240,11 @@ public final class IdUCmdEmailAddBegin
     if (existingOpt.isPresent()) {
       throw new IdCommandExecutionFailure(
         strings.format("emailDuplicate"),
+        EMAIL_DUPLICATE,
+        Map.of(),
+        Optional.empty(),
         context.requestId(),
-        400,
-        EMAIL_DUPLICATE
+        400
       );
     }
   }

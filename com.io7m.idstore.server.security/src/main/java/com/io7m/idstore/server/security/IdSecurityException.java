@@ -20,7 +20,8 @@ package com.io7m.idstore.server.security;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdException;
 
-import java.util.Objects;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * The type of exceptions raised during security policy evaluations.
@@ -29,50 +30,40 @@ import java.util.Objects;
 public final class IdSecurityException extends IdException
 {
   /**
-   * Create an exception.
+   * Construct an exception.
    *
-   * @param errorCode The error code
-   * @param message The exception message
+   * @param message             The message
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
    */
 
   public IdSecurityException(
-    final IdErrorCode errorCode,
-    final String message)
-  {
-    super(errorCode, Objects.requireNonNull(message, "message"));
-  }
-
-  /**
-   * Create an exception.
-   *
-   * @param errorCode The error code
-   * @param message The exception message
-   * @param cause   The cause
-   */
-
-  public IdSecurityException(
-    final IdErrorCode errorCode,
     final String message,
-    final Throwable cause)
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction)
   {
-    super(
-      errorCode,
-      Objects.requireNonNull(message, "message"),
-      Objects.requireNonNull(cause, "cause")
-    );
+    super(message, inErrorCode, inAttributes, inRemediatingAction);
   }
 
   /**
-   * Create an exception.
+   * Construct an exception.
    *
-   * @param errorCode The error code
-   * @param cause The cause
+   * @param message             The message
+   * @param cause               The cause
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
    */
 
   public IdSecurityException(
-    final IdErrorCode errorCode,
-    final Throwable cause)
+    final String message,
+    final Throwable cause,
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction)
   {
-    super(errorCode, Objects.requireNonNull(cause, "cause"));
+    super(message, cause, inErrorCode, inAttributes, inRemediatingAction);
   }
 }

@@ -41,6 +41,7 @@ import io.opentelemetry.api.trace.Span;
 
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
@@ -156,9 +157,11 @@ public final class IdUCmdEmailRemoveBegin
       throw new IdCommandExecutionFailure(
         e.getMessage(),
         e,
+        IO_ERROR,
+        Map.of(),
+        Optional.empty(),
         context.requestId(),
-        500,
-        IO_ERROR
+        500
       );
     }
 

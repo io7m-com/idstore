@@ -39,6 +39,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_ERROR;
@@ -82,10 +83,12 @@ public final class IdUProtocolNegotiation
       response = httpClient.send(request, ofByteArray());
     } catch (final IOException e) {
       throw new IdUClientException(
-        empty(),
-        IO_ERROR,
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
         e,
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName())
+        IO_ERROR,
+        Map.of(),
+        empty(),
+        empty()
       );
     }
 
@@ -94,7 +97,16 @@ public final class IdUProtocolNegotiation
     if (response.statusCode() >= 400) {
       final var msg =
         strings.format("httpError", Integer.valueOf(response.statusCode()));
-      throw new IdUClientException(empty(), HTTP_ERROR, msg, msg);
+
+      throw new IdUClientException(
+        msg,
+        HTTP_ERROR,
+        Map.ofEntries(
+          Map.entry("Status", Integer.toString(response.statusCode()))
+        ),
+        empty(),
+        empty()
+      );
     }
 
     final var protocols =
@@ -105,13 +117,22 @@ public final class IdUProtocolNegotiation
       final var body = decompressResponse(response, response.headers());
       message = protocols.parse(base, body);
     } catch (final VProtocolException e) {
-      throw new IdUClientException(empty(), PROTOCOL_ERROR, e, e.getMessage());
+      throw new IdUClientException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        PROTOCOL_ERROR,
+        Map.of(),
+        empty(),
+        empty()
+      );
     } catch (final IOException e) {
       throw new IdUClientException(
-        empty(),
-        IO_ERROR,
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
         e,
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName())
+        IO_ERROR,
+        Map.of(),
+        empty(),
+        empty()
       );
     }
 
@@ -192,11 +213,13 @@ public final class IdUProtocolNegotiation
       );
     } catch (final GenProtocolException e) {
       throw new IdUClientException(
-        empty(),
-        NO_SUPPORTED_PROTOCOLS,
-        e.getMessage(),
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
         e,
-        e.getMessage());
+        NO_SUPPORTED_PROTOCOLS,
+        Map.of(),
+        empty(),
+        empty()
+      );
     }
 
     final var serverEndpoint =

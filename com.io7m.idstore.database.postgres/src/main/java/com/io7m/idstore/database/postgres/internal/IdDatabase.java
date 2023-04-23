@@ -30,11 +30,14 @@ import org.jooq.conf.Settings;
 
 import java.sql.SQLException;
 import java.time.Clock;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.DB_SYSTEM;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.DbSystemValues.POSTGRESQL;
+import static java.util.Objects.requireNonNullElse;
 
 /**
  * The default postgres server database implementation.
@@ -153,7 +156,14 @@ public final class IdDatabase implements IdDatabaseType
     } catch (final SQLException e) {
       span.recordException(e);
       span.end();
-      throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
+
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        SQL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 

@@ -31,6 +31,7 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
@@ -104,7 +105,7 @@ public final class IdACmdUserCreateTest
     final var users =
       Mockito.mock(IdDatabaseUsersQueriesType.class);
 
-    Mockito.doThrow(new IdDatabaseException("", USER_DUPLICATE))
+    Mockito.doThrow(new IdDatabaseException("", USER_DUPLICATE, Map.of(), empty()))
       .when(users)
       .userCreate(
         any(),

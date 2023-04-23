@@ -48,6 +48,7 @@ import com.io7m.idstore.protocol.api.IdProtocolException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -162,8 +163,10 @@ public final class IdACB1ValidationGeneral
     final var es = fieldEmails.values();
     if (es.isEmpty()) {
       throw new IdProtocolException(
+        "Admin emails list is empty!",
         PROTOCOL_ERROR,
-        "Admin emails list is empty!"
+        Map.of(),
+        Optional.of("Provide at least one admin email address.")
       );
     }
 

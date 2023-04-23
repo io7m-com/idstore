@@ -17,44 +17,22 @@
 package com.io7m.idstore.server.controller.command_exec;
 
 import com.io7m.idstore.error_codes.IdErrorCode;
+import com.io7m.idstore.error_codes.IdException;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * A failure to execute a command.
  */
 
-public final class IdCommandExecutionFailure extends Exception
+public final class IdCommandExecutionFailure
+  extends IdException
 {
   private final UUID requestId;
   private final int httpStatusCode;
-  private final IdErrorCode errorCode;
-
-  /**
-   * Construct an exception.
-   *
-   * @param message          The message
-   * @param inRequestId      The request ID
-   * @param inHttpStatusCode The HTTP status code
-   * @param inErrorCode      The error code
-   */
-
-  public IdCommandExecutionFailure(
-    final String message,
-    final UUID inRequestId,
-    final int inHttpStatusCode,
-    final IdErrorCode inErrorCode)
-  {
-    super(Objects.requireNonNull(message, "message"));
-
-    this.requestId =
-      Objects.requireNonNull(inRequestId, "inRequestId");
-    this.httpStatusCode =
-      inHttpStatusCode;
-    this.errorCode =
-      Objects.requireNonNull(inErrorCode, "errorCode");
-  }
 
   /**
    * @return The request ID
@@ -75,41 +53,56 @@ public final class IdCommandExecutionFailure extends Exception
   }
 
   /**
-   * @return The error code
+   * Construct an exception.
+   *
+   * @param message             The message
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
+   * @param inRequestId         The request ID
+   * @param inHttpStatusCode    The HTTP status code
    */
 
-  public IdErrorCode errorCode()
+  public IdCommandExecutionFailure(
+    final String message,
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction,
+    final UUID inRequestId,
+    final int inHttpStatusCode)
   {
-    return this.errorCode;
+    super(message, inErrorCode, inAttributes, inRemediatingAction);
+    this.requestId =
+      Objects.requireNonNull(inRequestId, "requestId");
+    this.httpStatusCode =
+      inHttpStatusCode;
   }
 
   /**
    * Construct an exception.
    *
-   * @param message          The message
-   * @param cause            The cause
-   * @param inRequestId      The request ID
-   * @param inHttpStatusCode The HTTP status code
-   * @param inErrorCode      The error code
+   * @param message             The message
+   * @param cause               The cause
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
+   * @param inRequestId         The request ID
+   * @param inHttpStatusCode    The HTTP status code
    */
 
   public IdCommandExecutionFailure(
     final String message,
     final Throwable cause,
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction,
     final UUID inRequestId,
-    final int inHttpStatusCode,
-    final IdErrorCode inErrorCode)
+    final int inHttpStatusCode)
   {
-    super(
-      Objects.requireNonNull(message, "message"),
-      Objects.requireNonNull(cause, "cause")
-    );
-
+    super(message, cause, inErrorCode, inAttributes, inRemediatingAction);
     this.requestId =
       Objects.requireNonNull(inRequestId, "requestId");
     this.httpStatusCode =
       inHttpStatusCode;
-    this.errorCode =
-      Objects.requireNonNull(inErrorCode, "errorCode");
   }
 }

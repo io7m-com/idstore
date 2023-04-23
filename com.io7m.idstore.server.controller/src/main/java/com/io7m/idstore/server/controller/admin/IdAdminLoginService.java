@@ -28,9 +28,11 @@ import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
 import com.io7m.repetoir.core.RPServiceType;
+import com.io7m.seltzer.api.SStructuredErrorType;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
@@ -134,9 +136,11 @@ public final class IdAdminLoginService implements RPServiceType
       if (!ok) {
         throw new IdCommandExecutionFailure(
           this.strings.format("errorInvalidUsernamePassword"),
+          AUTHENTICATION_ERROR,
+          Map.of(),
+          Optional.empty(),
           requestId,
-          401,
-          AUTHENTICATION_ERROR
+          401
         );
       }
 
@@ -150,17 +154,21 @@ public final class IdAdminLoginService implements RPServiceType
       throw new IdCommandExecutionFailure(
         e.getMessage(),
         e,
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction(),
         requestId,
-        500,
-        e.errorCode()
+        500
       );
     } catch (final IdPasswordException e) {
       throw new IdCommandExecutionFailure(
         e.getMessage(),
         e,
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction(),
         requestId,
-        500,
-        e.errorCode()
+        500
       );
     }
   }
@@ -192,9 +200,11 @@ public final class IdAdminLoginService implements RPServiceType
     if (expiresOpt.isEmpty()) {
       throw new IdCommandExecutionFailure(
         this.strings.format("bannedNoExpire", ban.reason()),
+        BANNED,
+        Map.of(),
+        Optional.empty(),
         requestId,
-        403,
-        BANNED
+        403
       );
     }
 
@@ -208,9 +218,11 @@ public final class IdAdminLoginService implements RPServiceType
     if (timeNow.compareTo(timeExpires) < 0) {
       throw new IdCommandExecutionFailure(
         this.strings.format("banned", ban.reason(), timeExpires),
+        BANNED,
+        Map.of(),
+        Optional.empty(),
         requestId,
-        403,
-        BANNED
+        403
       );
     }
   }
@@ -219,12 +231,25 @@ public final class IdAdminLoginService implements RPServiceType
     final UUID requestId,
     final Exception cause)
   {
+    if (cause instanceof SStructuredErrorType<?> struct) {
+      return new IdCommandExecutionFailure(
+        this.strings.format("errorInvalidUsernamePassword"),
+        cause,
+        AUTHENTICATION_ERROR,
+        struct.attributes(),
+        struct.remediatingAction(),
+        requestId,
+        401
+      );
+    }
     return new IdCommandExecutionFailure(
       this.strings.format("errorInvalidUsernamePassword"),
       cause,
+      AUTHENTICATION_ERROR,
+      Map.of(),
+      Optional.empty(),
       requestId,
-      401,
-      AUTHENTICATION_ERROR
+      401
     );
   }
 

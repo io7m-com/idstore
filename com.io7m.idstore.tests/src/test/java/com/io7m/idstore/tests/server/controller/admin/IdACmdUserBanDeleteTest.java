@@ -27,6 +27,8 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Map;
+
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdAdminPermission.USER_BAN;
@@ -95,7 +97,7 @@ public final class IdACmdUserBanDeleteTest
     final var users =
       mock(IdDatabaseUsersQueriesType.class);
 
-    doThrow(new IdDatabaseException("", ADMIN_NONEXISTENT))
+    doThrow(new IdDatabaseException("", ADMIN_NONEXISTENT, Map.of(), empty()))
       .when(users)
       .userBanDelete(Mockito.any());
 

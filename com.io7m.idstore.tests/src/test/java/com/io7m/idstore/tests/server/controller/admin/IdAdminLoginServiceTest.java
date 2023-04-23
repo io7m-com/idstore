@@ -53,6 +53,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTEN
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
+import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -136,7 +137,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     throws Exception
   {
     when(this.admins.adminGetForNameRequire(any()))
-      .thenThrow(new IdDatabaseException("", ADMIN_NONEXISTENT));
+      .thenThrow(new IdDatabaseException("", ADMIN_NONEXISTENT, Map.of(), empty()));
 
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
@@ -166,7 +167,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     throws Exception
   {
     when(this.admins.adminGetForNameRequire(any()))
-      .thenThrow(new IdDatabaseException("", SQL_ERROR));
+      .thenThrow(new IdDatabaseException("", SQL_ERROR, Map.of(), empty()));
 
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
