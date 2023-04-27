@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,7 +24,10 @@ import com.io7m.idstore.model.IdNonEmptyList;
 import com.io7m.idstore.model.IdPasswordAlgorithmRedacted;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
+import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
+import com.io7m.idstore.protocol.user.IdUMessageType;
 import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseLogin;
@@ -35,14 +38,13 @@ import com.io7m.idstore.user_client.IdUClients;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientCredentials;
 import com.io7m.idstore.user_client.api.IdUClientException;
-import com.io7m.idstore.user_client.api.IdUClientType;
+import com.io7m.idstore.user_client.api.IdUClientSynchronousType;
 import com.io7m.quixote.core.QWebServerType;
 import com.io7m.quixote.core.QWebServers;
 import com.io7m.verdant.core.VProtocolSupported;
 import com.io7m.verdant.core.VProtocols;
 import com.io7m.verdant.core.cb.VProtocolMessages;
 import net.jqwik.api.Arbitraries;
-import net.jqwik.api.providers.TypeUsage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
@@ -50,16 +52,11 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.net.URI;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -69,9 +66,9 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTEN
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_NONEXISTENT;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NOT_LOGGED_IN;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_MISMATCH;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -83,7 +80,7 @@ public final class IdUClientIT extends IdWithServerContract
   private IdUCB1Messages messages;
   private IdUser user;
   private IdUClients clients;
-  private IdUClientType client;
+  private IdUClientSynchronousType client;
   private VProtocols versions;
   private VProtocolMessages versionMessages;
   private byte[] versionHeader;
@@ -107,7 +104,9 @@ public final class IdUClientIT extends IdWithServerContract
     this.clients =
       new IdUClients();
     this.client =
-      this.clients.open(new IdUClientConfiguration(Locale.ROOT));
+      this.clients.openSynchronousClient(
+        new IdUClientConfiguration(Locale.ROOT)
+      );
 
     this.messages =
       new IdUCB1Messages();
@@ -325,8 +324,7 @@ public final class IdUClientIT extends IdWithServerContract
   }
 
   /**
-   * Every method that requires a login throws an exception if the user is not
-   * logged in.
+   * Executing a command without being connected results in an error.
    *
    * @return The tests
    */
@@ -334,82 +332,25 @@ public final class IdUClientIT extends IdWithServerContract
   @TestFactory
   public Stream<DynamicTest> testDisconnected()
   {
-    return disconnectionRelevantMethodsOf(IdUClientType.class)
-      .map(this::disconnectedOf);
-  }
-
-  private DynamicTest disconnectedOf(
-    final Method method)
-  {
-    return DynamicTest.dynamicTest(
-      "testDisconnected_%s".formatted(method.getName()),
-      () -> {
-        final var parameterTypes =
-          method.getGenericParameterTypes();
-        final var parameters =
-          new Object[parameterTypes.length];
-
-        for (var index = 0; index < parameterTypes.length; ++index) {
-          final var pType = parameterTypes[index];
-          if (pType instanceof ParameterizedType param) {
-            final List<TypeUsage> typeArgs =
-              Arrays.stream(param.getActualTypeArguments())
-                .map(TypeUsage::forType)
-                .toList();
-
-            final var typeArgsArray = new TypeUsage[typeArgs.size()];
-            typeArgs.toArray(typeArgsArray);
-
-            final var mainType =
-              TypeUsage.of((Class<?>) param.getRawType(), typeArgsArray);
-
-            parameters[index] = Arbitraries.defaultFor(mainType).sample();
-          } else if (pType instanceof Class<?> clazz) {
-            parameters[index] = Arbitraries.defaultFor(clazz).sample();
+    return Arbitraries.defaultFor(IdUMessageType.class)
+      .sampleStream()
+      .filter(m -> m instanceof IdUCommandType<?>)
+      .map(IdUCommandType.class::cast)
+      .limit(1000L)
+      .map(c -> {
+        return DynamicTest.dynamicTest(
+          "testDisconnected_%s".formatted(c),
+          () -> {
+            assertThrows(IdUClientException.class, () -> {
+              this.client.executeOrElseThrow(c, IdUClientException::ofError);
+            });
           }
-        }
-
-        try {
-          method.invoke(this.client, parameters);
-        } catch (final IllegalAccessException | IllegalArgumentException e) {
-          throw new RuntimeException(e);
-        } catch (final InvocationTargetException e) {
-          if (e.getCause() instanceof IdUClientException ex) {
-            if (Objects.equals(ex.errorCode(), NOT_LOGGED_IN)) {
-              return;
-            }
-          }
-          throw e;
-        }
+        );
       });
   }
 
-  private static Stream<Method> disconnectionRelevantMethodsOf(
-    final Class<? extends IdUClientType> clazz)
-  {
-    return Stream.of(clazz.getMethods())
-      .filter(IdUClientIT::isDisconnectionRelevantMethod);
-  }
-
-  private static boolean isDisconnectionRelevantMethod(
-    final Method m)
-  {
-    return switch (m.getName()) {
-      case "toString",
-        "equals",
-        "hashCode",
-        "getClass",
-        "close",
-        "login",
-        "notify",
-        "wait",
-        "notifyAll" -> false;
-      default -> true;
-    };
-  }
-
   /**
-   * A smoke test that simply calls every method with random arguments.
+   * A smoke test that simply executes random commands.
    *
    * @return The tests
    */
@@ -420,11 +361,37 @@ public final class IdUClientIT extends IdWithServerContract
   {
     final var admin =
       this.serverCreateAdminInitial("admin", "12345678");
+    final var user =
+      this.serverCreateUser(admin, "someone");
 
-    this.serverCreateUser(admin, "someone");
+    return Arbitraries.defaultFor(IdUMessageType.class)
+      .sampleStream()
+      .filter(m -> m instanceof IdUCommandType<?>)
+      .map(IdUCommandType.class::cast)
+      .filter(m -> !(m instanceof IdUCommandPasswordUpdate))
+      .limit(2000L)
+      .map(c -> {
+        return DynamicTest.dynamicTest("testSmoke_" + c, () -> {
+          this.client.loginOrElseThrow(
+            new IdUClientCredentials(
+              "someone",
+              "12345678",
+              this.serverUserAPIURL(),
+              Map.of()
+            ),
+            IdUClientException::ofError
+          );
 
-    return disconnectionRelevantMethodsOf(IdUClientType.class)
-      .map(this::smokeOf);
+          try {
+            this.client.executeOrElseThrow(c, IdUClientException::ofError);
+          } catch (final IdUClientException ex) {
+            if (ALLOWED_SMOKE_CODES.contains(ex.errorCode())) {
+              return;
+            }
+            throw ex;
+          }
+        });
+      });
   }
 
   private static final Set<IdErrorCode> ALLOWED_SMOKE_CODES =
@@ -434,61 +401,8 @@ public final class IdUClientIT extends IdWithServerContract
       EMAIL_VERIFICATION_NONEXISTENT,
       PASSWORD_RESET_MISMATCH,
       PROTOCOL_ERROR,
+      RATE_LIMIT_EXCEEDED,
       USER_NONEXISTENT
     );
 
-  private DynamicTest smokeOf(
-    final Method method)
-  {
-    return DynamicTest.dynamicTest(
-      "testSmoke_%s".formatted(method.getName()),
-      () -> {
-        final var parameterTypes =
-          method.getGenericParameterTypes();
-        final var parameters =
-          new Object[parameterTypes.length];
-
-        for (var index = 0; index < parameterTypes.length; ++index) {
-          final var pType = parameterTypes[index];
-          if (pType instanceof ParameterizedType param) {
-            final List<TypeUsage> typeArgs =
-              Arrays.stream(param.getActualTypeArguments())
-                .map(TypeUsage::forType)
-                .toList();
-
-            final var typeArgsArray = new TypeUsage[typeArgs.size()];
-            typeArgs.toArray(typeArgsArray);
-
-            final var mainType =
-              TypeUsage.of((Class<?>) param.getRawType(), typeArgsArray);
-
-            parameters[index] = Arbitraries.defaultFor(mainType).sample();
-          } else if (pType instanceof Class<?> clazz) {
-            parameters[index] = Arbitraries.defaultFor(clazz).sample();
-          }
-        }
-
-        this.client.login(
-          new IdUClientCredentials(
-            "someone",
-            "12345678",
-            this.serverUserAPIURL(),
-            Map.of()
-          )
-        );
-
-        try {
-          method.invoke(this.client, parameters);
-        } catch (final IllegalAccessException | IllegalArgumentException e) {
-          throw e;
-        } catch (final InvocationTargetException e) {
-          if (e.getCause() instanceof IdUClientException ex) {
-            if (ALLOWED_SMOKE_CODES.contains(ex.errorCode())) {
-              return;
-            }
-          }
-          throw e;
-        }
-      });
-  }
 }

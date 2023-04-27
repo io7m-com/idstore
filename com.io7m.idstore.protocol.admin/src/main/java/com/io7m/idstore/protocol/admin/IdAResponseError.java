@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.protocol.admin;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.seltzer.api.SStructuredErrorType;
 
 import java.util.Map;
@@ -36,10 +37,10 @@ import java.util.UUID;
 public record IdAResponseError(
   UUID requestId,
   String message,
-  String errorCode,
+  IdErrorCode errorCode,
   Map<String, String> attributes,
   Optional<String> remediatingAction)
-  implements IdAResponseType, SStructuredErrorType<String>
+  implements IdAResponseType, SStructuredErrorType<IdErrorCode>
 {
   /**
    * An error response.

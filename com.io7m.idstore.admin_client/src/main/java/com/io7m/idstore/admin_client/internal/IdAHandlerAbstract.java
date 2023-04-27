@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,48 +14,35 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.admin_client.internal;
 
-import java.net.URI;
+import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
+
 import java.net.http.HttpClient;
 import java.util.Objects;
 
 /**
- * Abstract base class for versioned handlers.
+ * The abstract base class for handlers.
  */
 
-public abstract class IdAClientProtocolHandlerAbstract
-  implements IdAClientProtocolHandlerType
+public abstract class IdAHandlerAbstract
+  implements IdAHandlerType
 {
-  private final HttpClient httpClient;
   private final IdAStrings strings;
-  private final URI base;
+  private final HttpClient httpClient;
+  private final IdAClientConfiguration configuration;
 
-  /**
-   * Abstract base class for versioned handlers.
-   *
-   * @param inHttpClient The HTTP client
-   * @param inBase       The base URI
-   * @param inStrings    The string resources
-   */
-
-  public IdAClientProtocolHandlerAbstract(
-    final HttpClient inHttpClient,
+  protected IdAHandlerAbstract(
+    final IdAClientConfiguration inConfiguration,
     final IdAStrings inStrings,
-    final URI inBase)
+    final HttpClient inHttpClient)
   {
-    this.httpClient =
-      Objects.requireNonNull(inHttpClient, "inHttpClient");
+    this.configuration =
+      Objects.requireNonNull(inConfiguration, "configuration");
     this.strings =
-      Objects.requireNonNull(inStrings, "inStrings");
-    this.base =
-      Objects.requireNonNull(inBase, "inBase");
-  }
-
-  protected final HttpClient httpClient()
-  {
-    return this.httpClient;
+      Objects.requireNonNull(inStrings, "strings");
+    this.httpClient =
+      Objects.requireNonNull(inHttpClient, "httpClient");
   }
 
   protected final IdAStrings strings()
@@ -63,8 +50,13 @@ public abstract class IdAClientProtocolHandlerAbstract
     return this.strings;
   }
 
-  protected final URI base()
+  protected final HttpClient httpClient()
   {
-    return this.base;
+    return this.httpClient;
+  }
+
+  protected final IdAClientConfiguration configuration()
+  {
+    return this.configuration;
   }
 }

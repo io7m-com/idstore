@@ -16,10 +16,12 @@
 
 package com.io7m.idstore.user_client;
 
+import com.io7m.idstore.user_client.api.IdUClientAsynchronousType;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientFactoryType;
-import com.io7m.idstore.user_client.api.IdUClientType;
-import com.io7m.idstore.user_client.internal.IdUClient;
+import com.io7m.idstore.user_client.api.IdUClientSynchronousType;
+import com.io7m.idstore.user_client.internal.IdUClientAsynchronous;
+import com.io7m.idstore.user_client.internal.IdUClientSynchronous;
 import com.io7m.idstore.user_client.internal.IdUStrings;
 
 import java.io.IOException;
@@ -42,16 +44,8 @@ public final class IdUClients implements IdUClientFactoryType
 
   }
 
-  /**
-   * Open a new client.
-   *
-   * @param configuration The client configuration
-   *
-   * @return A new client
-   */
-
   @Override
-  public IdUClientType open(
+  public IdUClientAsynchronousType openAsynchronousClient(
     final IdUClientConfiguration configuration)
   {
     final var cookieJar =
@@ -60,7 +54,6 @@ public final class IdUClients implements IdUClientFactoryType
       configuration.locale();
 
     final IdUStrings strings;
-
     try {
       strings = new IdUStrings(locale);
     } catch (final IOException e) {
@@ -72,6 +65,30 @@ public final class IdUClients implements IdUClientFactoryType
         .cookieHandler(cookieJar)
         .build();
 
-    return IdUClient.open(configuration, strings, httpClient);
+    return new IdUClientAsynchronous(configuration, strings, httpClient);
+  }
+
+  @Override
+  public IdUClientSynchronousType openSynchronousClient(
+    final IdUClientConfiguration configuration)
+  {
+    final var cookieJar =
+      new CookieManager();
+    final var locale =
+      configuration.locale();
+
+    final IdUStrings strings;
+    try {
+      strings = new IdUStrings(locale);
+    } catch (final IOException e) {
+      throw new UncheckedIOException(e);
+    }
+
+    final var httpClient =
+      HttpClient.newBuilder()
+        .cookieHandler(cookieJar)
+        .build();
+
+    return new IdUClientSynchronous(configuration, strings, httpClient);
   }
 }

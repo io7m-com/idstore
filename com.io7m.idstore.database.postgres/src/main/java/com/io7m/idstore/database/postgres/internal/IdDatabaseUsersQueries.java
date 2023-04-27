@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -59,7 +59,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
 import static com.io7m.idstore.database.postgres.internal.Tables.AUDIT;
@@ -70,11 +69,7 @@ import static com.io7m.idstore.database.postgres.internal.Tables.LOGIN_HISTORY;
 import static com.io7m.idstore.database.postgres.internal.Tables.USERS;
 import static com.io7m.idstore.database.postgres.internal.Tables.USER_IDS;
 import static com.io7m.idstore.database.postgres.internal.Tables.USER_PASSWORD_RESETS;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_EMAIL;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID_NAME;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHostProxied;
@@ -86,14 +81,16 @@ final class IdDatabaseUsersQueries
   extends IdBaseQueries
   implements IdDatabaseUsersQueriesType
 {
-  static final Supplier<IdDatabaseException> USER_DOES_NOT_EXIST = () -> {
+  static IdDatabaseException userDoesNotExist(
+    final Map<String, String> attributes)
+  {
     return new IdDatabaseException(
       "User does not exist",
       USER_NONEXISTENT,
-      Map.of(),
+      attributes,
       Optional.empty()
     );
-  };
+  }
 
   IdDatabaseUsersQueries(
     final IdDatabaseTransaction inTransaction)
@@ -182,88 +179,46 @@ final class IdDatabaseUsersQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userCreate");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", id.toString()),
+        Map.entry("User Name", idName.value()),
+        Map.entry("Email", email.value())
+      );
+
     try {
-      {
-        final var existing =
-          context.fetchOptional(USER_IDS, USER_IDS.ID.eq(id));
-        if (existing.isPresent()) {
-          throw new IdDatabaseException(
-            "User ID already exists",
-            USER_DUPLICATE_ID,
-            Map.of("User ID", id.toString()),
-            Optional.empty()
-          );
-        }
-      }
+      context.insertInto(USER_IDS)
+        .set(USER_IDS.ID, id)
+        .execute();
 
-      {
-        final var existing =
-          context.fetchOptional(USERS, USERS.ID_NAME.eq(idName.value()));
-        if (existing.isPresent()) {
-          throw new IdDatabaseException(
-            "User ID name already exists",
-            USER_DUPLICATE_ID_NAME,
-            Map.of("User Name", idName.value()),
-            Optional.empty()
-          );
-        }
-      }
-
-      {
-        final var existing =
-          context.fetchOptional(
-            EMAILS,
-            EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value())
-              .and(EMAILS.USER_ID.isNotNull())
-          );
-
-        if (existing.isPresent()) {
-          throw new IdDatabaseException(
-            "Email already exists",
-            USER_DUPLICATE_EMAIL,
-            Map.of("Email", email.value()),
-            Optional.empty()
-          );
-        }
-      }
-
-      final var idCreate =
-        context.insertInto(USER_IDS)
-          .set(USER_IDS.ID, id);
-
-      idCreate.execute();
-
-      final var userCreate =
-        context.insertInto(USERS)
-          .set(USERS.ID, id)
-          .set(USERS.ID_NAME, idName.value())
-          .set(USERS.REAL_NAME, realName.value())
-          .set(USERS.TIME_CREATED, created)
-          .set(USERS.TIME_UPDATED, created)
-          .set(USERS.PASSWORD_ALGO, password.algorithm().identifier())
-          .set(USERS.PASSWORD_HASH, password.hash())
-          .set(USERS.PASSWORD_SALT, password.salt())
-          .set(USERS.DELETING, Boolean.FALSE);
-
-      userCreate.execute();
+      context.insertInto(USERS)
+        .set(USERS.ID, id)
+        .set(USERS.ID_NAME, idName.value())
+        .set(USERS.REAL_NAME, realName.value())
+        .set(USERS.TIME_CREATED, created)
+        .set(USERS.TIME_UPDATED, created)
+        .set(USERS.PASSWORD_ALGO, password.algorithm().identifier())
+        .set(USERS.PASSWORD_HASH, password.hash())
+        .set(USERS.PASSWORD_SALT, password.salt())
+        .set(USERS.DELETING, Boolean.FALSE)
+        .execute();
 
       context.insertInto(EMAILS)
         .set(EMAILS.EMAIL_ADDRESS, email.value())
         .set(EMAILS.USER_ID, id)
         .execute();
 
-      final var audit =
-        context.insertInto(AUDIT)
-          .set(AUDIT.TIME, this.currentTime())
-          .set(AUDIT.TYPE, "USER_CREATED")
-          .set(AUDIT.USER_ID, adminId)
-          .set(AUDIT.MESSAGE, id.toString());
+      context.insertInto(AUDIT)
+        .set(AUDIT.TIME, this.currentTime())
+        .set(AUDIT.TYPE, "USER_CREATED")
+        .set(AUDIT.USER_ID, adminId)
+        .set(AUDIT.MESSAGE, id.toString())
+        .execute();
 
-      audit.execute();
       return this.userGet(id).orElseThrow();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -282,6 +237,11 @@ final class IdDatabaseUsersQueries
       transaction.createContext();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userGet");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", id.toString())
+      );
 
     try {
       final var userRecordOpt =
@@ -304,7 +264,7 @@ final class IdDatabaseUsersQueries
       return Optional.of(userMap(userRecord, emails));
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } catch (final IdPasswordException e) {
       querySpan.recordException(e);
       throw handlePasswordException(e);
@@ -318,7 +278,10 @@ final class IdDatabaseUsersQueries
     final UUID id)
     throws IdDatabaseException
   {
-    return this.userGet(id).orElseThrow(USER_DOES_NOT_EXIST);
+    return this.userGet(id)
+      .orElseThrow(() -> userDoesNotExist(
+        Map.ofEntries(Map.entry("User ID", id.toString()))
+      ));
   }
 
   @Override
@@ -334,6 +297,11 @@ final class IdDatabaseUsersQueries
       transaction.createContext();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userGetForName");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User Name", name.value())
+      );
 
     try {
       final var userRecordOpt =
@@ -356,7 +324,7 @@ final class IdDatabaseUsersQueries
       return Optional.of(userMap(userRecord, emails));
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } catch (final IdPasswordException e) {
       querySpan.recordException(e);
       throw handlePasswordException(e);
@@ -370,7 +338,10 @@ final class IdDatabaseUsersQueries
     final IdName name)
     throws IdDatabaseException
   {
-    return this.userGetForName(name).orElseThrow(USER_DOES_NOT_EXIST);
+    return this.userGetForName(name)
+      .orElseThrow(() -> userDoesNotExist(
+        Map.ofEntries(Map.entry("User Name", name.value()))
+      ));
   }
 
   @Override
@@ -386,6 +357,11 @@ final class IdDatabaseUsersQueries
       transaction.createContext();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userGetForEmail");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Email", email.value())
+      );
 
     try {
       final var emailOpt =
@@ -405,7 +381,7 @@ final class IdDatabaseUsersQueries
       return this.userGet(emailRecord.getUserId());
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -416,7 +392,10 @@ final class IdDatabaseUsersQueries
     final IdEmail email)
     throws IdDatabaseException
   {
-    return this.userGetForEmail(email).orElseThrow(USER_DOES_NOT_EXIST);
+    return this.userGetForEmail(email)
+      .orElseThrow(() -> userDoesNotExist(
+        Map.ofEntries(Map.entry("Email", email.value()))
+      ));
   }
 
   @Override
@@ -436,6 +415,11 @@ final class IdDatabaseUsersQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userLogin");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", id.toString())
+      );
+
     try {
       final var limit =
         Math.max(limitHistory, 1);
@@ -443,7 +427,7 @@ final class IdDatabaseUsersQueries
         this.currentTime();
 
       context.fetchOptional(USERS, USERS.ID.eq(id))
-        .orElseThrow(USER_DOES_NOT_EXIST);
+        .orElseThrow(() -> userDoesNotExist(attributes));
 
       /*
        * Find the oldest login record.
@@ -501,7 +485,7 @@ final class IdDatabaseUsersQueries
       audit.execute();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -589,10 +573,15 @@ final class IdDatabaseUsersQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userUpdate");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", id.toString())
+      );
+
     try {
       final var record = context.fetchOne(USERS, USERS.ID.eq(id));
       if (record == null) {
-        throw USER_DOES_NOT_EXIST.get();
+        throw userDoesNotExist(attributes);
       }
 
       if (withIdName.isPresent()) {
@@ -636,7 +625,7 @@ final class IdDatabaseUsersQueries
       record.store();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -660,24 +649,13 @@ final class IdDatabaseUsersQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userEmailAdd");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", id.toString()),
+        Map.entry("Email", email.value())
+      );
+
     try {
-      context.fetchOptional(USERS, USERS.ID.eq(id))
-        .orElseThrow(USER_DOES_NOT_EXIST);
-
-      final var existing =
-        context.selectFrom(EMAILS)
-          .where(EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value()))
-          .fetchOptional();
-
-      if (existing.isPresent()) {
-        throw new IdDatabaseException(
-          "Email %s already exists.".formatted(email),
-          EMAIL_DUPLICATE,
-          Map.of("Email", email.value()),
-          Optional.empty()
-        );
-      }
-
       context.insertInto(EMAILS)
         .set(EMAILS.USER_ID, id)
         .set(EMAILS.EMAIL_ADDRESS, email.value())
@@ -692,7 +670,7 @@ final class IdDatabaseUsersQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -716,9 +694,15 @@ final class IdDatabaseUsersQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userEmailAdd");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", id.toString()),
+        Map.entry("Email", email.value())
+      );
+
     try {
       context.fetchOptional(USERS, USERS.ID.eq(id))
-        .orElseThrow(USER_DOES_NOT_EXIST);
+        .orElseThrow(() -> userDoesNotExist(attributes));
 
       final var existing =
         context.fetchOptional(
@@ -750,7 +734,7 @@ final class IdDatabaseUsersQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -771,20 +755,21 @@ final class IdDatabaseUsersQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userLoginHistory");
 
-    try {
-      context.fetchOptional(USERS, USERS.ID.eq(id))
-        .orElseThrow(USER_DOES_NOT_EXIST);
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", id.toString())
+      );
 
+    try {
       return context.selectFrom(LOGIN_HISTORY)
         .where(LOGIN_HISTORY.USER_ID.eq(id))
         .limit(Integer.valueOf(limit))
         .stream()
         .map(IdDatabaseUsersQueries::mapLogin)
         .toList();
-
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -804,6 +789,11 @@ final class IdDatabaseUsersQueries
       transaction.adminId();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userDelete");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", id.toString())
+      );
 
     try {
       final var user = this.userGetRequire(id);
@@ -834,7 +824,7 @@ final class IdDatabaseUsersQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -855,6 +845,12 @@ final class IdDatabaseUsersQueries
       transaction.adminId();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userBanCreate");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", ban.user().toString()),
+        Map.entry("Reason", ban.reason())
+      );
 
     try {
       final var user =
@@ -880,7 +876,7 @@ final class IdDatabaseUsersQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -899,6 +895,11 @@ final class IdDatabaseUsersQueries
       transaction.createContext();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userBanGet");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", id.toString())
+      );
 
     try {
       final var user =
@@ -919,7 +920,7 @@ final class IdDatabaseUsersQueries
       );
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -940,6 +941,12 @@ final class IdDatabaseUsersQueries
       transaction.adminId();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userBanDelete");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", ban.user().toString()),
+        Map.entry("Reason", ban.reason())
+      );
 
     try {
       final var user =
@@ -962,7 +969,7 @@ final class IdDatabaseUsersQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -983,6 +990,11 @@ final class IdDatabaseUsersQueries
       transaction.createQuerySpan(
         "IdDatabaseUsersQueries.userPasswordResetCreate");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", reset.user().toString())
+      );
+
     try {
       final var user =
         this.userGetRequire(reset.user());
@@ -1002,7 +1014,7 @@ final class IdDatabaseUsersQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -1022,6 +1034,11 @@ final class IdDatabaseUsersQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseUsersQueries.userPasswordResetGet");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", userId.toString())
+      );
+
     try {
       this.userGetRequire(userId);
 
@@ -1032,7 +1049,7 @@ final class IdDatabaseUsersQueries
         .toList();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -1053,6 +1070,11 @@ final class IdDatabaseUsersQueries
       transaction.createQuerySpan(
         "IdDatabaseUsersQueries.userPasswordResetGetForToken");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Token", token.value())
+      );
+
     try {
       return context.selectFrom(USER_PASSWORD_RESETS)
         .where(USER_PASSWORD_RESETS.TOKEN.eq(token.value()))
@@ -1061,7 +1083,7 @@ final class IdDatabaseUsersQueries
         .findFirst();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -1082,6 +1104,12 @@ final class IdDatabaseUsersQueries
       transaction.createQuerySpan(
         "IdDatabaseUsersQueries.userPasswordResetDelete");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", reset.user().toString()),
+        Map.entry("Token", reset.token().value())
+      );
+
     try {
       context.deleteFrom(USER_PASSWORD_RESETS)
         .where(USER_PASSWORD_RESETS.USER_ID.eq(reset.user())
@@ -1089,7 +1117,7 @@ final class IdDatabaseUsersQueries
         .execute();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -1186,7 +1214,7 @@ final class IdDatabaseUsersQueries
       return new IdDatabaseUsersQueries.UsersSearch(pages);
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
+      throw handleDatabaseException(this.transaction(), e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -1264,7 +1292,7 @@ final class IdDatabaseUsersQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
+      throw handleDatabaseException(this.transaction(), e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -1329,7 +1357,7 @@ final class IdDatabaseUsersQueries
         );
       } catch (final DataAccessException e) {
         querySpan.recordException(e);
-        throw handleDatabaseException(transaction, e);
+        throw handleDatabaseException(transaction, e, Map.of());
       } finally {
         querySpan.end();
       }
@@ -1395,7 +1423,7 @@ final class IdDatabaseUsersQueries
         );
       } catch (final DataAccessException e) {
         querySpan.recordException(e);
-        throw handleDatabaseException(transaction, e);
+        throw handleDatabaseException(transaction, e, Map.of());
       } finally {
         querySpan.end();
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,34 +16,24 @@
 
 package com.io7m.idstore.admin_client.api;
 
-import com.io7m.idstore.model.IdAdmin;
-
-import java.io.Closeable;
-import java.net.URI;
+import com.io7m.hibiscus.api.HBClientSynchronousType;
+import com.io7m.idstore.protocol.admin.IdACommandType;
+import com.io7m.idstore.protocol.admin.IdAResponseError;
+import com.io7m.idstore.protocol.admin.IdAResponseType;
 
 /**
- * The type of clients.
+ * The type of synchronous clients.
  */
 
-public interface IdAClientType
-  extends Closeable, IdAClientUsersType, IdAClientAdminsType, IdAClientAuditType
+public interface IdAClientSynchronousType
+  extends HBClientSynchronousType<
+  IdAClientException,
+  IdACommandType<?>,
+  IdAResponseType,
+  IdAResponseType,
+  IdAResponseError,
+  IdAClientEventType,
+  IdAClientCredentials>
 {
-  /**
-   * Log in.
-   *
-   * @param user     The admin username
-   * @param password The password
-   * @param base     The base URI
-   *
-   * @return The logged in admin profile
-   *
-   * @throws IdAClientException   On errors
-   * @throws InterruptedException On interruption
-   */
 
-  IdAdmin login(
-    String user,
-    String password,
-    URI base)
-    throws IdAClientException, InterruptedException;
 }

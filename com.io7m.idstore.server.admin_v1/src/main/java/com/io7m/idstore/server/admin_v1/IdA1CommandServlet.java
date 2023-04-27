@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -185,7 +185,7 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
       final IdAResponseType result = this.executor.execute(context, command);
       sends.send(servletResponse, 200, result);
       if (result instanceof IdAResponseError error) {
-        Span.current().setAttribute("idstore.errorCode", error.errorCode());
+        Span.current().setAttribute("idstore.errorCode", error.errorCode().id());
       } else {
         transaction.commit();
       }
@@ -210,8 +210,8 @@ public final class IdA1CommandServlet extends IdA1AuthenticatedServlet
         500,
         new IdAResponseError(
           requestId,
-          IO_ERROR.id(),
           e.getMessage(),
+          IO_ERROR,
           Map.of(),
           Optional.empty()
         )

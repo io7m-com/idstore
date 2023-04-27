@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,25 +14,16 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.user_client.api;
+package com.io7m.idstore.admin_client.api;
 
-import com.io7m.hibiscus.api.HBClientType;
-import com.io7m.idstore.protocol.user.IdUCommandType;
-import com.io7m.idstore.protocol.user.IdUResponseError;
-import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.hibiscus.api.HBEventType;
 
 /**
- * The type of clients.
+ * The type of client events.
  */
 
-public interface IdUClientType
-  extends HBClientType<
-  IdUClientException,
-  IdUCommandType<?>,
-  IdUResponseType,
-  IdUResponseError,
-  IdUClientEventType,
-  IdUClientCredentials>
+public interface IdAClientEventType
+  extends HBEventType
 {
 
 }

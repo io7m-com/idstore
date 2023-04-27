@@ -65,7 +65,7 @@
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
     <com.io7m.cedarbridge.version>0.0.11</com.io7m.cedarbridge.version>
     <com.io7m.cxbutton.version>0.0.5</com.io7m.cxbutton.version>
-    <com.io7m.hibiscus.version>0.0.2</com.io7m.hibiscus.version>
+    <com.io7m.hibiscus.version>0.0.5</com.io7m.hibiscus.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jbssio.version>2.0.0</com.io7m.jbssio.version>
     <com.io7m.jqpage.version>0.0.2</com.io7m.jqpage.version>
@@ -177,6 +177,11 @@
       <dependency>
         <groupId>com.io7m.hibiscus</groupId>
         <artifactId>com.io7m.hibiscus.api</artifactId>
+        <version>${com.io7m.hibiscus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.hibiscus</groupId>
+        <artifactId>com.io7m.hibiscus.basic</artifactId>
         <version>${com.io7m.hibiscus.version}</version>
       </dependency>
       <dependency>
@@ -446,7 +451,7 @@
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
-        <version>1.8.20</version>
+        <version>1.8.21</version>
       </dependency>
 
       <dependency>

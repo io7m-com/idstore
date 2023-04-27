@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,6 +18,7 @@ package com.io7m.idstore.user_client.api;
 
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.protocol.user.IdUResponseError;
 
 import java.util.Map;
 import java.util.Objects;
@@ -83,5 +84,25 @@ public final class IdUClientException extends IdException
   public Optional<UUID> requestId()
   {
     return this.requestId;
+  }
+
+  /**
+   * Transform an error response to an exception.
+   *
+   * @param error The error
+   *
+   * @return The exception
+   */
+
+  public static IdUClientException ofError(
+    final IdUResponseError error)
+  {
+    return new IdUClientException(
+      error.message(),
+      error.errorCode(),
+      error.attributes(),
+      error.remediatingAction(),
+      Optional.of(error.requestId())
+    );
   }
 }

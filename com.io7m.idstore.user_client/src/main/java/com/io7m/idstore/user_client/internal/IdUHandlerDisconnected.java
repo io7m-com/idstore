@@ -18,15 +18,20 @@ package com.io7m.idstore.user_client.internal;
 
 import com.io7m.hibiscus.api.HBResultFailure;
 import com.io7m.hibiscus.api.HBResultType;
+import com.io7m.hibiscus.basic.HBClientNewHandler;
 import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientCredentials;
+import com.io7m.idstore.user_client.api.IdUClientEventType;
 import com.io7m.idstore.user_client.api.IdUClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.http.HttpClient;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,25 +42,23 @@ import java.util.UUID;
 
 public final class IdUHandlerDisconnected extends IdUHandlerAbstract
 {
-  IdUHandlerDisconnected(
+  private static final Logger LOG =
+    LoggerFactory.getLogger(IdUHandlerDisconnected.class);
+
+  /**
+   * Construct a handler.
+   *
+   * @param inConfiguration The configuration
+   * @param inStrings       The string resources
+   * @param inHttpClient    The client
+   */
+
+  public IdUHandlerDisconnected(
     final IdUClientConfiguration inConfiguration,
     final IdUStrings inStrings,
     final HttpClient inHttpClient)
   {
     super(inConfiguration, inStrings, inHttpClient);
-  }
-
-  @Override
-  public void pollEvents()
-  {
-
-  }
-
-  @Override
-  public <R extends IdUResponseType> HBResultType<R, IdUResponseError> executeCommand(
-    final IdUCommandType<R> command)
-  {
-    return this.notLoggedIn();
   }
 
   private <A> HBResultFailure<A, IdUResponseError> notLoggedIn()
@@ -72,23 +75,28 @@ public final class IdUHandlerDisconnected extends IdUHandlerAbstract
   }
 
   @Override
-  public boolean isConnected()
+  public boolean onIsConnected()
   {
     return false;
   }
 
-  /**
-   * Execute the login process.
-   *
-   * @param credentials The credentials
-   *
-   * @return The result
-   *
-   * @throws InterruptedException On interruption
-   */
+  @Override
+  public List<IdUClientEventType> onPollEvents()
+  {
+    return List.of();
+  }
 
   @Override
-  public HBResultType<IdUNewHandler, IdUResponseError> login(
+  public HBResultType<HBClientNewHandler<
+    IdUClientException,
+    IdUCommandType<?>,
+    IdUResponseType,
+    IdUResponseType,
+    IdUResponseError,
+    IdUClientEventType,
+    IdUClientCredentials>,
+    IdUResponseError>
+  onExecuteLogin(
     final IdUClientCredentials credentials)
     throws InterruptedException
   {
@@ -101,8 +109,10 @@ public final class IdUHandlerDisconnected extends IdUHandlerAbstract
           credentials.baseURI()
         );
 
-      return handler.login(credentials);
+      LOG.debug("login: negotiated {}", handler);
+      return handler.onExecuteLogin(credentials);
     } catch (final IdUClientException e) {
+      LOG.debug("login: ", e);
       return new HBResultFailure<>(
         new IdUResponseError(
           UUID.randomUUID(),
@@ -115,4 +125,17 @@ public final class IdUHandlerDisconnected extends IdUHandlerAbstract
     }
   }
 
+  @Override
+  public HBResultType<IdUResponseType, IdUResponseError>
+  onExecuteCommand(
+    final IdUCommandType<?> command)
+  {
+    return this.notLoggedIn();
+  }
+
+  @Override
+  public void onDisconnect()
+  {
+
+  }
 }

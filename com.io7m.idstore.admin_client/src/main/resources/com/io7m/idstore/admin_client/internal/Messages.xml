@@ -9,6 +9,10 @@
   <entry key="clientSupports">Client supports:</entry>
   <entry key="notLoggedIn">Error: Not logged in!</entry>
 
+  <entry key="Expected Response Type">Expected Response Type</entry>
+  <entry key="Received Response Type">Received Response Type</entry>
+  <entry key="Received an unexpected response type.">Received an unexpected response type.</entry>
+
   <entry key="errorContentType"><![CDATA[The server sent an unexpected content type.
   Command:  {0}
   Expected: {1}

@@ -19,6 +19,7 @@ package com.io7m.idstore.user_client.internal;
 import com.io7m.hibiscus.api.HBResultFailure;
 import com.io7m.hibiscus.api.HBResultSuccess;
 import com.io7m.hibiscus.api.HBResultType;
+import com.io7m.hibiscus.basic.HBClientNewHandler;
 import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.protocol.api.IdProtocolException;
@@ -31,6 +32,8 @@ import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientCredentials;
+import com.io7m.idstore.user_client.api.IdUClientEventType;
+import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.junreachable.UnreachableCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +44,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -114,81 +118,6 @@ public final class IdUHandler1 extends IdUHandlerAbstract
       version = "0.0.0";
     }
     return "com.io7m.cardant.client/%s".formatted(version);
-  }
-
-  @Override
-  public void pollEvents()
-  {
-
-  }
-
-  @Override
-  public <R extends IdUResponseType> HBResultType<R, IdUResponseError> executeCommand(
-    final IdUCommandType<R> command)
-    throws InterruptedException
-  {
-    return this.sendCommand(command);
-  }
-
-  @Override
-  public boolean isConnected()
-  {
-    return this.connected;
-  }
-
-  /**
-   * Execute the login process.
-   *
-   * @param credentials The credentials
-   *
-   * @return The result
-   *
-   * @throws InterruptedException On interruption
-   */
-
-  @Override
-  public HBResultType<IdUNewHandler, IdUResponseError> login(
-    final IdUClientCredentials credentials)
-    throws InterruptedException
-  {
-    this.mostRecentLogin =
-      new IdUCommandLogin(
-        new IdName(credentials.userName()),
-        credentials.password(),
-        credentials.attributes()
-      );
-
-    final var response =
-      this.sendLogin(this.mostRecentLogin);
-
-    if (response instanceof final HBResultSuccess<IdUResponseLogin, IdUResponseError> success) {
-      return new HBResultSuccess<>(
-        new IdUNewHandler(
-          success.result(),
-          this
-        )
-      );
-    }
-    if (response instanceof final HBResultFailure<IdUResponseLogin, IdUResponseError> failure) {
-      return failure.cast();
-    }
-
-    throw new UnreachableCodeException();
-  }
-
-  private HBResultType<IdUResponseLogin, IdUResponseError> sendLogin(
-    final IdUCommandLogin message)
-    throws InterruptedException
-  {
-    return this.send(1, this.loginURI, true, message);
-  }
-
-  private <R extends IdUResponseType, C extends IdUCommandType<R>>
-  HBResultType<R, IdUResponseError>
-  sendCommand(final C command)
-    throws InterruptedException
-  {
-    return this.send(1, this.commandURI, false, command);
   }
 
   private <R extends IdUResponseType, C extends IdUCommandType<R>>
@@ -330,6 +259,13 @@ public final class IdUHandler1 extends IdUHandlerAbstract
     throw new UnreachableCodeException();
   }
 
+  private HBResultType<IdUResponseLogin, IdUResponseError> sendLogin(
+    final IdUCommandLogin login)
+    throws InterruptedException
+  {
+    return this.send(1, this.loginURI, true, login);
+  }
+
   private <R extends IdUResponseType> HBResultFailure<R, IdUResponseError> errorContentType(
     final String contentType,
     final String expectedContentType)
@@ -355,7 +291,8 @@ public final class IdUHandler1 extends IdUHandlerAbstract
     );
   }
 
-  private <R extends IdUResponseType, C extends IdUCommandType<R>> HBResultFailure<R, IdUResponseError>
+  private <R extends IdUResponseType, C extends IdUCommandType<R>>
+  HBResultFailure<R, IdUResponseError>
   errorUnexpectedResponseType(
     final C message,
     final IdUMessageType responseActual)
@@ -386,5 +323,75 @@ public final class IdUHandler1 extends IdUHandlerAbstract
     final Object... args)
   {
     return this.strings().format(id, args);
+  }
+
+  @Override
+  public boolean onIsConnected()
+  {
+    return this.connected;
+  }
+
+  @Override
+  public List<IdUClientEventType> onPollEvents()
+  {
+    return List.of();
+  }
+
+
+  @Override
+  public HBResultType<
+    HBClientNewHandler<
+      IdUClientException,
+      IdUCommandType<?>,
+      IdUResponseType,
+      IdUResponseType,
+      IdUResponseError,
+      IdUClientEventType,
+      IdUClientCredentials>,
+    IdUResponseError>
+  onExecuteLogin(
+    final IdUClientCredentials credentials)
+    throws InterruptedException
+  {
+    LOG.debug("login: {}", credentials.baseURI());
+
+    this.mostRecentLogin =
+      new IdUCommandLogin(
+        new IdName(credentials.userName()),
+        credentials.password(),
+        credentials.attributes()
+      );
+
+    final var response =
+      this.sendLogin(this.mostRecentLogin);
+
+    if (response instanceof final HBResultSuccess<IdUResponseLogin, IdUResponseError> success) {
+      LOG.debug("login: succeeded");
+      return new HBResultSuccess<>(
+        new HBClientNewHandler<>(this, success.result())
+      );
+    }
+    if (response instanceof final HBResultFailure<IdUResponseLogin, IdUResponseError> failure) {
+      LOG.debug("login: failed ({})", failure.result().message());
+      return failure.cast();
+    }
+
+    throw new UnreachableCodeException();
+  }
+
+  @Override
+  public HBResultType<IdUResponseType, IdUResponseError>
+  onExecuteCommand(
+    final IdUCommandType<?> command)
+    throws InterruptedException
+  {
+    return this.send(1, this.commandURI, false, command)
+      .map(x -> x);
+  }
+
+  @Override
+  public void onDisconnect()
+  {
+
   }
 }

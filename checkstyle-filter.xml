@@ -171,7 +171,11 @@
 
   <suppress files="IdA1CmdAbstract\.java"
             checks="ThrowsCount"/>
-  
+
+  <!-- The client service refers to a lot of command types. -->
+  <suppress files="IdAGClientService\.java"
+            checks="ClassDataAbstractionCoupling"/>
+
   <!-- MXBeans have specific name conventions. -->
   <suppress files="IdDatabaseMetricsMXBean\.java"
             checks="TypeName"/>

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,8 +26,7 @@ import java.util.UUID;
  */
 
 public record IdACommandAdminGet(
-  UUID admin)
-  implements IdACommandType<IdAResponseAdminGet>
+  UUID admin) implements IdACommandType<IdAResponseAdminGet>
 {
   /**
    * Get the given admin.
@@ -36,5 +35,11 @@ public record IdACommandAdminGet(
   public IdACommandAdminGet
   {
     Objects.requireNonNull(admin, "id");
+  }
+
+  @Override
+  public Class<IdAResponseAdminGet> responseClass()
+  {
+    return IdAResponseAdminGet.class;
   }
 }

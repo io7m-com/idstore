@@ -51,6 +51,10 @@
     </dependency>
 
     <dependency>
+      <groupId>com.io7m.junreachable</groupId>
+      <artifactId>com.io7m.junreachable.core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.io7m.verdant</groupId>
       <artifactId>com.io7m.verdant.core</artifactId>
     </dependency>
@@ -69,6 +73,14 @@
     <dependency>
       <groupId>com.io7m.genevan</groupId>
       <artifactId>com.io7m.genevan.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.hibiscus</groupId>
+      <artifactId>com.io7m.hibiscus.api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.hibiscus</groupId>
+      <artifactId>com.io7m.hibiscus.basic</artifactId>
     </dependency>
 
     <dependency>

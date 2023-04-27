@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -23,5 +23,9 @@ package com.io7m.idstore.protocol.admin;
 public record IdACommandAdminSearchNext()
   implements IdACommandType<IdAResponseAdminSearchNext>
 {
-
+  @Override
+  public Class<IdAResponseAdminSearchNext> responseClass()
+  {
+    return IdAResponseAdminSearchNext.class;
+  }
 }

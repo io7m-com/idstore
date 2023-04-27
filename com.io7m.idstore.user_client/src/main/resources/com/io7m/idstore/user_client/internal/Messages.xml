@@ -9,6 +9,10 @@
   <entry key="clientSupports">Client supports:</entry>
   <entry key="notLoggedIn">Error: Not logged in!</entry>
 
+  <entry key="Expected Response Type">Expected Response Type</entry>
+  <entry key="Received Response Type">Received Response Type</entry>
+  <entry key="Received an unexpected response type.">Received an unexpected response type.</entry>
+
   <entry key="errorLoginNotHere">The login command cannot be used with this method.</entry>
   <entry key="errorReasonContentType">The server sent an unexpected content type.</entry>
   <entry key="errorReasonResponseType">The server sent an unexpected message response type.</entry>

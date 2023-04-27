@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.EnumSet;
+import java.util.Map;
 
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseAdminsQueries.permissionsSerialize;
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
@@ -116,7 +117,7 @@ public final class IdDatabaseMaintenanceQueries
       LOG.debug("updated permissions for {} initial admins", valueOf(updated));
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -142,7 +143,7 @@ public final class IdDatabaseMaintenanceQueries
       LOG.debug("deleted {} expired password resets", valueOf(deleted));
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -168,7 +169,7 @@ public final class IdDatabaseMaintenanceQueries
       LOG.debug("deleted {} expired email verifications", valueOf(deleted));
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -193,7 +194,7 @@ public final class IdDatabaseMaintenanceQueries
       LOG.debug("deleted {} expired bans", valueOf(deleted));
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, Map.of());
     } finally {
       querySpan.end();
     }

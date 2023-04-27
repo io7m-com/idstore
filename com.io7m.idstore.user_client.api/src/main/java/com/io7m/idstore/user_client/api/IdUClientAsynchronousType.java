@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,33 +14,26 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.admin_client.internal;
+package com.io7m.idstore.user_client.api;
 
-import com.io7m.idstore.model.IdAdmin;
-
-import java.util.Objects;
+import com.io7m.hibiscus.api.HBClientAsynchronousType;
+import com.io7m.idstore.protocol.user.IdUCommandType;
+import com.io7m.idstore.protocol.user.IdUResponseError;
+import com.io7m.idstore.protocol.user.IdUResponseType;
 
 /**
- * A newly negotiated protocol handler.
- *
- * @param adminLoggedIn The admin that logged in
- * @param handler       The protocol handler
+ * The type of asynchronous clients.
  */
 
-public record IdANewHandler(
-  IdAdmin adminLoggedIn,
-  IdAClientProtocolHandlerType handler)
+public interface IdUClientAsynchronousType
+  extends HBClientAsynchronousType<
+  IdUClientException,
+  IdUCommandType<?>,
+  IdUResponseType,
+  IdUResponseType,
+  IdUResponseError,
+  IdUClientEventType,
+  IdUClientCredentials>
 {
-  /**
-   * A newly negotiated protocol handler.
-   *
-   * @param adminLoggedIn The admin that logged in
-   * @param handler       The protocol handler
-   */
 
-  public IdANewHandler
-  {
-    Objects.requireNonNull(adminLoggedIn, "adminLoggedIn");
-    Objects.requireNonNull(handler, "handler");
-  }
 }

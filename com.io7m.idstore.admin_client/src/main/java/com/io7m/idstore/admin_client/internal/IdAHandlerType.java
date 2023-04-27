@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,38 +14,30 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.admin_client.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientAdminsType;
-import com.io7m.idstore.admin_client.api.IdAClientAuditType;
+import com.io7m.hibiscus.basic.HBClientHandlerType;
+import com.io7m.idstore.admin_client.api.IdAClientCredentials;
+import com.io7m.idstore.admin_client.api.IdAClientEventType;
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.admin_client.api.IdAClientUsersType;
-
-import java.net.URI;
+import com.io7m.idstore.protocol.admin.IdACommandType;
+import com.io7m.idstore.protocol.admin.IdAResponseError;
+import com.io7m.idstore.protocol.admin.IdAResponseType;
 
 /**
- * A versioned protocol handler.
+ * The client handler type.
  */
 
-public interface IdAClientProtocolHandlerType
-  extends IdAClientUsersType, IdAClientAdminsType, IdAClientAuditType
+public interface IdAHandlerType
+  extends HBClientHandlerType<
+  IdAClientException,
+  IdACommandType<?>,
+  IdAResponseType,
+  IdAResponseType,
+  IdAResponseError,
+  IdAClientEventType,
+  IdAClientCredentials>
 {
-  /**
-   * Attempt to log in.
-   *
-   * @param admin    The admin
-   * @param password The password
-   * @param base     The base URI
-   *
-   * @return A new protocol handler
-   *
-   * @throws IdAClientException   On errors
-   * @throws InterruptedException On interruption
-   */
 
-  IdANewHandler login(
-    String admin,
-    String password,
-    URI base)
-    throws IdAClientException, InterruptedException;
 }

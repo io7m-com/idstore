@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,10 +16,13 @@
 
 package com.io7m.idstore.admin_gui.internal.client;
 
+import com.io7m.hibiscus.api.HBState;
+import com.io7m.idstore.admin_client.api.IdAClientAsynchronousType;
+import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
+import com.io7m.idstore.admin_client.api.IdAClientCredentials;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientFactoryType;
-import com.io7m.idstore.admin_client.api.IdAClientType;
-import com.io7m.idstore.admin_gui.internal.IdAGStrings;
+import com.io7m.idstore.admin_gui.internal.IdAGPerpetualSubscriber;
 import com.io7m.idstore.admin_gui.internal.events.IdAGEventBus;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminColumn;
@@ -29,6 +32,7 @@ import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 import com.io7m.idstore.model.IdAdminSummary;
 import com.io7m.idstore.model.IdAuditEvent;
+import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdLogin;
@@ -38,78 +42,123 @@ import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.model.IdUserColumn;
 import com.io7m.idstore.model.IdUserColumnOrdering;
 import com.io7m.idstore.model.IdUserCreate;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
+import com.io7m.idstore.protocol.admin.IdACommandAdminCreate;
+import com.io7m.idstore.protocol.admin.IdACommandAdminDelete;
+import com.io7m.idstore.protocol.admin.IdACommandAdminEmailAdd;
+import com.io7m.idstore.protocol.admin.IdACommandAdminEmailRemove;
+import com.io7m.idstore.protocol.admin.IdACommandAdminGet;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchBegin;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchNext;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
+import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
+import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandUserBanCreate;
+import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
+import com.io7m.idstore.protocol.admin.IdACommandUserBanGet;
+import com.io7m.idstore.protocol.admin.IdACommandUserCreate;
+import com.io7m.idstore.protocol.admin.IdACommandUserDelete;
+import com.io7m.idstore.protocol.admin.IdACommandUserEmailAdd;
+import com.io7m.idstore.protocol.admin.IdACommandUserEmailRemove;
+import com.io7m.idstore.protocol.admin.IdACommandUserGet;
+import com.io7m.idstore.protocol.admin.IdACommandUserGetByEmail;
+import com.io7m.idstore.protocol.admin.IdACommandUserLoginHistory;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchBegin;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailNext;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
+import com.io7m.idstore.protocol.admin.IdACommandUserSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdate;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminCreate;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminDelete;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminGet;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchBegin;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailNext;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchNext;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminSelf;
+import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
+import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchBegin;
+import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchNext;
+import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseLogin;
+import com.io7m.idstore.protocol.admin.IdAResponseUserBanCreate;
+import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
+import com.io7m.idstore.protocol.admin.IdAResponseUserBanGet;
+import com.io7m.idstore.protocol.admin.IdAResponseUserCreate;
+import com.io7m.idstore.protocol.admin.IdAResponseUserGet;
+import com.io7m.idstore.protocol.admin.IdAResponseUserLoginHistory;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchBegin;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailBegin;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailNext;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchNext;
+import com.io7m.idstore.protocol.admin.IdAResponseUserSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
 import com.io7m.repetoir.core.RPServiceType;
-import com.io7m.taskrecorder.core.TRTaskRecorder;
-import com.io7m.taskrecorder.core.TRTaskRecorderType;
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import static com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus.DISCONNECTED;
+import static com.io7m.idstore.model.IdUserColumn.BY_IDNAME;
 
 /**
  * A client service.
  */
 
-public final class IdAGClientService implements RPServiceType, Closeable
+public final class IdAGClientService implements RPServiceType, AutoCloseable
 {
   private static final Logger LOG =
     LoggerFactory.getLogger(IdAGClientService.class);
 
   private static final IdUserColumnOrdering DEFAULT_USER_ORDERING =
-    new IdUserColumnOrdering(IdUserColumn.BY_IDNAME, true);
-
+    new IdUserColumnOrdering(BY_IDNAME, true);
 
   private static final IdAdminColumnOrdering DEFAULT_ADMIN_ORDERING =
     new IdAdminColumnOrdering(IdAdminColumn.BY_IDNAME, true);
-  
+
   private final IdAGEventBus eventBus;
-  private final ExecutorService executor;
-  private final IdAClientType client;
-  private final SimpleObjectProperty<IdAGClientStatus> status;
-  private final IdAGStrings strings;
+  private final SimpleObjectProperty<HBState> status;
   private URI serverLatest;
   private IdAdmin self;
+  private final IdAClientAsynchronousType client;
 
   private IdAGClientService(
     final IdAGEventBus inEventBus,
-    final ExecutorService inExecutor,
-    final IdAClientType inClient,
-    final IdAGStrings inStrings)
+    final IdAClientAsynchronousType inClient)
   {
     this.eventBus =
       Objects.requireNonNull(inEventBus, "eventBus");
-    this.executor =
-      Objects.requireNonNull(inExecutor, "executor");
     this.client =
       Objects.requireNonNull(inClient, "client");
-    this.strings =
-      Objects.requireNonNull(inStrings, "strings");
 
     this.serverLatest =
       URI.create("urn:unspecified");
     this.status =
-      new SimpleObjectProperty<>(DISCONNECTED);
+      new SimpleObjectProperty<>(HBState.CLIENT_DISCONNECTED);
   }
 
   /**
@@ -117,7 +166,6 @@ public final class IdAGClientService implements RPServiceType, Closeable
    *
    * @param eventBus The event bus
    * @param clients  The client factory
-   * @param strings  The string resources
    * @param locale   The locale
    *
    * @return A new service
@@ -129,26 +177,18 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public static IdAGClientService create(
     final IdAGEventBus eventBus,
     final IdAClientFactoryType clients,
-    final IdAGStrings strings,
     final Locale locale)
     throws IdAClientException, InterruptedException
   {
-    final var executor =
-      Executors.newSingleThreadExecutor(r -> {
-        final var thread = new Thread(r);
-        thread.setDaemon(true);
-        thread.setName(
-          "com.io7m.idstore.admin_gui.internal.client.IdAGClientService[%d]"
-            .formatted(Long.valueOf(thread.getId())));
-        return thread;
-      });
+    final var client =
+      clients.openAsynchronousClient(new IdAClientConfiguration(locale));
+    final var service =
+      new IdAGClientService(eventBus, client);
 
-    return new IdAGClientService(
-      eventBus,
-      executor,
-      clients.create(locale),
-      strings
-    );
+    client.state()
+      .subscribe(new IdAGPerpetualSubscriber<>(service.status::set));
+
+    return service;
   }
 
   private static URI uriOf(
@@ -171,7 +211,7 @@ public final class IdAGClientService implements RPServiceType, Closeable
    * @return The current client status
    */
 
-  public ReadOnlyObjectProperty<IdAGClientStatus> status()
+  public ReadOnlyObjectProperty<HBState> status()
   {
     return this.status;
   }
@@ -186,11 +226,16 @@ public final class IdAGClientService implements RPServiceType, Closeable
   }
 
   @Override
+  public String toString()
+  {
+    return this.description();
+  }
+
+  @Override
   public void close()
-    throws IOException
+    throws Exception
   {
     this.client.close();
-    this.executor.shutdown();
   }
 
   /**
@@ -215,57 +260,14 @@ public final class IdAGClientService implements RPServiceType, Closeable
     this.serverLatest =
       uriOf(https, host, port);
 
-    final var eventConnecting =
-      new IdAGClientEventConnecting(
-        this.strings.format("client.connecting", this.serverLatest));
+    final var credentials =
+      new IdAClientCredentials(username, password, this.serverLatest, Map.of());
 
-    final var eventConnectionOK =
-      new IdAGClientEventConnectionSucceeded(
-        this.strings.format("client.connected", this.serverLatest));
-
-    final var eventConnected =
-      new IdAGClientEventConnected(
-        this.strings.format("client.connected", this.serverLatest));
-
-    this.publishEvent(eventConnecting);
-
-    final var future = new CompletableFuture<IdAdmin>();
-    this.executor.submit(() -> {
-      try (var recorder = TRTaskRecorder.<Object>create(LOG, eventConnecting.message())) {
-        try {
-          this.self = this.client.login(username, password, this.serverLatest);
-          future.complete(this.self);
-          recorder.setTaskSucceeded("OK", new Object());
-          this.publishEvent(eventConnectionOK);
-          this.publishEvent(eventConnected);
-        } catch (final Exception e) {
-          future.completeExceptionally(e);
-          final var text =
-            this.strings.format("client.connectionFailed", e.getMessage());
-          recorder.setTaskFailed(text, Optional.of(e));
-          this.publishEvent(
-            new IdAGClientEventConnectionFailed(recorder.toTask(), text)
-          );
-        }
-      }
-    });
-    return future;
-  }
-
-  private void publishEvent(
-    final IdAGClientEventType event)
-  {
-    Platform.runLater(() -> {
-      this.status.set(event.clientStatus());
-      this.eventBus.submit(event);
-    });
-  }
-
-  private TRTaskRecorderType<?> requestStart()
-  {
-    final var message = this.strings.format("client.requesting");
-    this.publishEvent(new IdAGClientEventRequesting(message));
-    return TRTaskRecorder.create(LOG, message);
+    return this.client.loginAsyncOrElseThrow(credentials, IdAClientException::ofError)
+      .thenApply(IdAResponseLogin.class::cast)
+      .thenCompose(x -> this.client.executeAsyncOrElseThrow(new IdACommandAdminSelf(), IdAClientException::ofError))
+      .thenApply(IdAResponseAdminSelf.class::cast)
+      .thenApply(IdAResponseAdminSelf::admin);
   }
 
   /**
@@ -274,17 +276,7 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public void disconnect()
   {
-    this.executor.submit(() -> {
-      try {
-        this.client.close();
-      } catch (final IOException e) {
-        LOG.error("close: ", e);
-      }
-      this.publishEvent(
-        new IdAGClientEventDisconnected(
-          this.strings.format("client.disconnected"))
-      );
-    });
+    this.client.disconnectAsync();
   }
 
   /**
@@ -302,36 +294,21 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final IdTimeRange timeUpdatedRange,
     final Optional<String> search)
   {
-    final var future = new CompletableFuture<IdPage<IdUserSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
+    final var command =
+      new IdACommandUserSearchBegin(
+        new IdUserSearchParameters(
+          timeCreatedRange,
+          timeUpdatedRange,
+          search,
+          DEFAULT_USER_ORDERING,
+          100
+        ));
 
-      try {
-        future.complete(
-          this.client.userSearchBegin(
-            new IdUserSearchParameters(
-              timeCreatedRange,
-              timeUpdatedRange,
-              search,
-              DEFAULT_USER_ORDERING,
-              100
-            )
-          )
-        );
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
-  }
-
-  private void requestFinish()
-  {
-    this.publishEvent(
-      new IdAGClientEventConnected(
-        this.strings.format("client.connected", this.serverLatest))
-    );
+    return this.client.executeAsyncOrElseThrow(
+        command,
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserSearchBegin.class::cast)
+      .thenApply(IdAResponseUserSearchBegin::page);
   }
 
   /**
@@ -342,18 +319,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public CompletableFuture<IdPage<IdUserSummary>> userSearchNext()
   {
-    final var future = new CompletableFuture<IdPage<IdUserSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userSearchNext());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserSearchNext(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserSearchNext.class::cast)
+      .thenApply(IdAResponseUserSearchNext::page);
   }
 
   /**
@@ -364,29 +334,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public CompletableFuture<IdPage<IdUserSummary>> userSearchPrevious()
   {
-    final var future = new CompletableFuture<IdPage<IdUserSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userSearchPrevious());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
-  }
-
-  private Exception requestFailed(
-    final TRTaskRecorderType<?> task,
-    final Exception e)
-  {
-    task.setTaskFailed(e.getMessage(), Optional.of(e));
-    this.publishEvent(
-      new IdAGClientEventRequestFailed(task.toTask(), e.getMessage())
-    );
-    return e;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserSearchPrevious(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserSearchPrevious.class::cast)
+      .thenApply(IdAResponseUserSearchPrevious::page);
   }
 
   /**
@@ -400,18 +352,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public CompletableFuture<Optional<IdUser>> userGet(
     final UUID id)
   {
-    final var future = new CompletableFuture<Optional<IdUser>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userGet(id));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserGet(id),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserGet.class::cast)
+      .thenApply(IdAResponseUserGet::user);
   }
 
   /**
@@ -431,18 +376,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final Optional<IdRealName> realName,
     final Optional<IdPassword> password)
   {
-    final var future = new CompletableFuture<IdUser>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userUpdate(id, idName, realName, password));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserUpdate(id, idName, realName, password),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserUpdate.class::cast)
+      .thenApply(IdAResponseUserUpdate::user);
   }
 
   /**
@@ -454,20 +392,13 @@ public final class IdAGClientService implements RPServiceType, Closeable
    */
 
   public CompletableFuture<Optional<IdUser>> userGetForEmail(
-    final String email)
+    final IdEmail email)
   {
-    final var future = new CompletableFuture<Optional<IdUser>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userGetByEmail(new IdEmail(email)));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserGetByEmail(email),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserGet.class::cast)
+      .thenApply(IdAResponseUserGet::user);
   }
 
   /**
@@ -487,24 +418,17 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final Optional<String> type,
     final Optional<String> message)
   {
-    final var future = new CompletableFuture<IdPage<IdAuditEvent>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.auditSearchBegin(
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAuditSearchBegin(new IdAuditSearchParameters(
           timeRange,
           owner,
           type,
           message,
           100
-        ));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+        )),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAuditSearchBegin.class::cast)
+      .thenApply(IdAResponseAuditSearchBegin::page);
   }
 
   /**
@@ -515,18 +439,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public CompletableFuture<IdPage<IdAuditEvent>> auditSearchPrevious()
   {
-    final var future = new CompletableFuture<IdPage<IdAuditEvent>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.auditSearchPrevious());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAuditSearchPrevious(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAuditSearchPrevious.class::cast)
+      .thenApply(IdAResponseAuditSearchPrevious::page);
   }
 
   /**
@@ -537,18 +454,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public CompletableFuture<IdPage<IdAuditEvent>> auditSearchNext()
   {
-    final var future = new CompletableFuture<IdPage<IdAuditEvent>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.auditSearchNext());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAuditSearchNext(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAuditSearchNext.class::cast)
+      .thenApply(IdAResponseAuditSearchNext::page);
   }
 
   /**
@@ -566,28 +476,19 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final IdTimeRange timeUpdatedRange,
     final String search)
   {
-    final var future = new CompletableFuture<IdPage<IdUserSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(
-          this.client.userSearchByEmailBegin(
-            new IdUserSearchByEmailParameters(
-              timeCreatedRange,
-              timeUpdatedRange,
-              search,
-              DEFAULT_USER_ORDERING,
-              100
-            )
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserSearchByEmailBegin(
+          new IdUserSearchByEmailParameters(
+            timeCreatedRange,
+            timeUpdatedRange,
+            search,
+            DEFAULT_USER_ORDERING,
+            100
           )
-        );
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+        ),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserSearchByEmailBegin.class::cast)
+      .thenApply(IdAResponseUserSearchByEmailBegin::page);
   }
 
   /**
@@ -598,18 +499,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public CompletableFuture<IdPage<IdUserSummary>> userSearchByEmailNext()
   {
-    final var future = new CompletableFuture<IdPage<IdUserSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userSearchByEmailNext());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserSearchByEmailNext(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserSearchByEmailNext.class::cast)
+      .thenApply(IdAResponseUserSearchByEmailNext::page);
   }
 
   /**
@@ -620,18 +514,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public CompletableFuture<IdPage<IdUserSummary>> userSearchByEmailPrevious()
   {
-    final var future = new CompletableFuture<IdPage<IdUserSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userSearchByEmailPrevious());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserSearchByEmailPrevious(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserSearchByEmailPrevious.class::cast)
+      .thenApply(IdAResponseUserSearchByEmailPrevious::page);
   }
 
   /**
@@ -645,19 +532,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public CompletableFuture<Void> userDelete(
     final UUID id)
   {
-    final var future = new CompletableFuture<Void>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        this.client.userDelete(id);
-        future.complete(null);
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserDelete(id),
+        IdAClientException::ofError)
+      .thenRun(() -> {
+      });
   }
 
   /**
@@ -688,18 +567,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final UUID id,
     final IdEmail email)
   {
-    final var future = new CompletableFuture<IdAdmin>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.adminEmailAdd(id, email));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminEmailAdd(id, email),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminUpdate.class::cast)
+      .thenApply(IdAResponseAdminUpdate::admin);
   }
 
   /**
@@ -715,18 +587,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final UUID id,
     final IdEmail email)
   {
-    final var future = new CompletableFuture<IdAdmin>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.adminEmailRemove(id, email));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminEmailRemove(id, email),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminUpdate.class::cast)
+      .thenApply(IdAResponseAdminUpdate::admin);
   }
 
   /**
@@ -742,18 +607,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final UUID id,
     final IdEmail email)
   {
-    final var future = new CompletableFuture<IdUser>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userEmailAdd(id, email));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserEmailAdd(id, email),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserUpdate.class::cast)
+      .thenApply(IdAResponseUserUpdate::user);
   }
 
   /**
@@ -769,18 +627,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final UUID id,
     final IdEmail email)
   {
-    final var future = new CompletableFuture<IdUser>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userEmailRemove(id, email));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserEmailRemove(id, email),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserUpdate.class::cast)
+      .thenApply(IdAResponseUserUpdate::user);
   }
 
   /**
@@ -794,18 +645,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public CompletableFuture<Optional<IdBan>> userBanGet(
     final UUID id)
   {
-    final var future = new CompletableFuture<Optional<IdBan>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userBanGet(id));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserBanGet(id),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserBanGet.class::cast)
+      .thenApply(IdAResponseUserBanGet::ban);
   }
 
   /**
@@ -819,19 +663,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public CompletableFuture<IdBan> userBanCreate(
     final IdBan ban)
   {
-    final var future = new CompletableFuture<IdBan>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        this.client.userBanCreate(ban);
-        future.complete(ban);
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserBanCreate(ban),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserBanCreate.class::cast)
+      .thenApply(IdAResponseUserBanCreate::ban);
   }
 
   /**
@@ -845,19 +681,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public CompletableFuture<Optional<IdBan>> userBanDelete(
     final UUID id)
   {
-    final var future = new CompletableFuture<Optional<IdBan>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        this.client.userBanDelete(new IdBan(id, "", Optional.empty()));
-        future.complete(Optional.empty());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserBanDelete(id),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserBanDelete.class::cast)
+      .thenApply(x -> Optional.empty());
   }
 
   /**
@@ -871,18 +699,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public CompletableFuture<List<IdLogin>> userLoginHistory(
     final UUID id)
   {
-    final var future = new CompletableFuture<List<IdLogin>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userLoginHistory(id));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserLoginHistory(id),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserLoginHistory.class::cast)
+      .thenApply(IdAResponseUserLoginHistory::history);
   }
 
   /**
@@ -896,18 +717,16 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public CompletableFuture<IdUser> userCreate(
     final IdUserCreate create)
   {
-    final var future = new CompletableFuture<IdUser>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.userCreate(create));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandUserCreate(
+          create.id(),
+          create.idName(),
+          create.realName(),
+          create.email(),
+          create.password()),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseUserCreate.class::cast)
+      .thenApply(IdAResponseUserCreate::user);
   }
 
   /**
@@ -921,25 +740,17 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public CompletableFuture<IdAdmin> adminCreate(
     final IdAdminCreate create)
   {
-    final var future = new CompletableFuture<IdAdmin>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.adminCreate(
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminCreate(
           create.id(),
           create.idName(),
           create.realName(),
           create.email(),
           create.password(),
-          create.permissions()
-        ));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+          create.permissions().impliedPermissions()),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminCreate.class::cast)
+      .thenApply(IdAResponseAdminCreate::admin);
   }
 
   /**
@@ -953,26 +764,12 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public CompletableFuture<Optional<IdAdmin>> adminGet(
     final UUID id)
   {
-    final var future = new CompletableFuture<Optional<IdAdmin>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.adminGet(id));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminGet(id),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminGet.class::cast)
+      .thenApply(IdAResponseAdminGet::admin);
   }
-
-
-
-
-
-
-
 
   /**
    * Start searching for admins.
@@ -989,28 +786,18 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final IdTimeRange timeUpdatedRange,
     final String search)
   {
-    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(
-          this.client.adminSearchByEmailBegin(
-            new IdAdminSearchByEmailParameters(
-              timeCreatedRange,
-              timeUpdatedRange,
-              search,
-              DEFAULT_ADMIN_ORDERING,
-              100
-            )
-          )
-        );
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminSearchByEmailBegin(
+          new IdAdminSearchByEmailParameters(
+            timeCreatedRange,
+            timeUpdatedRange,
+            search,
+            DEFAULT_ADMIN_ORDERING,
+            100
+          )),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminSearchByEmailBegin.class::cast)
+      .thenApply(IdAResponseAdminSearchByEmailBegin::page);
   }
 
   /**
@@ -1021,18 +808,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public CompletableFuture<IdPage<IdAdminSummary>> adminSearchByEmailNext()
   {
-    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.adminSearchByEmailNext());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminSearchByEmailNext(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminSearchByEmailNext.class::cast)
+      .thenApply(IdAResponseAdminSearchByEmailNext::page);
   }
 
   /**
@@ -1043,18 +823,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public CompletableFuture<IdPage<IdAdminSummary>> adminSearchByEmailPrevious()
   {
-    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.adminSearchByEmailPrevious());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminSearchByEmailPrevious(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminSearchByEmailPrevious.class::cast)
+      .thenApply(IdAResponseAdminSearchByEmailPrevious::page);
   }
 
   /**
@@ -1072,28 +845,18 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final IdTimeRange timeUpdatedRange,
     final Optional<String> search)
   {
-    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(
-          this.client.adminSearchBegin(
-            new IdAdminSearchParameters(
-              timeCreatedRange,
-              timeUpdatedRange,
-              search,
-              DEFAULT_ADMIN_ORDERING,
-              100
-            )
-          )
-        );
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminSearchBegin(
+          new IdAdminSearchParameters(
+            timeCreatedRange,
+            timeUpdatedRange,
+            search,
+            DEFAULT_ADMIN_ORDERING,
+            100
+          )),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminSearchBegin.class::cast)
+      .thenApply(IdAResponseAdminSearchBegin::page);
   }
 
   /**
@@ -1104,18 +867,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public CompletableFuture<IdPage<IdAdminSummary>> adminSearchNext()
   {
-    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.adminSearchNext());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminSearchNext(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminSearchNext.class::cast)
+      .thenApply(IdAResponseAdminSearchNext::page);
   }
 
   /**
@@ -1126,18 +882,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
 
   public CompletableFuture<IdPage<IdAdminSummary>> adminSearchPrevious()
   {
-    final var future = new CompletableFuture<IdPage<IdAdminSummary>>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.adminSearchPrevious());
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminSearchPrevious(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminSearchPrevious.class::cast)
+      .thenApply(IdAResponseAdminSearchPrevious::page);
   }
 
   /**
@@ -1157,18 +906,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
     final Optional<IdRealName> realName,
     final Optional<IdPassword> password)
   {
-    final var future = new CompletableFuture<IdAdmin>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        future.complete(this.client.adminUpdate(id, idName, realName, password));
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminUpdate(id, idName, realName, password),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminUpdate.class::cast)
+      .thenApply(IdAResponseAdminUpdate::admin);
   }
 
   /**
@@ -1182,18 +924,11 @@ public final class IdAGClientService implements RPServiceType, Closeable
   public CompletableFuture<Void> adminDelete(
     final UUID id)
   {
-    final var future = new CompletableFuture<Void>();
-    this.executor.submit(() -> {
-      final var task = this.requestStart();
-
-      try {
-        this.client.adminDelete(id);
-        future.complete(null);
-        this.requestFinish();
-      } catch (final Exception e) {
-        future.completeExceptionally(this.requestFailed(task, e));
-      }
-    });
-    return future;
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminDelete(id),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminDelete.class::cast)
+      .thenRun(() -> {
+      });
   }
 }

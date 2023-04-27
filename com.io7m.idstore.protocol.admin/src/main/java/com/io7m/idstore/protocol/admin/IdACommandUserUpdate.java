@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,7 +27,7 @@ import java.util.UUID;
 /**
  * Update the given user.
  *
- * @param user    The user to be updated
+ * @param user     The user to be updated
  * @param idName   The user's ID name
  * @param realName The user's realname
  * @param password The user's password
@@ -50,5 +50,11 @@ public record IdACommandUserUpdate(
     Objects.requireNonNull(idName, "idName");
     Objects.requireNonNull(realName, "realName");
     Objects.requireNonNull(password, "password");
+  }
+
+  @Override
+  public Class<IdAResponseUserUpdate> responseClass()
+  {
+    return IdAResponseUserUpdate.class;
   }
 }

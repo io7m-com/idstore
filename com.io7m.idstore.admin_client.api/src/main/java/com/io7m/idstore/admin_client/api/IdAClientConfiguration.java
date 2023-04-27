@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,28 +14,31 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.admin_client.api;
 
-package com.io7m.idstore.admin_gui.internal.client;
+import com.io7m.hibiscus.api.HBConfigurationType;
 
-import com.io7m.idstore.admin_gui.internal.events.IdAGEventType;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
- * The type of client events.
+ * The admin client configuration.
+ *
+ * @param locale The locale
  */
 
-public sealed interface IdAGClientEventType
-  extends IdAGEventType
-  permits IdAGClientEventConnected,
-  IdAGClientEventConnecting,
-  IdAGClientEventConnectionFailed,
-  IdAGClientEventConnectionSucceeded,
-  IdAGClientEventDisconnected,
-  IdAGClientEventRequestFailed,
-  IdAGClientEventRequesting
+public record IdAClientConfiguration(
+  Locale locale)
+  implements HBConfigurationType
 {
   /**
-   * @return The client status value
+   * The user client configuration.
+   *
+   * @param locale The locale
    */
 
-  IdAGClientStatus clientStatus();
+  public IdAClientConfiguration
+  {
+    Objects.requireNonNull(locale, "locale");
+  }
 }

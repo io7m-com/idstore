@@ -16,57 +16,27 @@
 
 package com.io7m.idstore.user_client.internal;
 
-import com.io7m.hibiscus.api.HBResultType;
+import com.io7m.hibiscus.basic.HBClientHandlerType;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.user_client.api.IdUClientCredentials;
+import com.io7m.idstore.user_client.api.IdUClientEventType;
+import com.io7m.idstore.user_client.api.IdUClientException;
 
 /**
  * A versioned protocol handler.
  */
 
 public interface IdUHandlerType
+  extends HBClientHandlerType<
+  IdUClientException,
+  IdUCommandType<?>,
+  IdUResponseType,
+  IdUResponseType,
+  IdUResponseError,
+  IdUClientEventType,
+  IdUClientCredentials>
 {
-  /**
-   * Poll the server for events.
-   */
 
-  void pollEvents();
-
-  /**
-   * Execute the given command.
-   *
-   * @param command The command
-   * @param <R>     The response type
-   *
-   * @return The response
-   *
-   * @throws InterruptedException On interruption
-   */
-
-  <R extends IdUResponseType>
-  HBResultType<R, IdUResponseError>
-  executeCommand(IdUCommandType<R> command)
-    throws InterruptedException;
-
-  /**
-   * @return {@code true} if this handler is connected (logged in)
-   */
-
-  boolean isConnected();
-
-  /**
-   * Execute the login process.
-   *
-   * @param credentials The credentials
-   *
-   * @return The result
-   *
-   * @throws InterruptedException On interruption
-   */
-
-  HBResultType<IdUNewHandler, IdUResponseError> login(
-    IdUClientCredentials credentials)
-    throws InterruptedException;
 }

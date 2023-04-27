@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,6 +18,7 @@ package com.io7m.idstore.protocol.admin;
 
 import com.io7m.idstore.model.IdName;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -25,11 +26,13 @@ import java.util.Objects;
  *
  * @param userName The username
  * @param password The password
+ * @param metadata Extra metadata included with the request
  */
 
 public record IdACommandLogin(
   IdName userName,
-  String password)
+  String password,
+  Map<String, String> metadata)
   implements IdACommandType<IdAResponseLogin>
 {
   /**
@@ -37,11 +40,19 @@ public record IdACommandLogin(
    *
    * @param userName The username
    * @param password The password
+   * @param metadata Extra metadata included with the request
    */
 
   public IdACommandLogin
   {
     Objects.requireNonNull(userName, "userName");
     Objects.requireNonNull(password, "password");
+    Objects.requireNonNull(metadata, "metadata");
+  }
+
+  @Override
+  public Class<IdAResponseLogin> responseClass()
+  {
+    return IdAResponseLogin.class;
   }
 }

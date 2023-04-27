@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,21 +14,29 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.tests.integration;
 
 import com.io7m.idstore.admin_client.IdAClients;
+import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
+import com.io7m.idstore.admin_client.api.IdAClientCredentials;
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.admin_client.api.IdAClientType;
+import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdAdminColumn;
+import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminPermissionSet;
+import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
 import com.io7m.idstore.model.IdPasswordAlgorithmRedacted;
 import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.model.IdTimeRange;
+import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
+import com.io7m.idstore.protocol.admin.IdACommandType;
+import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSelf;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
@@ -41,7 +49,6 @@ import com.io7m.verdant.core.VProtocolSupported;
 import com.io7m.verdant.core.VProtocols;
 import com.io7m.verdant.core.cb.VProtocolMessages;
 import net.jqwik.api.Arbitraries;
-import net.jqwik.api.providers.TypeUsage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
@@ -49,28 +56,26 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.net.URI;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_ID_NAME;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NOT_LOGGED_IN;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID_NAME;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 @Tag("admin-client")
@@ -79,7 +84,7 @@ public final class IdAClientIT extends IdWithServerContract
   private IdACB1Messages messages;
   private IdAdmin admin;
   private IdAClients clients;
-  private IdAClientType client;
+  private IdAClientSynchronousType client;
   private VProtocols versions;
   private VProtocolMessages versionMessages;
   private byte[] versionHeader;
@@ -104,7 +109,7 @@ public final class IdAClientIT extends IdWithServerContract
     this.clients =
       new IdAClients();
     this.client =
-      this.clients.create(Locale.ROOT);
+      this.clients.openSynchronousClient(new IdAClientConfiguration(Locale.ROOT));
 
     this.messages =
       new IdACB1Messages();
@@ -167,7 +172,7 @@ public final class IdAClientIT extends IdWithServerContract
           new IdAResponseError(
             UUID.randomUUID(),
             "error",
-            AUTHENTICATION_ERROR.id(),
+            AUTHENTICATION_ERROR,
             Map.of(),
             Optional.empty()
           ))
@@ -189,14 +194,20 @@ public final class IdAClientIT extends IdWithServerContract
           new IdAResponseAdminSelf(UUID.randomUUID(), this.admin))
       );
 
-    this.client.login(
-      "someone",
-      "whatever",
-      URI.create("http://localhost:60000/")
+    this.client.loginOrElseThrow(
+      new IdAClientCredentials(
+        "someone",
+        "whatever",
+        URI.create("http://localhost:60000/"),
+        Map.of()
+      ),
+      IdAClientException::ofError
     );
 
-    final var result = this.client.adminSelf();
-    assertEquals(this.admin.id(), result.id());
+    final var result = (IdAResponseAdminSelf) this.client.executeOrElseThrow(
+      new IdACommandAdminSelf(),
+      IdAClientException::ofError);
+    assertEquals(this.admin.id(), result.admin().id());
   }
 
   /**
@@ -228,14 +239,26 @@ public final class IdAClientIT extends IdWithServerContract
       .withContentType(IdACB1Messages.contentType())
       .withFixedData(this.messages.serialize(new IdACommandAdminSelf()));
 
-    this.client.login(
-      "someone",
-      "whatever",
-      URI.create("http://localhost:60000/")
+    this.client.loginOrElseThrow(
+      new IdAClientCredentials(
+        "someone",
+        "whatever",
+        URI.create("http://localhost:60000/"),
+        Map.of()
+      ),
+      IdAClientException::ofError
     );
 
     final var ex =
-      assertThrows(IdAClientException.class, () -> this.client.adminSelf());
+      assertThrows(
+        IdAClientException.class,
+        () -> {
+          this.client.executeOrElseThrow(
+            new IdACommandAdminSelf(),
+            IdAClientException::ofError
+          );
+        }
+      );
 
     assertEquals(PROTOCOL_ERROR, ex.errorCode());
   }
@@ -270,14 +293,23 @@ public final class IdAClientIT extends IdWithServerContract
       .withFixedData(this.messages.serialize(
         new IdAResponseUserBanDelete(UUID.randomUUID())));
 
-    this.client.login(
-      "someone",
-      "whatever",
-      URI.create("http://localhost:60000/")
+    this.client.loginOrElseThrow(
+      new IdAClientCredentials(
+        "someone",
+        "whatever",
+        URI.create("http://localhost:60000/"),
+        Map.of()
+      ),
+      IdAClientException::ofError
     );
 
     final var ex =
-      assertThrows(IdAClientException.class, () -> this.client.adminSelf());
+      assertThrows(
+        IdAClientException.class,
+        () -> this.client.executeOrElseThrow(
+          new IdACommandAdminSelf(),
+          IdAClientException::ofError)
+      );
 
     assertEquals(PROTOCOL_ERROR, ex.errorCode());
   }
@@ -295,13 +327,37 @@ public final class IdAClientIT extends IdWithServerContract
     final var admin =
       this.serverCreateAdminInitial("admin", "12345678");
 
-    this.client.login("admin", "12345678", this.serverAdminAPIURL());
+    this.client.loginOrElseThrow(
+      new IdAClientCredentials(
+        "admin",
+        "12345678",
+        this.serverAdminAPIURL(),
+        Map.of()
+      ),
+      IdAClientException::ofError
+    );
 
-    final var self = this.client.adminSelf();
-    assertEquals(admin, self.id());
+    final var self =
+      (IdAResponseAdminSelf)
+        this.client.executeOrElseThrow(
+          new IdACommandAdminSelf(),
+          IdAClientException::ofError
+        );
+    assertEquals(admin, self.admin().id());
 
     this.client.close();
-    this.client.login("admin", "12345678", this.serverAdminAPIURL());
+
+    assertThrows(IllegalStateException.class, () -> {
+      this.client.loginOrElseThrow(
+        new IdAClientCredentials(
+          "admin",
+          "12345678",
+          this.serverAdminAPIURL(),
+          Map.of()
+        ),
+        IdAClientException::ofError
+      );
+    });
   }
 
   /**
@@ -319,15 +375,22 @@ public final class IdAClientIT extends IdWithServerContract
 
     final var ex =
       assertThrows(IdAClientException.class, () -> {
-        this.client.login("admin", "1234", this.serverAdminAPIURL());
+        this.client.loginOrElseThrow(
+          new IdAClientCredentials(
+            "admin",
+            "1234",
+            this.serverAdminAPIURL(),
+            Map.of()
+          ),
+          IdAClientException::ofError
+        );
       });
 
     assertEquals(AUTHENTICATION_ERROR, ex.errorCode());
   }
 
   /**
-   * Every method that requires a login throws an exception if the user is not
-   * logged in.
+   * Executing a command without being connected results in an error.
    *
    * @return The tests
    */
@@ -335,82 +398,25 @@ public final class IdAClientIT extends IdWithServerContract
   @TestFactory
   public Stream<DynamicTest> testDisconnected()
   {
-    return disconnectionRelevantMethodsOf(IdAClientType.class)
-      .map(this::disconnectedOf);
-  }
-
-  private DynamicTest disconnectedOf(
-    final Method method)
-  {
-    return DynamicTest.dynamicTest(
-      "testDisconnected_%s".formatted(method.getName()),
-      () -> {
-        final var parameterTypes =
-          method.getGenericParameterTypes();
-        final var parameters =
-          new Object[parameterTypes.length];
-
-        for (var index = 0; index < parameterTypes.length; ++index) {
-          final var pType = parameterTypes[index];
-          if (pType instanceof ParameterizedType param) {
-            final List<TypeUsage> typeArgs =
-              Arrays.stream(param.getActualTypeArguments())
-                .map(TypeUsage::forType)
-                .toList();
-
-            final var typeArgsArray = new TypeUsage[typeArgs.size()];
-            typeArgs.toArray(typeArgsArray);
-
-            final var mainType =
-              TypeUsage.of((Class<?>) param.getRawType(), typeArgsArray);
-
-            parameters[index] = Arbitraries.defaultFor(mainType).sample();
-          } else if (pType instanceof Class<?> clazz) {
-            parameters[index] = Arbitraries.defaultFor(clazz).sample();
+    return Arbitraries.defaultFor(IdAMessageType.class)
+      .sampleStream()
+      .filter(m -> m instanceof IdACommandType<?>)
+      .map(IdACommandType.class::cast)
+      .limit(1000L)
+      .map(c -> {
+        return DynamicTest.dynamicTest(
+          "testDisconnected_%s".formatted(c),
+          () -> {
+            assertThrows(IdAClientException.class, () -> {
+              this.client.executeOrElseThrow(c, IdAClientException::ofError);
+            });
           }
-        }
-
-        try {
-          method.invoke(this.client, parameters);
-        } catch (final IllegalAccessException | IllegalArgumentException e) {
-          throw new RuntimeException(e);
-        } catch (final InvocationTargetException e) {
-          if (e.getCause() instanceof IdAClientException ex) {
-            if (Objects.equals(ex.errorCode(), NOT_LOGGED_IN)) {
-              return;
-            }
-          }
-          throw e;
-        }
+        );
       });
   }
 
-  private static Stream<Method> disconnectionRelevantMethodsOf(
-    final Class<? extends IdAClientType> clazz)
-  {
-    return Stream.of(clazz.getMethods())
-      .filter(IdAClientIT::isDisconnectionRelevantMethod);
-  }
-
-  private static boolean isDisconnectionRelevantMethod(
-    final Method m)
-  {
-    return switch (m.getName()) {
-      case "toString",
-        "equals",
-        "hashCode",
-        "getClass",
-        "close",
-        "login",
-        "notify",
-        "wait",
-        "notifyAll" -> false;
-      default -> true;
-    };
-  }
-
   /**
-   * A smoke test that simply calls every method with random arguments.
+   * A smoke test that simply executes random commands.
    *
    * @return The tests
    */
@@ -422,62 +428,85 @@ public final class IdAClientIT extends IdWithServerContract
     final var admin =
       this.serverCreateAdminInitial("admin", "12345678");
 
-    return disconnectionRelevantMethodsOf(IdAClientType.class)
-      .map(this::smokeOf);
+    return Arbitraries.defaultFor(IdAMessageType.class)
+      .sampleStream()
+      .filter(m -> m instanceof IdACommandType<?>)
+      .map(IdACommandType.class::cast)
+      .limit(2000L)
+      .map(c -> {
+        return DynamicTest.dynamicTest("testSmoke_" + c, () -> {
+          this.client.loginOrElseThrow(
+            new IdAClientCredentials(
+              "admin",
+              "12345678",
+              this.serverAdminAPIURL(),
+              Map.of()
+            ),
+            IdAClientException::ofError
+          );
+
+          try {
+            this.client.executeOrElseThrow(c, IdAClientException::ofError);
+          } catch (final IdAClientException ex) {
+            if (ALLOWED_SMOKE_CODES.contains(ex.errorCode())) {
+              return;
+            }
+            throw ex;
+          }
+        });
+      });
   }
 
   private static final Set<IdErrorCode> ALLOWED_SMOKE_CODES =
     Set.of(
+      ADMIN_DUPLICATE_ID_NAME,
       ADMIN_NONEXISTENT,
       USER_NONEXISTENT,
-      PROTOCOL_ERROR
+      USER_DUPLICATE_ID_NAME,
+      PROTOCOL_ERROR,
+      EMAIL_DUPLICATE
     );
 
-  private DynamicTest smokeOf(
-    final Method method)
+  /**
+   * Emails with bad encodings do not cause problems.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testEmailEncodingBug()
+    throws Exception
   {
-    return DynamicTest.dynamicTest(
-      "testSmoke_%s".formatted(method.getName()),
-      () -> {
-        final var parameterTypes =
-          method.getGenericParameterTypes();
-        final var parameters =
-          new Object[parameterTypes.length];
+    final var admin =
+      this.serverCreateAdminInitial("admin", "12345678");
 
-        for (var index = 0; index < parameterTypes.length; ++index) {
-          final var pType = parameterTypes[index];
-          if (pType instanceof ParameterizedType param) {
-            final List<TypeUsage> typeArgs =
-              Arrays.stream(param.getActualTypeArguments())
-                .map(TypeUsage::forType)
-                .toList();
+    this.client.loginOrElseThrow(
+      new IdAClientCredentials(
+        "admin",
+        "12345678",
+        this.serverAdminAPIURL(),
+        Map.of()
+      ),
+      IdAClientException::ofError
+    );
 
-            final var typeArgsArray = new TypeUsage[typeArgs.size()];
-            typeArgs.toArray(typeArgsArray);
-
-            final var mainType =
-              TypeUsage.of((Class<?>) param.getRawType(), typeArgsArray);
-
-            parameters[index] = Arbitraries.defaultFor(mainType).sample();
-          } else if (pType instanceof Class<?> clazz) {
-            parameters[index] = Arbitraries.defaultFor(clazz).sample();
-          }
-        }
-
-        this.client.login("admin", "12345678", this.serverAdminAPIURL());
-
-        try {
-          method.invoke(this.client, parameters);
-        } catch (final IllegalAccessException | IllegalArgumentException e) {
-          throw e;
-        } catch (final InvocationTargetException e) {
-          if (e.getCause() instanceof IdAClientException ex) {
-            if (ALLOWED_SMOKE_CODES.contains(ex.errorCode())) {
-              return;
-            }
-          }
-          throw e;
-        }
+    final var ex =
+      assertThrows(IdAClientException.class, () -> {
+        this.client.executeOrElseThrow(
+          new IdACommandAdminSearchByEmailBegin(
+            new IdAdminSearchByEmailParameters(
+              IdTimeRange.largest(),
+              IdTimeRange.largest(),
+              "\0",
+              new IdAdminColumnOrdering(IdAdminColumn.BY_IDNAME, true),
+              100
+            )
+          ),
+          IdAClientException::ofError
+        );
       });
+
+    assertTrue(ex.getMessage().contains("invalid byte sequence for encoding"));
+    assertEquals(PROTOCOL_ERROR, ex.errorCode());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -1144,11 +1144,11 @@ public final class IdServerUserViewIT extends IdWithServerContract
       newBuilder.build();
     final var res =
       this.httpClient.send(req, new IdXHTMLBodyHandler());
-    assertEquals(expected, res.statusCode());
 
     final var titles =
       IdDocuments.elementsWithName(res.body(), "title");
     assertEquals(Login, titles.get(0).getTextContent());
+    assertEquals(expected, res.statusCode());
   }
 
   private void permitEmailChallenge(final String x)

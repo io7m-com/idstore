@@ -14,33 +14,35 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.user_client.internal;
+package com.io7m.idstore.admin_client.internal;
 
-import com.io7m.idstore.protocol.user.IdUResponseLogin;
+import com.io7m.genevan.core.GenProtocolClientHandlerType;
+import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
 
-import java.util.Objects;
+import java.net.URI;
+import java.net.http.HttpClient;
 
 /**
- * A newly negotiated protocol handler.
- *
- * @param response The successful login
- * @param handler  The protocol handler
+ * The type of protocol handler factories.
  */
 
-public record IdUNewHandler(
-  IdUResponseLogin response,
-  IdUHandlerType handler)
+public interface IdAHandlerFactoryType
+  extends GenProtocolClientHandlerType
 {
   /**
-   * A newly negotiated protocol handler.
+   * Create a new handler.
    *
-   * @param response The successful login
-   * @param handler  The protocol handler
+   * @param configuration The configuration
+   * @param inHttpClient  The underlying HTTP client
+   * @param inStrings     The string resources
+   * @param baseURI       The base URI negotiated by the server
+   *
+   * @return A new handler
    */
 
-  public IdUNewHandler
-  {
-    Objects.requireNonNull(response, "userLoggedIn");
-    Objects.requireNonNull(handler, "handler");
-  }
+  IdAHandlerType createHandler(
+    IdAClientConfiguration configuration,
+    HttpClient inHttpClient,
+    IdAStrings inStrings,
+    URI baseURI);
 }

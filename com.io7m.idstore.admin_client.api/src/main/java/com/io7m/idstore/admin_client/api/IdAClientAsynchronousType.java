@@ -14,34 +14,26 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.user_client.api;
+package com.io7m.idstore.admin_client.api;
 
-import com.io7m.idstore.protocol.user.IdUResponseError;
-
-import java.util.Objects;
+import com.io7m.hibiscus.api.HBClientAsynchronousType;
+import com.io7m.idstore.protocol.admin.IdACommandType;
+import com.io7m.idstore.protocol.admin.IdAResponseError;
+import com.io7m.idstore.protocol.admin.IdAResponseType;
 
 /**
- * A command failed.
- *
- * @param command The command
- * @param result  The result
+ * The type of asynchronous clients.
  */
 
-public record IdUClientEventCommandFailed(
-  String command,
-  IdUResponseError result)
-  implements IdUClientEventType
+public interface IdAClientAsynchronousType
+  extends HBClientAsynchronousType<
+  IdAClientException,
+  IdACommandType<?>,
+  IdAResponseType,
+  IdAResponseType,
+  IdAResponseError,
+  IdAClientEventType,
+  IdAClientCredentials>
 {
-  /**
-   * A command failed.
-   *
-   * @param command The command
-   * @param result  The result
-   */
 
-  public IdUClientEventCommandFailed
-  {
-    Objects.requireNonNull(command, "command");
-    Objects.requireNonNull(result, "result");
-  }
 }

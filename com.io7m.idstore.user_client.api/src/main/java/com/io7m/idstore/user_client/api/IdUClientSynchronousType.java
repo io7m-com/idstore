@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,32 +14,26 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.admin_client.internal;
+package com.io7m.idstore.user_client.api;
 
-import com.io7m.genevan.core.GenProtocolClientHandlerType;
-
-import java.net.URI;
-import java.net.http.HttpClient;
+import com.io7m.hibiscus.api.HBClientSynchronousType;
+import com.io7m.idstore.protocol.user.IdUCommandType;
+import com.io7m.idstore.protocol.user.IdUResponseError;
+import com.io7m.idstore.protocol.user.IdUResponseType;
 
 /**
- * A factory of versioned protocol handlers.
+ * The type of synchronous clients.
  */
 
-public interface IdAClientProtocolHandlerFactoryType
-  extends GenProtocolClientHandlerType
+public interface IdUClientSynchronousType
+  extends HBClientSynchronousType<
+  IdUClientException,
+  IdUCommandType<?>,
+  IdUResponseType,
+  IdUResponseType,
+  IdUResponseError,
+  IdUClientEventType,
+  IdUClientCredentials>
 {
-  /**
-   * Create a new handler.
-   *
-   * @param inHttpClient The underlying HTTP client
-   * @param inStrings    The string resources
-   * @param inBase       The server base URI
-   *
-   * @return A new handler
-   */
 
-  IdAClientProtocolHandlerType createHandler(
-    HttpClient inHttpClient,
-    IdAStrings inStrings,
-    URI inBase);
 }

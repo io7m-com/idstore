@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -28,9 +28,6 @@ module com.io7m.idstore.server.api
   requires com.io7m.cxbutton.core;
 
   uses com.io7m.idstore.database.api.IdDatabaseFactoryType;
-
-  opens com.io7m.idstore.server.api
-    to com.fasterxml.jackson.databind;
 
   exports com.io7m.idstore.server.api;
 }
