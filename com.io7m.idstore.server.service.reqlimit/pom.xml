@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>0.0.12</version>
+    <version>0.0.13-SNAPSHOT</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.service.reqlimit</artifactId>
