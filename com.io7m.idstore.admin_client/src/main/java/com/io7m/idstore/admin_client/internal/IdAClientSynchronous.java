@@ -59,4 +59,36 @@ public final class IdAClientSynchronous
   {
     super(new IdAHandlerDisconnected(inConfiguration, inStrings, inHttpClient));
   }
+
+  @Override
+  protected void onCommandExecuteSucceeded(
+    final IdACommandType<?> command,
+    final IdAResponseType result)
+  {
+
+  }
+
+  @Override
+  protected void onCommandExecuteFailed(
+    final IdACommandType<?> command,
+    final IdAResponseError result)
+  {
+
+  }
+
+  @Override
+  protected void onLoginExecuteSucceeded(
+    final IdAClientCredentials credentials,
+    final IdAResponseType result)
+  {
+
+  }
+
+  @Override
+  protected void onLoginExecuteFailed(
+    final IdAClientCredentials credentials,
+    final IdAResponseError result)
+  {
+
+  }
 }

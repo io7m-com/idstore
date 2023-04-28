@@ -66,7 +66,6 @@ public final class IdAHandler1 extends IdAHandlerAbstract
   private final IdACB1Messages messages;
   private final URI loginURI;
   private final URI commandURI;
-  private final boolean connected;
   private IdACommandLogin mostRecentLogin;
 
   /**
@@ -95,8 +94,6 @@ public final class IdAHandler1 extends IdAHandlerAbstract
     this.commandURI =
       baseURI.resolve("command")
         .normalize();
-
-    this.connected = false;
   }
 
   private static boolean isAuthenticationError(
@@ -328,7 +325,7 @@ public final class IdAHandler1 extends IdAHandlerAbstract
   @Override
   public boolean onIsConnected()
   {
-    return this.connected;
+    return true;
   }
 
   @Override
