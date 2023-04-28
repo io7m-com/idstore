@@ -58,4 +58,36 @@ public final class IdUClientSynchronous
   {
     super(new IdUHandlerDisconnected(inConfiguration, inStrings, inHttpClient));
   }
+
+  @Override
+  protected void onCommandExecuteSucceeded(
+    final IdUCommandType<?> command,
+    final IdUResponseType result)
+  {
+
+  }
+
+  @Override
+  protected void onCommandExecuteFailed(
+    final IdUCommandType<?> command,
+    final IdUResponseError result)
+  {
+
+  }
+
+  @Override
+  protected void onLoginExecuteSucceeded(
+    final IdUClientCredentials credentials,
+    final IdUResponseType result)
+  {
+
+  }
+
+  @Override
+  protected void onLoginExecuteFailed(
+    final IdUClientCredentials credentials,
+    final IdUResponseError result)
+  {
+
+  }
 }
