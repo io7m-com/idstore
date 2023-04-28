@@ -124,7 +124,6 @@ public final class IdAGBootServices
         return IdAGClientService.create(
           eventBus,
           clients,
-          strings,
           configuration.locale()
         );
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -41,6 +41,7 @@ import com.io7m.idstore.protocol.user.cb.IdU1User;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -83,8 +84,10 @@ public final class IdUCB1ValidationGeneral
     final var es = fieldEmails.values();
     if (es.isEmpty()) {
       throw new IdProtocolException(
+        "Admin emails list is empty!",
         PROTOCOL_ERROR,
-        "Admin emails list is empty!"
+        Map.of(),
+        Optional.of("Provide at least one admin email address.")
       );
     }
 

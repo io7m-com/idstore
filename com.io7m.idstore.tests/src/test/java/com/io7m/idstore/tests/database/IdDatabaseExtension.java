@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,6 +27,7 @@ import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUpgrade;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.database.postgres.IdDatabases;
+import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -39,6 +40,7 @@ import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.jmulticlose.core.ClosingResourceFailedException;
 import io.opentelemetry.api.OpenTelemetry;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -315,8 +317,20 @@ public final class IdDatabaseExtension
       ).pageCurrent(audit).items();
 
     for (var index = 0; index < expectedEvents.length; ++index) {
-      final var event =
-        events.get(index);
+      final IdAuditEvent event;
+      try {
+        event = events.get(index);
+      } catch (final IndexOutOfBoundsException e) {
+        Assertions.fail(
+          String.format(
+            "Expected an event %s at index %d, but no such event existed.",
+            expectedEvents[index],
+            Integer.valueOf(index)
+          )
+        );
+        throw e;
+      }
+
       final var expect =
         expectedEvents[index];
 

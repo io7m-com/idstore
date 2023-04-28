@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,10 +17,10 @@
 
 package com.io7m.idstore.admin_gui.internal.profile;
 
+import com.io7m.hibiscus.api.HBState;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientService;
-import com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus;
 import com.io7m.idstore.admin_gui.internal.users.IdAGUserEmailAddController;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermission;
@@ -68,7 +68,7 @@ public final class IdAGProfileController
    * The profile screen controller.
    *
    * @param inConfiguration The configuration
-   * @param inServices The service directory
+   * @param inServices      The service directory
    */
 
   public IdAGProfileController(
@@ -126,31 +126,29 @@ public final class IdAGProfileController
   }
 
   private void onClientStatusChanged(
-    final IdAGClientStatus statusNew)
+    final HBState statusNew)
   {
     switch (statusNew) {
-      case DISCONNECTED -> {
-        this.admin = null;
-        this.container.setDisable(true);
-      }
-      case CONNECTING -> {
+      case CLIENT_EXECUTING_LOGIN,
+        CLIENT_CLOSED,
+        CLIENT_POLLING_EVENTS_SUCCEEDED,
+        CLIENT_POLLING_EVENTS_FAILED,
+        CLIENT_POLLING_EVENTS,
+        CLIENT_EXECUTING_COMMAND_SUCCEEDED,
+        CLIENT_EXECUTING_COMMAND_FAILED,
+        CLIENT_EXECUTING_COMMAND,
+        CLIENT_EXECUTING_LOGIN_SUCCEEDED,
+        CLIENT_EXECUTING_LOGIN_FAILED -> {
 
       }
-      case CONNECTION_FAILED -> {
 
-      }
-      case CONNECTION_SUCCEEDED -> {
+      case CLIENT_CONNECTED -> {
         this.onAdminReceived(this.client.self());
       }
 
-      case CONNECTED -> {
-
-      }
-      case REQUESTING -> {
-
-      }
-      case REQUEST_FAILED -> {
-
+      case CLIENT_DISCONNECTED -> {
+        this.admin = null;
+        this.container.setDisable(true);
       }
     }
   }

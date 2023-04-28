@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,7 +26,9 @@ import com.io7m.repetoir.core.RPServiceType;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -52,11 +54,13 @@ public final class IdUCB1Sends implements RPServiceType
   /**
    * Send an error message.
    *
-   * @param response   The servlet response
-   * @param requestId  The request ID
-   * @param statusCode The HTTP status code
-   * @param errorCode  The error code
-   * @param message    The message
+   * @param response          The servlet response
+   * @param requestId         The request ID
+   * @param statusCode        The HTTP status code
+   * @param errorCode         The error code
+   * @param message           The message
+   * @param remediatingAction The remediating action, if any
+   * @param attributes        The attributes
    *
    * @throws IOException On errors
    */
@@ -66,13 +70,21 @@ public final class IdUCB1Sends implements RPServiceType
     final UUID requestId,
     final int statusCode,
     final IdErrorCode errorCode,
-    final String message)
+    final String message,
+    final Map<String, String> attributes,
+    final Optional<String> remediatingAction)
     throws IOException
   {
     this.send(
       response,
       statusCode,
-      new IdUResponseError(requestId, errorCode.id(), message)
+      new IdUResponseError(
+        requestId,
+        message,
+        errorCode,
+        attributes,
+        remediatingAction
+      )
     );
   }
 

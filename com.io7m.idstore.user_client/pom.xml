@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>0.0.10</version>
+    <version>0.0.11</version>
   </parent>
 
   <artifactId>com.io7m.idstore.user_client</artifactId>
@@ -50,6 +50,18 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.io7m.hibiscus</groupId>
+      <artifactId>com.io7m.hibiscus.api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.hibiscus</groupId>
+      <artifactId>com.io7m.hibiscus.basic</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.junreachable</groupId>
+      <artifactId>com.io7m.junreachable.core</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.io7m.verdant</groupId>
       <artifactId>com.io7m.verdant.core</artifactId>

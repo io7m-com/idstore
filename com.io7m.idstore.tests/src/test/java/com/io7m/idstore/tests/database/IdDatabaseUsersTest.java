@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -43,7 +43,6 @@ import java.util.Set;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIRED;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_EMAIL;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID_NAME;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
@@ -243,12 +242,14 @@ public final class IdDatabaseUsersTest
         password
       );
 
+    t.commit();
+
     {
       final var ex =
         assertThrows(IdDatabaseException.class, () -> {
           users.userCreate(
             reqId,
-            new IdName("someone"),
+            user.idName(),
             new IdRealName("someoneElse"),
             new IdEmail("someone2@example.com"),
             now,
@@ -263,7 +264,7 @@ public final class IdDatabaseUsersTest
         assertThrows(IdDatabaseException.class, () -> {
           users.userCreate(
             randomUUID(),
-            new IdName("someone"),
+            user.idName(),
             new IdRealName("someoneElse"),
             new IdEmail("someone2@example.com"),
             now,
@@ -285,7 +286,7 @@ public final class IdDatabaseUsersTest
             password
           );
         });
-      assertEquals(USER_DUPLICATE_EMAIL, ex.errorCode());
+      assertEquals(EMAIL_DUPLICATE, ex.errorCode());
     }
   }
 
@@ -338,7 +339,7 @@ public final class IdDatabaseUsersTest
         );
       });
 
-    assertEquals(USER_DUPLICATE_EMAIL, ex.errorCode());
+    assertEquals(EMAIL_DUPLICATE, ex.errorCode());
   }
 
   /**
@@ -1067,7 +1068,11 @@ public final class IdDatabaseUsersTest
         password
       );
 
+    t.commit();
+
     users.userDelete(reqId);
+
+    t.commit();
 
     {
       final var ex =

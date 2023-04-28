@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -61,6 +61,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_E
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -180,7 +181,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     throws Exception
   {
     when(this.users.userGetForNameRequire(any()))
-      .thenThrow(new IdDatabaseException("", USER_NONEXISTENT));
+      .thenThrow(new IdDatabaseException("", USER_NONEXISTENT, Map.of(), empty()));
 
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
@@ -210,7 +211,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     throws Exception
   {
     when(this.users.userGetForNameRequire(any()))
-      .thenThrow(new IdDatabaseException("", SQL_ERROR));
+      .thenThrow(new IdDatabaseException("", SQL_ERROR, Map.of(), empty()));
 
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {

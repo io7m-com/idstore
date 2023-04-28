@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,6 +26,7 @@ import com.io7m.idstore.tests.arbitraries.IdArbAuditSearchParametersProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbBanProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbEmailProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbHashProvider;
+import com.io7m.idstore.tests.arbitraries.IdArbIdErrorCodeProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbIdNameProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbInetAddressProvider;
 import com.io7m.idstore.tests.arbitraries.IdArbLoginProvider;
@@ -75,6 +76,7 @@ module com.io7m.idstore.tests.arbitraries
       IdArbBanProvider,
       IdArbEmailProvider,
       IdArbHashProvider,
+      IdArbIdErrorCodeProvider,
       IdArbIdNameProvider,
       IdArbInetAddressProvider,
       IdArbLoginProvider,

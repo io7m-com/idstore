@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,7 +21,7 @@ import java.util.Objects;
 /**
  * A request to change the user's password.
  *
- * @param password The password
+ * @param password        The password
  * @param passwordConfirm The password confirmation
  */
 
@@ -33,7 +33,7 @@ public record IdUCommandPasswordUpdate(
   /**
    * A request to change the user's password.
    *
-   * @param password The password
+   * @param password        The password
    * @param passwordConfirm The password confirmation
    */
 
@@ -41,5 +41,11 @@ public record IdUCommandPasswordUpdate(
   {
     Objects.requireNonNull(password, "password");
     Objects.requireNonNull(passwordConfirm, "passwordConfirm");
+  }
+
+  @Override
+  public Class<IdUResponseUserUpdate> responseClass()
+  {
+    return IdUResponseUserUpdate.class;
   }
 }

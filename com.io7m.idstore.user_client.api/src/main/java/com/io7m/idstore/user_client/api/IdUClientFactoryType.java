@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,26 +16,27 @@
 
 package com.io7m.idstore.user_client.api;
 
-import java.util.Locale;
+import com.io7m.hibiscus.api.HBClientFactoryType;
+import com.io7m.idstore.protocol.user.IdUCommandType;
+import com.io7m.idstore.protocol.user.IdUResponseError;
+import com.io7m.idstore.protocol.user.IdUResponseType;
 
 /**
  * A factory of clients.
  */
 
 public interface IdUClientFactoryType
+  extends HBClientFactoryType<
+  IdUClientException,
+  IdUClientConfiguration,
+  IdUCommandType<?>,
+  IdUResponseType,
+  IdUResponseType,
+  IdUResponseError,
+  IdUClientEventType,
+  IdUClientCredentials,
+  IdUClientAsynchronousType,
+  IdUClientSynchronousType>
 {
-  /**
-   * Create a new client.
-   *
-   * @param locale The locale for messages
-   *
-   * @return A new client
-   *
-   * @throws IdUClientException    On errors
-   * @throws InterruptedException On interruption
-   */
 
-  IdUClientType create(
-    Locale locale)
-    throws IdUClientException, InterruptedException;
 }

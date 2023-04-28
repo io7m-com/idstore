@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -35,7 +35,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
@@ -149,15 +151,19 @@ public abstract class IdU1AuthenticatedServlet
         IdRequestUniqueIDs.requestIdFor(request),
         HttpStatus.UNAUTHORIZED_401,
         AUTHENTICATION_ERROR,
-        this.strings.format("unauthorized")
+        this.strings.format("unauthorized"),
+        Map.of(),
+        Optional.empty()
       );
     } catch (final IdHTTPErrorStatusException e) {
       this.sends.sendError(
         servletResponse,
         IdRequestUniqueIDs.requestIdFor(request),
-        e.statusCode(),
+        e.httpStatusCode(),
         e.errorCode(),
-        e.getMessage()
+        e.getMessage(),
+        e.attributes(),
+        e.remediatingAction()
       );
     } catch (final IdPasswordException e) {
       this.sends.sendError(
@@ -165,7 +171,9 @@ public abstract class IdU1AuthenticatedServlet
         IdRequestUniqueIDs.requestIdFor(request),
         INTERNAL_SERVER_ERROR_500,
         PASSWORD_ERROR,
-        e.getMessage()
+        e.getMessage(),
+        e.attributes(),
+        e.remediatingAction()
       );
     } catch (final IdDatabaseException e) {
       this.sends.sendError(
@@ -173,7 +181,9 @@ public abstract class IdU1AuthenticatedServlet
         IdRequestUniqueIDs.requestIdFor(request),
         INTERNAL_SERVER_ERROR_500,
         SQL_ERROR,
-        e.getMessage()
+        e.getMessage(),
+        e.attributes(),
+        e.remediatingAction()
       );
     } catch (final Exception e) {
       throw new IOException(e);

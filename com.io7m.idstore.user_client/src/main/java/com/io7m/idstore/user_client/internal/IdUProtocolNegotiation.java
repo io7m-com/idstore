@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,7 +14,6 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.user_client.internal;
 
 import com.io7m.genevan.core.GenProtocolException;
@@ -24,6 +23,7 @@ import com.io7m.genevan.core.GenProtocolSolved;
 import com.io7m.genevan.core.GenProtocolSolver;
 import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
+import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.verdant.core.VProtocolException;
 import com.io7m.verdant.core.VProtocols;
@@ -38,7 +38,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_ERROR;
@@ -82,10 +82,12 @@ public final class IdUProtocolNegotiation
       response = httpClient.send(request, ofByteArray());
     } catch (final IOException e) {
       throw new IdUClientException(
-        empty(),
-        IO_ERROR,
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
         e,
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName())
+        IO_ERROR,
+        Map.of(),
+        empty(),
+        empty()
       );
     }
 
@@ -94,7 +96,16 @@ public final class IdUProtocolNegotiation
     if (response.statusCode() >= 400) {
       final var msg =
         strings.format("httpError", Integer.valueOf(response.statusCode()));
-      throw new IdUClientException(empty(), HTTP_ERROR, msg, msg);
+
+      throw new IdUClientException(
+        msg,
+        HTTP_ERROR,
+        Map.ofEntries(
+          Map.entry("Status", Integer.toString(response.statusCode()))
+        ),
+        empty(),
+        empty()
+      );
     }
 
     final var protocols =
@@ -105,13 +116,22 @@ public final class IdUProtocolNegotiation
       final var body = decompressResponse(response, response.headers());
       message = protocols.parse(base, body);
     } catch (final VProtocolException e) {
-      throw new IdUClientException(empty(), PROTOCOL_ERROR, e, e.getMessage());
+      throw new IdUClientException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        PROTOCOL_ERROR,
+        Map.of(),
+        empty(),
+        empty()
+      );
     } catch (final IOException e) {
       throw new IdUClientException(
-        empty(),
-        IO_ERROR,
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
         e,
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName())
+        IO_ERROR,
+        Map.of(),
+        empty(),
+        empty()
       );
     }
 
@@ -146,7 +166,7 @@ public final class IdUProtocolNegotiation
   /**
    * Negotiate a protocol handler.
    *
-   * @param locale     The locale
+   * @param configuration     The configuration
    * @param httpClient The HTTP client
    * @param strings    The string resources
    * @param base       The base URI
@@ -157,21 +177,21 @@ public final class IdUProtocolNegotiation
    * @throws InterruptedException On interruption
    */
 
-  public static IdUClientProtocolHandlerType negotiateProtocolHandler(
-    final Locale locale,
+  public static IdUHandlerType negotiateProtocolHandler(
+    final IdUClientConfiguration configuration,
     final HttpClient httpClient,
     final IdUStrings strings,
     final URI base)
     throws IdUClientException, InterruptedException
   {
-    Objects.requireNonNull(locale, "locale");
+    Objects.requireNonNull(configuration, "configuration");
     Objects.requireNonNull(httpClient, "httpClient");
     Objects.requireNonNull(strings, "strings");
     Objects.requireNonNull(base, "base");
 
     final var clientSupports =
       List.of(
-        new IdUClientProtocolHandlers1()
+        new IdUHandlers1()
       );
 
     final var serverProtocols =
@@ -180,10 +200,10 @@ public final class IdUProtocolNegotiation
     LOG.debug("server supports {} protocols", serverProtocols.size());
 
     final var solver =
-      GenProtocolSolver.<IdUClientProtocolHandlerFactoryType, IdUServerEndpoint>create(
-        locale);
+      GenProtocolSolver.<IdUHandlerFactoryType, IdUServerEndpoint>
+        create(configuration.locale());
 
-    final GenProtocolSolved<IdUClientProtocolHandlerFactoryType, IdUServerEndpoint> solved;
+    final GenProtocolSolved<IdUHandlerFactoryType, IdUServerEndpoint> solved;
     try {
       solved = solver.solve(
         serverProtocols,
@@ -192,11 +212,13 @@ public final class IdUProtocolNegotiation
       );
     } catch (final GenProtocolException e) {
       throw new IdUClientException(
-        empty(),
-        NO_SUPPORTED_PROTOCOLS,
-        e.getMessage(),
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
         e,
-        e.getMessage());
+        NO_SUPPORTED_PROTOCOLS,
+        Map.of(),
+        empty(),
+        empty()
+      );
     }
 
     final var serverEndpoint =
@@ -215,6 +237,7 @@ public final class IdUProtocolNegotiation
     );
 
     return solved.clientHandler().createHandler(
+      configuration,
       httpClient,
       strings,
       target

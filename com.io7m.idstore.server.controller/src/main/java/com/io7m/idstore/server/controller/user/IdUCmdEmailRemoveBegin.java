@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -41,6 +41,7 @@ import io.opentelemetry.api.trace.Span;
 
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
@@ -156,9 +157,11 @@ public final class IdUCmdEmailRemoveBegin
       throw new IdCommandExecutionFailure(
         e.getMessage(),
         e,
+        IO_ERROR,
+        Map.of(),
+        Optional.empty(),
         context.requestId(),
-        500,
-        IO_ERROR
+        500
       );
     }
 

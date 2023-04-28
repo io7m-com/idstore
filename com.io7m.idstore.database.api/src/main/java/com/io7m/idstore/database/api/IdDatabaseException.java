@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,7 +20,8 @@ package com.io7m.idstore.database.api;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdException;
 
-import java.util.Objects;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * The type of exceptions raised by the server database.
@@ -29,49 +30,40 @@ import java.util.Objects;
 public final class IdDatabaseException extends IdException
 {
   /**
-   * Create an exception.
+   * Construct an exception.
    *
-   * @param message     The message
-   * @param inErrorCode The error code
+   * @param message             The message
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
    */
 
   public IdDatabaseException(
     final String message,
-    final IdErrorCode inErrorCode)
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction)
   {
-    super(inErrorCode, Objects.requireNonNull(message, "message"));
+    super(message, inErrorCode, inAttributes, inRemediatingAction);
   }
 
   /**
-   * Create an exception.
+   * Construct an exception.
    *
-   * @param message     The message
-   * @param cause       The cause
-   * @param inErrorCode The error code
+   * @param message             The message
+   * @param cause               The cause
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
    */
 
   public IdDatabaseException(
     final String message,
     final Throwable cause,
-    final IdErrorCode inErrorCode)
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction)
   {
-    super(
-      inErrorCode,
-      Objects.requireNonNull(message, "message"),
-      Objects.requireNonNull(cause, "cause"));
-  }
-
-  /**
-   * Create an exception.
-   *
-   * @param cause       The cause
-   * @param inErrorCode The error code
-   */
-
-  public IdDatabaseException(
-    final Throwable cause,
-    final IdErrorCode inErrorCode)
-  {
-    super(inErrorCode, Objects.requireNonNull(cause, "cause"));
+    super(message, cause, inErrorCode, inAttributes, inRemediatingAction);
   }
 }

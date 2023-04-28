@@ -1,5 +1,5 @@
 ;
-; Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+; Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
 ;
 ; Permission to use, copy, modify, and/or distribute this software for any
 ; purpose with or without fee is hereby granted, provided that the above
@@ -466,6 +466,8 @@
   [field userName cb:String]
   [documentation password "The password."]
   [field password cb:String]
+  [documentation metadata "The extra metadata"]
+  [field metadata [cb:Map cb:String cb:String]]
 ]
 
 ;
@@ -840,6 +842,10 @@
   [field errorCode cb:String]
   [documentation message "The error message."]
   [field message cb:String]
+  [documentation attributes "The error attributes."]
+  [field attributes [cb:Map cb:String cb:String]]
+  [documentation remediatingAction "The remediating action, if any."]
+  [field remediatingAction [cb:Option cb:String]]
 ]
 
 [documentation IdA1ResponseLogin "A response to IdA1CommandLogin."]

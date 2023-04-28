@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -19,7 +19,6 @@ package com.io7m.idstore.database.postgres.internal;
 import com.io7m.idstore.database.api.IdDatabaseAdminSearchByEmailType;
 import com.io7m.idstore.database.api.IdDatabaseAdminSearchType;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
-import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.postgres.internal.tables.records.AdminsRecord;
 import com.io7m.idstore.database.postgres.internal.tables.records.EmailsRecord;
@@ -68,7 +67,6 @@ import static com.io7m.idstore.database.postgres.internal.Tables.BANS;
 import static com.io7m.idstore.database.postgres.internal.Tables.EMAILS;
 import static com.io7m.idstore.database.postgres.internal.Tables.LOGIN_HISTORY;
 import static com.io7m.idstore.database.postgres.internal.Tables.USER_IDS;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_EMAIL;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_ID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_ID_NAME;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
@@ -88,7 +86,9 @@ final class IdDatabaseAdminsQueries
   static final Supplier<IdDatabaseException> ADMIN_DOES_NOT_EXIST = () -> {
     return new IdDatabaseException(
       "Admin does not exist",
-      ADMIN_NONEXISTENT
+      ADMIN_NONEXISTENT,
+      Map.of(),
+      Optional.empty()
     );
   };
 
@@ -144,7 +144,9 @@ final class IdDatabaseAdminsQueries
     return new IdDatabaseException(
       exception.getMessage(),
       exception,
-      PASSWORD_ERROR
+      PASSWORD_ERROR,
+      exception.attributes(),
+      exception.remediatingAction()
     );
   }
 
@@ -184,10 +186,18 @@ final class IdDatabaseAdminsQueries
     Objects.requireNonNull(created, "created");
     Objects.requireNonNull(password, "password");
 
-    final var transaction = this.transaction();
-    final var context = transaction.createContext();
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseAdminsQueries.adminCreateInitial");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", id.toString()),
+        Map.entry("Admin Name", idName.value())
+      );
 
     try {
       final var existing =
@@ -198,7 +208,9 @@ final class IdDatabaseAdminsQueries
       if (existing.isNotEmpty()) {
         throw new IdDatabaseException(
           "Admin already exists",
-          ADMIN_NOT_INITIAL
+          ADMIN_NOT_INITIAL,
+          Map.of(),
+          Optional.empty()
         );
       }
 
@@ -243,7 +255,7 @@ final class IdDatabaseAdminsQueries
       return this.adminGet(id).orElseThrow();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -276,6 +288,12 @@ final class IdDatabaseAdminsQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseAdminsQueries.adminCreate");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", id.toString()),
+        Map.entry("Admin Name", idName.value())
+      );
+
     try {
       {
         final var existing =
@@ -283,7 +301,9 @@ final class IdDatabaseAdminsQueries
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "Admin ID already exists",
-            ADMIN_DUPLICATE_ID
+            ADMIN_DUPLICATE_ID,
+            attributes,
+            Optional.empty()
           );
         }
       }
@@ -294,25 +314,10 @@ final class IdDatabaseAdminsQueries
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "Admin ID name already exists",
-            ADMIN_DUPLICATE_ID_NAME
+            ADMIN_DUPLICATE_ID_NAME,
+            attributes,
+            Optional.empty()
           );
-        }
-      }
-
-      {
-        final var emails =
-          this.transaction().queries(IdDatabaseEmailsQueriesType.class);
-        final var existingOpt =
-          emails.emailExists(email);
-
-        if (existingOpt.isPresent()) {
-          final var existing = existingOpt.get();
-          if (existing.isAdmin()) {
-            throw new IdDatabaseException(
-              "Email already exists",
-              ADMIN_DUPLICATE_EMAIL
-            );
-          }
         }
       }
 
@@ -320,7 +325,8 @@ final class IdDatabaseAdminsQueries
         permissionsSerialize(permissions);
 
       context.insertInto(USER_IDS)
-        .set(USER_IDS.ID, id).execute();
+        .set(USER_IDS.ID, id)
+        .execute();
 
       context.insertInto(ADMINS)
         .set(ADMINS.ID, id)
@@ -345,12 +351,13 @@ final class IdDatabaseAdminsQueries
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "ADMIN_CREATED")
         .set(AUDIT.USER_ID, executor)
-        .set(AUDIT.MESSAGE, id.toString()).execute();
+        .set(AUDIT.MESSAGE, id.toString())
+        .execute();
 
       return this.adminGet(id).orElseThrow();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -369,6 +376,11 @@ final class IdDatabaseAdminsQueries
       transaction.createContext();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseAdminsQueries.adminGet");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", id.toString())
+      );
 
     try {
       final var adminRecordOpt =
@@ -391,7 +403,7 @@ final class IdDatabaseAdminsQueries
       return Optional.of(adminMap(adminRecord, emails));
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } catch (final IdPasswordException e) {
       querySpan.recordException(e);
       throw handlePasswordException(e);
@@ -435,7 +447,7 @@ final class IdDatabaseAdminsQueries
       return Optional.of(adminMap(adminRecord, emails));
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, Map.of());
     } catch (final IdPasswordException e) {
       querySpan.recordException(e);
       throw handlePasswordException(e);
@@ -485,7 +497,7 @@ final class IdDatabaseAdminsQueries
       return this.adminGet(emailRecord.getAdminId());
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -542,7 +554,7 @@ final class IdDatabaseAdminsQueries
       audit.execute();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -621,7 +633,7 @@ final class IdDatabaseAdminsQueries
       return new AdminsSearch(pages);
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
+      throw handleDatabaseException(this.transaction(), e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -655,6 +667,11 @@ final class IdDatabaseAdminsQueries
     final var executor = transaction.adminId();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseAdminsQueries.adminUpdate");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", id.toString())
+      );
 
     try {
       final var record = context.fetchOne(ADMINS, ADMINS.ID.eq(id));
@@ -719,7 +736,7 @@ final class IdDatabaseAdminsQueries
       record.store();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
+      throw handleDatabaseException(this.transaction(), e, attributes);
     } finally {
       querySpan.end();
     }
@@ -740,10 +757,13 @@ final class IdDatabaseAdminsQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseAdminsQueries.adminEmailAdd");
 
-    try {
-      context.fetchOptional(ADMINS, ADMINS.ID.eq(id))
-        .orElseThrow(ADMIN_DOES_NOT_EXIST);
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", id.toString()),
+        Map.entry("Email", email.value())
+      );
 
+    try {
       context.insertInto(EMAILS)
         .set(EMAILS.ADMIN_ID, id)
         .set(EMAILS.EMAIL_ADDRESS, email.value())
@@ -758,7 +778,7 @@ final class IdDatabaseAdminsQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
+      throw handleDatabaseException(this.transaction(), e, attributes);
     } finally {
       querySpan.end();
     }
@@ -778,6 +798,12 @@ final class IdDatabaseAdminsQueries
     final var executor = transaction.adminId();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseAdminsQueries.adminEmailRemove");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", id.toString()),
+        Map.entry("Email", email.value())
+      );
 
     try {
       context.fetchOptional(ADMINS, ADMINS.ID.eq(id))
@@ -813,7 +839,7 @@ final class IdDatabaseAdminsQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
+      throw handleDatabaseException(this.transaction(), e, attributes);
     } finally {
       querySpan.end();
     }
@@ -831,6 +857,11 @@ final class IdDatabaseAdminsQueries
     final var executor = transaction.adminId();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseAdminsQueries.adminDelete");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", id.toString())
+      );
 
     try {
       final var admin = this.adminGetRequire(id);
@@ -857,7 +888,7 @@ final class IdDatabaseAdminsQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
+      throw handleDatabaseException(this.transaction(), e, attributes);
     } finally {
       querySpan.end();
     }
@@ -875,6 +906,11 @@ final class IdDatabaseAdminsQueries
     final var executor = transaction.adminId();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseAdminsQueries.adminBanCreate");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", executor.toString())
+      );
 
     try {
       final var user =
@@ -900,7 +936,7 @@ final class IdDatabaseAdminsQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -917,6 +953,11 @@ final class IdDatabaseAdminsQueries
     final var context = transaction.createContext();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseAdminsQueries.adminBanGet");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", id.toString())
+      );
 
     try {
       final var user =
@@ -937,7 +978,7 @@ final class IdDatabaseAdminsQueries
       );
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -955,6 +996,11 @@ final class IdDatabaseAdminsQueries
     final var executor = transaction.adminId();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseAdminsQueries.adminBanDelete");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", executor.toString())
+      );
 
     try {
       final var user =
@@ -977,7 +1023,7 @@ final class IdDatabaseAdminsQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -1052,7 +1098,7 @@ final class IdDatabaseAdminsQueries
       return new AdminsByEmailSearch(pages);
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
+      throw handleDatabaseException(this.transaction(), e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -1117,7 +1163,7 @@ final class IdDatabaseAdminsQueries
         );
       } catch (final DataAccessException e) {
         querySpan.recordException(e);
-        throw handleDatabaseException(transaction, e);
+        throw handleDatabaseException(transaction, e, Map.of());
       } finally {
         querySpan.end();
       }
@@ -1183,7 +1229,7 @@ final class IdDatabaseAdminsQueries
         );
       } catch (final DataAccessException e) {
         querySpan.recordException(e);
-        throw handleDatabaseException(transaction, e);
+        throw handleDatabaseException(transaction, e, Map.of());
       } finally {
         querySpan.end();
       }

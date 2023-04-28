@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -108,6 +108,7 @@ import com.io7m.idstore.protocol.admin.cb.IdA1ResponseAdminSelf;
 import com.io7m.idstore.protocol.admin.cb.IdA1ResponseAdminUpdate;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -151,6 +152,7 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGenera
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWireTimeRange;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWireTimestamp;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWireUUID;
+import static java.util.Objects.requireNonNullElse;
 
 /**
  * Functions to translate between the core command set and the Admin v1
@@ -907,7 +909,13 @@ public final class IdACB1ValidationAdmin
         .map(IdACB1ValidationAdmin::fromWireAdminPermission)
         .collect(Collectors.toUnmodifiableSet());
     } catch (final IllegalArgumentException e) {
-      throw new IdProtocolException(PROTOCOL_ERROR, e.getMessage());
+      throw new IdProtocolException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        PROTOCOL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 

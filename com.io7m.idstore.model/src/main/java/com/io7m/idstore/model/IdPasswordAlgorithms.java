@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,7 +18,9 @@
 package com.io7m.idstore.model;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 
@@ -68,29 +70,34 @@ public final class IdPasswordAlgorithms
             );
           }
 
-          final var lineSeparator = System.lineSeparator();
           throw new IdPasswordException(
+            "Unparseable password algorithm.",
             PASSWORD_ERROR,
-            new StringBuilder(128)
-              .append("Unparseable password algorithm.")
-              .append(lineSeparator)
-              .append(
-                "  Expected: 'PBKDF2WithHmacSHA256' : <iteration count> : <key length>")
-              .append(lineSeparator)
-              .append("  Received: ")
-              .append(text)
-              .append(lineSeparator)
-              .toString()
+            Map.ofEntries(
+              Map.entry(
+                "Expected",
+                "'PBKDF2WithHmacSHA256' : <iteration count> : <key length>"),
+              Map.entry("Received", text)
+            ),
+            Optional.of("Use the correct syntax.")
           );
         } catch (final NumberFormatException e) {
-          throw new IdPasswordException(PASSWORD_ERROR, e.getMessage(), e);
+          throw new IdPasswordException(
+            e.getMessage(),
+            e,
+            PASSWORD_ERROR,
+            Map.of(),
+            Optional.empty()
+          );
         }
       }
 
       default -> {
         throw new IdPasswordException(
+          "Unsupported algorithm: %s".formatted(name),
           PASSWORD_ERROR,
-          "Unsupported algorithm: %s".formatted(name)
+          Map.of(),
+          Optional.empty()
         );
       }
     };

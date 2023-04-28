@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,9 +14,9 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.admin_gui.internal.main;
 
+import com.io7m.hibiscus.api.HBState;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGAboutController;
 import com.io7m.idstore.admin_gui.internal.IdAGApplication;
@@ -24,7 +24,6 @@ import com.io7m.idstore.admin_gui.internal.IdAGCSS;
 import com.io7m.idstore.admin_gui.internal.IdAGPerpetualSubscriber;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientService;
-import com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus;
 import com.io7m.idstore.admin_gui.internal.errors.IdAGErrorDialogs;
 import com.io7m.idstore.admin_gui.internal.events.IdAGEventBus;
 import com.io7m.idstore.admin_gui.internal.events.IdAGEventStatusCancelled;
@@ -148,7 +147,9 @@ public final class IdAGMainScreenController implements Initializable
         try (var recorder =
                TRTaskRecorder.<RPServiceDirectoryType>create(
                  LOG, "Booting application...")) {
-          recorder.setTaskFailed(exception.getMessage(), Optional.of(exception));
+          recorder.setTaskFailed(
+            exception.getMessage(),
+            Optional.of(exception));
           this.task = recorder.toTask();
         }
         this.onBootFailed();
@@ -209,24 +210,31 @@ public final class IdAGMainScreenController implements Initializable
   }
 
   private void configureMainContentViewForClientStatus(
-    final IdAGClientStatus status)
+    final HBState status)
   {
     switch (status) {
-      case CONNECTION_FAILED, DISCONNECTED -> {
-        this.contentHide();
-        this.mainConnectMenuItem.setDisable(false);
-        this.mainConnectMenuItem.setText(
-          this.strings.format("menu.connect"));
-      }
-
-      case CONNECTING -> {
+      case CLIENT_EXECUTING_LOGIN -> {
         this.contentHide();
         this.mainConnectMenuItem.setDisable(true);
         this.mainConnectMenuItem.setText(
           this.strings.format("menu.disconnect"));
       }
-
-      case CONNECTED, REQUESTING, REQUEST_FAILED -> {
+      case CLIENT_EXECUTING_LOGIN_FAILED,
+        CLIENT_CLOSED,
+        CLIENT_DISCONNECTED -> {
+        this.contentHide();
+        this.mainConnectMenuItem.setDisable(false);
+        this.mainConnectMenuItem.setText(
+          this.strings.format("menu.connect"));
+      }
+      case CLIENT_EXECUTING_LOGIN_SUCCEEDED,
+        CLIENT_POLLING_EVENTS_SUCCEEDED,
+        CLIENT_POLLING_EVENTS_FAILED,
+        CLIENT_POLLING_EVENTS,
+        CLIENT_EXECUTING_COMMAND_SUCCEEDED,
+        CLIENT_EXECUTING_COMMAND_FAILED,
+        CLIENT_EXECUTING_COMMAND,
+        CLIENT_CONNECTED -> {
         this.contentShow();
         this.mainConnectMenuItem.setDisable(false);
         this.mainConnectMenuItem.setText(
@@ -338,7 +346,18 @@ public final class IdAGMainScreenController implements Initializable
     throws IOException
   {
     switch (this.client.status().get()) {
-      case DISCONNECTED, CONNECTION_FAILED -> {
+      case CLIENT_EXECUTING_LOGIN,
+        CLIENT_POLLING_EVENTS_SUCCEEDED,
+        CLIENT_POLLING_EVENTS_FAILED,
+        CLIENT_POLLING_EVENTS,
+        CLIENT_EXECUTING_COMMAND_SUCCEEDED,
+        CLIENT_EXECUTING_COMMAND_FAILED,
+        CLIENT_EXECUTING_COMMAND,
+        CLIENT_CONNECTED,
+        CLIENT_EXECUTING_LOGIN_SUCCEEDED -> {
+        this.client.disconnect();
+      }
+      case CLIENT_EXECUTING_LOGIN_FAILED, CLIENT_DISCONNECTED -> {
         final var stage = new Stage();
         final var connectXML =
           IdAGMainScreenController.class.getResource(
@@ -364,11 +383,8 @@ public final class IdAGMainScreenController implements Initializable
         stage.setTitle(this.strings.format("connect.connect"));
         stage.showAndWait();
       }
-      case CONNECTING -> {
-        // Nothing
-      }
-      case CONNECTED, REQUESTING -> {
-        this.client.disconnect();
+      case CLIENT_CLOSED -> {
+
       }
     }
   }

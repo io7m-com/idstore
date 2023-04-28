@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -30,11 +30,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
+import static java.util.Optional.empty;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -100,7 +102,7 @@ public final class IdACmdUserEmailAddTest
     final var admins =
       mock(IdDatabaseUsersQueriesType.class);
 
-    Mockito.doThrow(new IdDatabaseException("", SQL_ERROR_UNIQUE))
+    Mockito.doThrow(new IdDatabaseException("", SQL_ERROR_UNIQUE, Map.of(), empty()))
       .when(admins)
       .userEmailAdd(any(), any());
 
@@ -153,7 +155,7 @@ public final class IdACmdUserEmailAddTest
     final var admins =
       mock(IdDatabaseUsersQueriesType.class);
 
-    Mockito.doThrow(new IdDatabaseException("", SQL_ERROR))
+    Mockito.doThrow(new IdDatabaseException("", SQL_ERROR, Map.of(), empty()))
       .when(admins)
       .userEmailAdd(any(), any());
 

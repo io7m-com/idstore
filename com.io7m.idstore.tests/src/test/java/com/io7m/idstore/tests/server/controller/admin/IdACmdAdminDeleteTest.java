@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,10 +26,13 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Map;
+
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.OPERATION_NOT_PERMITTED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_DELETE;
+import static java.util.Optional.empty;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -92,7 +95,7 @@ public final class IdACmdAdminDeleteTest
       mock(IdDatabaseAdminsQueriesType.class);
 
     final var adminId = randomUUID();
-    Mockito.doThrow(new IdDatabaseException("", ADMIN_NONEXISTENT))
+    Mockito.doThrow(new IdDatabaseException("", ADMIN_NONEXISTENT, Map.of(), empty()))
       .when(admins)
       .adminDelete(adminId);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,7 +18,9 @@ package com.io7m.idstore.protocol.admin.cb;
 
 import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned16;
 import com.io7m.cedarbridge.runtime.api.CBList;
+import com.io7m.cedarbridge.runtime.api.CBMap;
 import com.io7m.cedarbridge.runtime.api.CBString;
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordException;
@@ -101,6 +103,11 @@ import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
 import com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageValidatorType;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.io7m.cedarbridge.runtime.api.CBOptionType.fromOptional;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
@@ -236,6 +243,7 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.t
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireResponseUserSearchNext;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireResponseUserSearchPrevious;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireResponseUserUpdate;
+import static java.util.Map.entry;
 
 /**
  * Functions to translate between the core command set and the Admin v1
@@ -338,8 +346,10 @@ public final class IdACB1Validation
     }
 
     throw new IdProtocolException(
+      "Unrecognized message: %s".formatted(response),
       PROTOCOL_ERROR,
-      "Unrecognized message: %s".formatted(response)
+      Map.of(),
+      Optional.empty()
     );
   }
 
@@ -388,8 +398,16 @@ public final class IdACB1Validation
   {
     return new IdA1ResponseError(
       toWireUUID(error.requestId()),
-      new CBString(error.errorCode()),
-      new CBString(error.message())
+      new CBString(error.errorCode().id()),
+      new CBString(error.message()),
+      new CBMap<>(
+        error.attributes()
+          .entrySet()
+          .stream()
+          .map(e -> Map.entry(new CBString(e.getKey()), new CBString(e.getValue())))
+          .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+      ),
+      fromOptional(error.remediatingAction().map(CBString::new))
     );
   }
 
@@ -499,8 +517,10 @@ public final class IdACB1Validation
     }
 
     throw new IdProtocolException(
+      "Unrecognized message: %s".formatted(command),
       PROTOCOL_ERROR,
-      "Unrecognized message: %s".formatted(command)
+      Map.of(),
+      Optional.empty()
     );
   }
 
@@ -549,7 +569,19 @@ public final class IdACB1Validation
   {
     return new IdA1CommandLogin(
       new CBString(login.userName().value()),
-      new CBString(login.password())
+      new CBString(login.password()),
+      toWireLoginMetadata(login.metadata())
+    );
+  }
+
+  private static CBMap<CBString, CBString> toWireLoginMetadata(
+    final Map<String, String> metadata)
+  {
+    return new CBMap<>(
+      metadata.entrySet()
+        .stream()
+        .map(e -> entry(new CBString(e.getKey()), new CBString(e.getValue())))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
     );
   }
 
@@ -558,8 +590,17 @@ public final class IdACB1Validation
   {
     return new IdAResponseError(
       fromWireUUID(error.fieldRequestId()),
-      error.fieldErrorCode().value(),
-      error.fieldMessage().value()
+      error.fieldMessage().value(),
+      new IdErrorCode(error.fieldErrorCode().value()),
+      error.fieldAttributes()
+        .values()
+        .entrySet()
+        .stream()
+        .map(e -> Map.entry(e.getKey().value(), e.getValue().value()))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)),
+      error.fieldRemediatingAction()
+        .asOptional()
+        .map(CBString::value)
     );
   }
 
@@ -578,8 +619,19 @@ public final class IdACB1Validation
   {
     return new IdACommandLogin(
       new IdName(login.fieldUserName().value()),
-      login.fieldPassword().value()
+      login.fieldPassword().value(),
+      fromWireCommandLoginMetadata(login.fieldMetadata())
     );
+  }
+
+  private static Map<String, String> fromWireCommandLoginMetadata(
+    final CBMap<CBString, CBString> map)
+  {
+    return map.values()
+      .entrySet()
+      .stream()
+      .map(e -> Map.entry(e.getKey().value(), e.getValue().value()))
+      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   @Override
@@ -593,8 +645,10 @@ public final class IdACB1Validation
       return toWireResponse(response);
     } else {
       throw new IdProtocolException(
+        "Unrecognized message: %s".formatted(message),
         PROTOCOL_ERROR,
-        "Unrecognized message: %s".formatted(message)
+        Map.of(),
+        Optional.empty()
       );
     }
   }
@@ -779,12 +833,20 @@ public final class IdACB1Validation
       }
 
     } catch (final Exception e) {
-      throw new IdProtocolException(PROTOCOL_ERROR, e.getMessage(), e);
+      throw new IdProtocolException(
+        Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        PROTOCOL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
 
     throw new IdProtocolException(
+      "Unrecognized message: %s".formatted(message),
       PROTOCOL_ERROR,
-      "Unrecognized message: %s".formatted(message)
+      Map.of(),
+      Optional.empty()
     );
   }
 

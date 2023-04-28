@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,11 +27,13 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static com.io7m.idstore.model.IdAdminPermission.USER_READ;
 import static java.time.OffsetDateTime.now;
+import static java.util.Optional.empty;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -160,7 +162,7 @@ public final class IdACmdUserLoginHistoryTest
       mock(IdDatabaseUsersQueriesType.class);
 
     when(users.userLoginHistory(eq(userId), anyInt()))
-      .thenThrow(new IdDatabaseException("", USER_NONEXISTENT));
+      .thenThrow(new IdDatabaseException("", USER_NONEXISTENT, Map.of(), empty()));
 
     final var transaction = this.transaction();
     when(transaction.queries(IdDatabaseUsersQueriesType.class))

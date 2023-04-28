@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,6 +17,8 @@
 
 package com.io7m.idstore.protocol.admin;
 
+import com.io7m.hibiscus.api.HBCommandType;
+
 /**
  * The type of commands in the Admin protocol.
  *
@@ -24,7 +26,8 @@ package com.io7m.idstore.protocol.admin;
  */
 
 public sealed interface IdACommandType<R extends IdAResponseType>
-  extends IdAMessageType permits
+  extends IdAMessageType, HBCommandType
+  permits
   IdACommandAdminBanCreate,
   IdACommandAdminBanDelete,
   IdACommandAdminBanGet,
@@ -66,5 +69,9 @@ public sealed interface IdACommandType<R extends IdAResponseType>
   IdACommandUserSearchPrevious,
   IdACommandUserUpdate
 {
+  /**
+   * @return The response type associated with this command
+   */
 
+  Class<R> responseClass();
 }

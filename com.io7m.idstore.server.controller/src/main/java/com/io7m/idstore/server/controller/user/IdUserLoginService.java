@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -33,6 +33,7 @@ import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
@@ -141,9 +142,11 @@ public final class IdUserLoginService implements RPServiceType
       if (!ok) {
         throw new IdCommandExecutionFailure(
           this.strings.format("errorInvalidUsernamePassword"),
+          AUTHENTICATION_ERROR,
+          Map.of(),
+          Optional.empty(),
           requestId,
-          401,
-          AUTHENTICATION_ERROR
+          401
         );
       }
 
@@ -164,17 +167,21 @@ public final class IdUserLoginService implements RPServiceType
       throw new IdCommandExecutionFailure(
         e.getMessage(),
         e,
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction(),
         requestId,
-        500,
-        e.errorCode()
+        500
       );
     } catch (final IdPasswordException e) {
       throw new IdCommandExecutionFailure(
         e.getMessage(),
         e,
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction(),
         requestId,
-        500,
-        e.errorCode()
+        500
       );
     }
   }
@@ -206,9 +213,11 @@ public final class IdUserLoginService implements RPServiceType
     if (expiresOpt.isEmpty()) {
       throw new IdCommandExecutionFailure(
         this.strings.format("bannedNoExpire", ban.reason()),
+        BANNED,
+        Map.of(),
+        Optional.empty(),
         requestId,
-        403,
-        BANNED
+        403
       );
     }
 
@@ -222,9 +231,11 @@ public final class IdUserLoginService implements RPServiceType
     if (timeNow.compareTo(timeExpires) < 0) {
       throw new IdCommandExecutionFailure(
         this.strings.format("banned", ban.reason(), timeExpires),
+        BANNED,
+        Map.of(),
+        Optional.empty(),
         requestId,
-        403,
-        BANNED
+        403
       );
     }
   }
@@ -236,9 +247,11 @@ public final class IdUserLoginService implements RPServiceType
     return new IdCommandExecutionFailure(
       this.strings.format("errorInvalidUsernamePassword"),
       cause,
+      AUTHENTICATION_ERROR,
+      Map.of(),
+      Optional.empty(),
       requestId,
-      401,
-      AUTHENTICATION_ERROR
+      401
     );
   }
 

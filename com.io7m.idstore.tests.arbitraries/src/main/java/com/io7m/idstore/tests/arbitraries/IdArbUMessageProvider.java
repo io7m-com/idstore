@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.tests.arbitraries;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
@@ -281,9 +282,20 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
     final var s0 =
       Arbitraries.strings();
     final var s1 =
-      Arbitraries.strings();
+      Arbitraries.defaultFor(IdErrorCode.class);
 
-    return Combinators.combine(id, s0, s1).as(IdUResponseError::new);
+    final var s2 =
+      Arbitraries.strings();
+    final var s3 =
+      Arbitraries.strings();
+    final var ms =
+      Arbitraries.maps(s2, s3);
+
+    final var os =
+      Arbitraries.strings()
+        .optional();
+
+    return Combinators.combine(id, s0, s1, ms, os).as(IdUResponseError::new);
   }
 
   /**

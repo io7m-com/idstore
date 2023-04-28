@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,7 +18,9 @@ package com.io7m.idstore.user_client.api;
 
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.protocol.user.IdUResponseError;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,79 +31,50 @@ import java.util.UUID;
 
 public final class IdUClientException extends IdException
 {
-  private final String reason;
   private final Optional<UUID> requestId;
 
   /**
    * Construct an exception.
    *
-   * @param inRequestId The request ID
-   * @param errorCode   The error code
-   * @param message     The message
-   * @param inReason    The error reason
+   * @param message             The message
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
+   * @param inRequestId         The request ID
    */
 
   public IdUClientException(
-    final Optional<UUID> inRequestId,
-    final IdErrorCode errorCode,
     final String message,
-    final String inReason)
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction,
+    final Optional<UUID> inRequestId)
   {
-    super(errorCode, Objects.requireNonNull(message, "message"));
-    this.requestId =
-      Objects.requireNonNull(inRequestId, "requestId");
-    this.reason =
-      Objects.requireNonNull(inReason, "reason");
+    super(message, inErrorCode, inAttributes, inRemediatingAction);
+    this.requestId = Objects.requireNonNull(inRequestId, "requestId");
   }
 
   /**
    * Construct an exception.
    *
-   * @param inRequestId The request ID
-   * @param errorCode   The error code
-   * @param message     The message
-   * @param cause       The cause
-   * @param inReason    The error reason
+   * @param message             The message
+   * @param cause               The cause
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
+   * @param inRequestId         The request ID
    */
 
   public IdUClientException(
-    final Optional<UUID> inRequestId,
-    final IdErrorCode errorCode,
     final String message,
     final Throwable cause,
-    final String inReason)
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction,
+    final Optional<UUID> inRequestId)
   {
-    super(
-      errorCode,
-      Objects.requireNonNull(message, "message"),
-      Objects.requireNonNull(cause, "cause")
-    );
-    this.requestId =
-      Objects.requireNonNull(inRequestId, "requestId");
-    this.reason =
-      Objects.requireNonNull(inReason, "reason");
-  }
-
-  /**
-   * Construct an exception.
-   *
-   * @param inRequestId The request ID
-   * @param errorCode   The error code
-   * @param cause       The cause
-   * @param inReason    The error reason
-   */
-
-  public IdUClientException(
-    final Optional<UUID> inRequestId,
-    final IdErrorCode errorCode,
-    final Throwable cause,
-    final String inReason)
-  {
-    super(errorCode, Objects.requireNonNull(cause, "cause"));
-    this.requestId =
-      Objects.requireNonNull(inRequestId, "requestId");
-    this.reason =
-      Objects.requireNonNull(inReason, "reason");
+    super(message, cause, inErrorCode, inAttributes, inRemediatingAction);
+    this.requestId = Objects.requireNonNull(inRequestId, "requestId");
   }
 
   /**
@@ -114,11 +87,22 @@ public final class IdUClientException extends IdException
   }
 
   /**
-   * @return The error reason
+   * Transform an error response to an exception.
+   *
+   * @param error The error
+   *
+   * @return The exception
    */
 
-  public String reason()
+  public static IdUClientException ofError(
+    final IdUResponseError error)
   {
-    return this.reason;
+    return new IdUClientException(
+      error.message(),
+      error.errorCode(),
+      error.attributes(),
+      error.remediatingAction(),
+      Optional.of(error.requestId())
+    );
   }
 }

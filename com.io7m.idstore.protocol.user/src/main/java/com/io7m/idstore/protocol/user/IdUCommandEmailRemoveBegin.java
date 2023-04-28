@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,7 +26,6 @@ import java.util.Objects;
  * @param email The email address
  */
 
-
 public record IdUCommandEmailRemoveBegin(
   IdEmail email)
   implements IdUCommandType<IdUResponseEmailRemoveBegin>
@@ -40,5 +39,11 @@ public record IdUCommandEmailRemoveBegin(
   public IdUCommandEmailRemoveBegin
   {
     Objects.requireNonNull(email, "email");
+  }
+
+  @Override
+  public Class<IdUResponseEmailRemoveBegin> responseClass()
+  {
+    return IdUResponseEmailRemoveBegin.class;
   }
 }

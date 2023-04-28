@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -35,6 +35,7 @@ import org.jooq.impl.DSL;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -127,7 +128,7 @@ final class IdDatabaseAuditQueries
       return new AuditEventsSearch(baseTable, pages);
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(this.transaction(), e);
+      throw handleDatabaseException(this.transaction(), e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -161,7 +162,7 @@ final class IdDatabaseAuditQueries
         .execute();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, Map.of());
     } finally {
       querySpan.end();
     }
@@ -230,7 +231,7 @@ final class IdDatabaseAuditQueries
         );
       } catch (final DataAccessException e) {
         querySpan.recordException(e);
-        throw handleDatabaseException(transaction, e);
+        throw handleDatabaseException(transaction, e, Map.of());
       } finally {
         querySpan.end();
       }

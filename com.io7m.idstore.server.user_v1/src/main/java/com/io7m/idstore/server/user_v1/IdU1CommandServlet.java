@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -38,7 +38,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
@@ -95,17 +97,20 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
       }
     } catch (final IdProtocolException e) {
       throw new IdHTTPErrorStatusException(
-        BAD_REQUEST_400,
-        PROTOCOL_ERROR,
         e.getMessage(),
-        e
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction(),
+        BAD_REQUEST_400
       );
     }
 
     throw new IdHTTPErrorStatusException(
-      BAD_REQUEST_400,
+      this.strings().format("expectedCommand", "IdU1CommandType"),
       PROTOCOL_ERROR,
-      this.strings().format("expectedCommand", "IdU1CommandType")
+      Map.of(),
+      Optional.empty(),
+      BAD_REQUEST_400
     );
   }
 
@@ -155,7 +160,7 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
       final IdUResponseType result = this.executor.execute(context, command);
       sends.send(servletResponse, 200, result);
       if (result instanceof IdUResponseError error) {
-        Span.current().setAttribute("idstore.errorCode", error.errorCode());
+        Span.current().setAttribute("idstore.errorCode", error.errorCode().id());
       } else {
         transaction.commit();
       }
@@ -166,8 +171,10 @@ public final class IdU1CommandServlet extends IdU1AuthenticatedServlet
         e.httpStatusCode(),
         new IdUResponseError(
           e.requestId(),
-          e.errorCode().id(),
-          e.getMessage()
+          e.getMessage(),
+          e.errorCode(),
+          e.attributes(),
+          e.remediatingAction()
         ));
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,8 +18,12 @@ package com.io7m.idstore.admin_client.api;
 
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.protocol.admin.IdAResponseError;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * The type of client exceptions.
@@ -27,51 +31,78 @@ import java.util.Objects;
 
 public final class IdAClientException extends IdException
 {
-  /**
-   * Construct an exception.
-   *
-   * @param errorCode The error code
-   * @param message   The message
-   */
-
-  public IdAClientException(
-    final IdErrorCode errorCode,
-    final String message)
-  {
-    super(errorCode, Objects.requireNonNull(message, "message"));
-  }
+  private final Optional<UUID> requestId;
 
   /**
    * Construct an exception.
    *
-   * @param errorCode The error code
-   * @param message   The message
-   * @param cause     The cause
+   * @param message             The message
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
+   * @param inRequestId         The request ID
    */
 
   public IdAClientException(
-    final IdErrorCode errorCode,
     final String message,
-    final Throwable cause)
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction,
+    final Optional<UUID> inRequestId)
   {
-    super(
-      errorCode,
-      Objects.requireNonNull(message, "message"),
-      Objects.requireNonNull(cause, "cause")
-    );
+    super(message, inErrorCode, inAttributes, inRemediatingAction);
+    this.requestId = Objects.requireNonNull(inRequestId, "requestId");
   }
 
   /**
    * Construct an exception.
    *
-   * @param errorCode The error code
-   * @param cause     The cause
+   * @param message             The message
+   * @param cause               The cause
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
+   * @param inRequestId         The request ID
    */
 
   public IdAClientException(
-    final IdErrorCode errorCode,
-    final Throwable cause)
+    final String message,
+    final Throwable cause,
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction,
+    final Optional<UUID> inRequestId)
   {
-    super(errorCode, Objects.requireNonNull(cause, "cause"));
+    super(message, cause, inErrorCode, inAttributes, inRemediatingAction);
+    this.requestId = Objects.requireNonNull(inRequestId, "requestId");
+  }
+
+  /**
+   * @return The ID associated with the request, if the server returned one
+   */
+
+  public Optional<UUID> requestId()
+  {
+    return this.requestId;
+  }
+
+  /**
+   * Transform an error response to an exception.
+   *
+   * @param error The error
+   *
+   * @return The exception
+   */
+
+  public static IdAClientException ofError(
+    final IdAResponseError error)
+  {
+    return new IdAClientException(
+      error.message(),
+      error.errorCode(),
+      error.attributes(),
+      error.remediatingAction(),
+      Optional.of(error.requestId())
+    );
   }
 }

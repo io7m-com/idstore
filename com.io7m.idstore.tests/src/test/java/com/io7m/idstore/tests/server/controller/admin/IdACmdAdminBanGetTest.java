@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,6 +27,7 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
@@ -96,7 +97,7 @@ public final class IdACmdAdminBanGetTest
     final var admins =
       Mockito.mock(IdDatabaseAdminsQueriesType.class);
 
-    Mockito.doThrow(new IdDatabaseException("", ADMIN_NONEXISTENT))
+    Mockito.doThrow(new IdDatabaseException("", ADMIN_NONEXISTENT, Map.of(), empty()))
       .when(admins)
       .adminBanGet(any());
 

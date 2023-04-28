@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -158,12 +158,14 @@ public final class IdStandardErrorCodes
 
   public static final IdErrorCode USER_DUPLICATE_ID_NAME =
     new IdErrorCode("error-user-duplicate-id-name");
+
   /**
-   * An attempt was made to create a user that already exists (Email conflict).
+   * An attempt was made to create a user/admin that already exists (Email conflict).
    */
 
-  public static final IdErrorCode USER_DUPLICATE_EMAIL =
-    new IdErrorCode("error-user-duplicate-email");
+  public static final IdErrorCode EMAIL_DUPLICATE =
+    new IdErrorCode("error-email-duplicate");
+
   /**
    * An attempt was made to reference a user that does not exist.
    */
@@ -202,13 +204,7 @@ public final class IdStandardErrorCodes
 
   public static final IdErrorCode ADMIN_DUPLICATE_ID_NAME =
     new IdErrorCode("error-admin-duplicate-id-name");
-  /**
-   * An attempt was made to create a admin that already exists (Email
-   * conflict).
-   */
 
-  public static final IdErrorCode ADMIN_DUPLICATE_EMAIL =
-    new IdErrorCode("error-admin-duplicate-email");
   /**
    * An attempt was made to reference a admin that does not exist.
    */
@@ -253,12 +249,7 @@ public final class IdStandardErrorCodes
 
   public static final IdErrorCode EMAIL_VERIFICATION_FAILED =
     new IdErrorCode("error-email-verification-failed");
-  /**
-   * An attempt was made to create an email that already exists.
-   */
 
-  public static final IdErrorCode EMAIL_DUPLICATE =
-    new IdErrorCode("error-email-duplicate");
   /**
    * An attempt was made to reference an email that does not exist.
    */

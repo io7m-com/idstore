@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,6 +21,8 @@ import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.server.controller.admin.IdACmdAdminLogin;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,7 +53,9 @@ public final class IdACmdAdminLoginTest
     final var handler = new IdACmdAdminLogin();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdACommandLogin(admin.idName(), "y"));
+        handler.execute(
+          context,
+          new IdACommandLogin(admin.idName(), "y", Map.of()));
       });
 
     /* Assert. */

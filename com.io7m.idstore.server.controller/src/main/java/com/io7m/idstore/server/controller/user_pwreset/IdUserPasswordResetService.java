@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -336,9 +336,11 @@ public final class IdUserPasswordResetService
           if (resetOpt.isEmpty()) {
             throw new IdCommandExecutionFailure(
               this.service.strings.format("passwordResetNonexistent"),
+              PASSWORD_RESET_NONEXISTENT,
+              Map.of(),
+              Optional.empty(),
               this.requestId,
-              400,
-              PASSWORD_RESET_NONEXISTENT
+              400
             );
           }
 
@@ -347,9 +349,11 @@ public final class IdUserPasswordResetService
           if (timeNow.isAfter(reset.expires())) {
             throw new IdCommandExecutionFailure(
               this.service.strings.format("passwordResetNonexistent"),
+              PASSWORD_RESET_NONEXISTENT,
+              Map.of(),
+              Optional.empty(),
               this.requestId,
-              400,
-              PASSWORD_RESET_NONEXISTENT
+              400
             );
           }
 
@@ -373,9 +377,11 @@ public final class IdUserPasswordResetService
         throw new IdCommandExecutionFailure(
           e.getMessage(),
           e,
+          e.errorCode(),
+          e.attributes(),
+          e.remediatingAction(),
           this.requestId,
-          500,
-          e.errorCode()
+          500
         );
       }
     }
@@ -386,27 +392,33 @@ public final class IdUserPasswordResetService
       if (this.password0Opt.isEmpty()) {
         throw new IdCommandExecutionFailure(
           this.service.strings.format("missingParameter", "password0"),
+          HTTP_PARAMETER_NONEXISTENT,
+          Map.of(),
+          Optional.empty(),
           this.requestId,
-          400,
-          HTTP_PARAMETER_NONEXISTENT
+          400
         );
       }
 
       if (this.password1Opt.isEmpty()) {
         throw new IdCommandExecutionFailure(
           this.service.strings.format("missingParameter", "password1"),
+          HTTP_PARAMETER_NONEXISTENT,
+          Map.of(),
+          Optional.empty(),
           this.requestId,
-          400,
-          HTTP_PARAMETER_NONEXISTENT
+          400
         );
       }
 
       if (this.tokenOpt.isEmpty()) {
         throw new IdCommandExecutionFailure(
           this.service.strings.format("missingParameter", "token"),
+          HTTP_PARAMETER_NONEXISTENT,
+          Map.of(),
+          Optional.empty(),
           this.requestId,
-          400,
-          HTTP_PARAMETER_NONEXISTENT
+          400
         );
       }
 
@@ -418,18 +430,22 @@ public final class IdUserPasswordResetService
         throw new IdCommandExecutionFailure(
           e.getMessage(),
           e,
+          HTTP_PARAMETER_INVALID,
+          Map.of(),
+          Optional.empty(),
           this.requestId,
-          400,
-          HTTP_PARAMETER_INVALID
+          400
         );
       }
 
       if (!this.password0.equals(this.password1)) {
         throw new IdCommandExecutionFailure(
           this.service.strings.format("passwordResetMismatch"),
+          PASSWORD_RESET_MISMATCH,
+          Map.of(),
+          Optional.empty(),
           this.requestId,
-          400,
-          PASSWORD_RESET_MISMATCH
+          400
         );
       }
     }
@@ -478,9 +494,11 @@ public final class IdUserPasswordResetService
           if (resetOpt.isEmpty()) {
             throw new IdCommandExecutionFailure(
               this.service.strings.format("passwordResetNonexistent"),
+              PASSWORD_RESET_NONEXISTENT,
+              Map.of(),
+              Optional.empty(),
               this.requestId,
-              400,
-              PASSWORD_RESET_NONEXISTENT
+              400
             );
           }
 
@@ -489,9 +507,11 @@ public final class IdUserPasswordResetService
           if (timeNow.isAfter(reset.expires())) {
             throw new IdCommandExecutionFailure(
               this.service.strings.format("passwordResetNonexistent"),
+              PASSWORD_RESET_NONEXISTENT,
+              Map.of(),
+              Optional.empty(),
               this.requestId,
-              400,
-              PASSWORD_RESET_NONEXISTENT
+              400
             );
           }
         }
@@ -499,9 +519,11 @@ public final class IdUserPasswordResetService
         throw new IdCommandExecutionFailure(
           e.getMessage(),
           e,
+          e.errorCode(),
+          e.attributes(),
+          e.remediatingAction(),
           this.requestId,
-          500,
-          e.errorCode()
+          500
         );
       }
     }
@@ -512,9 +534,11 @@ public final class IdUserPasswordResetService
       if (this.tokenOpt.isEmpty()) {
         throw new IdCommandExecutionFailure(
           this.service.strings.format("missingParameter", "token"),
+          HTTP_PARAMETER_NONEXISTENT,
+          Map.of(),
+          Optional.empty(),
           this.requestId,
-          400,
-          HTTP_PARAMETER_NONEXISTENT
+          400
         );
       }
 
@@ -524,9 +548,11 @@ public final class IdUserPasswordResetService
         throw new IdCommandExecutionFailure(
           e.getMessage(),
           e,
+          HTTP_PARAMETER_INVALID,
+          Map.of(),
+          Optional.empty(),
           this.requestId,
-          400,
-          HTTP_PARAMETER_INVALID
+          400
         );
       }
     }
@@ -564,18 +590,22 @@ public final class IdUserPasswordResetService
         if (!this.service.rateLimit.isAllowedByRateLimit(this.sourceHost)) {
           throw new IdCommandExecutionFailure(
             this.service.strings.format("pwResetRateLimited"),
+            RATE_LIMIT_EXCEEDED,
+            Map.of(),
+            Optional.empty(),
             this.requestId,
-            400,
-            RATE_LIMIT_EXCEEDED
+            400
           );
         }
 
         if (this.emailOpt.isEmpty() && this.userNameOpt.isEmpty()) {
           throw new IdCommandExecutionFailure(
             this.service.strings.format("pwResetRequireParameters"),
+            HTTP_PARAMETER_NONEXISTENT,
+            Map.of(),
+            Optional.empty(),
             this.requestId,
-            400,
-            HTTP_PARAMETER_NONEXISTENT
+            400
           );
         }
 
@@ -589,17 +619,21 @@ public final class IdUserPasswordResetService
         throw new IdCommandExecutionFailure(
           e.getMessage(),
           e,
+          e.errorCode(),
+          e.attributes(),
+          e.remediatingAction(),
           this.requestId,
-          500,
-          e.errorCode()
+          500
         );
       } catch (final IdValidityException e) {
         throw new IdCommandExecutionFailure(
           e.getMessage(),
           e,
+          HTTP_PARAMETER_INVALID,
+          Map.of(),
+          Optional.empty(),
           this.requestId,
-          500,
-          HTTP_PARAMETER_INVALID
+          500
         );
       }
     }
@@ -620,9 +654,11 @@ public final class IdUserPasswordResetService
           if (userOpt.isEmpty()) {
             throw new IdCommandExecutionFailure(
               this.service.strings.format("userNonexistent"),
+              USER_NONEXISTENT,
+              Map.of(),
+              Optional.empty(),
               this.requestId,
-              400,
-              USER_NONEXISTENT
+              400
             );
           }
 
@@ -700,9 +736,11 @@ public final class IdUserPasswordResetService
         throw new IdCommandExecutionFailure(
           e.getMessage(),
           e,
+          IO_ERROR,
+          Map.of(),
+          Optional.empty(),
           this.requestId,
-          500,
-          IO_ERROR
+          500
         );
       }
 
@@ -732,9 +770,11 @@ public final class IdUserPasswordResetService
         throw new IdCommandExecutionFailure(
           e.getMessage(),
           e,
+          MAIL_SYSTEM_FAILURE,
+          Map.of(),
+          Optional.empty(),
           this.requestId,
-          500,
-          MAIL_SYSTEM_FAILURE
+          500
         );
       }
     }
@@ -755,9 +795,11 @@ public final class IdUserPasswordResetService
           if (userOpt.isEmpty()) {
             throw new IdCommandExecutionFailure(
               this.service.strings.format("userNonexistent"),
+              USER_NONEXISTENT,
+              Map.of(),
+              Optional.empty(),
               this.requestId,
-              400,
-              USER_NONEXISTENT
+              400
             );
           }
 

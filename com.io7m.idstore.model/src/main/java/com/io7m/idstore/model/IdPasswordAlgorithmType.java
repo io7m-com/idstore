@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -19,7 +19,9 @@ package com.io7m.idstore.model;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
 
@@ -89,7 +91,13 @@ public sealed interface IdPasswordAlgorithmType
       rng.nextBytes(salt);
       return this.createHashed(passwordText, salt);
     } catch (final NoSuchAlgorithmException e) {
-      throw new IdPasswordException(PASSWORD_ERROR, e.getMessage(), e);
+      throw new IdPasswordException(
+        e.getMessage(),
+        e,
+        PASSWORD_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 

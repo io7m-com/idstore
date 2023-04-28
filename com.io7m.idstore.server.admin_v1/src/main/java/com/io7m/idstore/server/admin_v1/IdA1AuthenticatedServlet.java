@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -30,6 +30,7 @@ import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
+import com.io7m.seltzer.api.SStructuredError;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
@@ -40,7 +41,6 @@ import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
-import static org.eclipse.jetty.http.HttpStatus.INTERNAL_SERVER_ERROR_500;
 
 /**
  * A servlet that checks that an admin is authenticated before delegating
@@ -131,7 +131,10 @@ public abstract class IdA1AuthenticatedServlet
         if (adminSessionOpt.isPresent()) {
           this.adminSession = adminSessionOpt.get();
           this.admin = this.adminGet(this.adminSession.adminId());
-          this.serviceAuthenticated(request, servletResponse, this.adminSession);
+          this.serviceAuthenticated(
+            request,
+            servletResponse,
+            this.adminSession);
           return;
         }
       }
@@ -141,24 +144,24 @@ public abstract class IdA1AuthenticatedServlet
         servletResponse,
         IdRequestUniqueIDs.requestIdFor(request),
         HttpStatus.UNAUTHORIZED_401,
-        AUTHENTICATION_ERROR,
-        this.strings.format("unauthorized")
+        SStructuredError.withMessageOnly(
+          AUTHENTICATION_ERROR,
+          this.strings.format("unauthorized")
+        )
       );
     } catch (final IdHTTPErrorStatusException e) {
       this.sends.sendError(
         servletResponse,
         IdRequestUniqueIDs.requestIdFor(request),
-        e.statusCode(),
-        e.errorCode(),
-        e.getMessage()
+        e.httpStatusCode(),
+        e
       );
     } catch (final IdPasswordException | IdDatabaseException e) {
       this.sends.sendError(
         servletResponse,
         IdRequestUniqueIDs.requestIdFor(request),
-        INTERNAL_SERVER_ERROR_500,
-        e.errorCode(),
-        e.getMessage()
+        500,
+        e
       );
     } catch (final Exception e) {
       throw new IOException(e);

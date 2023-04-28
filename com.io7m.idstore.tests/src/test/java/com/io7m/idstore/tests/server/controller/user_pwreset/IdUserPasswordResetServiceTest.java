@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -62,6 +62,7 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -76,6 +77,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_N
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -635,7 +637,7 @@ public final class IdUserPasswordResetServiceTest
     Mockito.when(this.rateLimit.isAllowedByRateLimit("127.0.0.1"))
       .thenReturn(Boolean.TRUE);
     Mockito.when(users.userGetForName(new IdName("person")))
-      .thenThrow(new IdDatabaseException("Ouch", SQL_ERROR));
+      .thenThrow(new IdDatabaseException("Ouch", SQL_ERROR, Map.of(), empty()));
 
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
@@ -825,7 +827,7 @@ public final class IdUserPasswordResetServiceTest
     Mockito.when(transaction.queries(IdDatabaseUsersQueriesType.class))
       .thenReturn(users);
     Mockito.when(users.userPasswordResetGetForToken(Mockito.any()))
-      .thenThrow(new IdDatabaseException("Ouch", SQL_ERROR));
+      .thenThrow(new IdDatabaseException("Ouch", SQL_ERROR, Map.of(), empty()));
 
     final var token =
       IdToken.generate();
@@ -870,7 +872,7 @@ public final class IdUserPasswordResetServiceTest
     Mockito.when(transaction.queries(IdDatabaseUsersQueriesType.class))
       .thenReturn(users);
     Mockito.when(users.userPasswordResetGetForToken(Mockito.any()))
-      .thenThrow(new IdDatabaseException("Ouch", SQL_ERROR));
+      .thenThrow(new IdDatabaseException("Ouch", SQL_ERROR, Map.of(), empty()));
 
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
@@ -912,7 +914,7 @@ public final class IdUserPasswordResetServiceTest
     Mockito.when(transaction.queries(IdDatabaseUsersQueriesType.class))
       .thenReturn(users);
     Mockito.when(users.userPasswordResetGetForToken(Mockito.any()))
-      .thenThrow(new IdDatabaseException("Ouch", SQL_ERROR));
+      .thenThrow(new IdDatabaseException("Ouch", SQL_ERROR, Map.of(), empty()));
 
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
@@ -1320,7 +1322,7 @@ public final class IdUserPasswordResetServiceTest
       IdToken.generate();
 
     Mockito.when(users.userPasswordResetGetForToken(token))
-      .thenThrow(new IdDatabaseException("Ouch", SQL_ERROR));
+      .thenThrow(new IdDatabaseException("Ouch", SQL_ERROR, Map.of(), empty()));
 
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -27,11 +27,12 @@ import com.io7m.idstore.model.IdEmailVerificationResolution;
 import com.io7m.idstore.model.IdToken;
 import org.jooq.exception.DataAccessException;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
-import static com.io7m.idstore.database.postgres.internal.IdDatabaseUsersQueries.USER_DOES_NOT_EXIST;
+import static com.io7m.idstore.database.postgres.internal.IdDatabaseUsersQueries.userDoesNotExist;
 import static com.io7m.idstore.database.postgres.internal.Tables.AUDIT;
 import static com.io7m.idstore.database.postgres.internal.Tables.EMAILS;
 import static com.io7m.idstore.database.postgres.internal.Tables.EMAIL_VERIFICATIONS;
@@ -61,6 +62,11 @@ final class IdDatabaseEmailsQueries
       transaction.createContext();
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseEmailsQueries.emailExists");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Email", email.value())
+      );
 
     try {
       final var emailRecordOpt =
@@ -92,7 +98,7 @@ final class IdDatabaseEmailsQueries
       );
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -112,11 +118,18 @@ final class IdDatabaseEmailsQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseEmailsQueries.emailVerificationCreate");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("User ID", verification.user().toString()),
+        Map.entry("Email", verification.email().value()),
+        Map.entry("Expires", verification.expires().toString())
+      );
+
     try {
       context.selectFrom(USER_IDS)
         .where(USER_IDS.ID.eq(verification.user()))
         .fetchOptional()
-        .orElseThrow(USER_DOES_NOT_EXIST);
+        .orElseThrow(() -> userDoesNotExist(attributes));
 
       {
         final var existing =
@@ -126,7 +139,9 @@ final class IdDatabaseEmailsQueries
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "Email verification token already exists.",
-            EMAIL_VERIFICATION_DUPLICATE
+            EMAIL_VERIFICATION_DUPLICATE,
+            Map.of("Token", verification.token().value()),
+            Optional.of("Use a different token.")
           );
         }
       }
@@ -149,7 +164,7 @@ final class IdDatabaseEmailsQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -169,6 +184,11 @@ final class IdDatabaseEmailsQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseEmailsQueries.emailVerificationGet");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Token", token.value())
+      );
+
     try {
       return context.selectFrom(EMAIL_VERIFICATIONS)
         .where(EMAIL_VERIFICATIONS.TOKEN.eq(token.value()))
@@ -176,7 +196,7 @@ final class IdDatabaseEmailsQueries
         .map(IdDatabaseEmailsQueries::mapVerification);
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }
@@ -212,6 +232,12 @@ final class IdDatabaseEmailsQueries
     final var querySpan =
       transaction.createQuerySpan("IdDatabaseEmailsQueries.emailVerificationDelete");
 
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Token", token.value()),
+        Map.entry("Resolution", resolution.name())
+      );
+
     try {
       context.deleteFrom(EMAIL_VERIFICATIONS)
         .where(EMAIL_VERIFICATIONS.TOKEN.eq(token.value()))
@@ -226,7 +252,7 @@ final class IdDatabaseEmailsQueries
 
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
-      throw handleDatabaseException(transaction, e);
+      throw handleDatabaseException(transaction, e, attributes);
     } finally {
       querySpan.end();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,7 +20,8 @@ package com.io7m.idstore.server.api;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdException;
 
-import java.util.Objects;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * The type of exceptions raised by the server.
@@ -29,49 +30,40 @@ import java.util.Objects;
 public final class IdServerException extends IdException
 {
   /**
-   * Create an exception.
+   * Construct an exception.
    *
-   * @param inErrorCode The error code
-   * @param message     The message
+   * @param message             The message
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
    */
 
   public IdServerException(
-    final IdErrorCode inErrorCode,
-    final String message)
-  {
-    super(inErrorCode, Objects.requireNonNull(message, "message"));
-  }
-
-  /**
-   * Create an exception.
-   *
-   * @param inErrorCode The error code
-   * @param message     The message
-   * @param cause       The cause
-   */
-
-  public IdServerException(
-    final IdErrorCode inErrorCode,
     final String message,
-    final Throwable cause)
+    final IdErrorCode inErrorCode,
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction)
   {
-    super(
-      inErrorCode,
-      Objects.requireNonNull(message, "message"),
-      Objects.requireNonNull(cause, "cause"));
+    super(message, inErrorCode, inAttributes, inRemediatingAction);
   }
 
   /**
-   * Create an exception.
+   * Construct an exception.
    *
-   * @param inErrorCode The error code
-   * @param cause       The cause
+   * @param message             The message
+   * @param cause               The cause
+   * @param inErrorCode         The error code
+   * @param inAttributes        The error attributes
+   * @param inRemediatingAction The remediating action, if any
    */
 
   public IdServerException(
+    final String message,
+    final Throwable cause,
     final IdErrorCode inErrorCode,
-    final Throwable cause)
+    final Map<String, String> inAttributes,
+    final Optional<String> inRemediatingAction)
   {
-    super(inErrorCode, Objects.requireNonNull(cause, "cause"));
+    super(message, cause, inErrorCode, inAttributes, inRemediatingAction);
   }
 }

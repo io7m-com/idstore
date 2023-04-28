@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,8 +24,8 @@ import java.util.Objects;
 /**
  * A request to log in.
  *
- * @param userName       The username
- * @param password       The password
+ * @param userName The username
+ * @param password The password
  * @param metadata Extra metadata included with the request
  */
 
@@ -38,8 +38,8 @@ public record IdUCommandLogin(
   /**
    * A request to log in.
    *
-   * @param userName       The username
-   * @param password       The password
+   * @param userName The username
+   * @param password The password
    * @param metadata Extra metadata included with the request
    */
 
@@ -48,5 +48,11 @@ public record IdUCommandLogin(
     Objects.requireNonNull(userName, "userName");
     Objects.requireNonNull(password, "password");
     Objects.requireNonNull(metadata, "metadata");
+  }
+
+  @Override
+  public Class<IdUResponseLogin> responseClass()
+  {
+    return IdUResponseLogin.class;
   }
 }

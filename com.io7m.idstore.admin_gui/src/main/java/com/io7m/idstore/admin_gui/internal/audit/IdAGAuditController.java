@@ -16,10 +16,10 @@
 
 package com.io7m.idstore.admin_gui.internal.audit;
 
+import com.io7m.hibiscus.api.HBState;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientService;
-import com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
@@ -44,7 +44,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import static com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus.DISCONNECTED;
 import static javafx.scene.control.SelectionMode.SINGLE;
 
 /**
@@ -145,9 +144,9 @@ public final class IdAGAuditController implements Initializable
   }
 
   private void onClientStatusChanged(
-    final IdAGClientStatus statusNew)
+    final HBState statusNew)
   {
-    if (statusNew == DISCONNECTED) {
+    if (statusNew == HBState.CLIENT_DISCONNECTED) {
       this.events.clear();
       this.eventTableControlsLock();
     }

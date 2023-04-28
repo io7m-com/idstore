@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -16,17 +16,18 @@
 
 package com.io7m.idstore.user_client;
 
+import com.io7m.idstore.user_client.api.IdUClientAsynchronousType;
+import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientFactoryType;
-import com.io7m.idstore.user_client.api.IdUClientType;
-import com.io7m.idstore.user_client.internal.IdUClient;
-import com.io7m.idstore.user_client.internal.IdUClientProtocolHandlerDisconnected;
+import com.io7m.idstore.user_client.api.IdUClientSynchronousType;
+import com.io7m.idstore.user_client.internal.IdUClientAsynchronous;
+import com.io7m.idstore.user_client.internal.IdUClientSynchronous;
 import com.io7m.idstore.user_client.internal.IdUStrings;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.CookieManager;
 import java.net.http.HttpClient;
-import java.util.Locale;
 
 /**
  * The default client factory.
@@ -44,10 +45,13 @@ public final class IdUClients implements IdUClientFactoryType
   }
 
   @Override
-  public IdUClientType create(final Locale locale)
+  public IdUClientAsynchronousType openAsynchronousClient(
+    final IdUClientConfiguration configuration)
   {
     final var cookieJar =
       new CookieManager();
+    final var locale =
+      configuration.locale();
 
     final IdUStrings strings;
     try {
@@ -61,11 +65,30 @@ public final class IdUClients implements IdUClientFactoryType
         .cookieHandler(cookieJar)
         .build();
 
-    return new IdUClient(
-      locale,
-      strings,
-      httpClient,
-      new IdUClientProtocolHandlerDisconnected(locale, strings, httpClient)
-    );
+    return new IdUClientAsynchronous(configuration, strings, httpClient);
+  }
+
+  @Override
+  public IdUClientSynchronousType openSynchronousClient(
+    final IdUClientConfiguration configuration)
+  {
+    final var cookieJar =
+      new CookieManager();
+    final var locale =
+      configuration.locale();
+
+    final IdUStrings strings;
+    try {
+      strings = new IdUStrings(locale);
+    } catch (final IOException e) {
+      throw new UncheckedIOException(e);
+    }
+
+    final var httpClient =
+      HttpClient.newBuilder()
+        .cookieHandler(cookieJar)
+        .build();
+
+    return new IdUClientSynchronous(configuration, strings, httpClient);
   }
 }

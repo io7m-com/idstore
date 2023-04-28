@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -23,7 +23,8 @@ module com.io7m.idstore.user_client.api
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires transitive com.io7m.idstore.model;
+  requires transitive com.io7m.hibiscus.api;
+  requires transitive com.io7m.idstore.protocol.user;
 
   exports com.io7m.idstore.user_client.api;
 }

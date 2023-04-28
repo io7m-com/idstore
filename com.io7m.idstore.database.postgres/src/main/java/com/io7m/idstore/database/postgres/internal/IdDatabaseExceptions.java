@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -20,15 +20,20 @@ package com.io7m.idstore.database.postgres.internal;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import org.jooq.exception.DataAccessException;
-import org.postgresql.util.PSQLState;
+import org.postgresql.util.PSQLException;
+import org.postgresql.util.ServerErrorMessage;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIRED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.OPERATION_NOT_PERMITTED;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_FOREIGN_KEY;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID_NAME;
 
 /**
  * Functions to handle database exceptions.
@@ -46,49 +51,175 @@ public final class IdDatabaseExceptions
    *
    * @param transaction The transaction
    * @param e           The exception
+   * @param attributes  The extra exception attributes
    *
    * @return The resulting exception
    */
 
   public static IdDatabaseException handleDatabaseException(
     final IdDatabaseTransactionType transaction,
-    final DataAccessException e)
+    final DataAccessException e,
+    final Map<String, String> attributes)
   {
     final var m = e.getMessage();
 
-    final IdDatabaseException result = switch (e.sqlState()) {
-      case "42501" -> {
-        yield new IdDatabaseException(m, e, OPERATION_NOT_PERMITTED);
-      }
+    IdDatabaseException result =
+      new IdDatabaseException(
+        m,
+        e,
+        SQL_ERROR,
+        attributes,
+        Optional.empty()
+      );
 
-      case "ID001" -> {
-        yield new IdDatabaseException(m, e, EMAIL_ONE_REQUIRED);
-      }
+    if (e.getCause() instanceof final PSQLException psqlException) {
+      final var serverError =
+        Objects.requireNonNullElse(
+          psqlException.getServerErrorMessage(),
+          new ServerErrorMessage("")
+        );
 
-      default -> {
-        PSQLState actual = null;
-        for (final var possible : PSQLState.values()) {
-          if (Objects.equals(possible.getState(), e.sqlState())) {
-            actual = possible;
-            break;
-          }
-        }
+      /*
+       * See https://www.postgresql.org/docs/current/errcodes-appendix.html
+       * for all of these numeric codes.
+       */
 
-        if (actual != null) {
-          yield switch (actual) {
-            case FOREIGN_KEY_VIOLATION -> {
-              yield new IdDatabaseException(m, e, SQL_ERROR_FOREIGN_KEY);
+      result = switch (psqlException.getSQLState()) {
+
+        /*
+         * foreign_key_violation
+         */
+
+        case "23503" -> {
+          final var constraint =
+            Objects.requireNonNullElse(serverError.getConstraint(), "");
+
+          yield switch (constraint) {
+            case "emails_user_id_fkey", "emails_admin_id_fkey" -> {
+              yield new IdDatabaseException(
+                "Email already exists",
+                EMAIL_DUPLICATE,
+                attributes,
+                Optional.empty()
+              );
             }
-            case UNIQUE_VIOLATION -> {
-              yield new IdDatabaseException(m, e, SQL_ERROR_UNIQUE);
+
+            default -> {
+              yield new IdDatabaseException(
+                m,
+                e,
+                SQL_ERROR,
+                attributes,
+                Optional.empty()
+              );
             }
-            default -> new IdDatabaseException(m, e, SQL_ERROR);
           };
         }
 
-        yield new IdDatabaseException(m, e, SQL_ERROR);
-      }
-    };
+        /*
+         * unique_violation
+         */
+
+        case "23505" -> {
+          final var constraint =
+            Objects.requireNonNullElse(serverError.getConstraint(), "");
+
+          yield switch (constraint) {
+            case "users_id_name_key" -> {
+              yield new IdDatabaseException(
+                "User ID name already exists",
+                USER_DUPLICATE_ID_NAME,
+                attributes,
+                Optional.empty()
+              );
+            }
+
+            case "user_ids_pkey" -> {
+              yield new IdDatabaseException(
+                "User ID already exists",
+                USER_DUPLICATE_ID,
+                attributes,
+                Optional.empty()
+              );
+            }
+
+            case "emails_unique_lower_email_idx" -> {
+              yield new IdDatabaseException(
+                "Email already exists",
+                EMAIL_DUPLICATE,
+                attributes,
+                Optional.empty()
+              );
+            }
+
+            default -> {
+              yield new IdDatabaseException(
+                m,
+                e,
+                SQL_ERROR,
+                attributes,
+                Optional.empty()
+              );
+            }
+          };
+        }
+
+        case "22021" -> {
+
+          /*
+           * PostgreSQL: character_not_in_repertoire
+           */
+
+          yield new IdDatabaseException(
+            Objects.requireNonNullElse(
+              serverError.getMessage(),
+              e.getMessage()),
+            e,
+            PROTOCOL_ERROR,
+            attributes,
+            Optional.empty()
+          );
+        }
+
+        /*
+         * insufficient_privilege
+         */
+
+        case "42501" -> {
+          yield new IdDatabaseException(
+            m,
+            e,
+            OPERATION_NOT_PERMITTED,
+            attributes,
+            Optional.empty()
+          );
+        }
+
+        /*
+         * Custom state code defined in a trigger.
+         */
+
+        case "ID001" -> {
+          yield new IdDatabaseException(
+            m,
+            e,
+            EMAIL_ONE_REQUIRED,
+            attributes,
+            Optional.empty()
+          );
+        }
+
+        default -> {
+          yield new IdDatabaseException(
+            m,
+            e,
+            SQL_ERROR,
+            attributes,
+            Optional.empty()
+          );
+        }
+      };
+    }
 
     try {
       transaction.rollback();

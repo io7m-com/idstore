@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -42,6 +42,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -53,6 +54,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.TRASCO_ERROR;
 import static com.io7m.trasco.api.TrExecutorUpgrade.FAIL_INSTEAD_OF_UPGRADING;
 import static com.io7m.trasco.api.TrExecutorUpgrade.PERFORM_UPGRADES;
 import static java.math.BigInteger.valueOf;
+import static java.util.Objects.requireNonNullElse;
 
 /**
  * The default postgres server database implementation.
@@ -189,13 +191,37 @@ public final class IdDatabases implements IdDatabaseFactoryType
         dataSource
       );
     } catch (final IOException e) {
-      throw new IdDatabaseException(e.getMessage(), e, IO_ERROR);
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        IO_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     } catch (final TrException e) {
-      throw new IdDatabaseException(e.getMessage(), e, TRASCO_ERROR);
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        TRASCO_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     } catch (final ParseException e) {
-      throw new IdDatabaseException(e.getMessage(), e, SQL_REVISION_ERROR);
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        SQL_REVISION_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     } catch (final SQLException e) {
-      throw new IdDatabaseException(e.getMessage(), e, SQL_ERROR);
+      throw new IdDatabaseException(
+        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        e,
+        SQL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 

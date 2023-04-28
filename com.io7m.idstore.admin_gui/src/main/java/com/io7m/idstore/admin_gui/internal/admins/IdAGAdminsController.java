@@ -16,11 +16,11 @@
 
 package com.io7m.idstore.admin_gui.internal.admins;
 
+import com.io7m.hibiscus.api.HBState;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGCSS;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientService;
-import com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus;
 import com.io7m.idstore.admin_gui.internal.main.IdAGMainScreenController;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminCreate;
@@ -58,7 +58,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import static com.io7m.idstore.admin_gui.internal.client.IdAGClientStatus.DISCONNECTED;
 import static javafx.scene.control.SelectionMode.SINGLE;
 
 /**
@@ -127,9 +126,9 @@ public final class IdAGAdminsController implements Initializable
   }
 
   private void onClientStatusChanged(
-    final IdAGClientStatus statusNew)
+    final HBState statusNew)
   {
-    if (statusNew == DISCONNECTED) {
+    if (statusNew == HBState.CLIENT_DISCONNECTED) {
       this.admins.clear();
       this.admin = null;
       this.adminDetailsLock();

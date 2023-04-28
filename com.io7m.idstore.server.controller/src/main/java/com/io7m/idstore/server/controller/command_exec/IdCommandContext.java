@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -37,13 +37,13 @@ import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.trace.Tracer;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_PARAMETER_INVALID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.MAIL_SYSTEM_FAILURE;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 
 /**
@@ -181,53 +181,6 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
   }
 
   /**
-   * Produce an exception indicating an error, with a formatted error message.
-   *
-   * @param statusCode The HTTP status code
-   * @param errorCode  The error code
-   * @param messageId  The string resource message ID
-   * @param args       The string resource format arguments
-   *
-   * @return An execution failure
-   */
-
-  public final IdCommandExecutionFailure failFormatted(
-    final int statusCode,
-    final IdErrorCode errorCode,
-    final String messageId,
-    final Object... args)
-  {
-    return this.fail(
-      statusCode,
-      errorCode,
-      this.strings.format(messageId, args)
-    );
-  }
-
-  /**
-   * Produce an exception indicating an error, with a string constant message.
-   *
-   * @param statusCode The HTTP status code
-   * @param errorCode  The error code
-   * @param message    The string message
-   *
-   * @return An execution failure
-   */
-
-  public final IdCommandExecutionFailure fail(
-    final int statusCode,
-    final IdErrorCode errorCode,
-    final String message)
-  {
-    return new IdCommandExecutionFailure(
-      message,
-      this.requestId,
-      statusCode,
-      errorCode
-    );
-  }
-
-  /**
    * Produce an exception indicating a database error.
    *
    * @param e The database exception
@@ -241,9 +194,11 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
     return new IdCommandExecutionFailure(
       e.getMessage(),
       e,
+      e.errorCode(),
+      e.attributes(),
+      e.remediatingAction(),
       this.requestId,
-      500,
-      e.errorCode()
+      500
     );
   }
 
@@ -255,15 +210,17 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    * @return An execution failure
    */
 
-  public IdCommandExecutionFailure failSecurity(
+  public final IdCommandExecutionFailure failSecurity(
     final IdSecurityException e)
   {
     return new IdCommandExecutionFailure(
       e.getMessage(),
       e,
+      e.errorCode(),
+      e.attributes(),
+      e.remediatingAction(),
       this.requestId,
-      500,
-      SECURITY_POLICY_DENIED
+      500
     );
   }
 
@@ -287,9 +244,11 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
         e.getMessage()
       ),
       e,
+      MAIL_SYSTEM_FAILURE,
+      Map.of(),
+      Optional.empty(),
       this.requestId,
-      500,
-      MAIL_SYSTEM_FAILURE
+      500
     );
   }
 
@@ -301,15 +260,17 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    * @return An execution failure
    */
 
-  public IdCommandExecutionFailure failValidity(
+  public final IdCommandExecutionFailure failValidity(
     final IdValidityException e)
   {
     return new IdCommandExecutionFailure(
       e.getMessage(),
       e,
+      HTTP_PARAMETER_INVALID,
+      Map.of(),
+      Optional.empty(),
       this.requestId,
-      400,
-      HTTP_PARAMETER_INVALID
+      400
     );
   }
 
@@ -321,15 +282,17 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    * @return An execution failure
    */
 
-  public IdCommandExecutionFailure failPassword(
+  public final IdCommandExecutionFailure failPassword(
     final IdPasswordException e)
   {
     return new IdCommandExecutionFailure(
       e.getMessage(),
       e,
+      e.errorCode(),
+      e.attributes(),
+      e.remediatingAction(),
       this.requestId,
-      400,
-      PASSWORD_ERROR
+      400
     );
   }
 
@@ -341,15 +304,17 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    * @return An execution failure
    */
 
-  public IdCommandExecutionFailure failProtocol(
+  public final IdCommandExecutionFailure failProtocol(
     final IdProtocolException e)
   {
     return new IdCommandExecutionFailure(
       e.getMessage(),
       e,
+      e.errorCode(),
+      e.attributes(),
+      e.remediatingAction(),
       this.requestId,
-      400,
-      PROTOCOL_ERROR
+      400
     );
   }
 
@@ -358,20 +323,72 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    *
    * @param action The action
    *
-   * @throws IdSecurityException       On errors
-   * @throws IdCommandExecutionFailure On errors
+   * @throws IdSecurityException On errors
    */
 
-  public void securityCheck(
+  public final void securityCheck(
     final IdSecActionType action)
-    throws IdSecurityException, IdCommandExecutionFailure
+    throws IdSecurityException
   {
-    if (IdSecurity.check(action) instanceof IdSecPolicyResultDenied denied) {
-      throw this.fail(
-        403,
+    if (IdSecurity.check(action) instanceof final IdSecPolicyResultDenied denied) {
+      throw new IdSecurityException(
+        denied.message(),
         SECURITY_POLICY_DENIED,
-        denied.message()
+        Map.of(),
+        Optional.empty()
       );
     }
+  }
+
+  /**
+   * Fail with a constant error message.
+   *
+   * @param statusCode The status code
+   * @param errorCode  The error code
+   * @param text       The message
+   *
+   * @return An exception
+   */
+
+  public final IdCommandExecutionFailure fail(
+    final int statusCode,
+    final IdErrorCode errorCode,
+    final String text)
+  {
+    return new IdCommandExecutionFailure(
+      text,
+      errorCode,
+      Map.of(),
+      Optional.empty(),
+      this.requestId,
+      statusCode
+    );
+  }
+
+  /**
+   * Fail with a constant error message.
+   *
+   * @param statusCode The status code
+   * @param errorCode  The error code
+   * @param text       The message
+   * @param args       The format arguments
+   *
+   * @return An exception
+   */
+
+  public final IdCommandExecutionFailure failFormatted(
+    final int statusCode,
+    final IdErrorCode errorCode,
+    final String text,
+    final Object... args)
+  {
+    return new IdCommandExecutionFailure(
+      this.strings.format(text, args),
+      errorCode,
+      Map.of(),
+      Optional.empty(),
+      this.requestId,
+      statusCode
+    );
   }
 }

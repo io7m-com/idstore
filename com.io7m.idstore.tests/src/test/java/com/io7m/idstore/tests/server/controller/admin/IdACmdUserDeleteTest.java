@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -25,9 +25,12 @@ import com.io7m.idstore.server.controller.admin.IdACmdUserDelete;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static com.io7m.idstore.model.IdAdminPermission.USER_DELETE;
+import static java.util.Optional.empty;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -91,7 +94,7 @@ public final class IdACmdUserDeleteTest
       mock(IdDatabaseUsersQueriesType.class);
 
     final var adminId = randomUUID();
-    doThrow(new IdDatabaseException("", USER_NONEXISTENT))
+    doThrow(new IdDatabaseException("", USER_NONEXISTENT, Map.of(), empty()))
       .when(users)
       .userDelete(adminId);
 
