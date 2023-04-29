@@ -391,4 +391,13 @@ public final class IdAHandler1 extends IdAHandlerAbstract
   {
 
   }
+
+  @Override
+  public String toString()
+  {
+    return String.format(
+      "[IdAHandler1 0x%08x]",
+      Integer.valueOf(this.hashCode())
+    );
+  }
 }

@@ -394,4 +394,13 @@ public final class IdUHandler1 extends IdUHandlerAbstract
   {
 
   }
+
+  @Override
+  public String toString()
+  {
+    return String.format(
+      "[IdUHandler1 0x%08x]",
+      Integer.valueOf(this.hashCode())
+    );
+  }
 }

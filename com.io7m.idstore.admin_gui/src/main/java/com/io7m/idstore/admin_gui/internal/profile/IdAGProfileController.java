@@ -143,7 +143,8 @@ public final class IdAGProfileController
       }
 
       case CLIENT_CONNECTED -> {
-        this.onAdminReceived(this.client.self());
+        this.client.adminSelf()
+          .thenAcceptAsync(this::onAdminReceived);
       }
 
       case CLIENT_DISCONNECTED -> {

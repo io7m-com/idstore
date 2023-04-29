@@ -555,6 +555,21 @@ public final class IdAGClientService implements RPServiceType, AutoCloseable
   }
 
   /**
+   * Get the admin's own profile.
+   *
+   * @return A future representing the operation in progress
+   */
+
+  public CompletableFuture<IdAdmin> adminSelf()
+  {
+    return this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminSelf(),
+        IdAClientException::ofError)
+      .thenApply(IdAResponseAdminSelf.class::cast)
+      .thenApply(IdAResponseAdminSelf::admin);
+  }
+
+  /**
    * Add an email to the given admin.
    *
    * @param email The email
