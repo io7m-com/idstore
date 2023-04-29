@@ -20,7 +20,9 @@ package com.io7m.idstore.admin_gui.internal.errors;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGCSS;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.repetoir.core.RPServiceType;
+import com.io7m.seltzer.api.SStructuredErrorType;
 import com.io7m.taskrecorder.core.TRTask;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -63,10 +65,12 @@ public final class IdAGErrorDialogs implements RPServiceType
    * Open an error dialog assuming that the given task failed.
    *
    * @param task The failed task
+   * @param error The error
    */
 
   public void open(
-    final TRTask<?> task)
+    final TRTask<?> task,
+    final SStructuredErrorType<IdErrorCode> error)
   {
     try {
       final var stage = new Stage();
@@ -85,7 +89,9 @@ public final class IdAGErrorDialogs implements RPServiceType
           this.configuration,
           this.strings,
           task,
-          stage);
+          error,
+          stage
+        );
       });
 
       final Pane pane = loader.load();

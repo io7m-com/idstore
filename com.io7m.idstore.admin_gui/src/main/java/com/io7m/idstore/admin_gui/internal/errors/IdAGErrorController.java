@@ -19,17 +19,25 @@ package com.io7m.idstore.admin_gui.internal.errors;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.main.IdAGScreenControllerType;
+import com.io7m.idstore.error_codes.IdErrorCode;
+import com.io7m.seltzer.api.SStructuredErrorType;
 import com.io7m.taskrecorder.core.TRStep;
 import com.io7m.taskrecorder.core.TRTask;
 import com.io7m.taskrecorder.core.TRTaskItemType;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -41,14 +49,19 @@ public final class IdAGErrorController
   implements IdAGScreenControllerType
 {
   private final TRTask<?> task;
+  private final SStructuredErrorType<IdErrorCode> error;
   private final Stage stage;
   private final IdAGConfiguration configuration;
   private final IdAGStrings strings;
 
+  @FXML private TableColumn<Map.Entry<String, String>, String> errorNameColumn;
+  @FXML private TableColumn<Map.Entry<String, String>, String> errorValueColumn;
+  @FXML private VBox errorContainer;
   @FXML private ImageView errorIcon;
   @FXML private Label errorTaskTitle;
   @FXML private Label errorTaskMessage;
   @FXML private TreeView<TRTaskItemType> errorDetails;
+  @FXML private TableView<Map.Entry<String, String>> errorAttributes;
 
   /**
    * A controller for the error screen.
@@ -56,6 +69,7 @@ public final class IdAGErrorController
    * @param inStrings       The strings
    * @param inConfiguration The application configuration
    * @param inTask          The failed task
+   * @param inError         The error
    * @param inStage         The containing window
    */
 
@@ -63,6 +77,7 @@ public final class IdAGErrorController
     final IdAGConfiguration inConfiguration,
     final IdAGStrings inStrings,
     final TRTask<?> inTask,
+    final SStructuredErrorType<IdErrorCode> inError,
     final Stage inStage)
   {
     this.configuration =
@@ -71,6 +86,8 @@ public final class IdAGErrorController
       Objects.requireNonNull(inStrings, "strings");
     this.task =
       Objects.requireNonNull(inTask, "task");
+    this.error =
+      Objects.requireNonNull(inError, "error");
     this.stage =
       Objects.requireNonNull(inStage, "stage");
   }
@@ -98,8 +115,27 @@ public final class IdAGErrorController
     final URL location,
     final ResourceBundle resources)
   {
+    this.errorNameColumn.setCellValueFactory(
+      param -> new ReadOnlyObjectWrapper<>(param.getValue().getKey()));
+    this.errorValueColumn.setCellValueFactory(
+      param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue()));
+
     this.errorTaskTitle.setText(this.task.description());
     this.errorTaskMessage.setText(firstLineOf(this.task.resolution().message()));
+
+    final var attributes = this.error.attributes();
+    if (attributes.isEmpty()) {
+      this.errorContainer.getChildren().remove(this.errorAttributes);
+    } else {
+      this.errorAttributes.setItems(
+        FXCollections.observableList(
+          attributes.entrySet()
+            .stream()
+            .sorted(Map.Entry.comparingByKey())
+            .toList()
+        )
+      );
+    }
 
     this.errorDetails.setCellFactory(param -> {
       return new IdAGErrorTreeCell(this.configuration, this.strings);

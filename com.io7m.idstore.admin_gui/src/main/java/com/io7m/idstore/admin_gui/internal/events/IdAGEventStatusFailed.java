@@ -16,28 +16,55 @@
 
 package com.io7m.idstore.admin_gui.internal.events;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.jaffirm.core.Preconditions;
+import com.io7m.seltzer.api.SStructuredErrorType;
 import com.io7m.taskrecorder.core.TRTask;
 import com.io7m.taskrecorder.core.TRTaskFailed;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * The event indicates that an operation failed.
  *
- * @param task The failed task
+ * @param task              The failed task
+ * @param errorCode         The error code
+ * @param attributes        The attributes
+ * @param exception         The exception
+ * @param remediatingAction The remediating action
+ * @param message           The error message
  */
 
-public record IdAGEventStatusFailed(TRTask<?> task)
-  implements IdAGEventStatusType
+public record IdAGEventStatusFailed(
+  TRTask<?> task,
+  IdErrorCode errorCode,
+  String message,
+  Map<String, String> attributes,
+  Optional<String> remediatingAction,
+  Optional<Throwable> exception)
+  implements IdAGEventStatusType, SStructuredErrorType<IdErrorCode>
 {
   /**
    * The event indicates that an operation failed.
+   *
+   * @param task              The failed task
+   * @param errorCode         The error code
+   * @param attributes        The attributes
+   * @param exception         The exception
+   * @param remediatingAction The remediating action
+   * @param message           The error message
    */
 
   public IdAGEventStatusFailed
   {
     Objects.requireNonNull(task, "task");
+    Objects.requireNonNull(errorCode, "errorCode");
+    Objects.requireNonNull(message, "message");
+    Objects.requireNonNull(attributes, "attributes");
+    Objects.requireNonNull(remediatingAction, "remediatingAction");
+    Objects.requireNonNull(exception, "exception");
 
     Preconditions.checkPreconditionV(
       task.resolution() instanceof TRTaskFailed,

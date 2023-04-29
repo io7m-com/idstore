@@ -20,10 +20,18 @@ import com.io7m.hibiscus.api.HBState;
 import com.io7m.idstore.admin_client.api.IdAClientAsynchronousType;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
 import com.io7m.idstore.admin_client.api.IdAClientCredentials;
+import com.io7m.idstore.admin_client.api.IdAClientEventCommandFailed;
+import com.io7m.idstore.admin_client.api.IdAClientEventCommandSucceeded;
+import com.io7m.idstore.admin_client.api.IdAClientEventLoginFailed;
+import com.io7m.idstore.admin_client.api.IdAClientEventLoginSucceeded;
+import com.io7m.idstore.admin_client.api.IdAClientEventType;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientFactoryType;
 import com.io7m.idstore.admin_gui.internal.IdAGPerpetualSubscriber;
 import com.io7m.idstore.admin_gui.internal.events.IdAGEventBus;
+import com.io7m.idstore.admin_gui.internal.events.IdAGEventStatusCompleted;
+import com.io7m.idstore.admin_gui.internal.events.IdAGEventStatusFailed;
+import com.io7m.idstore.admin_gui.internal.events.IdAGEventType;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminColumn;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
@@ -109,6 +117,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
 import com.io7m.repetoir.core.RPServiceType;
+import com.io7m.taskrecorder.core.TRTaskRecorder;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.slf4j.Logger;
@@ -142,9 +151,9 @@ public final class IdAGClientService implements RPServiceType, AutoCloseable
 
   private final IdAGEventBus eventBus;
   private final SimpleObjectProperty<HBState> status;
+  private final IdAClientAsynchronousType client;
   private URI serverLatest;
   private IdAdmin self;
-  private final IdAClientAsynchronousType client;
 
   private IdAGClientService(
     final IdAGEventBus inEventBus,
@@ -188,7 +197,104 @@ public final class IdAGClientService implements RPServiceType, AutoCloseable
     client.state()
       .subscribe(new IdAGPerpetualSubscriber<>(service.status::set));
 
+    client.events()
+      .subscribe(new IdAGPerpetualSubscriber<>(e -> {
+        transformEvent(e).ifPresent(eventBus::submit);
+      }));
+
     return service;
+  }
+
+  private static Optional<IdAGEventType> transformEvent(
+    final IdAClientEventType e)
+  {
+    if (e instanceof final IdAClientEventCommandFailed cmd) {
+      return transformEventCommandFailed(cmd);
+    }
+    if (e instanceof final IdAClientEventLoginFailed login) {
+      return transformEventLoginFailed(login);
+    }
+    if (e instanceof final IdAClientEventCommandSucceeded cmd) {
+      return transformEventCommandSucceeded(cmd);
+    }
+    if (e instanceof final IdAClientEventLoginSucceeded login) {
+      return transformEventLoginSucceeded(login);
+    }
+    return Optional.empty();
+  }
+
+  private static Optional<IdAGEventType> transformEventLoginSucceeded(
+    final IdAClientEventLoginSucceeded login)
+  {
+    return Optional.of(
+      new IdAGClientEvent(
+        "Logged in successfully.",
+        new IdAGEventStatusCompleted()
+      )
+    );
+  }
+
+  private static Optional<IdAGEventType> transformEventCommandSucceeded(
+    final IdAClientEventCommandSucceeded cmd)
+  {
+    return Optional.of(
+      new IdAGClientEvent(
+        "Executed %s successfully.".formatted(cmd.command()),
+        new IdAGEventStatusCompleted()
+      )
+    );
+  }
+
+  private static Optional<IdAGEventType> transformEventLoginFailed(
+    final IdAClientEventLoginFailed login)
+  {
+    final var recorder =
+      TRTaskRecorder.create(LOG, "Logging in...");
+
+    final var error = login.error();
+    recorder.setStepFailed(error.message());
+    recorder.setTaskFailed(error.message());
+    final var task = recorder.toTask();
+
+    return Optional.of(
+      new IdAGClientEvent(
+        error.message(),
+        new IdAGEventStatusFailed(
+          task,
+          error.errorCode(),
+          error.message(),
+          error.attributes(),
+          error.remediatingAction(),
+          error.exception()
+        )
+      )
+    );
+  }
+
+  private static Optional<IdAGEventType> transformEventCommandFailed(
+    final IdAClientEventCommandFailed cmd)
+  {
+    final var recorder =
+      TRTaskRecorder.create(LOG, "Executing " + cmd.command());
+
+    final var error = cmd.error();
+    recorder.setStepFailed(error.message());
+    recorder.setTaskFailed(error.message());
+    final var task = recorder.toTask();
+
+    return Optional.of(
+      new IdAGClientEvent(
+        error.message(),
+        new IdAGEventStatusFailed(
+          task,
+          error.errorCode(),
+          error.message(),
+          error.attributes(),
+          error.remediatingAction(),
+          error.exception()
+        )
+      )
+    );
   }
 
   private static URI uriOf(

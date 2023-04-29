@@ -14,31 +14,34 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.admin_client.api;
+
+import com.io7m.idstore.protocol.admin.IdAResponseError;
+
+import java.util.Objects;
+
 /**
- * Identity server (Admin UI tool)
+ * Executing a command failed.
+ *
+ * @param command The command name
+ * @param error   The error
  */
 
-open module com.io7m.idstore.admin.gui
+public record IdAClientEventCommandFailed(
+  String command,
+  IdAResponseError error)
+  implements IdAClientEventType
 {
-  requires static org.osgi.annotation.bundle;
-  requires static org.osgi.annotation.versioning;
+  /**
+   * Executing a command failed.
+   *
+   * @param command The command name
+   * @param error   The error
+   */
 
-  requires com.io7m.idstore.admin_client.api;
-  requires com.io7m.idstore.admin_client;
-
-  requires javafx.controls;
-  requires javafx.fxml;
-  requires javafx.graphics;
-
-  requires com.io7m.jade.api;
-  requires com.io7m.jaffirm.core;
-  requires com.io7m.jproperties.core;
-  requires com.io7m.junreachable.core;
-  requires com.io7m.jxtrand.api;
-  requires com.io7m.repetoir.core;
-  requires com.io7m.seltzer.api;
-  requires com.io7m.taskrecorder.core;
-  requires org.slf4j;
-
-  exports com.io7m.idstore.admin_gui;
+  public IdAClientEventCommandFailed
+  {
+    Objects.requireNonNull(command, "command");
+    Objects.requireNonNull(error, "error");
+  }
 }

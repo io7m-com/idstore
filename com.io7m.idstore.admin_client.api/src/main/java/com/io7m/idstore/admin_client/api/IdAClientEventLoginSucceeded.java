@@ -14,8 +14,30 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.admin_client.api;
+
+import com.io7m.idstore.protocol.admin.IdAResponseLogin;
+
+import java.util.Objects;
+
 /**
- * Identity server (Admin UI tool [internals])
+ * Executing a login succeeded.
+ *
+ * @param response The response
  */
 
-package com.io7m.idstore.admin_gui.internal.permissions;
+public record IdAClientEventLoginSucceeded(
+  IdAResponseLogin response)
+  implements IdAClientEventType
+{
+  /**
+   * Executing a login succeeded.
+   *
+   * @param response The response
+   */
+
+  public IdAClientEventLoginSucceeded
+  {
+    Objects.requireNonNull(response, "response");
+  }
+}

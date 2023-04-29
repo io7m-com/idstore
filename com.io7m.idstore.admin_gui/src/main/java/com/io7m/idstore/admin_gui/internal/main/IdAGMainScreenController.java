@@ -289,7 +289,7 @@ public final class IdAGMainScreenController implements Initializable
   {
     final var status = event.status();
     if (status instanceof IdAGEventStatusFailed failed) {
-      this.errorDialogs.open(failed.task());
+      this.errorDialogs.open(failed.task(), failed);
     }
   }
 

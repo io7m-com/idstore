@@ -58,6 +58,12 @@
   -fx-background-color: #ffbbbb;
 }
 
+.errorTable
+{
+  -fx-font-size: 9pt;
+  -fx-font-family: "Monospaced";
+}
+
 .userTable
 {
   -fx-font-size: 9pt;

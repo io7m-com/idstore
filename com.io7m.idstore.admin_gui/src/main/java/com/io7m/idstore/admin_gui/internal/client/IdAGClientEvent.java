@@ -14,31 +14,35 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.admin_gui.internal.client;
+
+import com.io7m.idstore.admin_gui.internal.events.IdAGEventStatusType;
+import com.io7m.idstore.admin_gui.internal.events.IdAGEventType;
+
+import java.util.Objects;
+
 /**
- * Identity server (Admin UI tool)
+ * A client event.
+ *
+ * @param message The message
+ * @param status  The status
  */
 
-open module com.io7m.idstore.admin.gui
+public record IdAGClientEvent(
+  String message,
+  IdAGEventStatusType status)
+  implements IdAGEventType
 {
-  requires static org.osgi.annotation.bundle;
-  requires static org.osgi.annotation.versioning;
+  /**
+   * A client event.
+   *
+   * @param message The message
+   * @param status  The status
+   */
 
-  requires com.io7m.idstore.admin_client.api;
-  requires com.io7m.idstore.admin_client;
-
-  requires javafx.controls;
-  requires javafx.fxml;
-  requires javafx.graphics;
-
-  requires com.io7m.jade.api;
-  requires com.io7m.jaffirm.core;
-  requires com.io7m.jproperties.core;
-  requires com.io7m.junreachable.core;
-  requires com.io7m.jxtrand.api;
-  requires com.io7m.repetoir.core;
-  requires com.io7m.seltzer.api;
-  requires com.io7m.taskrecorder.core;
-  requires org.slf4j;
-
-  exports com.io7m.idstore.admin_gui;
+  public IdAGClientEvent
+  {
+    Objects.requireNonNull(message, "message");
+    Objects.requireNonNull(status, "status");
+  }
 }

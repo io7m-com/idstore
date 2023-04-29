@@ -22,8 +22,11 @@ import com.io7m.hibiscus.api.HBEventType;
  * The type of client events.
  */
 
-public interface IdAClientEventType
-  extends HBEventType
+public sealed interface IdAClientEventType
+  extends HBEventType permits IdAClientEventCommandFailed,
+  IdAClientEventCommandSucceeded,
+  IdAClientEventLoginFailed,
+  IdAClientEventLoginSucceeded
 {
 
 }
