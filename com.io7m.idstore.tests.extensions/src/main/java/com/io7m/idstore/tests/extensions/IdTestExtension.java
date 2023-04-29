@@ -136,7 +136,7 @@ public final class IdTestExtension
 
       context.getRoot()
         .getStore(GLOBAL)
-        .put("com.io7m.idstore.tests.extensions.IdTestServerExtension", this);
+        .put(IdTestExtension.class.getCanonicalName(), this);
 
       CONTAINER.start();
       CONTAINER.addEnv("PGPASSWORD", "12345678");
@@ -304,6 +304,25 @@ public final class IdTestExtension
 
     this.server = SERVERS.createServer(this.serverConfiguration);
     this.perTestResources.add(this.server);
+    this.server.start();
+  }
+
+  /**
+   * @return The server configuration
+   */
+
+  public IdServerConfiguration serverConfiguration()
+  {
+    return this.serverConfiguration;
+  }
+
+  /**
+   * @return The server
+   */
+
+  public IdServerType server()
+  {
+    return this.server;
   }
 
   @Override
@@ -325,7 +344,7 @@ public final class IdTestExtension
       parameterContext.getParameter().getType();
 
     return Objects.equals(requiredType, IdServerType.class)
-      || Objects.equals(requiredType, IdTestMailQueueType.class);
+           || Objects.equals(requiredType, IdTestMailQueueType.class);
   }
 
   @Override
