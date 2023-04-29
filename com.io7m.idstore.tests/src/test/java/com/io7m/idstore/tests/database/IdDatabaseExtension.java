@@ -70,6 +70,9 @@ public final class IdDatabaseExtension
   ExtensionContext.Store.CloseableResource,
   ParameterResolver
 {
+  public static final String POSTGRES_VERSION =
+    "15.2";
+
   private static final Logger LOG =
     LoggerFactory.getLogger(IdDatabaseExtension.class);
 
@@ -79,7 +82,7 @@ public final class IdDatabaseExtension
   private static final PostgreSQLContainer<?> CONTAINER =
     new PostgreSQLContainer<>(
       DockerImageName.parse("postgres")
-        .withTag("14.4"))
+        .withTag(POSTGRES_VERSION))
       .withDatabaseName("idstore")
       .withUsername("postgres")
       .withPassword("12345678");
@@ -139,7 +142,7 @@ public final class IdDatabaseExtension
         "-w",
         "-U",
         "postgres",
-        "eigion"
+        "idstore"
       );
     LOG.debug("stderr: {}", r0.getStderr());
 
@@ -149,7 +152,7 @@ public final class IdDatabaseExtension
         "-w",
         "-U",
         "postgres",
-        "eigion"
+        "idstore"
       );
 
     LOG.debug("stderr: {}", r0.getStderr());
@@ -159,9 +162,9 @@ public final class IdDatabaseExtension
       new IdDatabaseConfiguration(
         "postgres",
         "12345678",
-        CONTAINER.getContainerIpAddress(),
+        CONTAINER.getHost(),
         CONTAINER.getFirstMappedPort().intValue(),
-        "eigion",
+        "idstore",
         IdDatabaseCreate.CREATE_DATABASE,
         IdDatabaseUpgrade.UPGRADE_DATABASE,
         Clock.systemUTC()

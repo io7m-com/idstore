@@ -33,11 +33,12 @@ create role idstore_none with nosuperuser nocreatedb nocreaterole noinherit nolo
 
     <Statement><![CDATA[
 create table schema_version (
-  version_ban   char(1) not null default 'x',
-  version_number bigint  not null,
+  version_lock            char(1) not null default 'X',
+  version_application_id  text    not null,
+  version_number          bigint  not null,
 
-  constraint check_ban_primary primary key (version_ban),
-  constraint check_ban_baned check (version_ban = 'x')
+  constraint check_lock_primary primary key (version_lock),
+  constraint check_lock_locked check (version_lock = 'X')
 )
 ]]></Statement>
   </Schema>

@@ -65,6 +65,9 @@ public final class IdDatabases implements IdDatabaseFactoryType
   private static final Logger LOG =
     LoggerFactory.getLogger(IdDatabases.class);
 
+  private static final String DATABASE_APPLICATION_ID =
+    "com.io7m.idstore";
+
   /**
    * The default postgres server database implementation.
    *
@@ -82,14 +85,20 @@ public final class IdDatabases implements IdDatabaseFactoryType
   {
     final String statementText;
     if (Objects.equals(version, BigInteger.ZERO)) {
-      statementText = "insert into schema_version (version_number) values (?)";
+      statementText = "insert into schema_version (version_application_id, version_number) values (?, ?)";
+      try (var statement =
+             connection.prepareStatement(statementText)) {
+        statement.setString(1, DATABASE_APPLICATION_ID);
+        statement.setLong(2, version.longValueExact());
+        statement.execute();
+      }
     } else {
       statementText = "update schema_version set version_number = ?";
-    }
-
-    try (var statement = connection.prepareStatement(statementText)) {
-      statement.setLong(1, version.longValueExact());
-      statement.execute();
+      try (var statement =
+             connection.prepareStatement(statementText)) {
+        statement.setLong(1, version.longValueExact());
+        statement.execute();
+      }
     }
   }
 
@@ -100,7 +109,8 @@ public final class IdDatabases implements IdDatabaseFactoryType
     Objects.requireNonNull(connection, "connection");
 
     try {
-      final var statementText = "SELECT version_number FROM schema_version";
+      final var statementText =
+        "SELECT version_application_id, version_number FROM schema_version";
       LOG.debug("execute: {}", statementText);
 
       try (var statement = connection.prepareStatement(statementText)) {
@@ -108,7 +118,22 @@ public final class IdDatabases implements IdDatabaseFactoryType
           if (!result.next()) {
             throw new SQLException("schema_version table is empty!");
           }
-          return Optional.of(valueOf(result.getLong(1)));
+          final var applicationId =
+            result.getString(1);
+          final var version =
+            result.getLong(2);
+
+          if (!Objects.equals(applicationId, DATABASE_APPLICATION_ID)) {
+            throw new SQLException(
+              String.format(
+                "Database application ID is %s but should be %s",
+                applicationId,
+                DATABASE_APPLICATION_ID
+              )
+            );
+          }
+
+          return Optional.of(valueOf(version));
         }
       }
     } catch (final SQLException e) {

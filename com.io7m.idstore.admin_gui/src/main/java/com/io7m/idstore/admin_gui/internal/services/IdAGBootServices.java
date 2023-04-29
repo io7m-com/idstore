@@ -84,7 +84,7 @@ public final class IdAGBootServices
       }
     });
 
-    thread.setName("com.io7m.eigion.boot[%d]".formatted(thread.getId()));
+    thread.setName("com.io7m.idstore.boot[%d]".formatted(thread.getId()));
     thread.setDaemon(true);
     thread.start();
     return future;
@@ -202,7 +202,7 @@ public final class IdAGBootServices
     throws IOException
   {
     final var property =
-      System.getProperty("com.io7m.eigion.debug.boot_fail", "FALSE")
+      System.getProperty("com.io7m.idstore.debug.boot_fail", "FALSE")
         .toUpperCase(Locale.ROOT);
 
     if ("EXCEPTION".equals(property)) {
