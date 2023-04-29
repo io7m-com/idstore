@@ -56,6 +56,7 @@
     <module>com.io7m.idstore.server.user_view</module>
     <module>com.io7m.idstore.server.vanilla</module>
     <module>com.io7m.idstore.tests.arbitraries</module>
+    <module>com.io7m.idstore.tests.extensions</module>
     <module>com.io7m.idstore.tests</module>
     <module>com.io7m.idstore.user_client.api</module>
     <module>com.io7m.idstore.user_client</module>
