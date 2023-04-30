@@ -16,7 +16,11 @@
 
 package com.io7m.idstore.admin_gui.internal.main;
 
-import com.io7m.hibiscus.api.HBState;
+import com.io7m.hibiscus.api.HBStateType;
+import com.io7m.hibiscus.api.HBStateType.HBStateClosed;
+import com.io7m.hibiscus.api.HBStateType.HBStateDisconnected;
+import com.io7m.hibiscus.api.HBStateType.HBStateExecutingLogin;
+import com.io7m.hibiscus.api.HBStateType.HBStateExecutingLoginFailed;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGAboutController;
 import com.io7m.idstore.admin_gui.internal.IdAGApplication;
@@ -210,37 +214,36 @@ public final class IdAGMainScreenController implements Initializable
   }
 
   private void configureMainContentViewForClientStatus(
-    final HBState status)
+    final HBStateType<?, ?, ?, ?> status)
   {
-    switch (status) {
-      case CLIENT_EXECUTING_LOGIN -> {
+    if (status instanceof HBStateExecutingLogin) {
+      Platform.runLater(() -> {
         this.contentHide();
         this.mainConnectMenuItem.setDisable(true);
         this.mainConnectMenuItem.setText(
           this.strings.format("menu.disconnect"));
-      }
-      case CLIENT_EXECUTING_LOGIN_FAILED,
-        CLIENT_CLOSED,
-        CLIENT_DISCONNECTED -> {
+      });
+      return;
+    }
+
+    if (status instanceof HBStateClosed
+        || status instanceof HBStateExecutingLoginFailed
+        || status instanceof HBStateDisconnected) {
+      Platform.runLater(() -> {
         this.contentHide();
         this.mainConnectMenuItem.setDisable(false);
         this.mainConnectMenuItem.setText(
           this.strings.format("menu.connect"));
-      }
-      case CLIENT_EXECUTING_LOGIN_SUCCEEDED,
-        CLIENT_POLLING_EVENTS_SUCCEEDED,
-        CLIENT_POLLING_EVENTS_FAILED,
-        CLIENT_POLLING_EVENTS,
-        CLIENT_EXECUTING_COMMAND_SUCCEEDED,
-        CLIENT_EXECUTING_COMMAND_FAILED,
-        CLIENT_EXECUTING_COMMAND,
-        CLIENT_CONNECTED -> {
-        this.contentShow();
-        this.mainConnectMenuItem.setDisable(false);
-        this.mainConnectMenuItem.setText(
-          this.strings.format("menu.disconnect"));
-      }
+      });
+      return;
     }
+
+    Platform.runLater(() -> {
+      this.contentShow();
+      this.mainConnectMenuItem.setDisable(false);
+      this.mainConnectMenuItem.setText(
+        this.strings.format("menu.disconnect"));
+    });
   }
 
   private Node createTabs()
@@ -345,48 +348,40 @@ public final class IdAGMainScreenController implements Initializable
   private void onConnectSelected()
     throws IOException
   {
-    switch (this.client.status().get()) {
-      case CLIENT_EXECUTING_LOGIN,
-        CLIENT_POLLING_EVENTS_SUCCEEDED,
-        CLIENT_POLLING_EVENTS_FAILED,
-        CLIENT_POLLING_EVENTS,
-        CLIENT_EXECUTING_COMMAND_SUCCEEDED,
-        CLIENT_EXECUTING_COMMAND_FAILED,
-        CLIENT_EXECUTING_COMMAND,
-        CLIENT_CONNECTED,
-        CLIENT_EXECUTING_LOGIN_SUCCEEDED -> {
-        this.client.disconnect();
-      }
-      case CLIENT_EXECUTING_LOGIN_FAILED, CLIENT_DISCONNECTED -> {
-        final var stage = new Stage();
-        final var connectXML =
-          IdAGMainScreenController.class.getResource(
-            "/com/io7m/idstore/admin_gui/internal/connect.fxml");
+    final var state =
+      this.client.status()
+        .get();
 
-        final var resources =
-          this.strings.resources();
-        final var loader =
-          new FXMLLoader(connectXML, resources);
+    if (state instanceof HBStateExecutingLoginFailed
+        || state instanceof HBStateDisconnected) {
+      final var stage = new Stage();
+      final var connectXML =
+        IdAGMainScreenController.class.getResource(
+          "/com/io7m/idstore/admin_gui/internal/connect.fxml");
 
-        loader.setControllerFactory(
-          clazz -> new IdAGLoginController(
-            this.services,
-            this.configuration,
-            stage)
-        );
+      final var resources =
+        this.strings.resources();
+      final var loader =
+        new FXMLLoader(connectXML, resources);
 
-        final AnchorPane pane = loader.load();
-        IdAGCSS.setCSS(this.configuration, pane);
+      loader.setControllerFactory(
+        clazz -> new IdAGLoginController(
+          this.services,
+          this.configuration,
+          stage)
+      );
 
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(new Scene(pane));
-        stage.setTitle(this.strings.format("connect.connect"));
-        stage.showAndWait();
-      }
-      case CLIENT_CLOSED -> {
+      final AnchorPane pane = loader.load();
+      IdAGCSS.setCSS(this.configuration, pane);
 
-      }
+      stage.initModality(Modality.APPLICATION_MODAL);
+      stage.setScene(new Scene(pane));
+      stage.setTitle(this.strings.format("connect.connect"));
+      stage.showAndWait();
+      return;
     }
+
+    this.client.disconnect();
   }
 
   @FXML

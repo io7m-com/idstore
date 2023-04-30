@@ -31,26 +31,27 @@ module com.io7m.idstore.server.vanilla
 
   requires transitive com.io7m.idstore.server.api;
 
-  requires com.io7m.jmulticlose.core;
-
   requires com.io7m.idstore.protocol.admin.cb;
   requires com.io7m.idstore.protocol.user.cb;
   requires com.io7m.idstore.server.admin_v1;
   requires com.io7m.idstore.server.controller;
   requires com.io7m.idstore.server.service.branding;
   requires com.io7m.idstore.server.service.clock;
+  requires com.io7m.idstore.server.service.configuration;
   requires com.io7m.idstore.server.service.mail;
+  requires com.io7m.idstore.server.service.maintenance;
+  requires com.io7m.idstore.server.service.ratelimit;
+  requires com.io7m.idstore.server.service.reqlimit;
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.telemetry.api;
   requires com.io7m.idstore.server.service.templating;
   requires com.io7m.idstore.server.service.verdant;
   requires com.io7m.idstore.server.user_v1;
-  requires com.io7m.idstore.server.service.configuration;
-  requires com.io7m.idstore.server.service.ratelimit;
-  requires com.io7m.idstore.server.service.reqlimit;
   requires com.io7m.idstore.server.user_view;
-  requires org.eclipse.jetty.util;
+
+  requires com.io7m.jmulticlose.core;
   requires org.eclipse.jetty.server;
+  requires org.eclipse.jetty.util;
 
   provides IdServerFactoryType
     with IdServers;

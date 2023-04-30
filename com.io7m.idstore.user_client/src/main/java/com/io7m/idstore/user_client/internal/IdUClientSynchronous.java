@@ -17,6 +17,7 @@
 package com.io7m.idstore.user_client.internal;
 
 import com.io7m.hibiscus.basic.HBClientSynchronousAbstract;
+import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseType;
@@ -27,6 +28,10 @@ import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.idstore.user_client.api.IdUClientSynchronousType;
 
 import java.net.http.HttpClient;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * The synchronous client.
@@ -34,21 +39,21 @@ import java.net.http.HttpClient;
 
 public final class IdUClientSynchronous
   extends HBClientSynchronousAbstract<
-    IdUClientException,
-    IdUCommandType<?>,
-    IdUResponseType,
-    IdUResponseType,
-    IdUResponseError,
-    IdUClientEventType,
-    IdUClientCredentials>
+  IdUClientException,
+  IdUCommandType<?>,
+  IdUResponseType,
+  IdUResponseType,
+  IdUResponseError,
+  IdUClientEventType,
+  IdUClientCredentials>
   implements IdUClientSynchronousType
 {
   /**
    * The synchronous client.
    *
    * @param inConfiguration The configuration
-   * @param inHttpClient The HTTP client
-   * @param inStrings The string resources
+   * @param inHttpClient    The HTTP client
+   * @param inStrings       The string resources
    */
 
   public IdUClientSynchronous(
@@ -56,38 +61,33 @@ public final class IdUClientSynchronous
     final IdUStrings inStrings,
     final HttpClient inHttpClient)
   {
-    super(new IdUHandlerDisconnected(inConfiguration, inStrings, inHttpClient));
+    super(
+      new IdUHandlerDisconnected(inConfiguration, inStrings, inHttpClient),
+      IdUClientSynchronous::ofException
+    );
   }
 
-  @Override
-  protected void onCommandExecuteSucceeded(
-    final IdUCommandType<?> command,
-    final IdUResponseType result)
+  private static IdUResponseError ofException(
+    final Throwable ex)
   {
+    if (ex instanceof final IdUClientException e) {
+      return new IdUResponseError(
+        e.requestId().orElse(new UUID(0L, 0L)),
+        e.message(),
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction()
+      );
+    }
 
-  }
-
-  @Override
-  protected void onCommandExecuteFailed(
-    final IdUCommandType<?> command,
-    final IdUResponseError result)
-  {
-
-  }
-
-  @Override
-  protected void onLoginExecuteSucceeded(
-    final IdUClientCredentials credentials,
-    final IdUResponseType result)
-  {
-
-  }
-
-  @Override
-  protected void onLoginExecuteFailed(
-    final IdUClientCredentials credentials,
-    final IdUResponseError result)
-  {
-
+    return new IdUResponseError(
+      new UUID(0L, 0L),
+      Objects.requireNonNullElse(
+        ex.getMessage(),
+        ex.getClass().getSimpleName()),
+      IdStandardErrorCodes.IO_ERROR,
+      Map.of(),
+      Optional.empty()
+    );
   }
 }

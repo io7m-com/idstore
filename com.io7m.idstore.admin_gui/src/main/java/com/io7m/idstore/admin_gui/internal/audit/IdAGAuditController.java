@@ -16,7 +16,8 @@
 
 package com.io7m.idstore.admin_gui.internal.audit;
 
-import com.io7m.hibiscus.api.HBState;
+import com.io7m.hibiscus.api.HBStateType;
+import com.io7m.hibiscus.api.HBStateType.HBStateDisconnected;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientService;
@@ -144,11 +145,13 @@ public final class IdAGAuditController implements Initializable
   }
 
   private void onClientStatusChanged(
-    final HBState statusNew)
+    final HBStateType<?, ?, ?, ?> statusNew)
   {
-    if (statusNew == HBState.CLIENT_DISCONNECTED) {
-      this.events.clear();
-      this.eventTableControlsLock();
+    if (statusNew instanceof HBStateDisconnected) {
+      Platform.runLater(() -> {
+        this.events.clear();
+        this.eventTableControlsLock();
+      });
     }
   }
 

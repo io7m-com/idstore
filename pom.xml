@@ -45,6 +45,7 @@
     <module>com.io7m.idstore.server.service.clock</module>
     <module>com.io7m.idstore.server.service.configuration</module>
     <module>com.io7m.idstore.server.service.mail</module>
+    <module>com.io7m.idstore.server.service.maintenance</module>
     <module>com.io7m.idstore.server.service.ratelimit</module>
     <module>com.io7m.idstore.server.service.reqlimit</module>
     <module>com.io7m.idstore.server.service.sessions</module>
@@ -66,7 +67,7 @@
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
     <com.io7m.cedarbridge.version>0.0.11</com.io7m.cedarbridge.version>
     <com.io7m.cxbutton.version>0.0.5</com.io7m.cxbutton.version>
-    <com.io7m.hibiscus.version>0.0.6</com.io7m.hibiscus.version>
+    <com.io7m.hibiscus.version>0.0.7</com.io7m.hibiscus.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jbssio.version>2.0.0</com.io7m.jbssio.version>
     <com.io7m.jqpage.version>0.0.2</com.io7m.jqpage.version>

@@ -14,30 +14,22 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.admin_client.api;
-
-import com.io7m.idstore.protocol.admin.IdAResponseError;
-
-import java.util.Objects;
-
 /**
- * Executing a login failed.
- *
- * @param error The error
+ * Identity server (Server maintenance service)
  */
 
-public record IdAClientEventLoginFailed(
-  IdAResponseError error)
-  implements IdAClientEventType
+module com.io7m.idstore.server.service.maintenance
 {
-  /**
-   * Executing a login failed.
-   *
-   * @param error The error
-   */
+  requires static org.osgi.annotation.bundle;
+  requires static org.osgi.annotation.versioning;
 
-  public IdAClientEventLoginFailed
-  {
-    Objects.requireNonNull(error, "error");
-  }
+  requires com.io7m.idstore.database.api;
+  requires com.io7m.idstore.server.service.clock;
+  requires com.io7m.idstore.server.service.telemetry.api;
+
+  requires com.io7m.repetoir.core;
+  requires io.opentelemetry.api;
+  requires org.slf4j;
+
+  exports com.io7m.idstore.server.service.maintenance;
 }

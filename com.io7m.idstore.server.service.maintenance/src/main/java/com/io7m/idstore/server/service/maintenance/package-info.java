@@ -14,30 +14,13 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.admin_client.api;
-
-import com.io7m.idstore.protocol.admin.IdAResponseLogin;
-
-import java.util.Objects;
-
 /**
- * Executing a login succeeded.
- *
- * @param response The response
+ * Identity server (Server maintenance service)
  */
 
-public record IdAClientEventLoginSucceeded(
-  IdAResponseLogin response)
-  implements IdAClientEventType
-{
-  /**
-   * Executing a login succeeded.
-   *
-   * @param response The response
-   */
+@Export
+@Version("1.0.0")
+package com.io7m.idstore.server.service.maintenance;
 
-  public IdAClientEventLoginSucceeded
-  {
-    Objects.requireNonNull(response, "response");
-  }
-}
+import org.osgi.annotation.bundle.Export;
+import org.osgi.annotation.versioning.Version;

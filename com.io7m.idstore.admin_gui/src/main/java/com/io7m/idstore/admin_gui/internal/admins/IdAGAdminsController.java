@@ -16,7 +16,8 @@
 
 package com.io7m.idstore.admin_gui.internal.admins;
 
-import com.io7m.hibiscus.api.HBState;
+import com.io7m.hibiscus.api.HBStateType;
+import com.io7m.hibiscus.api.HBStateType.HBStateDisconnected;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGCSS;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
@@ -126,13 +127,15 @@ public final class IdAGAdminsController implements Initializable
   }
 
   private void onClientStatusChanged(
-    final HBState statusNew)
+    final HBStateType<?, ?, ?, ?> statusNew)
   {
-    if (statusNew == HBState.CLIENT_DISCONNECTED) {
-      this.admins.clear();
-      this.admin = null;
-      this.adminDetailsLock();
-      this.adminTableControlsLock();
+    if (statusNew instanceof HBStateDisconnected) {
+      Platform.runLater(() -> {
+        this.admins.clear();
+        this.admin = null;
+        this.adminDetailsLock();
+        this.adminTableControlsLock();
+      });
     }
   }
 

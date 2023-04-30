@@ -16,15 +16,15 @@
 
 package com.io7m.idstore.admin_gui.internal.client;
 
-import com.io7m.hibiscus.api.HBState;
+import com.io7m.hibiscus.api.HBStateType;
+import com.io7m.hibiscus.api.HBStateType.HBStateDisconnected;
+import com.io7m.hibiscus.api.HBStateType.HBStateExecutingCommandFailed;
+import com.io7m.hibiscus.api.HBStateType.HBStateExecutingCommandSucceeded;
+import com.io7m.hibiscus.api.HBStateType.HBStateExecutingLoginFailed;
+import com.io7m.hibiscus.api.HBStateType.HBStateExecutingLoginSucceeded;
 import com.io7m.idstore.admin_client.api.IdAClientAsynchronousType;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
 import com.io7m.idstore.admin_client.api.IdAClientCredentials;
-import com.io7m.idstore.admin_client.api.IdAClientEventCommandFailed;
-import com.io7m.idstore.admin_client.api.IdAClientEventCommandSucceeded;
-import com.io7m.idstore.admin_client.api.IdAClientEventLoginFailed;
-import com.io7m.idstore.admin_client.api.IdAClientEventLoginSucceeded;
-import com.io7m.idstore.admin_client.api.IdAClientEventType;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientFactoryType;
 import com.io7m.idstore.admin_gui.internal.IdAGPerpetualSubscriber;
@@ -71,6 +71,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanGet;
@@ -102,7 +103,9 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
+import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanGet;
@@ -150,7 +153,12 @@ public final class IdAGClientService implements RPServiceType, AutoCloseable
     new IdAdminColumnOrdering(IdAdminColumn.BY_IDNAME, true);
 
   private final IdAGEventBus eventBus;
-  private final SimpleObjectProperty<HBState> status;
+  private final SimpleObjectProperty<
+    HBStateType<
+      IdACommandType<?>,
+      IdAResponseType,
+      IdAResponseError,
+      IdAClientCredentials>> status;
   private final IdAClientAsynchronousType client;
   private URI serverLatest;
   private IdAdmin self;
@@ -167,7 +175,7 @@ public final class IdAGClientService implements RPServiceType, AutoCloseable
     this.serverLatest =
       URI.create("urn:unspecified");
     this.status =
-      new SimpleObjectProperty<>(HBState.CLIENT_DISCONNECTED);
+      new SimpleObjectProperty<>(new HBStateDisconnected<>());
   }
 
   /**
@@ -195,36 +203,39 @@ public final class IdAGClientService implements RPServiceType, AutoCloseable
       new IdAGClientService(eventBus, client);
 
     client.state()
-      .subscribe(new IdAGPerpetualSubscriber<>(service.status::set));
-
-    client.events()
-      .subscribe(new IdAGPerpetualSubscriber<>(e -> {
-        transformEvent(e).ifPresent(eventBus::submit);
+      .subscribe(new IdAGPerpetualSubscriber<>(s -> {
+        service.status.set(s);
+        transformState(s).ifPresent(eventBus::submit);
       }));
 
     return service;
   }
 
-  private static Optional<IdAGEventType> transformEvent(
-    final IdAClientEventType e)
+  private static Optional<IdAGEventType> transformState(
+    final HBStateType<IdACommandType<?>, IdAResponseType, IdAResponseError, IdAClientCredentials> e)
   {
-    if (e instanceof final IdAClientEventCommandFailed cmd) {
-      return transformEventCommandFailed(cmd);
+    if (e instanceof final HBStateExecutingCommandFailed<
+      IdACommandType<?>, IdAResponseType, IdAResponseError, IdAClientCredentials> cmd) {
+      return transformStateCommandFailed(cmd);
     }
-    if (e instanceof final IdAClientEventLoginFailed login) {
-      return transformEventLoginFailed(login);
+    if (e instanceof final HBStateExecutingLoginFailed<
+      IdACommandType<?>, IdAResponseType, IdAResponseError, IdAClientCredentials> login) {
+      return transformStateLoginFailed(login);
     }
-    if (e instanceof final IdAClientEventCommandSucceeded cmd) {
-      return transformEventCommandSucceeded(cmd);
+    if (e instanceof final HBStateExecutingCommandSucceeded<
+      IdACommandType<?>, IdAResponseType, IdAResponseError, IdAClientCredentials> cmd) {
+      return transformStateCommandSucceeded(cmd);
     }
-    if (e instanceof final IdAClientEventLoginSucceeded login) {
-      return transformEventLoginSucceeded(login);
+    if (e instanceof final HBStateExecutingLoginSucceeded<
+      IdACommandType<?>, IdAResponseType, IdAResponseError, IdAClientCredentials> login) {
+      return transformStateLoginSucceeded(login);
     }
     return Optional.empty();
   }
 
-  private static Optional<IdAGEventType> transformEventLoginSucceeded(
-    final IdAClientEventLoginSucceeded login)
+  private static Optional<IdAGEventType> transformStateLoginSucceeded(
+    final HBStateExecutingLoginSucceeded<
+      IdACommandType<?>, IdAResponseType, IdAResponseError, IdAClientCredentials> login)
   {
     return Optional.of(
       new IdAGClientEvent(
@@ -234,24 +245,26 @@ public final class IdAGClientService implements RPServiceType, AutoCloseable
     );
   }
 
-  private static Optional<IdAGEventType> transformEventCommandSucceeded(
-    final IdAClientEventCommandSucceeded cmd)
+  private static Optional<IdAGEventType> transformStateCommandSucceeded(
+    final HBStateExecutingCommandSucceeded<
+      IdACommandType<?>, IdAResponseType, IdAResponseError, IdAClientCredentials> cmd)
   {
     return Optional.of(
       new IdAGClientEvent(
-        "Executed %s successfully.".formatted(cmd.command()),
+        "Executed %s successfully.".formatted(cmd.command().getClass().getSimpleName()),
         new IdAGEventStatusCompleted()
       )
     );
   }
 
-  private static Optional<IdAGEventType> transformEventLoginFailed(
-    final IdAClientEventLoginFailed login)
+  private static Optional<IdAGEventType> transformStateLoginFailed(
+    final HBStateExecutingLoginFailed<
+      IdACommandType<?>, IdAResponseType, IdAResponseError, IdAClientCredentials> login)
   {
     final var recorder =
       TRTaskRecorder.create(LOG, "Logging in...");
 
-    final var error = login.error();
+    final var error = login.response();
     recorder.setStepFailed(error.message());
     recorder.setTaskFailed(error.message());
     final var task = recorder.toTask();
@@ -271,13 +284,15 @@ public final class IdAGClientService implements RPServiceType, AutoCloseable
     );
   }
 
-  private static Optional<IdAGEventType> transformEventCommandFailed(
-    final IdAClientEventCommandFailed cmd)
+  private static Optional<IdAGEventType>
+  transformStateCommandFailed(
+    final HBStateExecutingCommandFailed<
+      IdACommandType<?>, IdAResponseType, IdAResponseError, IdAClientCredentials> cmd)
   {
     final var recorder =
       TRTaskRecorder.create(LOG, "Executing " + cmd.command());
 
-    final var error = cmd.error();
+    final var error = cmd.response();
     recorder.setStepFailed(error.message());
     recorder.setTaskFailed(error.message());
     final var task = recorder.toTask();
@@ -317,7 +332,11 @@ public final class IdAGClientService implements RPServiceType, AutoCloseable
    * @return The current client status
    */
 
-  public ReadOnlyObjectProperty<HBState> status()
+  public ReadOnlyObjectProperty<HBStateType<
+    IdACommandType<?>,
+    IdAResponseType,
+    IdAResponseError,
+    IdAClientCredentials>> status()
   {
     return this.status;
   }
@@ -369,9 +388,13 @@ public final class IdAGClientService implements RPServiceType, AutoCloseable
     final var credentials =
       new IdAClientCredentials(username, password, this.serverLatest, Map.of());
 
-    return this.client.loginAsyncOrElseThrow(credentials, IdAClientException::ofError)
+    return this.client.loginAsyncOrElseThrow(
+        credentials,
+        IdAClientException::ofError)
       .thenApply(IdAResponseLogin.class::cast)
-      .thenCompose(x -> this.client.executeAsyncOrElseThrow(new IdACommandAdminSelf(), IdAClientException::ofError))
+      .thenCompose(x -> this.client.executeAsyncOrElseThrow(
+        new IdACommandAdminSelf(),
+        IdAClientException::ofError))
       .thenApply(IdAResponseAdminSelf.class::cast)
       .thenApply(IdAResponseAdminSelf::admin);
   }

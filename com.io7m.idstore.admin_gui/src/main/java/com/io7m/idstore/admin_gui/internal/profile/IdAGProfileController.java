@@ -17,7 +17,9 @@
 
 package com.io7m.idstore.admin_gui.internal.profile;
 
-import com.io7m.hibiscus.api.HBState;
+import com.io7m.hibiscus.api.HBStateType;
+import com.io7m.hibiscus.api.HBStateType.HBStateDisconnected;
+import com.io7m.hibiscus.api.HBStateType.HBStateExecutingLoginSucceeded;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientService;
@@ -126,31 +128,16 @@ public final class IdAGProfileController
   }
 
   private void onClientStatusChanged(
-    final HBState statusNew)
+    final HBStateType<?, ?, ?, ?> statusNew)
   {
-    switch (statusNew) {
-      case CLIENT_EXECUTING_LOGIN,
-        CLIENT_CLOSED,
-        CLIENT_POLLING_EVENTS_SUCCEEDED,
-        CLIENT_POLLING_EVENTS_FAILED,
-        CLIENT_POLLING_EVENTS,
-        CLIENT_EXECUTING_COMMAND_SUCCEEDED,
-        CLIENT_EXECUTING_COMMAND_FAILED,
-        CLIENT_EXECUTING_COMMAND,
-        CLIENT_EXECUTING_LOGIN_SUCCEEDED,
-        CLIENT_EXECUTING_LOGIN_FAILED -> {
+    if (statusNew instanceof HBStateExecutingLoginSucceeded) {
+      this.client.adminSelf().thenAcceptAsync(this::onAdminReceived);
+      return;
+    }
 
-      }
-
-      case CLIENT_CONNECTED -> {
-        this.client.adminSelf()
-          .thenAcceptAsync(this::onAdminReceived);
-      }
-
-      case CLIENT_DISCONNECTED -> {
-        this.admin = null;
-        this.container.setDisable(true);
-      }
+    if (statusNew instanceof HBStateDisconnected) {
+      this.admin = null;
+      this.container.setDisable(true);
     }
   }
 

@@ -46,6 +46,7 @@ import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.mail.IdServerMailService;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
+import com.io7m.idstore.server.service.maintenance.IdMaintenanceService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetService;
@@ -312,6 +313,10 @@ public final class IdServer implements IdServerType
       IdUserPasswordResetServiceType.class,
       userPasswordResetService
     );
+
+    final var maintenance =
+      IdMaintenanceService.create(clock, this.telemetry, newDatabase);
+    services.register(IdMaintenanceService.class, maintenance);
 
     services.register(IdRequestLimits.class, new IdRequestLimits(size -> {
       return strings.format("requestTooLarge", size);

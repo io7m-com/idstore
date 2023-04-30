@@ -16,7 +16,8 @@
 
 package com.io7m.idstore.admin_gui.internal.users;
 
-import com.io7m.hibiscus.api.HBState;
+import com.io7m.hibiscus.api.HBStateType;
+import com.io7m.hibiscus.api.HBStateType.HBStateDisconnected;
 import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGCSS;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
@@ -66,7 +67,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import static com.io7m.hibiscus.api.HBState.CLIENT_DISCONNECTED;
 import static javafx.scene.control.SelectionMode.SINGLE;
 
 /**
@@ -207,13 +207,15 @@ public final class IdAGUsersController implements Initializable
   }
 
   private void onClientStatusChanged(
-    final HBState statusNew)
+    final HBStateType<?, ?, ?, ?> statusNew)
   {
-    if (statusNew == CLIENT_DISCONNECTED) {
-      this.users.clear();
-      this.user = null;
-      this.userDetailsLock();
-      this.userTableControlsLock();
+    if (statusNew instanceof HBStateDisconnected) {
+      Platform.runLater(() -> {
+        this.users.clear();
+        this.user = null;
+        this.userDetailsLock();
+        this.userTableControlsLock();
+      });
     }
   }
 
