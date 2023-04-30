@@ -53,6 +53,7 @@ import static com.io7m.idstore.admin_client.internal.IdACompression.decompressRe
 import static com.io7m.idstore.admin_client.internal.IdAUUIDs.nullUUID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static java.util.Objects.requireNonNullElse;
 
 /**
  * The version 1 protocol handler.
@@ -221,7 +222,10 @@ public final class IdAHandler1 extends IdAHandlerAbstract
       return new HBResultFailure<>(
         new IdAResponseError(
           nullUUID(),
-          e.getMessage(),
+          requireNonNullElse(
+            e.getMessage(),
+            this.strings().format("connectFailure")
+          ),
           IO_ERROR,
           Map.of(),
           Optional.empty()
