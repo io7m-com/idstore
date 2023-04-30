@@ -36,6 +36,7 @@ import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -47,6 +48,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
@@ -58,6 +61,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 import static javafx.scene.control.SelectionMode.SINGLE;
 
@@ -86,7 +90,7 @@ public final class IdAGAdminsController implements Initializable
   @FXML private Button adminPagePrev;
   @FXML private ChoiceBox<IdAGAdminSearchKind> searchKind;
   @FXML private Label adminPageLabel;
-  @FXML private ListView<IdAGAdmin> adminList;
+  @FXML private TableView<IdAGAdmin> adminTable;
   @FXML private ListView<IdEmail> adminEmailList;
   @FXML private Parent adminDetailContainer;
   @FXML private Parent adminTableContainer;
@@ -162,15 +166,49 @@ public final class IdAGAdminsController implements Initializable
 
     this.permissionListView.setItems(this.adminPermissions);
 
-    this.adminList.setCellFactory(new IsAGAdminCellFactory(this.strings));
-    this.adminList.setFixedCellSize(24.0);
-    this.adminList.getSelectionModel().setSelectionMode(SINGLE);
-    this.adminList.setItems(this.admins);
-    this.adminList.getSelectionModel()
-      .selectedItemProperty()
-      .addListener((obs, adminOld, adminNew) -> {
-        this.onAdminSelected(adminNew);
-      });
+    {
+      final var tableColumns =
+        this.adminTable.getColumns();
+
+      final var tableIDColumn =
+        (TableColumn<IdAGAdmin, UUID>) tableColumns.get(0);
+      final var tableIdNameColumn =
+        (TableColumn<IdAGAdmin, IdName>) tableColumns.get(1);
+      final var tableRealNameColumn =
+        (TableColumn<IdAGAdmin, IdRealName>) tableColumns.get(2);
+
+      tableIDColumn.setSortable(true);
+      tableIDColumn.setReorderable(false);
+      tableIDColumn.setComparator(UUID::compareTo);
+      tableIDColumn.setCellValueFactory(
+        param -> {
+          return new SimpleObjectProperty<>(
+            param.getValue().id()
+          );
+        });
+
+      tableIdNameColumn.setSortable(true);
+      tableIdNameColumn.setReorderable(false);
+      tableIdNameColumn.setComparator(IdName::compareTo);
+      tableIdNameColumn.setCellValueFactory(
+        param -> param.getValue().idName());
+
+      tableRealNameColumn.setSortable(true);
+      tableRealNameColumn.setReorderable(false);
+      tableRealNameColumn.setComparator(IdRealName::compareTo);
+      tableRealNameColumn.setCellValueFactory(
+        param -> param.getValue().realName());
+
+      this.adminTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
+      this.adminTable.getSelectionModel().setSelectionMode(SINGLE);
+      this.adminTable.setItems(this.admins);
+      this.adminTable.setPlaceholder(new Label());
+      this.adminTable.getSelectionModel()
+        .selectedItemProperty()
+        .addListener((observable, oldValue, newValue) -> {
+          this.onAdminSelected(newValue);
+        });
+    }
 
     this.adminEmailList.setItems(this.adminEmails);
     this.adminEmailList.getSelectionModel()

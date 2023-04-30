@@ -26,6 +26,8 @@ import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -33,8 +35,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
 import java.net.URL;
@@ -66,7 +69,7 @@ public final class IdAGAuditController implements Initializable
   @FXML private TextField ownerField;
   @FXML private TextField typeField;
   @FXML private TextField messageField;
-  @FXML private ListView<IdAuditEvent> eventList;
+  @FXML private TableView<IdAuditEvent> eventTable;
   @FXML private Button auditPageNext;
   @FXML private Button auditPagePrev;
   @FXML private Label auditPageLabel;
@@ -133,10 +136,61 @@ public final class IdAGAuditController implements Initializable
     lowerTimeFactory.increment(1);
     upperTimeFactory.increment(1);
 
-    this.eventList.setCellFactory(new IsAGAuditEventCellFactory(this.strings));
-    this.eventList.setFixedCellSize(24.0);
-    this.eventList.getSelectionModel().setSelectionMode(SINGLE);
-    this.eventList.setItems(this.events);
+    final var tableColumns =
+      this.eventTable.getColumns();
+
+    final var tableIDColumn =
+      (TableColumn<IdAuditEvent, Long>) tableColumns.get(0);
+    final var tableTimeColumn =
+      (TableColumn<IdAuditEvent, OffsetDateTime>) tableColumns.get(1);
+    final var tableOwnerColumn =
+      (TableColumn<IdAuditEvent, String>) tableColumns.get(2);
+    final var tableTypeColumn =
+      (TableColumn<IdAuditEvent, String>) tableColumns.get(3);
+    final var tableMessageColumn =
+      (TableColumn<IdAuditEvent, String>) tableColumns.get(4);
+
+    tableIDColumn.setSortable(true);
+    tableIDColumn.setReorderable(false);
+    tableIDColumn.setComparator(Long::compareUnsigned);
+    tableIDColumn.setCellValueFactory(
+      param -> {
+        return new SimpleObjectProperty<>(
+          Long.valueOf(param.getValue().id())
+        );
+      });
+
+    tableTimeColumn.setSortable(true);
+    tableTimeColumn.setReorderable(false);
+    tableTimeColumn.setComparator(OffsetDateTime::compareTo);
+    tableTimeColumn.setCellValueFactory(
+      param -> {
+        return new SimpleObjectProperty<>(
+          param.getValue().time()
+        );
+      });
+
+    tableTypeColumn.setSortable(true);
+    tableTypeColumn.setReorderable(false);
+    tableTypeColumn.setComparator(String::compareToIgnoreCase);
+    tableTypeColumn.setCellValueFactory(
+      param -> new SimpleStringProperty(param.getValue().type()));
+
+    tableOwnerColumn.setSortable(true);
+    tableOwnerColumn.setReorderable(false);
+    tableOwnerColumn.setComparator(String::compareToIgnoreCase);
+    tableOwnerColumn.setCellValueFactory(
+      param -> new SimpleStringProperty(param.getValue().owner().toString()));
+
+    tableMessageColumn.setSortable(true);
+    tableMessageColumn.setReorderable(false);
+    tableMessageColumn.setComparator(String::compareToIgnoreCase);
+    tableMessageColumn.setCellValueFactory(
+      param -> new SimpleStringProperty(param.getValue().message()));
+
+    this.eventTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
+    this.eventTable.getSelectionModel().setSelectionMode(SINGLE);
+    this.eventTable.setItems(this.events);
 
     this.client.status()
       .addListener((obs, statusOld, statusNew) -> {

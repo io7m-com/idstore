@@ -66,7 +66,25 @@
 
 .userTable
 {
-  -fx-font-size: 9pt;
+  -fx-font-size: 8pt;
+  -fx-font-family: "Monospaced";
+}
+
+.adminTable
+{
+  -fx-font-size: 8pt;
+  -fx-font-family: "Monospaced";
+}
+
+.auditTable
+{
+  -fx-font-size: 8pt;
+  -fx-font-family: "Monospaced";
+}
+
+.userLoginHistoryTable
+{
+  -fx-font-size: 8pt;
   -fx-font-family: "Monospaced";
 }
 

@@ -22,7 +22,6 @@ import com.io7m.idstore.admin_gui.IdAGConfiguration;
 import com.io7m.idstore.admin_gui.internal.IdAGCSS;
 import com.io7m.idstore.admin_gui.internal.IdAGStrings;
 import com.io7m.idstore.admin_gui.internal.client.IdAGClientService;
-import com.io7m.idstore.admin_gui.internal.login.IsAGLoginHistoryCellFactory;
 import com.io7m.idstore.admin_gui.internal.main.IdAGMainScreenController;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
@@ -37,6 +36,7 @@ import com.io7m.idstore.model.IdUserCreate;
 import com.io7m.idstore.model.IdUserSummary;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -51,6 +51,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
@@ -66,6 +68,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 import static javafx.scene.control.SelectionMode.SINGLE;
 
@@ -99,7 +102,7 @@ public final class IdAGUsersController implements Initializable
   @FXML private DatePicker banExpiryPicker;
   @FXML private Label banLabel;
   @FXML private Label userPageLabel;
-  @FXML private ListView<IdAGUser> userList;
+  @FXML private TableView<IdAGUser> userTable;
   @FXML private ListView<IdEmail> userEmailList;
   @FXML private Parent userDetailContainer;
   @FXML private Parent userTableContainer;
@@ -110,7 +113,7 @@ public final class IdAGUsersController implements Initializable
   @FXML private TextField userRealNameField;
   @FXML private TextField userSearchField;
   @FXML private TextField userPasswordField;
-  @FXML private ListView<IdLogin> loginHistoryList;
+  @FXML private TableView<IdLogin> loginHistoryTable;
 
   /**
    * The user tab controller.
@@ -240,21 +243,8 @@ public final class IdAGUsersController implements Initializable
     this.userDetailsLock();
     this.userTableControlsLock();
 
-    this.userList.setCellFactory(new IsAGUserCellFactory(this.strings));
-    this.userList.setFixedCellSize(24.0);
-    this.userList.getSelectionModel().setSelectionMode(SINGLE);
-    this.userList.setItems(this.users);
-    this.userList.getSelectionModel()
-      .selectedItemProperty()
-      .addListener((obs, userOld, userNew) -> {
-        this.onUserSelected(userNew);
-      });
-
-    this.loginHistoryList.setCellFactory(
-      new IsAGLoginHistoryCellFactory(this.strings));
-    this.loginHistoryList.setItems(this.userLoginHistory);
-    this.loginHistoryList.setFixedCellSize(24.0);
-    this.loginHistoryList.getSelectionModel().setSelectionMode(SINGLE);
+    this.initializeUserTable();
+    this.initializeLoginHistoryTable();
 
     this.userEmailList.setItems(this.userEmails);
     this.userEmailList.getSelectionModel()
@@ -273,6 +263,99 @@ public final class IdAGUsersController implements Initializable
         this.banExpiryPicker.setDisable(!this.banExpires.isSelected());
       });
     this.banExpiryPicker.setDisable(true);
+  }
+
+  private void initializeUserTable()
+  {
+    final var tableColumns =
+      this.userTable.getColumns();
+
+    final var tableIDColumn =
+      (TableColumn<IdAGUser, UUID>) tableColumns.get(0);
+    final var tableIdNameColumn =
+      (TableColumn<IdAGUser, IdName>) tableColumns.get(1);
+    final var tableRealNameColumn =
+      (TableColumn<IdAGUser, IdRealName>) tableColumns.get(2);
+
+    tableIDColumn.setSortable(true);
+    tableIDColumn.setReorderable(false);
+    tableIDColumn.setComparator(UUID::compareTo);
+    tableIDColumn.setCellValueFactory(
+      param -> {
+        return new SimpleObjectProperty<>(
+          param.getValue().id()
+        );
+      });
+
+    tableIdNameColumn.setSortable(true);
+    tableIdNameColumn.setReorderable(false);
+    tableIdNameColumn.setComparator(IdName::compareTo);
+    tableIdNameColumn.setCellValueFactory(
+      param -> param.getValue().idName());
+
+    tableRealNameColumn.setSortable(true);
+    tableRealNameColumn.setReorderable(false);
+    tableRealNameColumn.setComparator(IdRealName::compareTo);
+    tableRealNameColumn.setCellValueFactory(
+      param -> param.getValue().realName());
+
+    this.userTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
+    this.userTable.getSelectionModel().setSelectionMode(SINGLE);
+    this.userTable.setItems(this.users);
+    this.userTable.setPlaceholder(new Label());
+    this.userTable.getSelectionModel()
+      .selectedItemProperty()
+      .addListener((observable, oldValue, newValue) -> {
+        this.onUserSelected(newValue);
+      });
+  }
+
+  private void initializeLoginHistoryTable()
+  {
+    final var tableColumns =
+      this.loginHistoryTable.getColumns();
+
+    final var tableTimeColumn =
+      (TableColumn<IdLogin, OffsetDateTime>) tableColumns.get(0);
+    final var tableHostColumn =
+      (TableColumn<IdLogin, String>) tableColumns.get(1);
+    final var tableUserAgentColumn =
+      (TableColumn<IdLogin, String>) tableColumns.get(2);
+
+    tableTimeColumn.setSortable(true);
+    tableTimeColumn.setReorderable(false);
+    tableTimeColumn.setComparator(OffsetDateTime::compareTo);
+    tableTimeColumn.setCellValueFactory(
+      param -> {
+        return new SimpleObjectProperty<>(
+          param.getValue().time()
+        );
+      });
+
+    tableHostColumn.setSortable(true);
+    tableHostColumn.setReorderable(false);
+    tableHostColumn.setComparator(String::compareTo);
+    tableHostColumn.setCellValueFactory(
+      param -> {
+        return new SimpleObjectProperty<>(
+          param.getValue().host()
+        );
+      });
+
+    tableUserAgentColumn.setSortable(true);
+    tableUserAgentColumn.setReorderable(false);
+    tableUserAgentColumn.setComparator(String::compareTo);
+    tableUserAgentColumn.setCellValueFactory(
+      param -> {
+        return new SimpleObjectProperty<>(
+          param.getValue().userAgent()
+        );
+      });
+
+    this.loginHistoryTable.setPlaceholder(new Label());
+    this.loginHistoryTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
+    this.loginHistoryTable.getSelectionModel().setSelectionMode(SINGLE);
+    this.loginHistoryTable.setItems(this.userLoginHistory);
   }
 
   private void onSearchKindSelected(

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?><?import javafx.scene.control.Label?><?import javafx.scene.control.Separator?><?import javafx.scene.layout.HBox?><?import javafx.scene.text.Font?>
-<HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="24.0" prefWidth="600.0" styleClass="userTableItem" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.io7m.idstore.admin_gui.internal.users.IdAGUserLoginHistoryCellController">
+<HBox maxHeight="-Infinity" minHeight="-Infinity" prefHeight="24.0" prefWidth="600.0" styleClass="userTableItem" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.io7m.idstore.admin_gui.internal.login.IdAGLoginHistoryCellController">
    <children>
       <Label fx:id="loginTime" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="24.0" prefWidth="192.0" text="2022-01-01T00:00:00+00:00" HBox.hgrow="NEVER">
          <font>
