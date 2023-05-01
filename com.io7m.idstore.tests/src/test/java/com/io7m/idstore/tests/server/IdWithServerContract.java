@@ -181,7 +181,7 @@ public abstract class IdWithServerContract
     this.emailsReceived =
       new ConcurrentLinkedQueue<>();
     this.smtp =
-      SMTPServer.port(25000)
+      SMTPServer.port(32025)
         .messageHandler((messageContext, source, destination, data) -> {
           LOG.debug(
             "received mail: {} {} {}",
@@ -283,7 +283,7 @@ public abstract class IdWithServerContract
 
     final var mailService =
       new IdServerMailConfiguration(
-        new IdServerMailTransportSMTP("localhost", 25000),
+        new IdServerMailTransportSMTP("localhost", 32025),
         Optional.empty(),
         "no-reply@example.com",
         Duration.ofDays(1L)

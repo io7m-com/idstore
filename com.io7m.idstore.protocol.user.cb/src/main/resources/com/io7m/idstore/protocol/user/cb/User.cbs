@@ -20,14 +20,6 @@
 
 [import com.io7m.cedarbridge cb]
 
-[documentation IdU1UUID "A 128-bit UUID value."]
-[record IdU1UUID
-  [documentation msb "The most significant bits of the UUID."]
-  [field msb cb:IntegerUnsigned64]
-  [documentation lsb "The least significant bits of the UUID."]
-  [field lsb cb:IntegerUnsigned64]
-]
-
 [documentation IdU1Password "Information for a hashed password."]
 [record IdU1Password
   [documentation algorithm "The password algorithm."]
@@ -59,7 +51,7 @@
 [documentation IdU1User "A user."]
 [record IdU1User
   [documentation id "The user ID."]
-  [field id IdU1UUID]
+  [field id cb:UUID]
   [documentation idName "The user ID name."]
   [field idName cb:String]
   [documentation realName "The user real name."]
@@ -148,7 +140,7 @@
 [documentation IdU1ResponseError "An error response."]
 [record IdU1ResponseError
   [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdU1UUID]
+  [field requestId cb:UUID]
   [documentation errorCode "The error code."]
   [field errorCode cb:String]
   [documentation message "The error message."]
@@ -162,7 +154,7 @@
 [documentation IdU1ResponseLogin "A response to IdU1CommandLogin."]
 [record IdU1ResponseLogin
   [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdU1UUID]
+  [field requestId cb:UUID]
   [documentation user "The user."]
   [field user IdU1User]
 ]
@@ -170,7 +162,7 @@
 [documentation IdU1ResponseUserSelf "A response to IdU1CommandUserSelf."]
 [record IdU1ResponseUserSelf
   [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdU1UUID]
+  [field requestId cb:UUID]
   [documentation user "The user."]
   [field user IdU1User]
 ]
@@ -178,7 +170,7 @@
 [documentation IdU1ResponseUserUpdate "A response to various update commands."]
 [record IdU1ResponseUserUpdate
   [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdU1UUID]
+  [field requestId cb:UUID]
   [documentation user "The user."]
   [field user IdU1User]
 ]
@@ -186,37 +178,37 @@
 [documentation IdU1ResponseEmailAddBegin "A response to IdU1CommandEmailAddBegin."]
 [record IdU1ResponseEmailAddBegin
   [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdU1UUID]
+  [field requestId cb:UUID]
 ]
 
 [documentation IdU1ResponseEmailRemoveBegin "A response to IdU1CommandEmailRemoveBegin."]
 [record IdU1ResponseEmailRemoveBegin
   [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdU1UUID]
+  [field requestId cb:UUID]
 ]
 
 [documentation IdU1ResponseEmailAddPermit "A response to IdU1CommandEmailAddPermit."]
 [record IdU1ResponseEmailAddPermit
   [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdU1UUID]
+  [field requestId cb:UUID]
 ]
 
 [documentation IdU1ResponseEmailRemovePermit "A response to IdU1CommandEmailRemovePermit."]
 [record IdU1ResponseEmailRemovePermit
   [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdU1UUID]
+  [field requestId cb:UUID]
 ]
 
 [documentation IdU1ResponseEmailAddDeny "A response to IdU1CommandEmailAddDeny."]
 [record IdU1ResponseEmailAddDeny
   [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdU1UUID]
+  [field requestId cb:UUID]
 ]
 
 [documentation IdU1ResponseEmailRemoveDeny "A response to IdU1CommandEmailRemoveDeny."]
 [record IdU1ResponseEmailRemoveDeny
   [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId IdU1UUID]
+  [field requestId cb:UUID]
 ]
 
 ;

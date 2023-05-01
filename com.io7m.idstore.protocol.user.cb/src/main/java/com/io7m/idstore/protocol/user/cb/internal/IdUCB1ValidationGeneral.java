@@ -18,12 +18,11 @@
 package com.io7m.idstore.protocol.user.cb.internal;
 
 import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned32;
-import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned64;
 import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned8;
 import com.io7m.cedarbridge.runtime.api.CBList;
-import com.io7m.cedarbridge.runtime.api.CBOptionType;
-import com.io7m.cedarbridge.runtime.api.CBSome;
 import com.io7m.cedarbridge.runtime.api.CBString;
+import com.io7m.cedarbridge.runtime.api.CBUUID;
+import com.io7m.cedarbridge.runtime.convenience.CBLists;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
@@ -35,7 +34,6 @@ import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.cb.IdU1Password;
 import com.io7m.idstore.protocol.user.cb.IdU1TimestampUTC;
-import com.io7m.idstore.protocol.user.cb.IdU1UUID;
 import com.io7m.idstore.protocol.user.cb.IdU1User;
 
 import java.time.OffsetDateTime;
@@ -43,7 +41,6 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 
@@ -57,24 +54,6 @@ public final class IdUCB1ValidationGeneral
   private IdUCB1ValidationGeneral()
   {
 
-  }
-
-  public static IdU1UUID toWireUUID(
-    final UUID uuid)
-  {
-    return new IdU1UUID(
-      new CBIntegerUnsigned64(uuid.getMostSignificantBits()),
-      new CBIntegerUnsigned64(uuid.getLeastSignificantBits())
-    );
-  }
-
-  public static UUID fromWireUUID(
-    final IdU1UUID uuid)
-  {
-    return new UUID(
-      uuid.fieldMsb().value(),
-      uuid.fieldLsb().value()
-    );
   }
 
   public static IdNonEmptyList<IdEmail> fromWireEmails(
@@ -97,18 +76,6 @@ public final class IdUCB1ValidationGeneral
       email0,
       emails.stream().map(CBString::value).map(IdEmail::new).toList()
     );
-  }
-
-  public static Optional<IdPassword> fromWirePasswordOptional(
-    final CBOptionType<IdU1Password> fieldPassword)
-    throws IdPasswordException
-  {
-    if (fieldPassword instanceof CBSome<IdU1Password> some) {
-      return Optional.of(
-        fromWirePassword(some.value())
-      );
-    }
-    return Optional.empty();
   }
 
   public static IdPassword fromWirePassword(
@@ -165,7 +132,7 @@ public final class IdUCB1ValidationGeneral
     final IdUser user)
   {
     return new IdU1User(
-      toWireUUID(user.id()),
+      new CBUUID(user.id()),
       new CBString(user.idName().value()),
       new CBString(user.realName().value()),
       toWireEmails(user.emails()),
@@ -178,12 +145,7 @@ public final class IdUCB1ValidationGeneral
   private static CBList<CBString> toWireEmails(
     final IdNonEmptyList<IdEmail> emails)
   {
-    return new CBList<>(
-      emails.toList()
-        .stream()
-        .map(IdEmail::value)
-        .map(CBString::new).toList()
-    );
+    return CBLists.ofCollection(emails.toList(), e -> new CBString(e.value()));
   }
 
   public static IdUser fromWireUser(
@@ -191,7 +153,7 @@ public final class IdUCB1ValidationGeneral
     throws IdProtocolException, IdPasswordException
   {
     return new IdUser(
-      fromWireUUID(user.fieldId()),
+      user.fieldId().value(),
       new IdName(user.fieldIdName().value()),
       new IdRealName(user.fieldRealName().value()),
       fromWireEmails(user.fieldEmails()),

@@ -18,6 +18,8 @@ package com.io7m.idstore.protocol.user.cb;
 
 import com.io7m.cedarbridge.runtime.api.CBMap;
 import com.io7m.cedarbridge.runtime.api.CBString;
+import com.io7m.cedarbridge.runtime.api.CBUUID;
+import com.io7m.cedarbridge.runtime.convenience.CBMaps;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -57,9 +59,7 @@ import java.util.stream.Collectors;
 
 import static com.io7m.cedarbridge.runtime.api.CBOptionType.fromOptional;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
-import static com.io7m.idstore.protocol.user.cb.internal.IdUCB1ValidationGeneral.fromWireUUID;
 import static com.io7m.idstore.protocol.user.cb.internal.IdUCB1ValidationGeneral.fromWireUser;
-import static com.io7m.idstore.protocol.user.cb.internal.IdUCB1ValidationGeneral.toWireUUID;
 import static com.io7m.idstore.protocol.user.cb.internal.IdUCB1ValidationGeneral.toWireUser;
 import static java.util.Map.entry;
 
@@ -118,44 +118,44 @@ public final class IdUCB1Validation
   private static IdU1ResponseEmailRemovePermit toWireResponseEmailRemovePermit(
     final IdUResponseEmailRemovePermit c)
   {
-    return new IdU1ResponseEmailRemovePermit(toWireUUID(c.requestId()));
+    return new IdU1ResponseEmailRemovePermit(new CBUUID(c.requestId()));
   }
 
   private static IdU1ResponseEmailRemoveDeny toWireResponseEmailRemoveDeny(
     final IdUResponseEmailRemoveDeny c)
   {
-    return new IdU1ResponseEmailRemoveDeny(toWireUUID(c.requestId()));
+    return new IdU1ResponseEmailRemoveDeny(new CBUUID(c.requestId()));
   }
 
   private static IdU1ResponseEmailRemoveBegin toWireResponseEmailRemoveBegin(
     final IdUResponseEmailRemoveBegin c)
   {
-    return new IdU1ResponseEmailRemoveBegin(toWireUUID(c.requestId()));
+    return new IdU1ResponseEmailRemoveBegin(new CBUUID(c.requestId()));
   }
 
   private static IdU1ResponseEmailAddPermit toWireResponseEmailAddPermit(
     final IdUResponseEmailAddPermit c)
   {
-    return new IdU1ResponseEmailAddPermit(toWireUUID(c.requestId()));
+    return new IdU1ResponseEmailAddPermit(new CBUUID(c.requestId()));
   }
 
   private static IdU1ResponseEmailAddDeny toWireResponseEmailAddDeny(
     final IdUResponseEmailAddDeny c)
   {
-    return new IdU1ResponseEmailAddDeny(toWireUUID(c.requestId()));
+    return new IdU1ResponseEmailAddDeny(new CBUUID(c.requestId()));
   }
 
   private static IdU1ResponseEmailAddBegin toWireResponseEmailAddBegin(
     final IdUResponseEmailAddBegin c)
   {
-    return new IdU1ResponseEmailAddBegin(toWireUUID(c.requestId()));
+    return new IdU1ResponseEmailAddBegin(new CBUUID(c.requestId()));
   }
 
   private static IdU1ResponseUserSelf toWireResponseUserSelf(
     final IdUResponseUserSelf c)
   {
     return new IdU1ResponseUserSelf(
-      toWireUUID(c.requestId()),
+      new CBUUID(c.requestId()),
       toWireUser(c.user())
     );
   }
@@ -164,7 +164,7 @@ public final class IdUCB1Validation
     final IdUResponseUserUpdate c)
   {
     return new IdU1ResponseUserUpdate(
-      toWireUUID(c.requestId()),
+      new CBUUID(c.requestId()),
       toWireUser(c.user())
     );
   }
@@ -173,16 +173,10 @@ public final class IdUCB1Validation
     final IdUResponseError error)
   {
     return new IdU1ResponseError(
-      toWireUUID(error.requestId()),
+      new CBUUID(error.requestId()),
       new CBString(error.errorCode().id()),
       new CBString(error.message()),
-      new CBMap<>(
-        error.attributes()
-          .entrySet()
-          .stream()
-          .map(e -> Map.entry(new CBString(e.getKey()), new CBString(e.getValue())))
-          .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-      ),
+      CBMaps.ofMapString(error.attributes()),
       fromOptional(error.remediatingAction().map(CBString::new))
     );
   }
@@ -191,7 +185,7 @@ public final class IdUCB1Validation
     final IdUResponseLogin login)
   {
     return new IdU1ResponseLogin(
-      toWireUUID(login.requestId()),
+      new CBUUID(login.requestId()),
       toWireUser(login.user())
     );
   }
@@ -312,15 +306,10 @@ public final class IdUCB1Validation
     final IdU1ResponseError error)
   {
     return new IdUResponseError(
-      fromWireUUID(error.fieldRequestId()),
+      error.fieldRequestId().value(),
       error.fieldMessage().value(),
       new IdErrorCode(error.fieldErrorCode().value()),
-      error.fieldAttributes()
-        .values()
-        .entrySet()
-        .stream()
-        .map(e -> Map.entry(e.getKey().value(), e.getValue().value()))
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)),
+      CBMaps.toMapString(error.fieldAttributes()),
       error.fieldRemediatingAction()
         .asOptional()
         .map(CBString::value)
@@ -332,7 +321,7 @@ public final class IdUCB1Validation
     throws IdProtocolException, IdPasswordException
   {
     return new IdUResponseLogin(
-      fromWireUUID(login.fieldRequestId()),
+      login.fieldRequestId().value(),
       fromWireUser(login.fieldUser())
     );
   }
@@ -505,37 +494,37 @@ public final class IdUCB1Validation
   private static IdUResponseEmailAddBegin fromWireResponseEmailAddBegin(
     final IdU1ResponseEmailAddBegin c)
   {
-    return new IdUResponseEmailAddBegin(fromWireUUID(c.fieldRequestId()));
+    return new IdUResponseEmailAddBegin(c.fieldRequestId().value());
   }
 
   private static IdUResponseEmailAddPermit fromWireResponseEmailAddPermit(
     final IdU1ResponseEmailAddPermit c)
   {
-    return new IdUResponseEmailAddPermit(fromWireUUID(c.fieldRequestId()));
+    return new IdUResponseEmailAddPermit(c.fieldRequestId().value());
   }
 
   private static IdUResponseEmailAddDeny fromWireResponseEmailAddDeny(
     final IdU1ResponseEmailAddDeny c)
   {
-    return new IdUResponseEmailAddDeny(fromWireUUID(c.fieldRequestId()));
+    return new IdUResponseEmailAddDeny(c.fieldRequestId().value());
   }
 
   private static IdUResponseEmailRemoveBegin fromWireResponseEmailRemoveBegin(
     final IdU1ResponseEmailRemoveBegin c)
   {
-    return new IdUResponseEmailRemoveBegin(fromWireUUID(c.fieldRequestId()));
+    return new IdUResponseEmailRemoveBegin(c.fieldRequestId().value());
   }
 
   private static IdUResponseEmailRemovePermit fromWireResponseEmailRemovePermit(
     final IdU1ResponseEmailRemovePermit c)
   {
-    return new IdUResponseEmailRemovePermit(fromWireUUID(c.fieldRequestId()));
+    return new IdUResponseEmailRemovePermit(c.fieldRequestId().value());
   }
 
   private static IdUResponseEmailRemoveDeny fromWireResponseEmailRemoveDeny(
     final IdU1ResponseEmailRemoveDeny c)
   {
-    return new IdUResponseEmailRemoveDeny(fromWireUUID(c.fieldRequestId()));
+    return new IdUResponseEmailRemoveDeny(c.fieldRequestId().value());
   }
 
   private static IdUCommandUserSelf fromWireCommandUserSelf(
@@ -549,7 +538,7 @@ public final class IdUCB1Validation
     throws IdProtocolException, IdPasswordException
   {
     return new IdUResponseUserSelf(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWireUser(c.fieldUser())
     );
   }
@@ -559,7 +548,7 @@ public final class IdUCB1Validation
     throws IdProtocolException, IdPasswordException
   {
     return new IdUResponseUserUpdate(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWireUser(c.fieldUser())
     );
   }

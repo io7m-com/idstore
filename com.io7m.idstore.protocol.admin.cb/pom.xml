@@ -53,6 +53,10 @@
       <artifactId>com.io7m.cedarbridge.runtime.bssio</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.io7m.cedarbridge</groupId>
+      <artifactId>com.io7m.cedarbridge.runtime.convenience</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.io7m.jbssio</groupId>
       <artifactId>com.io7m.jbssio.vanilla</artifactId>
     </dependency>
