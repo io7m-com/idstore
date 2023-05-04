@@ -23,8 +23,6 @@
   <modules>
     <module>com.io7m.idstore.admin_client.api</module>
     <module>com.io7m.idstore.admin_client</module>
-    <module>com.io7m.idstore.admin_gui.main</module>
-    <module>com.io7m.idstore.admin_gui</module>
     <module>com.io7m.idstore.database.api</module>
     <module>com.io7m.idstore.database.postgres</module>
     <module>com.io7m.idstore.documentation</module>
@@ -83,7 +81,6 @@
     <jooq.version>3.18.3</jooq.version>
     <logback.version>1.4.7</logback.version>
     <opentelemetry.version>1.25.0</opentelemetry.version>
-    <org.javafx.version>20.0.1</org.javafx.version>
     <org.jline.version>3.23.0</org.jline.version>
     <slf4j.version>2.0.7</slf4j.version>
     <testcontainers.version>1.18.0</testcontainers.version>
@@ -348,23 +345,6 @@
         <groupId>com.io7m.genevan</groupId>
         <artifactId>com.io7m.genevan.core</artifactId>
         <version>0.0.2</version>
-      </dependency>
-
-      <!-- JavaFX -->
-      <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-graphics</artifactId>
-        <version>${org.javafx.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-controls</artifactId>
-        <version>${org.javafx.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-fxml</artifactId>
-        <version>${org.javafx.version}</version>
       </dependency>
 
       <dependency>
