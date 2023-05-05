@@ -46,6 +46,7 @@ import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.mail.IdServerMailService;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
+import com.io7m.idstore.server.service.maintenance.IdMaintenanceService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetService;
@@ -89,8 +90,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public final class IdServer implements IdServerType
 {
   private final IdServerConfiguration configuration;
-  private CloseableCollectionType<IdServerException> resources;
   private final AtomicBoolean stopped;
+  private CloseableCollectionType<IdServerException> resources;
   private IdServerTelemetryServiceType telemetry;
   private IdDatabaseType database;
 
@@ -109,6 +110,20 @@ public final class IdServer implements IdServerType
       createResourceCollection();
     this.stopped =
       new AtomicBoolean(true);
+  }
+
+  private static CloseableCollectionType<IdServerException> createResourceCollection()
+  {
+    return CloseableCollection.create(
+      () -> {
+        return new IdServerException(
+          "Server creation failed.",
+          new IdErrorCode("server-creation"),
+          Map.of(),
+          Optional.empty()
+        );
+      }
+    );
   }
 
   @Override
@@ -299,6 +314,10 @@ public final class IdServer implements IdServerType
       userPasswordResetService
     );
 
+    final var maintenance =
+      IdMaintenanceService.create(clock, this.telemetry, newDatabase);
+    services.register(IdMaintenanceService.class, maintenance);
+
     services.register(IdRequestLimits.class, new IdRequestLimits(size -> {
       return strings.format("requestTooLarge", size);
     }));
@@ -351,6 +370,12 @@ public final class IdServer implements IdServerType
     if (this.stopped.compareAndSet(false, true)) {
       this.resources.close();
     }
+  }
+
+  @Override
+  public IdServerConfiguration configuration()
+  {
+    return this.configuration;
   }
 
   @Override
@@ -435,19 +460,5 @@ public final class IdServer implements IdServerType
         Optional.empty()
       );
     }
-  }
-
-  private static CloseableCollectionType<IdServerException> createResourceCollection()
-  {
-    return CloseableCollection.create(
-      () -> {
-        return new IdServerException(
-          "Server creation failed.",
-          new IdErrorCode("server-creation"),
-          Map.of(),
-          Optional.empty()
-        );
-      }
-    );
   }
 }

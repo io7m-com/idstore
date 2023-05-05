@@ -20,6 +20,7 @@ package com.io7m.idstore.server.admin_v1;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdLoginMetadataStandard;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
@@ -30,6 +31,7 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.http.IdCommonInstrumentedServlet;
 import com.io7m.idstore.server.http.IdHTTPErrorStatusException;
 import com.io7m.idstore.server.http.IdRequestUniqueIDs;
+import com.io7m.idstore.server.http.IdRequestUserAgents;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
@@ -38,6 +40,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -111,13 +114,24 @@ public final class IdA1Login extends IdCommonInstrumentedServlet
 
       try (var connection = this.database.openConnection(IDSTORE)) {
         try (var transaction = connection.openTransaction()) {
+          final var meta = new HashMap<>(login.metadata());
+          meta.put(
+            IdLoginMetadataStandard.remoteHost(),
+            Objects.requireNonNullElse(request.getRemoteAddr(), ""));
+          meta.put(
+            IdLoginMetadataStandard.userAgent(),
+            Objects.requireNonNullElse(
+              IdRequestUserAgents.requestUserAgent(request),
+              "")
+          );
+
           final var loggedIn =
             this.logins.adminLogin(
               transaction,
               IdRequestUniqueIDs.requestIdFor(request),
               login.userName().value(),
               login.password(),
-              Map.of()
+              meta
             );
 
           transaction.commit();

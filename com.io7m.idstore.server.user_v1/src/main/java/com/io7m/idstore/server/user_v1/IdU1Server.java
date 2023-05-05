@@ -157,6 +157,12 @@ public final class IdU1Server
     );
     servlets.addServlet(
       servletHolders.create(
+        IdU1VersionServlet.class,
+        IdU1VersionServlet::new),
+      "/version"
+    );
+    servlets.addServlet(
+      servletHolders.create(
         IdU1Login.class,
         IdU1Login::new),
       "/user/1/0/login"

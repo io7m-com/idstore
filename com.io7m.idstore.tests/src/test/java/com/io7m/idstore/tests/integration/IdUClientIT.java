@@ -53,6 +53,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -72,6 +75,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEE
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("integration")
 @Tag("user-client")
@@ -405,4 +409,38 @@ public final class IdUClientIT extends IdWithServerContract
       USER_NONEXISTENT
     );
 
+  /**
+   * The version endpoint returns something sensible.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testServerVersionEndpoint()
+    throws Exception
+  {
+    final var httpClient =
+      HttpClient.newHttpClient();
+
+    this.serverStartIfNecessary();
+
+    final var request =
+      HttpRequest.newBuilder(
+          this.serverUserAPIURL()
+            .resolve("/version")
+            .normalize()
+        ).GET()
+        .build();
+
+    final var response =
+      httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+    assertEquals(
+      "text/plain",
+      response.headers()
+        .firstValue("content-type")
+        .orElseThrow()
+    );
+    assertTrue(response.body().startsWith("com.io7m.idstore "));
+  }
 }

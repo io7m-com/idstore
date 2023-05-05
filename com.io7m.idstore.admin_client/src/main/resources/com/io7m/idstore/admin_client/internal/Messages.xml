@@ -8,6 +8,7 @@
   <entry key="serverSupports">Server supports:</entry>
   <entry key="clientSupports">Client supports:</entry>
   <entry key="notLoggedIn">Error: Not logged in!</entry>
+  <entry key="connectFailure">An error occurred whilst trying to connect to the identity server.</entry>
 
   <entry key="Expected Response Type">Expected Response Type</entry>
   <entry key="Received Response Type">Received Response Type</entry>

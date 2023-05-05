@@ -53,6 +53,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.user_client.internal.IdUCompression.decompressResponse;
 import static com.io7m.idstore.user_client.internal.IdUUUIDs.nullUUID;
+import static java.util.Objects.requireNonNullElse;
 
 /**
  * The version 1 protocol handler.
@@ -224,7 +225,10 @@ public final class IdUHandler1 extends IdUHandlerAbstract
       return new HBResultFailure<>(
         new IdUResponseError(
           nullUUID(),
-          e.getMessage(),
+          requireNonNullElse(
+            e.getMessage(),
+            this.strings().format("connectFailure")
+          ),
           IO_ERROR,
           Map.of(),
           Optional.empty()
@@ -393,5 +397,14 @@ public final class IdUHandler1 extends IdUHandlerAbstract
   public void onDisconnect()
   {
 
+  }
+
+  @Override
+  public String toString()
+  {
+    return String.format(
+      "[IdUHandler1 0x%08x]",
+      Integer.valueOf(this.hashCode())
+    );
   }
 }

@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.model;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -27,6 +28,7 @@ import java.util.regex.Pattern;
  */
 
 public record IdName(String value)
+  implements Comparable<IdName>
 {
   /**
    * The pattern that defines valid ID names.
@@ -56,5 +58,13 @@ public record IdName(String value)
   public String toString()
   {
     return this.value;
+  }
+
+  @Override
+  public int compareTo(
+    final IdName other)
+  {
+    return Comparator.comparing(IdName::value)
+      .compare(this, other);
   }
 }

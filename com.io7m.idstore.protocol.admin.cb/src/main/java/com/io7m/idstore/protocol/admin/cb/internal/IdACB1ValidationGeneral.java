@@ -25,6 +25,7 @@ import com.io7m.cedarbridge.runtime.api.CBOptionType;
 import com.io7m.cedarbridge.runtime.api.CBSerializableType;
 import com.io7m.cedarbridge.runtime.api.CBSome;
 import com.io7m.cedarbridge.runtime.api.CBString;
+import com.io7m.cedarbridge.runtime.api.CBUUID;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
@@ -42,7 +43,6 @@ import com.io7m.idstore.protocol.admin.cb.IdA1Page;
 import com.io7m.idstore.protocol.admin.cb.IdA1Password;
 import com.io7m.idstore.protocol.admin.cb.IdA1TimeRange;
 import com.io7m.idstore.protocol.admin.cb.IdA1TimestampUTC;
-import com.io7m.idstore.protocol.admin.cb.IdA1UUID;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 
 import java.time.OffsetDateTime;
@@ -50,7 +50,6 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Function;
 
 import static com.io7m.cedarbridge.runtime.api.CBOptionType.fromOptional;
@@ -85,7 +84,7 @@ public final class IdACB1ValidationGeneral
     final IdBan ban)
   {
     return new IdA1Ban(
-      toWireUUID(ban.user()),
+      new CBUUID(ban.user()),
       new CBString(ban.reason()),
       fromOptional(
         ban.expires().map(IdACB1ValidationGeneral::toWireTimestamp)
@@ -107,15 +106,6 @@ public final class IdACB1ValidationGeneral
     );
   }
 
-  public static IdA1UUID toWireUUID(
-    final UUID uuid)
-  {
-    return new IdA1UUID(
-      new CBIntegerUnsigned64(uuid.getMostSignificantBits()),
-      new CBIntegerUnsigned64(uuid.getLeastSignificantBits())
-    );
-  }
-
   public static IdA1TimeRange toWireTimeRange(
     final IdTimeRange timeRange)
   {
@@ -132,15 +122,6 @@ public final class IdACB1ValidationGeneral
       new CBString(password.algorithm().identifier()),
       new CBString(password.hash()),
       new CBString(password.salt())
-    );
-  }
-
-  public static UUID fromWireUUID(
-    final IdA1UUID uuid)
-  {
-    return new UUID(
-      uuid.fieldMsb().value(),
-      uuid.fieldLsb().value()
     );
   }
 
@@ -214,7 +195,7 @@ public final class IdACB1ValidationGeneral
     final IdA1Ban fieldBan)
   {
     return new IdBan(
-      fromWireUUID(fieldBan.fieldUser()),
+      fieldBan.fieldUser().value(),
       fieldBan.fieldReason().value(),
       mapPartial(
         fieldBan.fieldExpires().asOptional(),
@@ -242,7 +223,7 @@ public final class IdACB1ValidationGeneral
   {
     return new IdA1AuditEvent(
       new CBIntegerUnsigned64(e.id()),
-      toWireUUID(e.owner()),
+      new CBUUID(e.owner()),
       toWireTimestamp(e.time()),
       new CBString(e.type()),
       new CBString(e.message())
@@ -253,7 +234,7 @@ public final class IdACB1ValidationGeneral
     final IdA1Login i)
   {
     return new IdLogin(
-      fromWireUUID(i.fieldUser()),
+      i.fieldUser().value(),
       fromWireTimestamp(i.fieldTime()),
       i.fieldHost().value(),
       i.fieldAgent().value()
@@ -265,7 +246,7 @@ public final class IdACB1ValidationGeneral
   {
     return new IdAuditEvent(
       i.fieldId().value(),
-      fromWireUUID(i.fieldOwner()),
+      i.fieldOwner().value(),
       fromWireTimestamp(i.fieldTime()),
       i.fieldType().value(),
       i.fieldMessage().value()
@@ -276,7 +257,7 @@ public final class IdACB1ValidationGeneral
     final IdLogin i)
   {
     return new IdA1Login(
-      toWireUUID(i.userId()),
+      new CBUUID(i.userId()),
       toWireTimestamp(i.time()),
       new CBString(i.host()),
       new CBString(i.userAgent())

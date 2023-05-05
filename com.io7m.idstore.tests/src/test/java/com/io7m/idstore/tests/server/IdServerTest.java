@@ -127,7 +127,7 @@ public final class IdServerTest
   {
     final var mailService =
       new IdServerMailConfiguration(
-        new IdServerMailTransportSMTP("localhost", 25000),
+        new IdServerMailTransportSMTP("localhost", 32025),
         Optional.empty(),
         "no-reply@example.com",
         Duration.ofDays(1L)

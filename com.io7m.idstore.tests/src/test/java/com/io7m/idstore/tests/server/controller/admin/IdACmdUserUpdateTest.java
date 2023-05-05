@@ -74,9 +74,9 @@ public final class IdACmdUserUpdateTest
       assertThrows(IdCommandExecutionFailure.class, () -> {
         handler.execute(context, new IdACommandUserUpdate(
           randomUUID(),
-          Optional.empty(),
-          Optional.empty(),
-          Optional.empty()
+          empty(),
+          empty(),
+          empty()
         ));
       });
 
@@ -109,9 +109,9 @@ public final class IdACmdUserUpdateTest
       assertThrows(IdCommandExecutionFailure.class, () -> {
         handler.execute(context, new IdACommandUserUpdate(
           admin.id(),
-          Optional.empty(),
-          Optional.empty(),
-          Optional.empty()
+          empty(),
+          empty(),
+          empty()
         ));
       });
 
@@ -163,9 +163,9 @@ public final class IdACmdUserUpdateTest
           context,
           new IdACommandUserUpdate(
             user0.id(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty()));
+            empty(),
+            empty(),
+            empty()));
       });
 
     /* Assert. */
@@ -181,9 +181,9 @@ public final class IdACmdUserUpdateTest
     verify(users, this.once())
       .userUpdateAsAdmin(
         user0.id(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty()
+        empty(),
+        empty(),
+        empty()
       );
 
     verifyNoMoreInteractions(users);
@@ -318,8 +318,8 @@ public final class IdACmdUserUpdateTest
           new IdACommandUserUpdate(
             user0.id(),
             Optional.of(admin0.idName()),
-            Optional.empty(),
-            Optional.empty()));
+            empty(),
+            empty()));
       });
 
     /* Assert. */
@@ -334,8 +334,8 @@ public final class IdACmdUserUpdateTest
       .userUpdateAsAdmin(
         user0.id(),
         Optional.of(admin0.idName()),
-        Optional.empty(),
-        Optional.empty()
+        empty(),
+        empty()
       );
     verify(users, this.once())
       .userGetRequire(user0.id());

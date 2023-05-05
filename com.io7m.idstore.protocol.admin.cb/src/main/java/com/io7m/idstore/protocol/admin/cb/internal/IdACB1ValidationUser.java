@@ -21,6 +21,7 @@ import com.io7m.cedarbridge.runtime.api.CBList;
 import com.io7m.cedarbridge.runtime.api.CBOptionType;
 import com.io7m.cedarbridge.runtime.api.CBSome;
 import com.io7m.cedarbridge.runtime.api.CBString;
+import com.io7m.cedarbridge.runtime.api.CBUUID;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordException;
@@ -118,13 +119,11 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGenera
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.fromWirePasswordOptional;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.fromWireTimeRange;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.fromWireTimestamp;
-import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.fromWireUUID;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWireBan;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWirePage;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWirePassword;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWireTimeRange;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWireTimestamp;
-import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWireUUID;
 
 /**
  * Functions to translate between the core command set and the Admin v1
@@ -142,7 +141,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserSearchBegin r)
   {
     return new IdA1ResponseUserSearchBegin(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWirePage(r.page(), IdACB1ValidationUser::toWireUserSummary)
     );
   }
@@ -151,7 +150,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserSearchNext r)
   {
     return new IdA1ResponseUserSearchNext(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWirePage(r.page(), IdACB1ValidationUser::toWireUserSummary)
     );
   }
@@ -160,7 +159,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserSearchPrevious r)
   {
     return new IdA1ResponseUserSearchPrevious(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWirePage(r.page(), IdACB1ValidationUser::toWireUserSummary)
     );
   }
@@ -169,7 +168,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserSearchByEmailBegin r)
   {
     return new IdA1ResponseUserSearchByEmailBegin(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWirePage(r.page(), IdACB1ValidationUser::toWireUserSummary)
     );
   }
@@ -178,7 +177,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserSearchByEmailNext r)
   {
     return new IdA1ResponseUserSearchByEmailNext(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWirePage(r.page(), IdACB1ValidationUser::toWireUserSummary)
     );
   }
@@ -187,7 +186,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserSearchByEmailPrevious r)
   {
     return new IdA1ResponseUserSearchByEmailPrevious(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWirePage(r.page(), IdACB1ValidationUser::toWireUserSummary)
     );
   }
@@ -196,7 +195,7 @@ public final class IdACB1ValidationUser
     final IdUserSummary s)
   {
     return new IdA1UserSummary(
-      toWireUUID(s.id()),
+      new CBUUID(s.id()),
       new CBString(s.idName().value()),
       new CBString(s.realName().value()),
       toWireTimestamp(s.timeCreated()),
@@ -208,7 +207,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserUpdate r)
   {
     return new IdA1ResponseUserUpdate(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWireUser(r.user())
     );
   }
@@ -217,7 +216,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserGet r)
   {
     return new IdA1ResponseUserGet(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       fromOptional(r.user().map(IdACB1ValidationUser::toWireUser))
     );
   }
@@ -226,7 +225,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserDelete r)
   {
     return new IdA1ResponseUserDelete(
-      toWireUUID(r.requestId())
+      new CBUUID(r.requestId())
     );
   }
 
@@ -234,7 +233,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserCreate r)
   {
     return new IdA1ResponseUserCreate(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWireUser(r.user())
     );
   }
@@ -243,7 +242,7 @@ public final class IdACB1ValidationUser
     final IdUser admin)
   {
     return new IdA1User(
-      toWireUUID(admin.id()),
+      new CBUUID(admin.id()),
       new CBString(admin.idName().value()),
       new CBString(admin.realName().value()),
       new CBList<>(
@@ -264,7 +263,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserBanCreate r)
   {
     return new IdA1ResponseUserBanCreate(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWireBan(r.ban())
     );
   }
@@ -273,7 +272,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserBanDelete r)
   {
     return new IdA1ResponseUserBanDelete(
-      toWireUUID(r.requestId())
+      new CBUUID(r.requestId())
     );
   }
 
@@ -281,7 +280,7 @@ public final class IdACB1ValidationUser
     final IdAResponseUserBanGet r)
   {
     return new IdA1ResponseUserBanGet(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       fromOptional(r.ban().map(IdACB1ValidationGeneral::toWireBan))
     );
   }
@@ -290,7 +289,7 @@ public final class IdACB1ValidationUser
     final IdACommandUserUpdate c)
   {
     return new IdA1CommandUserUpdate(
-      toWireUUID(c.user()),
+      new CBUUID(c.user()),
       fromOptional(c.idName().map(IdName::value).map(CBString::new)),
       fromOptional(c.realName().map(IdRealName::value).map(CBString::new)),
       fromOptional(c.password().map(IdACB1ValidationGeneral::toWirePassword))
@@ -386,7 +385,7 @@ public final class IdACB1ValidationUser
     final IdACommandUserEmailRemove c)
   {
     return new IdA1CommandUserEmailRemove(
-      toWireUUID(c.user()),
+      new CBUUID(c.user()),
       new CBString(c.email().value())
     );
   }
@@ -395,7 +394,7 @@ public final class IdACB1ValidationUser
     final IdACommandUserEmailAdd c)
   {
     return new IdA1CommandUserEmailAdd(
-      toWireUUID(c.user()),
+      new CBUUID(c.user()),
       new CBString(c.email().value())
     );
   }
@@ -404,7 +403,7 @@ public final class IdACB1ValidationUser
     final IdACommandUserGet c)
   {
     return new IdA1CommandUserGet(
-      toWireUUID(c.user())
+      new CBUUID(c.user())
     );
   }
 
@@ -420,7 +419,7 @@ public final class IdACB1ValidationUser
     final IdACommandUserBanDelete c)
   {
     return new IdA1CommandUserBanDelete(
-      toWireUUID(c.user())
+      new CBUUID(c.user())
     );
   }
 
@@ -428,7 +427,7 @@ public final class IdACB1ValidationUser
     final IdACommandUserBanGet c)
   {
     return new IdA1CommandUserBanGet(
-      toWireUUID(c.user())
+      new CBUUID(c.user())
     );
   }
 
@@ -444,7 +443,7 @@ public final class IdACB1ValidationUser
     final IdACommandUserCreate c)
   {
     return new IdA1CommandUserCreate(
-      fromOptional(c.id().map(IdACB1ValidationGeneral::toWireUUID)),
+      fromOptional(c.id().map(CBUUID::new)),
       new CBString(c.idName().value()),
       new CBString(c.realName().value()),
       new CBString(c.email().value()),
@@ -456,7 +455,7 @@ public final class IdACB1ValidationUser
     final IdACommandUserDelete c)
   {
     return new IdA1CommandUserDelete(
-      toWireUUID(c.userId())
+      new CBUUID(c.userId())
     );
   }
 
@@ -464,7 +463,7 @@ public final class IdACB1ValidationUser
     final IdA1ResponseUserBanCreate c)
   {
     return new IdAResponseUserBanCreate(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWireBan(c.fieldBan())
     );
   }
@@ -473,7 +472,7 @@ public final class IdACB1ValidationUser
     final IdA1ResponseUserBanDelete c)
   {
     return new IdAResponseUserBanDelete(
-      fromWireUUID(c.fieldRequestId())
+      c.fieldRequestId().value()
     );
   }
 
@@ -481,7 +480,7 @@ public final class IdACB1ValidationUser
     final IdA1ResponseUserBanGet c)
   {
     return new IdAResponseUserBanGet(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       c.fieldBan().asOptional().map(IdACB1ValidationGeneral::fromWireBan)
     );
   }
@@ -491,7 +490,7 @@ public final class IdACB1ValidationUser
     throws IdProtocolException, IdPasswordException
   {
     return new IdAResponseUserCreate(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWireUser(c.fieldUser())
     );
   }
@@ -500,7 +499,7 @@ public final class IdACB1ValidationUser
     final IdA1ResponseUserDelete c)
   {
     return new IdAResponseUserDelete(
-      fromWireUUID(c.fieldRequestId())
+      c.fieldRequestId().value()
     );
   }
 
@@ -509,7 +508,7 @@ public final class IdACB1ValidationUser
     throws IdProtocolException, IdPasswordException
   {
     return new IdAResponseUserGet(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWireUserOptional(c.fieldUser())
     );
   }
@@ -528,7 +527,7 @@ public final class IdACB1ValidationUser
     final IdA1ResponseUserSearchBegin c)
   {
     return new IdAResponseUserSearchBegin(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWirePage(c.fieldPage(), IdACB1ValidationUser::fromWireUserSummary)
     );
   }
@@ -537,7 +536,7 @@ public final class IdACB1ValidationUser
     final IdA1ResponseUserSearchByEmailBegin c)
   {
     return new IdAResponseUserSearchByEmailBegin(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWirePage(c.fieldPage(), IdACB1ValidationUser::fromWireUserSummary)
     );
   }
@@ -546,7 +545,7 @@ public final class IdACB1ValidationUser
     final IdA1ResponseUserSearchByEmailNext c)
   {
     return new IdAResponseUserSearchByEmailNext(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWirePage(c.fieldPage(), IdACB1ValidationUser::fromWireUserSummary)
     );
   }
@@ -555,7 +554,7 @@ public final class IdACB1ValidationUser
     final IdA1ResponseUserSearchByEmailPrevious c)
   {
     return new IdAResponseUserSearchByEmailPrevious(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWirePage(c.fieldPage(), IdACB1ValidationUser::fromWireUserSummary)
     );
   }
@@ -564,7 +563,7 @@ public final class IdACB1ValidationUser
     final IdA1ResponseUserSearchNext c)
   {
     return new IdAResponseUserSearchNext(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWirePage(c.fieldPage(), IdACB1ValidationUser::fromWireUserSummary)
     );
   }
@@ -573,7 +572,7 @@ public final class IdACB1ValidationUser
     final IdA1ResponseUserSearchPrevious c)
   {
     return new IdAResponseUserSearchPrevious(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWirePage(c.fieldPage(), IdACB1ValidationUser::fromWireUserSummary)
     );
   }
@@ -583,7 +582,7 @@ public final class IdACB1ValidationUser
     throws IdProtocolException, IdPasswordException
   {
     return new IdAResponseUserUpdate(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWireUser(c.fieldUser())
     );
   }
@@ -600,7 +599,7 @@ public final class IdACB1ValidationUser
     final IdA1CommandUserBanDelete c)
   {
     return new IdACommandUserBanDelete(
-      fromWireUUID(c.fieldUserId())
+      c.fieldUserId().value()
     );
   }
 
@@ -608,16 +607,16 @@ public final class IdACB1ValidationUser
     final IdA1CommandUserBanGet c)
   {
     return new IdACommandUserBanGet(
-      fromWireUUID(c.fieldUserId())
+      c.fieldUserId().value()
     );
   }
 
   public static IdACommandUserCreate fromWireCommandUserCreate(
     final IdA1CommandUserCreate c)
-    throws IdPasswordException, IdProtocolException
+    throws IdPasswordException
   {
     return new IdACommandUserCreate(
-      c.fieldUserId().asOptional().map(IdACB1ValidationGeneral::fromWireUUID),
+      c.fieldUserId().asOptional().map(CBUUID::value),
       new IdName(c.fieldIdName().value()),
       new IdRealName(c.fieldRealName().value()),
       new IdEmail(c.fieldEmail().value()),
@@ -629,7 +628,7 @@ public final class IdACB1ValidationUser
     final IdA1CommandUserDelete c)
   {
     return new IdACommandUserDelete(
-      fromWireUUID(c.fieldUserId())
+      c.fieldUserId().value()
     );
   }
 
@@ -637,7 +636,7 @@ public final class IdACB1ValidationUser
     final IdA1CommandUserEmailAdd c)
   {
     return new IdACommandUserEmailAdd(
-      fromWireUUID(c.fieldUserId()),
+      c.fieldUserId().value(),
       new IdEmail(c.fieldEmail().value())
     );
   }
@@ -646,7 +645,7 @@ public final class IdACB1ValidationUser
     final IdA1CommandUserEmailRemove c)
   {
     return new IdACommandUserEmailRemove(
-      fromWireUUID(c.fieldUserId()),
+      c.fieldUserId().value(),
       new IdEmail(c.fieldEmail().value())
     );
   }
@@ -655,7 +654,7 @@ public final class IdACB1ValidationUser
     final IdA1CommandUserGet c)
   {
     return new IdACommandUserGet(
-      fromWireUUID(c.fieldUserId())
+      c.fieldUserId().value()
     );
   }
 
@@ -712,7 +711,7 @@ public final class IdACB1ValidationUser
     throws IdPasswordException
   {
     return new IdACommandUserUpdate(
-      fromWireUUID(c.fieldUserId()),
+      c.fieldUserId().value(),
       c.fieldIdName().asOptional().map(n -> new IdName(n.value())),
       c.fieldRealName().asOptional().map(n -> new IdRealName(n.value())),
       fromWirePasswordOptional(c.fieldPassword())
@@ -776,7 +775,7 @@ public final class IdACB1ValidationUser
     final IdA1UserSummary i)
   {
     return new IdUserSummary(
-      fromWireUUID(i.fieldId()),
+      i.fieldId().value(),
       new IdName(i.fieldIdName().value()),
       new IdRealName(i.fieldRealName().value()),
       fromWireTimestamp(i.fieldTimeCreated()),
@@ -789,7 +788,7 @@ public final class IdACB1ValidationUser
     throws IdPasswordException, IdProtocolException
   {
     return new IdUser(
-      fromWireUUID(fieldUser.fieldId()),
+      fieldUser.fieldId().value(),
       new IdName(fieldUser.fieldIdName().value()),
       new IdRealName(fieldUser.fieldRealName().value()),
       fromWireEmails(fieldUser.fieldEmails()),

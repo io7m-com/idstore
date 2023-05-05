@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.model;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 /**
@@ -25,6 +26,7 @@ import java.util.Objects;
  */
 
 public record IdRealName(String value)
+  implements Comparable<IdRealName>
 {
   /**
    * A user display name.
@@ -53,5 +55,13 @@ public record IdRealName(String value)
   public String toString()
   {
     return this.value;
+  }
+
+  @Override
+  public int compareTo(
+    final IdRealName other)
+  {
+    return Comparator.comparing(IdRealName::value)
+      .compare(this, other);
   }
 }

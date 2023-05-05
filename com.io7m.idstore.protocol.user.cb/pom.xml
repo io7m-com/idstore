@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>0.0.13</version>
+    <version>0.0.14</version>
   </parent>
 
   <artifactId>com.io7m.idstore.protocol.user.cb</artifactId>
@@ -51,6 +51,10 @@
     <dependency>
       <groupId>com.io7m.cedarbridge</groupId>
       <artifactId>com.io7m.cedarbridge.runtime.bssio</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.cedarbridge</groupId>
+      <artifactId>com.io7m.cedarbridge.runtime.convenience</artifactId>
     </dependency>
     <dependency>
       <groupId>com.io7m.jbssio</groupId>

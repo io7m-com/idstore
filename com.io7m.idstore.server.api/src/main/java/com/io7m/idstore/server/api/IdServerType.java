@@ -21,6 +21,7 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 
+import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,8 +32,8 @@ import java.util.UUID;
 public interface IdServerType extends AutoCloseable
 {
   /**
-   * Start the server instance. Can be called multiple times redundantly,
-   * and can be called before or after #close() has been called.
+   * Start the server instance. Can be called multiple times redundantly, and
+   * can be called before or after #close() has been called.
    *
    * @throws IdServerException On errors
    */
@@ -58,6 +59,39 @@ public interface IdServerType extends AutoCloseable
   @Override
   void close()
     throws IdServerException;
+
+  /**
+   * @return The configuration used for the server
+   */
+
+  IdServerConfiguration configuration();
+
+  /**
+   * @return The address of the user API
+   */
+
+  default URI userAPI()
+  {
+    return this.configuration().userApiAddress().externalAddress();
+  }
+
+  /**
+   * @return The address of the user view
+   */
+
+  default URI userView()
+  {
+    return this.configuration().userViewAddress().externalAddress();
+  }
+
+  /**
+   * @return The address of the admin API
+   */
+
+  default URI adminAPI()
+  {
+    return this.configuration().adminApiAddress().externalAddress();
+  }
 
   /**
    * Do the work necessary to set up a server instance (such as initializing

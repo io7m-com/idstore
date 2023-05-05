@@ -82,7 +82,10 @@ public final class IdUProtocolNegotiation
       response = httpClient.send(request, ofByteArray());
     } catch (final IOException e) {
       throw new IdUClientException(
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        requireNonNullElse(
+          e.getMessage(),
+          strings.format("connectFailure")
+        ),
         e,
         IO_ERROR,
         Map.of(),
@@ -126,7 +129,10 @@ public final class IdUProtocolNegotiation
       );
     } catch (final IOException e) {
       throw new IdUClientException(
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        requireNonNullElse(
+          e.getMessage(),
+          strings.format("connectFailure")
+        ),
         e,
         IO_ERROR,
         Map.of(),

@@ -57,7 +57,7 @@ public final class IdServerMailServiceTest
   {
     this.emailsReceived = new ConcurrentLinkedQueue<>();
     this.smtp =
-      SMTPServer.port(25000)
+      SMTPServer.port(32025)
         .messageHandler((messageContext, source, destination, data) -> {
           try {
             final var message =
@@ -76,7 +76,7 @@ public final class IdServerMailServiceTest
 
     this.configuration =
       new IdServerMailConfiguration(
-        new IdServerMailTransportSMTP("127.0.0.1", 25000),
+        new IdServerMailTransportSMTP("127.0.0.1", 32025),
         Optional.empty(),
         "examples@localhost.com",
         Duration.ofHours(6L)

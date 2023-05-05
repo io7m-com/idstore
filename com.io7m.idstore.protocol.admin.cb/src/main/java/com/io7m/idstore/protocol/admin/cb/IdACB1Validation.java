@@ -17,9 +17,11 @@
 package com.io7m.idstore.protocol.admin.cb;
 
 import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned16;
-import com.io7m.cedarbridge.runtime.api.CBList;
 import com.io7m.cedarbridge.runtime.api.CBMap;
 import com.io7m.cedarbridge.runtime.api.CBString;
+import com.io7m.cedarbridge.runtime.api.CBUUID;
+import com.io7m.cedarbridge.runtime.convenience.CBLists;
+import com.io7m.cedarbridge.runtime.convenience.CBMaps;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdName;
@@ -181,10 +183,8 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireResponseAdminUpdate;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.fromWirePage;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.fromWireTimeRange;
-import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.fromWireUUID;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWirePage;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWireTimeRange;
-import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.toWireUUID;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireCommandUserBanCreate;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireCommandUserBanDelete;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireCommandUserBanGet;
@@ -243,7 +243,6 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.t
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireResponseUserSearchNext;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireResponseUserSearchPrevious;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireResponseUserUpdate;
-import static java.util.Map.entry;
 
 /**
  * Functions to translate between the core command set and the Admin v1
@@ -357,12 +356,8 @@ public final class IdACB1Validation
     final IdAResponseUserLoginHistory c)
   {
     return new IdA1ResponseUserLoginHistory(
-      toWireUUID(c.requestId()),
-      new CBList<>(
-        c.history()
-          .stream()
-          .map(IdACB1ValidationGeneral::toWireLogin)
-          .toList())
+      new CBUUID(c.requestId()),
+      CBLists.ofCollection(c.history(), IdACB1ValidationGeneral::toWireLogin)
     );
   }
 
@@ -370,7 +365,7 @@ public final class IdACB1Validation
     final IdAResponseAuditSearchBegin r)
   {
     return new IdA1ResponseAuditSearchBegin(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWirePage(r.page(), IdACB1ValidationGeneral::toWireAuditEvent)
     );
   }
@@ -379,7 +374,7 @@ public final class IdACB1Validation
     final IdAResponseAuditSearchNext r)
   {
     return new IdA1ResponseAuditSearchNext(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWirePage(r.page(), IdACB1ValidationGeneral::toWireAuditEvent)
     );
   }
@@ -388,7 +383,7 @@ public final class IdACB1Validation
     final IdAResponseAuditSearchPrevious r)
   {
     return new IdA1ResponseAuditSearchPrevious(
-      toWireUUID(r.requestId()),
+      new CBUUID(r.requestId()),
       toWirePage(r.page(), IdACB1ValidationGeneral::toWireAuditEvent)
     );
   }
@@ -397,16 +392,10 @@ public final class IdACB1Validation
     final IdAResponseError error)
   {
     return new IdA1ResponseError(
-      toWireUUID(error.requestId()),
+      new CBUUID(error.requestId()),
       new CBString(error.errorCode().id()),
       new CBString(error.message()),
-      new CBMap<>(
-        error.attributes()
-          .entrySet()
-          .stream()
-          .map(e -> Map.entry(new CBString(e.getKey()), new CBString(e.getValue())))
-          .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-      ),
+      CBMaps.ofMapString(error.attributes()),
       fromOptional(error.remediatingAction().map(CBString::new))
     );
   }
@@ -415,7 +404,7 @@ public final class IdACB1Validation
     final IdAResponseLogin login)
   {
     return new IdA1ResponseLogin(
-      toWireUUID(login.requestId()),
+      new CBUUID(login.requestId()),
       toWireAdmin(login.admin())
     );
   }
@@ -528,7 +517,7 @@ public final class IdACB1Validation
     final IdACommandUserLoginHistory c)
   {
     return new IdA1CommandUserLoginHistory(
-      toWireUUID(c.user())
+      new CBUUID(c.user())
     );
   }
 
@@ -570,18 +559,7 @@ public final class IdACB1Validation
     return new IdA1CommandLogin(
       new CBString(login.userName().value()),
       new CBString(login.password()),
-      toWireLoginMetadata(login.metadata())
-    );
-  }
-
-  private static CBMap<CBString, CBString> toWireLoginMetadata(
-    final Map<String, String> metadata)
-  {
-    return new CBMap<>(
-      metadata.entrySet()
-        .stream()
-        .map(e -> entry(new CBString(e.getKey()), new CBString(e.getValue())))
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+      CBMaps.ofMapString(login.metadata())
     );
   }
 
@@ -589,15 +567,10 @@ public final class IdACB1Validation
     final IdA1ResponseError error)
   {
     return new IdAResponseError(
-      fromWireUUID(error.fieldRequestId()),
+      error.fieldRequestId().value(),
       error.fieldMessage().value(),
       new IdErrorCode(error.fieldErrorCode().value()),
-      error.fieldAttributes()
-        .values()
-        .entrySet()
-        .stream()
-        .map(e -> Map.entry(e.getKey().value(), e.getValue().value()))
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)),
+      CBMaps.toMapString(error.fieldAttributes()),
       error.fieldRemediatingAction()
         .asOptional()
         .map(CBString::value)
@@ -609,7 +582,7 @@ public final class IdACB1Validation
     throws IdProtocolException, IdPasswordException
   {
     return new IdAResponseLogin(
-      fromWireUUID(login.fieldRequestId()),
+      login.fieldRequestId().value(),
       fromWireAdmin(login.fieldAdmin())
     );
   }
@@ -854,7 +827,7 @@ public final class IdACB1Validation
     final IdA1CommandUserLoginHistory c)
   {
     return new IdACommandUserLoginHistory(
-      fromWireUUID(c.fieldUserId())
+      c.fieldUserId().value()
     );
   }
 
@@ -862,7 +835,7 @@ public final class IdACB1Validation
     final IdA1ResponseUserLoginHistory c)
   {
     return new IdAResponseUserLoginHistory(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       c.fieldHistory()
         .values()
         .stream()
@@ -875,7 +848,7 @@ public final class IdACB1Validation
     final IdA1ResponseAuditSearchBegin c)
   {
     return new IdAResponseAuditSearchBegin(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWirePage(c.fieldPage(), IdACB1ValidationGeneral::fromWireAuditEvent)
     );
   }
@@ -884,7 +857,7 @@ public final class IdACB1Validation
     final IdA1ResponseAuditSearchNext c)
   {
     return new IdAResponseAuditSearchNext(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWirePage(c.fieldPage(), IdACB1ValidationGeneral::fromWireAuditEvent)
     );
   }
@@ -893,7 +866,7 @@ public final class IdACB1Validation
     final IdA1ResponseAuditSearchPrevious c)
   {
     return new IdAResponseAuditSearchPrevious(
-      fromWireUUID(c.fieldRequestId()),
+      c.fieldRequestId().value(),
       fromWirePage(c.fieldPage(), IdACB1ValidationGeneral::fromWireAuditEvent)
     );
   }

@@ -23,11 +23,16 @@ import com.io7m.idstore.admin_client.api.IdAClientCredentials;
 import com.io7m.idstore.admin_client.api.IdAClientEventType;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
+import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 
 import java.net.http.HttpClient;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * The synchronous client.
@@ -57,38 +62,33 @@ public final class IdAClientSynchronous
     final IdAStrings inStrings,
     final HttpClient inHttpClient)
   {
-    super(new IdAHandlerDisconnected(inConfiguration, inStrings, inHttpClient));
+    super(
+      new IdAHandlerDisconnected(inConfiguration, inStrings, inHttpClient),
+      IdAClientSynchronous::ofException
+    );
   }
 
-  @Override
-  protected void onCommandExecuteSucceeded(
-    final IdACommandType<?> command,
-    final IdAResponseType result)
+  private static IdAResponseError ofException(
+    final Throwable ex)
   {
+    if (ex instanceof final IdAClientException e) {
+      return new IdAResponseError(
+        e.requestId().orElse(new UUID(0L, 0L)),
+        e.message(),
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction()
+      );
+    }
 
-  }
-
-  @Override
-  protected void onCommandExecuteFailed(
-    final IdACommandType<?> command,
-    final IdAResponseError result)
-  {
-
-  }
-
-  @Override
-  protected void onLoginExecuteSucceeded(
-    final IdAClientCredentials credentials,
-    final IdAResponseType result)
-  {
-
-  }
-
-  @Override
-  protected void onLoginExecuteFailed(
-    final IdAClientCredentials credentials,
-    final IdAResponseError result)
-  {
-
+    return new IdAResponseError(
+      new UUID(0L, 0L),
+      Objects.requireNonNullElse(
+        ex.getMessage(),
+        ex.getClass().getSimpleName()),
+      IdStandardErrorCodes.IO_ERROR,
+      Map.of(),
+      Optional.empty()
+    );
   }
 }

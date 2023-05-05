@@ -24,6 +24,7 @@ module com.io7m.idstore.protocol.user.cb
   requires static org.osgi.annotation.versioning;
 
   requires com.io7m.cedarbridge.runtime.bssio;
+  requires com.io7m.cedarbridge.runtime.convenience;
   requires com.io7m.jbssio.api;
   requires com.io7m.jbssio.vanilla;
   requires transitive com.io7m.cedarbridge.runtime.api;
