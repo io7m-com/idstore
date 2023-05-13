@@ -16,50 +16,86 @@
 
 package com.io7m.idstore.server.main.internal;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.io7m.claypot.core.CLPAbstractCommand;
-import com.io7m.claypot.core.CLPCommandContextType;
 import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.api.IdServerFactoryType;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.quarrel.core.QCommandContextType;
+import com.io7m.quarrel.core.QCommandMetadata;
+import com.io7m.quarrel.core.QCommandStatus;
+import com.io7m.quarrel.core.QCommandType;
+import com.io7m.quarrel.core.QParameterNamed1;
+import com.io7m.quarrel.core.QParameterNamedType;
+import com.io7m.quarrel.core.QParametersPositionalNone;
+import com.io7m.quarrel.core.QParametersPositionalType;
+import com.io7m.quarrel.core.QStringType;
+import com.io7m.quarrel.ext.logback.QLogback;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.nio.file.Path;
 import java.time.Clock;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.stream.Stream;
 
-import static com.io7m.claypot.core.CLPCommandType.Status.SUCCESS;
+import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
 
 /**
  * The "server" command.
  */
 
-@Parameters(commandDescription = "Start the server.")
-public final class IdSCmdServer extends CLPAbstractCommand
+public final class IdSCmdServer implements QCommandType
 {
-  @Parameter(
-    names = "--configuration",
-    description = "The configuration file",
-    required = true
-  )
-  private Path configurationFile;
+  private static final QParameterNamed1<Path> CONFIGURATION_FILE =
+    new QParameterNamed1<>(
+      "--configuration",
+      List.of(),
+      new QStringType.QConstant("The configuration file."),
+      Optional.empty(),
+      Path.class
+    );
+
+  private final QCommandMetadata metadata;
 
   /**
    * Construct a command.
-   *
-   * @param inContext The command context
    */
 
-  public IdSCmdServer(
-    final CLPCommandContextType inContext)
+  public IdSCmdServer()
   {
-    super(inContext);
+    this.metadata = new QCommandMetadata(
+      "server",
+      new QStringType.QConstant("Start the server."),
+      Optional.empty()
+    );
+  }
+
+  private static IllegalStateException noService()
+  {
+    return new IllegalStateException(
+      "No services available of %s".formatted(IdServerFactoryType.class)
+    );
   }
 
   @Override
-  protected Status executeActual()
+  public List<QParameterNamedType<?>> onListNamedParameters()
+  {
+    return Stream.concat(
+      Stream.of(CONFIGURATION_FILE),
+      QLogback.parameters().stream()
+    ).toList();
+  }
+
+  @Override
+  public QParametersPositionalType onListPositionalParameters()
+  {
+    return new QParametersPositionalNone();
+  }
+
+  @Override
+  public QCommandStatus onExecute(
+    final QCommandContextType context)
     throws Exception
   {
     System.setProperty("org.jooq.no-tips", "true");
@@ -68,9 +104,11 @@ public final class IdSCmdServer extends CLPAbstractCommand
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
 
+    QLogback.configure(context);
+
     final var configFile =
       new IdServerConfigurationFiles()
-        .parse(this.configurationFile);
+        .parse(context.parameterValue(CONFIGURATION_FILE));
 
     final var configuration =
       IdServerConfigurations.ofFile(
@@ -99,16 +137,9 @@ public final class IdSCmdServer extends CLPAbstractCommand
     return SUCCESS;
   }
 
-  private static IllegalStateException noService()
-  {
-    return new IllegalStateException(
-      "No services available of %s".formatted(IdServerFactoryType.class)
-    );
-  }
-
   @Override
-  public String name()
+  public QCommandMetadata metadata()
   {
-    return "server";
+    return this.metadata;
   }
 }

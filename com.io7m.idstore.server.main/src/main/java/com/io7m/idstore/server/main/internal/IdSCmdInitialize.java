@@ -16,90 +16,143 @@
 
 package com.io7m.idstore.server.main.internal;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.io7m.claypot.core.CLPAbstractCommand;
-import com.io7m.claypot.core.CLPCommandContextType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.api.IdServerFactoryType;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.quarrel.core.QCommandContextType;
+import com.io7m.quarrel.core.QCommandMetadata;
+import com.io7m.quarrel.core.QCommandStatus;
+import com.io7m.quarrel.core.QCommandType;
+import com.io7m.quarrel.core.QParameterNamed01;
+import com.io7m.quarrel.core.QParameterNamed1;
+import com.io7m.quarrel.core.QParameterNamedType;
+import com.io7m.quarrel.core.QParametersPositionalNone;
+import com.io7m.quarrel.core.QParametersPositionalType;
+import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.quarrel.ext.logback.QLogback;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.nio.file.Path;
 import java.time.Clock;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
+import java.util.stream.Stream;
 
-import static com.io7m.claypot.core.CLPCommandType.Status.SUCCESS;
+import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
 
 /**
  * The "initialize" command.
  */
 
-@Parameters(commandDescription = "Initialize the database.")
-public final class IdSCmdInitialize extends CLPAbstractCommand
+public final class IdSCmdInitialize implements QCommandType
 {
-  @Parameter(
-    names = "--configuration",
-    description = "The configuration file",
-    required = true
-  )
-  private Path configurationFile;
+  private static final QParameterNamed1<Path> CONFIGURATION_FILE =
+    new QParameterNamed1<>(
+      "--configuration",
+      List.of(),
+      new QConstant("The configuration file."),
+      Optional.empty(),
+      Path.class
+    );
 
-  @Parameter(
-    names = "--admin-id",
-    description = "The ID of the initial administrator",
-    required = false
-  )
-  private UUID adminId;
+  private static final QParameterNamed01<UUID> INITIAL_ADMIN =
+    new QParameterNamed01<>(
+      "--admin-id",
+      List.of(),
+      new QConstant("The ID of the initial administrator."),
+      Optional.empty(),
+      UUID.class
+    );
 
-  @Parameter(
-    names = "--admin-username",
-    description = "The initial administrator to create.",
-    required = true
-  )
-  private String adminUsername;
+  private static final QParameterNamed1<String> INITIAL_ADMIN_NAME =
+    new QParameterNamed1<>(
+      "--admin-username",
+      List.of(),
+      new QConstant("The initial administrator to create."),
+      Optional.empty(),
+      String.class
+    );
 
-  @Parameter(
-    names = "--admin-password",
-    description = "The password of the initial administrator.",
-    required = true
-  )
-  private String adminPassword;
+  private static final QParameterNamed1<String> INITIAL_ADMIN_PASSWORD =
+    new QParameterNamed1<>(
+      "--admin-password",
+      List.of(),
+      new QConstant("The password of the initial administrator."),
+      Optional.empty(),
+      String.class
+    );
 
-  @Parameter(
-    names = "--admin-email",
-    description = "The email address of the initial administrator.",
-    required = true
-  )
-  private String adminEmail;
+  private static final QParameterNamed1<String> INITIAL_ADMIN_EMAIL =
+    new QParameterNamed1<>(
+      "--admin-email",
+      List.of(),
+      new QConstant("The email address of the initial administrator."),
+      Optional.empty(),
+      String.class
+    );
 
-  @Parameter(
-    names = "--admin-realname",
-    description = "The real name of the initial administrator.",
-    required = true
-  )
-  private String adminRealname;
+  private static final QParameterNamed1<String> INITIAL_ADMIN_REALNAME =
+    new QParameterNamed1<>(
+      "--admin-realname",
+      List.of(),
+      new QConstant("The real name of the initial administrator."),
+      Optional.empty(),
+      String.class
+    );
+
+  private final QCommandMetadata metadata;
 
   /**
    * Construct a command.
-   *
-   * @param inContext The command context
    */
 
-  public IdSCmdInitialize(
-    final CLPCommandContextType inContext)
+  public IdSCmdInitialize()
   {
-    super(inContext);
+    this.metadata = new QCommandMetadata(
+      "initialize",
+      new QConstant("Initialize the server and database."),
+      Optional.empty()
+    );
+  }
+
+  private static IllegalStateException noService()
+  {
+    return new IllegalStateException(
+      "No services available of %s".formatted(IdServerFactoryType.class)
+    );
   }
 
   @Override
-  protected Status executeActual()
+  public List<QParameterNamedType<?>> onListNamedParameters()
+  {
+    return Stream.concat(
+      Stream.of(
+        CONFIGURATION_FILE,
+        INITIAL_ADMIN,
+        INITIAL_ADMIN_EMAIL,
+        INITIAL_ADMIN_NAME,
+        INITIAL_ADMIN_PASSWORD,
+        INITIAL_ADMIN_REALNAME
+      ),
+      QLogback.parameters().stream()
+    ).toList();
+  }
+
+  @Override
+  public QParametersPositionalType onListPositionalParameters()
+  {
+    return new QParametersPositionalNone();
+  }
+
+  @Override
+  public QCommandStatus onExecute(
+    final QCommandContextType context)
     throws Exception
   {
     System.setProperty("org.jooq.no-tips", "true");
@@ -108,9 +161,14 @@ public final class IdSCmdInitialize extends CLPAbstractCommand
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
 
+    QLogback.configure(context);
+
+    final var configurationFile =
+      context.parameterValue(CONFIGURATION_FILE);
+
     final var configFile =
       new IdServerConfigurationFiles()
-        .parse(this.configurationFile);
+        .parse(configurationFile);
 
     final var configuration =
       IdServerConfigurations.ofFile(
@@ -126,27 +184,20 @@ public final class IdSCmdInitialize extends CLPAbstractCommand
 
     try (var server = servers.createServer(configuration)) {
       server.setup(
-        Optional.ofNullable(this.adminId),
-        new IdName(this.adminUsername),
-        new IdEmail(this.adminEmail),
-        new IdRealName(this.adminRealname),
-        this.adminPassword
+        context.parameterValue(INITIAL_ADMIN),
+        new IdName(context.parameterValue(INITIAL_ADMIN_NAME)),
+        new IdEmail(context.parameterValue(INITIAL_ADMIN_EMAIL)),
+        new IdRealName(context.parameterValue(INITIAL_ADMIN_REALNAME)),
+        context.parameterValue(INITIAL_ADMIN_PASSWORD)
       );
     }
 
     return SUCCESS;
   }
 
-  private static IllegalStateException noService()
-  {
-    return new IllegalStateException(
-      "No services available of %s".formatted(IdServerFactoryType.class)
-    );
-  }
-
   @Override
-  public String name()
+  public QCommandMetadata metadata()
   {
-    return "initialize";
+    return this.metadata;
   }
 }

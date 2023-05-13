@@ -73,6 +73,7 @@
     <com.io7m.jqpage.version>0.0.2</com.io7m.jqpage.version>
     <com.io7m.jvindicator.version>0.0.1</com.io7m.jvindicator.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
+    <com.io7m.quarrel.version>0.0.2</com.io7m.quarrel.version>
     <com.io7m.quixote.version>0.0.2</com.io7m.quixote.version>
     <com.io7m.seltzer.version>0.0.1</com.io7m.seltzer.version>
     <com.io7m.trasco.version>0.0.6</com.io7m.trasco.version>
@@ -205,6 +206,21 @@
         <artifactId>com.io7m.jcip.annotations</artifactId>
         <version>2.0.0</version>
       </dependency>
+      <dependency>
+        <groupId>com.io7m.quarrel</groupId>
+        <artifactId>com.io7m.quarrel.core</artifactId>
+        <version>${com.io7m.quarrel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.quarrel</groupId>
+        <artifactId>com.io7m.quarrel.ext.logback</artifactId>
+        <version>${com.io7m.quarrel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.quarrel</groupId>
+        <artifactId>com.io7m.quarrel.ext.xstructural</artifactId>
+        <version>${com.io7m.quarrel.version}</version>
+      </dependency>
 
       <!-- Shell -->
       <dependency>
@@ -333,12 +349,6 @@
       </dependency>
 
       <dependency>
-        <groupId>com.beust</groupId>
-        <artifactId>jcommander</artifactId>
-        <version>1.82</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-math3</artifactId>
         <version>3.6.1</version>
@@ -370,11 +380,6 @@
         <groupId>com.io7m.jade</groupId>
         <artifactId>com.io7m.jade.vanilla</artifactId>
         <version>${com.io7m.jade.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.io7m.claypot</groupId>
-        <artifactId>com.io7m.claypot.core</artifactId>
-        <version>0.0.8</version>
       </dependency>
 
       <!-- Cedarbridge -->
@@ -448,6 +453,11 @@
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
         <version>1.8.21</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okio</groupId>
+        <artifactId>okio-jvm</artifactId>
+        <version>3.2.0</version>
       </dependency>
 
       <dependency>

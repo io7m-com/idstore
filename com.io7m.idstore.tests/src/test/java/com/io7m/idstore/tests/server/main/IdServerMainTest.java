@@ -88,7 +88,7 @@ public final class IdServerMainTest
     final var r = IdServerMain.mainExitless(new String[]{
 
     });
-    assertEquals(1, r);
+    assertEquals(0, r);
   }
 
   @Test

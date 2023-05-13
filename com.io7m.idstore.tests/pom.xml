@@ -95,6 +95,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.shell.admin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.tests.extensions</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -166,6 +171,10 @@
     <dependency>
       <groupId>com.io7m.quixote</groupId>
       <artifactId>com.io7m.quixote.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.quarrel</groupId>
+      <artifactId>com.io7m.quarrel.ext.xstructural</artifactId>
     </dependency>
   </dependencies>
 

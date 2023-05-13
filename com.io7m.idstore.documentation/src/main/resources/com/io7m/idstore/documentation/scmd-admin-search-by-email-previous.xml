@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Section id="d9574212-8cf0-3a9d-b5f3-4230b8eb2077" title="admin-search-by-email-previous" xmlns="urn:com.io7m.structural:8:0">
+  <Subsection title="Name">
+    <Paragraph>
+      <Term type="command">admin-search-by-email-previous</Term>
+       - Go to the previous page of admins.
+    </Paragraph>
+  </Subsection>
+  <Subsection title="Description">
+    <Paragraph>
+      The 
+      <Term type="command">admin-search-by-email-previous</Term>
+       command moves to the previous page of search results.
+    </Paragraph>
+  </Subsection>
+</Section>
+

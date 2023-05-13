@@ -29,11 +29,11 @@ open module com.io7m.idstore.server.main
   requires com.io7m.idstore.database.postgres;
   requires com.io7m.idstore.error_codes;
   requires com.io7m.idstore.model;
-  requires com.io7m.idstore.protocol.admin;
   requires com.io7m.idstore.protocol.admin.cb;
+  requires com.io7m.idstore.protocol.admin;
   requires com.io7m.idstore.protocol.api;
-  requires com.io7m.idstore.protocol.user;
   requires com.io7m.idstore.protocol.user.cb;
+  requires com.io7m.idstore.protocol.user;
   requires com.io7m.idstore.server.admin_v1;
   requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server.controller;
@@ -53,12 +53,13 @@ open module com.io7m.idstore.server.main
   requires com.io7m.idstore.server.user_v1;
   requires com.io7m.idstore.server.user_view;
   requires com.io7m.idstore.server.vanilla;
-  requires com.io7m.repetoir.core;
+  requires com.io7m.idstore.shell.admin;
 
+  requires com.io7m.quarrel.core;
+  requires com.io7m.quarrel.ext.logback;
+  requires com.io7m.repetoir.core;
   requires jul.to.slf4j;
   requires org.slf4j;
-  requires com.io7m.claypot.core;
-  requires jcommander;
 
   uses IdServerFactoryType;
 

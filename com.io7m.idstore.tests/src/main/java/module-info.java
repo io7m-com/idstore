@@ -16,17 +16,17 @@
 
 open module com.io7m.idstore.tests
 {
-  requires com.io7m.idstore.admin_client;
   requires com.io7m.idstore.admin_client.api;
+  requires com.io7m.idstore.admin_client;
   requires com.io7m.idstore.database.api;
   requires com.io7m.idstore.database.postgres;
   requires com.io7m.idstore.error_codes;
   requires com.io7m.idstore.model;
-  requires com.io7m.idstore.protocol.admin;
   requires com.io7m.idstore.protocol.admin.cb;
+  requires com.io7m.idstore.protocol.admin;
   requires com.io7m.idstore.protocol.api;
-  requires com.io7m.idstore.protocol.user;
   requires com.io7m.idstore.protocol.user.cb;
+  requires com.io7m.idstore.protocol.user;
   requires com.io7m.idstore.server.admin_v1;
   requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server.controller;
@@ -47,13 +47,14 @@ open module com.io7m.idstore.tests
   requires com.io7m.idstore.server.user_v1;
   requires com.io7m.idstore.server.user_view;
   requires com.io7m.idstore.server.vanilla;
-  requires com.io7m.repetoir.core;
+  requires com.io7m.idstore.shell.admin;
   requires com.io7m.idstore.tests.arbitraries;
-  requires com.io7m.idstore.user_client;
   requires com.io7m.idstore.user_client.api;
+  requires com.io7m.idstore.user_client;
 
   requires com.io7m.cxbutton.core;
   requires com.io7m.jmulticlose.core;
+  requires com.io7m.repetoir.core;
   requires com.io7m.verdant.core.cb;
   requires com.io7m.verdant.core;
   requires jakarta.mail;
