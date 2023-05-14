@@ -104,11 +104,12 @@
             </executions>
           </plugin>
 
-          <!-- Build and tag an image with podman. -->
+          <!-- OCI image creation and deployment. -->
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <executions>
+              <!-- Build and tag an image with podman. -->
               <execution>
                 <id>oci-image-create</id>
                 <goals>
@@ -125,20 +126,14 @@
                   </arguments>
                 </configuration>
               </execution>
-            </executions>
-          </plugin>
 
-          <!-- Push with podman. -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <executions>
+              <!-- Push with podman. -->
               <execution>
                 <id>oci-image-push</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <phase>package</phase>
+                <phase>deploy</phase>
                 <configuration>
                   <executable>podman</executable>
                   <arguments>
