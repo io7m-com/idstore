@@ -1,4 +1,4 @@
-IdSVersion(
+IdMVersion(
   appVersion,
   appBuild) ::= <<
 
@@ -18,14 +18,14 @@ IdSVersion(
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.main.internal;
+package com.io7m.idstore.main.internal;
 
-public final class IdSVersion
+public final class IdMVersion
 {
-  public static final String SERVER_VERSION = "<appVersion>";
-  public static final String SERVER_BUILD = "<appBuild>";
+  public static final String MAIN_VERSION = "<appVersion>";
+  public static final String MAIN_BUILD = "<appBuild>";
 
-  private IdSVersion()
+  private IdMVersion()
   {
 
   }

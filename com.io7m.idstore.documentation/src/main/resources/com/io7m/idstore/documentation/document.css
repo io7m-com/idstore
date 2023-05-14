@@ -52,16 +52,18 @@
   font-family: monospace;
 }
 
-.parametersTable tr
+.parameterTable tr
 {
 
 }
-.parametersTable th
+.parameterTable th
 {
-  text-align: left;
-  padding:    0.5em;
+  text-align:   left;
+  padding:      0.5em;
+  border-top:   1px solid #eee;
+  border-right: 1px solid #eee;
 }
-.parametersTable td
+.parameterTable td
 {
   vertical-align: top;
   hyphens:      auto;
@@ -69,31 +71,33 @@
   border-top:   1px solid #eee;
   border-right: 1px solid #eee;
 }
-.parametersTable td:nth-child(1)
+.parameterTable td:nth-child(1)
 {
   hyphens: none;
 }
-.parametersTable td:nth-child(2)
+.parameterTable td:nth-child(2)
 {
 
 }
-.parametersTable td:nth-child(3)
+.parameterTable td:nth-child(3)
 {
 
 }
-.parametersTable td:nth-child(4)
+.parameterTable td:nth-child(4)
 {
 
 }
-.parametersTable td:last-child
+.parameterTable td:last-child
 {
   border-right: none;
 }
 
 .valueTable th
 {
-  text-align: left;
-  padding:    0.5em;
+  text-align:   left;
+  padding:      0.5em;
+  border-top:   1px solid #eee;
+  border-right: 1px solid #eee;
 }
 .valueTable td
 {
@@ -117,8 +121,10 @@
 
 .genericTable th
 {
-  text-align: left;
-  padding:    0.5em;
+  text-align:   left;
+  padding:      0.5em;
+  border-top:   1px solid #eee;
+  border-right: 1px solid #eee;
 }
 .genericTable td
 {

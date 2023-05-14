@@ -5,7 +5,138 @@
          id="79cef67f-7c8e-4d49-86f1-e8bd9e25f884"
          title="Installation">
 
-  <xi:include href="server_install.xml"/>
-  <xi:include href="admin_client_install.xml"/>
+  <Subsection title="Overview">
+    <Paragraph>
+      The <Term type="package">idstore</Term> server package is available from the following sources:
+    </Paragraph>
+    <FormalItem title="Sources">
+      <ListUnordered>
+        <Item>
+          <Link target="bfd06f1f-c785-4780-83c4-23a0c12f3010">Maven Central</Link>
+        </Item>
+        <Item>
+          <Link target="8d8acfdb-ab75-42c8-a066-33b646e19eb5">Quay.io</Link>
+        </Item>
+      </ListUnordered>
+    </FormalItem>
+    <Paragraph>
+      Regardless of the distribution method, the <Term type="package">idstore</Term> package will contain a command
+      named <Term type="command">idstore</Term> that acts as the main entrypoint to all of the server and client
+      functionality.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="PostgreSQL"
+              id="c19831a6-1d7b-44c5-8145-af542e97e39a">
+    <Paragraph>
+      The <Term type="package">idstore</Term> server requires a
+      <LinkExternal target="https://www.postgresql.org/">PostgreSQL</LinkExternal>
+      server. The <Term type="package">idstore</Term> server will create the required tables and database objects on
+      first startup, given the name of a running PostgreSQL database, and a PostgreSQL role and password.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Maven Central"
+              id="bfd06f1f-c785-4780-83c4-23a0c12f3010">
+    <Paragraph>
+      A distribution package can be found at
+      <LinkExternal target="https://repo1.maven.org/maven2/com/io7m/idstore/com.io7m.idstore.main/${project.version}/com.io7m.idstore.main-${project.version}-distribution.zip">
+        Maven Central</LinkExternal>.
+    </Paragraph>
+    <Paragraph>
+      The <Term type="command">idstore</Term> command requires that a Java 17+ compatible JVM be accessible
+      via <Term type="command">/usr/bin/env java</Term>.
+    </Paragraph>
+    <Paragraph>
+      Verify the integrity of the distribution zip file:
+    </Paragraph>
+    <FormalItem title="Verify">
+      <Verbatim><![CDATA[
+$ gpg --verify com.io7m.idstore.main-${project.version}-distribution.zip.asc
+gpg: assuming signed data in 'com.io7m.idstore.main-${project.version}-distribution.zip.asc'
+gpg: Signature made Tue 28 Jun 2022 15:01:56 GMT
+gpg:                using RSA key 3CCE59428B30462D10459909C5607DA146E128B8
+gpg:                issuer "contact@io7m.com"
+gpg: using pgp trust model
+gpg: Good signature from "io7m.com (2022 maven-rsa-key) <contact@io7m.com>" [unknown]
+]]></Verbatim>
+    </FormalItem>
+    <Paragraph>
+      Unzip the zip file, and set up the environment appropriately. The <Term type="command">idstore</Term> command
+      expects an environment variable named <Term type="variable">IDSTORE_HOME</Term>
+      to be defined that points to the installation directory.
+    </Paragraph>
+    <FormalItem title="Extract">
+      <Verbatim><![CDATA[
+$ unzip com.io7m.idstore.main-${project.version}-distribution.zip
+$ export IDSTORE_HOME=$(realpath idstore)
+$ ./idstore/bin/idstore
+idstore: usage: idstore [command] [arguments ...]
+...
+]]></Verbatim>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="Quay.io" id="8d8acfdb-ab75-42c8-a066-33b646e19eb5">
+    <Paragraph>
+      <LinkExternal target="https://opencontainers.org/">OCI</LinkExternal> images are available
+      from <LinkExternal target="https://quay.io/repository/io7mcom/idstore">Quay.io</LinkExternal>
+      for use with <LinkExternal target="https://podman.io/">podman</LinkExternal> or
+      <LinkExternal target="https://www.docker.com/">docker</LinkExternal>.
+    </Paragraph>
+    <FormalItem title="Podman/Docker">
+      <Verbatim><![CDATA[$ podman pull quay.io/io7mcom/idstore
+$ podman run quay.io/io7mcom/idstore
+idstore: usage: idstore [command] [arguments ...]
+...
+]]></Verbatim>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="Running The Server">
+    <Subsection title="Initialization">
+      <Paragraph>
+        Given an appropriate
+        <Link target="c99d5d5d-769c-4616-8847-926b5d085270">configuration file</Link>
+        in <Term type="expression">server.conf</Term>, it's necessary to tell
+        <Term type="command">idstore</Term>
+        to configure the database and create an initial administrator user:
+      </Paragraph>
+      <FormalItem title="Initialize">
+        <Verbatim>
+          <xi:include href="c-initialize-example.txt"
+                      parse="text"/>
+        </Verbatim>
+      </FormalItem>
+    </Subsection>
+
+    <Subsection title="Running">
+      <Paragraph>
+        The server can now be run with <Term type="command">idstore server</Term>:
+      </Paragraph>
+      <FormalItem title="Run">
+        <Verbatim>
+          <xi:include href="c-server-example.txt"
+                      parse="text"/>
+        </Verbatim>
+      </FormalItem>
+      <Paragraph>
+        The server <Term type="emphasis">does not</Term> fork into the background and is designed to be run under process
+        supervision.
+      </Paragraph>
+    </Subsection>
+  </Subsection>
+
+  <Subsection title="Running The Shell">
+    <Paragraph>
+      Run <Term type="expression">idstore shell</Term>.
+    </Paragraph>
+    <FormalItem title="Shell">
+      <Verbatim>
+        <xi:include href="c-shell-example.txt"
+                    parse="text"/>
+      </Verbatim>
+    </FormalItem>
+  </Subsection>
 
 </Section>

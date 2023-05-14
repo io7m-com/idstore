@@ -14,12 +14,12 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.main;
+package com.io7m.idstore.main;
 
-import com.io7m.idstore.server.main.internal.IdSCmdInitialize;
-import com.io7m.idstore.server.main.internal.IdSCmdServer;
-import com.io7m.idstore.server.main.internal.IdSCmdShell;
-import com.io7m.idstore.server.main.internal.IdSVersion;
+import com.io7m.idstore.main.internal.IdMCmdInitialize;
+import com.io7m.idstore.main.internal.IdMCmdServer;
+import com.io7m.idstore.main.internal.IdMCmdShell;
+import com.io7m.idstore.main.internal.IdMVersion;
 import com.io7m.quarrel.core.QApplication;
 import com.io7m.quarrel.core.QApplicationMetadata;
 import com.io7m.quarrel.core.QApplicationType;
@@ -32,12 +32,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * IdServerMain command line entry point.
+ * Main command line entry point.
  */
 
-public final class IdServerMain implements Runnable
+public final class IdMain implements Runnable
 {
-  private static final Logger LOG = LoggerFactory.getLogger(IdServerMain.class);
+  private static final Logger LOG = LoggerFactory.getLogger(IdMain.class);
 
   private final List<String> args;
   private final QApplicationType application;
@@ -49,7 +49,7 @@ public final class IdServerMain implements Runnable
    * @param inArgs Command-line arguments
    */
 
-  public IdServerMain(
+  public IdMain(
     final String[] inArgs)
   {
     this.args =
@@ -59,17 +59,17 @@ public final class IdServerMain implements Runnable
       new QApplicationMetadata(
         "idstore",
         "com.io7m.idstore",
-        IdSVersion.SERVER_VERSION,
-        IdSVersion.SERVER_BUILD,
+        IdMVersion.MAIN_VERSION,
+        IdMVersion.MAIN_BUILD,
         "The idstore server and command-line application.",
         Optional.of(URI.create("https://www.io7m.com/software/idstore/"))
       );
 
     final var builder =
       QApplication.builder(metadata);
-    builder.addCommand(new IdSCmdInitialize());
-    builder.addCommand(new IdSCmdServer());
-    builder.addCommand(new IdSCmdShell());
+    builder.addCommand(new IdMCmdInitialize());
+    builder.addCommand(new IdMCmdServer());
+    builder.addCommand(new IdMCmdShell());
 
     this.application = builder.build();
     this.exitCode = 0;
@@ -98,7 +98,7 @@ public final class IdServerMain implements Runnable
   public static int mainExitless(
     final String[] args)
   {
-    final IdServerMain cm = new IdServerMain(args);
+    final IdMain cm = new IdMain(args);
     cm.run();
     return cm.exitCode();
   }

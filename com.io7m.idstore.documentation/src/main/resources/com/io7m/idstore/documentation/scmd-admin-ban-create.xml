@@ -69,5 +69,12 @@
       </Table>
     </FormalItem>
   </Subsection>
+  <Subsection title="Example">
+    <FormalItem title="Example">
+      <Verbatim><![CDATA[[idstore]# admin-ban-create
+> --admin 3a193a61-9427-4c24-8bd4-667d19914970
+> --expires-on 2100-01-01T00:00:00+00:00
+> --reason "You did something objectionable"]]></Verbatim>
+    </FormalItem>
+  </Subsection>
 </Section>
-

@@ -15,12 +15,10 @@
  */
 
 /**
- * The server main distribution.
+ * The main distribution [internals].
  */
 
-@Export
 @Version("1.0.0")
-package com.io7m.idstore.server.main;
+package com.io7m.idstore.main.internal;
 
-import org.osgi.annotation.bundle.Export;
 import org.osgi.annotation.versioning.Version;

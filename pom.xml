@@ -38,7 +38,7 @@
     <module>com.io7m.idstore.server.api</module>
     <module>com.io7m.idstore.server.controller</module>
     <module>com.io7m.idstore.server.http</module>
-    <module>com.io7m.idstore.server.main</module>
+    <module>com.io7m.idstore.main</module>
     <module>com.io7m.idstore.server.security</module>
     <module>com.io7m.idstore.server.service.branding</module>
     <module>com.io7m.idstore.server.service.clock</module>

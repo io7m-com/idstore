@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Section id="7d69608f-4375-3727-993b-819e07c3e63d" title="login" xmlns="urn:com.io7m.structural:8:0">
+
+<Section id="7d69608f-4375-3727-993b-819e07c3e63d"
+         title="login"
+         xmlns="urn:com.io7m.structural:8:0">
   <Subsection title="Name">
     <Paragraph>
       <Term type="command">login</Term>
-       - Log in.
+      - Log in.
     </Paragraph>
   </Subsection>
   <Subsection title="Description">
     <Paragraph>
-      The 
+      The
       <Term type="command">login</Term>
-       command logs in to a server.
+      command logs in to a server. This command is required to be executed before most other commands can be executed.
     </Paragraph>
   </Subsection>
 </Section>

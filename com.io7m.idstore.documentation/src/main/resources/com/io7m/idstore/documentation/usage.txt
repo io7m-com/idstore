@@ -1,27 +1,24 @@
-Usage: idstore [options] [command] [command options]
+idstore: usage: idstore [command] [arguments ...]
 
-  Options:
-    --verbose
-      Set the minimum logging verbosity level.
-      Default: info
-      Possible Values: [trace, debug, info, warn, error]
+  The idstore server and command-line application.
 
   Use the "help" command to examine specific commands:
 
     $ idstore help help.
 
-  Command-line arguments can be placed one per line into a file, and the file
-  can be referenced using the @ symbol:
+  Command-line arguments can be placed one per line into a file, and
+  the file can be referenced using the @ symbol:
 
     $ echo help > file.txt
     $ echo help >> file.txt
     $ idstore @file.txt
 
   Commands:
-    help           Show detailed help messages for commands.
-    initialize     Initialize the database.
-    server         Start the server.
-    version        Retrieve the version number.
+    help          Show usage information for a command.
+    initialize    Initialize the server and database.
+    server        Start the server.
+    shell         Run the admin command shell.
+    version       Show the application version.
 
   Documentation:
-    https://www.io7m.com/software/idstore/documentation/
+    https://www.io7m.com/software/idstore/

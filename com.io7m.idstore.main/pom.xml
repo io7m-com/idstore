@@ -12,10 +12,10 @@
     <version>0.0.15-SNAPSHOT</version>
   </parent>
 
-  <artifactId>com.io7m.idstore.server.main</artifactId>
+  <artifactId>com.io7m.idstore.main</artifactId>
 
-  <name>com.io7m.idstore.server.main</name>
-  <description>Identity server (Server main distribution)</description>
+  <name>com.io7m.idstore.main</name>
+  <description>Identity server (Main distribution)</description>
   <url>https://www.io7m.com/software/idstore</url>
 
   <dependencies>
@@ -104,9 +104,9 @@
               <templates>
                 <template>
                   <directory>src/main/string-template</directory>
-                  <name>IdSVersion</name>
+                  <name>IdMVersion</name>
                   <target>
-                    ${project.build.directory}/generated-sources/string-template/com/io7m/idstore/server/main/internal/IdSVersion.java
+                    ${project.build.directory}/generated-sources/string-template/com/io7m/idstore/main/internal/IdMVersion.java
                   </target>
                   <properties>
                     <appVersion>${project.version}</appVersion>

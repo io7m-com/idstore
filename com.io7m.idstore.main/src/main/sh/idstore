@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ -z "${IDSTORE_HOME}" ]
+then
+  echo "IDSTORE_HOME is unset" 1>&2
+  exit 1
+fi
+
+exec /usr/bin/env java \
+-p "${IDSTORE_HOME}/lib" \
+-m com.io7m.idstore.main/com.io7m.idstore.main.IdMain \
+"$@"

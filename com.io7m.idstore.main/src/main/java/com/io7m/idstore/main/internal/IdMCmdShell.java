@@ -14,67 +14,46 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.main.internal;
+package com.io7m.idstore.main.internal;
 
-import com.io7m.idstore.server.api.IdServerConfigurations;
-import com.io7m.idstore.server.api.IdServerFactoryType;
-import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.idstore.shell.admin.IdAShellConfiguration;
+import com.io7m.idstore.shell.admin.IdAShells;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
 import com.io7m.quarrel.core.QCommandType;
-import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QParametersPositionalNone;
 import com.io7m.quarrel.core.QParametersPositionalType;
-import com.io7m.quarrel.core.QStringType;
+import com.io7m.quarrel.core.QStringType.QConstant;
 import com.io7m.quarrel.ext.logback.QLogback;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import java.nio.file.Path;
-import java.time.Clock;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
+import static com.io7m.quarrel.core.QCommandStatus.FAILURE;
 import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
 
 /**
- * The "server" command.
+ * The "shell" command.
  */
 
-public final class IdSCmdServer implements QCommandType
+public final class IdMCmdShell implements QCommandType
 {
-  private static final QParameterNamed1<Path> CONFIGURATION_FILE =
-    new QParameterNamed1<>(
-      "--configuration",
-      List.of(),
-      new QStringType.QConstant("The configuration file."),
-      Optional.empty(),
-      Path.class
-    );
-
   private final QCommandMetadata metadata;
 
   /**
-   * Construct a command.
+   * The "shell" command.
    */
 
-  public IdSCmdServer()
+  public IdMCmdShell()
   {
     this.metadata = new QCommandMetadata(
-      "server",
-      new QStringType.QConstant("Start the server."),
+      "shell",
+      new QConstant("Run the admin command shell."),
       Optional.empty()
-    );
-  }
-
-  private static IllegalStateException noService()
-  {
-    return new IllegalStateException(
-      "No services available of %s".formatted(IdServerFactoryType.class)
     );
   }
 
@@ -82,7 +61,7 @@ public final class IdSCmdServer implements QCommandType
   public List<QParameterNamedType<?>> onListNamedParameters()
   {
     return Stream.concat(
-      Stream.of(CONFIGURATION_FILE),
+      Stream.of(),
       QLogback.parameters().stream()
     ).toList();
   }
@@ -98,43 +77,19 @@ public final class IdSCmdServer implements QCommandType
     final QCommandContextType context)
     throws Exception
   {
-    System.setProperty("org.jooq.no-tips", "true");
-    System.setProperty("org.jooq.no-logo", "true");
-
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
-
     QLogback.configure(context);
 
-    final var configFile =
-      new IdServerConfigurationFiles()
-        .parse(context.parameterValue(CONFIGURATION_FILE));
-
     final var configuration =
-      IdServerConfigurations.ofFile(
+      new IdAShellConfiguration(
         Locale.getDefault(),
-        Clock.systemUTC(),
-        configFile
+        Optional.empty()
       );
 
-    final var servers =
-      ServiceLoader.load(IdServerFactoryType.class)
-        .findFirst()
-        .orElseThrow(IdSCmdServer::noService);
-
-    try (var server = servers.createServer(configuration)) {
-      server.start();
-
-      while (true) {
-        try {
-          Thread.sleep(1_000L);
-        } catch (final InterruptedException e) {
-          break;
-        }
-      }
+    final var shells = new IdAShells();
+    try (var shell = shells.create(configuration)) {
+      shell.run();
+      return shell.exitCode() == 0 ? SUCCESS : FAILURE;
     }
-
-    return SUCCESS;
   }
 
   @Override

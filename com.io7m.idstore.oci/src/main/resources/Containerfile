@@ -2,8 +2,7 @@ FROM docker.io/library/alpine:${com.io7m.oci.versionAlpine}
 FROM docker.io/library/eclipse-temurin:${com.io7m.oci.versionTemurin}
 
 ENV PATH="/idstore/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/java/openjdk/bin"
-ENV IDSTORE_SERVER_HOME="/idstore"
-ENV IDSTORE_SERVER_LOG_DIRECTORY="${IDSTORE_SERVER_HOME}/var/log"
+ENV IDSTORE_HOME="/idstore"
 
 COPY idstore /idstore
 
@@ -15,8 +14,5 @@ LABEL "org.opencontainers.image.title"="Idstore"
 LABEL "org.opencontainers.image.url"="https://www.io7m.com/software/idstore"
 LABEL "org.opencontainers.image.version"="${project.version}"
 LABEL "org.opencontainers.image.revision"="${buildNumber}"
-
-VOLUME "/idstore/etc"
-VOLUME "/idstore/var"
 
 CMD ["/idstore/bin/idstore"]

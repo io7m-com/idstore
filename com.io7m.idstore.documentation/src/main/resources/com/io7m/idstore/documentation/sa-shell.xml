@@ -5,55 +5,105 @@
          xmlns="urn:com.io7m.structural:8:0"
          xmlns:xi="http://www.w3.org/2001/XInclude">
 
-  <Section title="Overview">
-    <Paragraph>
-      In addition to the various types of <Link target="7a497fd6-1559-46c7-9f2b-3004fb075c91">API</Link>
-      access the server provides, the <Term type="package">idstore</Term> package includes an interactive
-      command-line shell for performing basic administrative tasks.
-    </Paragraph>
-    <Paragraph>
-      The shell is started using the <Link target="15c17f31-3293-4a64-8e37-e420aef8a8c3">shell</Link>
-      command. The shell supports basic tab-completion and history accessed with the up and down arrows.
-    </Paragraph>
+  <Section title="Usage">
+    <Subsection title="Overview">
+      <Paragraph>
+        In addition to the various types of <Link target="7a497fd6-1559-46c7-9f2b-3004fb075c91">API</Link>
+        access the server provides, the <Term type="package">idstore</Term> package includes an interactive
+        command-line shell for performing basic administrative tasks.
+      </Paragraph>
+      <Paragraph>
+        The shell is started using the <Link target="15c17f31-3293-4a64-8e37-e420aef8a8c3">shell</Link>
+        command. The shell supports basic tab-completion and history accessed with the up and down arrows.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Tab Completion">
+      <Paragraph>
+        When running on an appropriate terminal, the shell supports tab completion for command and most
+        command arguments. Begin typing the name of a command, or the name of a command argument, and then
+        press tab. A set of completion options will be displayed.
+      </Paragraph>
+      <FormalItem title="Command Completion">
+        <Image source="term0.png" width="509" height="360">Command completion.</Image>
+      </FormalItem>
+      <FormalItem title="Argument Completion">
+        <Image source="term1.png" width="509" height="360">Argument completion.</Image>
+      </FormalItem>
+    </Subsection>
+    <Subsection title="History">
+      <Paragraph>
+        When running on an appropriate terminal, the command shell stores the history of command in memory (the
+        history is not saved to disk, for security reasons). Press the up and down arrows to navigate to previously
+        executed commands.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Quoting">
+      <Paragraph>
+        Arguments to shell commands may be quoted using the <Term type="constant">"</Term> or
+        <Term type="constant">'</Term> characters. This is required when calling commands that take arguments
+        that may need to contain strings.
+      </Paragraph>
+      <FormalItem title="Strings">
+        <Image source="term2.png" width="509" height="360">Quoting.</Image>
+      </FormalItem>
+    </Subsection>
+    <Subsection title="Newlines">
+      <Paragraph>
+        Typically, the <Term type="expression">ENTER</Term> key ends the current line. This will cause the shell to
+        interpret the contents of a line as a command and execute it. Pressing <Term type="expression">ALT+ENTER</Term>
+        inserts an actual newline character without executing the command. This can be useful if an argument to a
+        command needs to contain a newline character:
+      </Paragraph>
+      <FormalItem title="Strings">
+        <Image source="term3.png" width="509" height="360">Multiline.</Image>
+      </FormalItem>
+      <Paragraph>
+        When in this mode, the cursor can be moved around freely with the arrow keys to allow for editing lines.
+        Pressing the <Term type="expression">ENTER</Term> key ends the multiline editing mode and executes the
+        command.
+      </Paragraph>
+    </Subsection>
   </Section>
 
-  <xi:include href="scmd-admin-ban-create.xml"/>
-  <xi:include href="scmd-admin-ban-delete.xml"/>
-  <xi:include href="scmd-admin-ban-get.xml"/>
-  <xi:include href="scmd-admin-create.xml"/>
-  <xi:include href="scmd-admin-email-add.xml"/>
-  <xi:include href="scmd-admin-email-remove.xml"/>
-  <xi:include href="scmd-admin-get-by-email.xml"/>
-  <xi:include href="scmd-admin-get.xml"/>
-  <xi:include href="scmd-admin-search-begin.xml"/>
-  <xi:include href="scmd-admin-search-by-email-begin.xml"/>
-  <xi:include href="scmd-admin-search-by-email-next.xml"/>
-  <xi:include href="scmd-admin-search-by-email-previous.xml"/>
-  <xi:include href="scmd-admin-search-next.xml"/>
-  <xi:include href="scmd-admin-search-previous.xml"/>
-  <xi:include href="scmd-audit-search-begin.xml"/>
-  <xi:include href="scmd-audit-search-next.xml"/>
-  <xi:include href="scmd-audit-search-previous.xml"/>
-  <xi:include href="scmd-help.xml"/>
-  <xi:include href="scmd-login.xml"/>
-  <xi:include href="scmd-logout.xml"/>
-  <xi:include href="scmd-self.xml"/>
-  <xi:include href="scmd-set.xml"/>
-  <xi:include href="scmd-user-ban-create.xml"/>
-  <xi:include href="scmd-user-ban-delete.xml"/>
-  <xi:include href="scmd-user-ban-get.xml"/>
-  <xi:include href="scmd-user-create.xml"/>
-  <xi:include href="scmd-user-email-add.xml"/>
-  <xi:include href="scmd-user-email-remove.xml"/>
-  <xi:include href="scmd-user-get-by-email.xml"/>
-  <xi:include href="scmd-user-get.xml"/>
-  <xi:include href="scmd-user-login-history.xml"/>
-  <xi:include href="scmd-user-search-begin.xml"/>
-  <xi:include href="scmd-user-search-by-email-begin.xml"/>
-  <xi:include href="scmd-user-search-by-email-next.xml"/>
-  <xi:include href="scmd-user-search-by-email-previous.xml"/>
-  <xi:include href="scmd-user-search-next.xml"/>
-  <xi:include href="scmd-user-search-previous.xml"/>
-  <xi:include href="scmd-version.xml"/>
+  <Section title="Admin Shell Command Reference">
+    <xi:include href="scmd-admin-ban-create.xml"/>
+    <xi:include href="scmd-admin-ban-delete.xml"/>
+    <xi:include href="scmd-admin-ban-get.xml"/>
+    <xi:include href="scmd-admin-create.xml"/>
+    <xi:include href="scmd-admin-email-add.xml"/>
+    <xi:include href="scmd-admin-email-remove.xml"/>
+    <xi:include href="scmd-admin-get-by-email.xml"/>
+    <xi:include href="scmd-admin-get.xml"/>
+    <xi:include href="scmd-admin-search-begin.xml"/>
+    <xi:include href="scmd-admin-search-by-email-begin.xml"/>
+    <xi:include href="scmd-admin-search-by-email-next.xml"/>
+    <xi:include href="scmd-admin-search-by-email-previous.xml"/>
+    <xi:include href="scmd-admin-search-next.xml"/>
+    <xi:include href="scmd-admin-search-previous.xml"/>
+    <xi:include href="scmd-audit-search-begin.xml"/>
+    <xi:include href="scmd-audit-search-next.xml"/>
+    <xi:include href="scmd-audit-search-previous.xml"/>
+    <xi:include href="scmd-help.xml"/>
+    <xi:include href="scmd-login.xml"/>
+    <xi:include href="scmd-logout.xml"/>
+    <xi:include href="scmd-self.xml"/>
+    <xi:include href="scmd-set.xml"/>
+    <xi:include href="scmd-user-ban-create.xml"/>
+    <xi:include href="scmd-user-ban-delete.xml"/>
+    <xi:include href="scmd-user-ban-get.xml"/>
+    <xi:include href="scmd-user-create.xml"/>
+    <xi:include href="scmd-user-email-add.xml"/>
+    <xi:include href="scmd-user-email-remove.xml"/>
+    <xi:include href="scmd-user-get-by-email.xml"/>
+    <xi:include href="scmd-user-get.xml"/>
+    <xi:include href="scmd-user-login-history.xml"/>
+    <xi:include href="scmd-user-search-begin.xml"/>
+    <xi:include href="scmd-user-search-by-email-begin.xml"/>
+    <xi:include href="scmd-user-search-by-email-next.xml"/>
+    <xi:include href="scmd-user-search-by-email-previous.xml"/>
+    <xi:include href="scmd-user-search-next.xml"/>
+    <xi:include href="scmd-user-search-previous.xml"/>
+    <xi:include href="scmd-version.xml"/>
+  </Section>
 
 </Section>

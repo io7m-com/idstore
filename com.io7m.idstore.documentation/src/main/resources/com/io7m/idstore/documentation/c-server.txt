@@ -1,11 +1,18 @@
-Usage: server [options]
+idstore: usage: server [named-arguments ...]
 
-  Options:
+  Start the server.
+
+  Named parameters:
   * --configuration
-      The configuration file
+      Description       : The configuration file.
+      Type              : Path
+      Cardinality       : [1]; Specify exactly once.
+      Syntax            : <platform-specific path syntax>
     --verbose
-      Set the minimum logging verbosity level.
-      Default: info
-      Possible Values: [trace, debug, info, warn, error]
+      Description       : Set the logging level of the application.
+      Type              : QLogLevel
+      Cardinality       : [1]; Specify exactly once, or use the default.
+      Default value     : info
+      Syntax            : trace|debug|info|warn|error
 
-
+  The command does not accept any positional arguments.

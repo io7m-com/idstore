@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.main.internal;
+package com.io7m.idstore.main.internal;
 
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -50,7 +50,7 @@ import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
  * The "initialize" command.
  */
 
-public final class IdSCmdInitialize implements QCommandType
+public final class IdMCmdInitialize implements QCommandType
 {
   private static final QParameterNamed1<Path> CONFIGURATION_FILE =
     new QParameterNamed1<>(
@@ -112,7 +112,7 @@ public final class IdSCmdInitialize implements QCommandType
    * Construct a command.
    */
 
-  public IdSCmdInitialize()
+  public IdMCmdInitialize()
   {
     this.metadata = new QCommandMetadata(
       "initialize",
@@ -180,7 +180,7 @@ public final class IdSCmdInitialize implements QCommandType
     final var servers =
       ServiceLoader.load(IdServerFactoryType.class)
         .findFirst()
-        .orElseThrow(IdSCmdInitialize::noService);
+        .orElseThrow(IdMCmdInitialize::noService);
 
     try (var server = servers.createServer(configuration)) {
       server.setup(

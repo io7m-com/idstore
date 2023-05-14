@@ -17,10 +17,10 @@
 import com.io7m.idstore.server.api.IdServerFactoryType;
 
 /**
- * The server main distribution.
+ * The main distribution.
  */
 
-open module com.io7m.idstore.server.main
+open module com.io7m.idstore.main
 {
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
@@ -63,8 +63,8 @@ open module com.io7m.idstore.server.main
 
   uses IdServerFactoryType;
 
-  exports com.io7m.idstore.server.main.internal
+  exports com.io7m.idstore.main.internal
     to com.io7m.idstore.documentation;
 
-  exports com.io7m.idstore.server.main;
+  exports com.io7m.idstore.main;
 }
