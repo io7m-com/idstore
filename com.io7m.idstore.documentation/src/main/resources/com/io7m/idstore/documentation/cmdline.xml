@@ -8,11 +8,14 @@
     <Paragraph>
       The <Term type="package">idstore</Term> package provides a command-line interface for performing tasks such as
       starting the server, checking configuration files, hashing passwords, and etc. The base
-      <Term type="command">idstore</Term> command is broken into a number of subcommands which are documented
-      over the following sections.
+      <Term type="command">idstore</Term>
+      command is broken into a number of subcommands which are documented over the following sections.
     </Paragraph>
     <FormalItem title="Command-Line Overview">
-      <Verbatim><xi:include parse="text" href="usage.txt"/></Verbatim>
+      <Verbatim>
+        <xi:include parse="text"
+                    href="usage.txt"/>
+      </Verbatim>
     </FormalItem>
     <Paragraph>
       All subcommands accept a <Term type="parameter">--verbose</Term> parameter that may be set to one of
@@ -24,10 +27,10 @@
       level effectively causes everything to be logged, and will produce large volumes of debugging output.
     </Paragraph>
     <Paragraph id="ec6fd8d1-a6ae-4a4f-b478-48963f6a9ad9">
-      The <Term type="package">idstore</Term> command-line tool uses <LinkExternal target="https://jcommander.org/">
-      jcommander
-    </LinkExternal> to parse command-line arguments, and therefore supports placing command-line arguments into a file,
-      one argument per line, and then referencing that file with <Term type="constant">@</Term>. For example:
+      The <Term type="package">idstore</Term> command-line tool uses
+      <LinkExternal target="https://www.io7m.com/software/quarrel/">quarrel</LinkExternal>
+      to parse command-line arguments, and therefore supports placing command-line arguments into a file, one argument
+      per line, and then referencing that file with <Term type="constant">@</Term>. For example:
     </Paragraph>
     <FormalItem title="@ Syntax">
       <Verbatim>
@@ -43,6 +46,7 @@
 
   <xi:include href="c-initialize.xml"/>
   <xi:include href="c-server.xml"/>
+  <xi:include href="c-shell.xml"/>
   <xi:include href="c-version.xml"/>
 
 </Section>

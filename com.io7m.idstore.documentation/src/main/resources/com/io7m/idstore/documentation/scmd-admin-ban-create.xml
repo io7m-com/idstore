@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Section id="d7076a50-be5b-3b28-aad3-6f5bd92c1555" title="admin-ban-create" xmlns="urn:com.io7m.structural:8:0">
+  <Subsection title="Name">
+    <Paragraph>
+      <Term type="command">admin-ban-create</Term>
+       - Ban an admin.
+    </Paragraph>
+  </Subsection>
+  <Subsection title="Description">
+    <Paragraph>
+      The 
+      <Term type="command">admin-ban-create</Term>
+       command creates a new ban for an admin.
+    </Paragraph>
+    <FormalItem title="Parameters">
+      <Table type="parameterTable">
+        <Columns>
+          <Column>Parameter</Column>
+          <Column>Type</Column>
+          <Column>Cardinality</Column>
+          <Column>Default</Column>
+          <Column>Description</Column>
+        </Columns>
+        <Row>
+          <Cell>
+            <Term type="parameter">--admin</Term>
+          </Cell>
+          <Cell>
+            <Term type="type">java.util.UUID</Term>
+          </Cell>
+          <Cell>
+            <Term type="expression">[1, 1]</Term>
+          </Cell>
+          <Cell>
+            <Term type="constant"/>
+          </Cell>
+          <Cell>The admin ID.</Cell>
+        </Row>
+        <Row>
+          <Cell>
+            <Term type="parameter">--expires-on</Term>
+          </Cell>
+          <Cell>
+            <Term type="type">java.time.OffsetDateTime</Term>
+          </Cell>
+          <Cell>
+            <Term type="expression">[0, 1]</Term>
+          </Cell>
+          <Cell>
+            <Term type="constant"/>
+          </Cell>
+          <Cell>The time/date the ban expires.</Cell>
+        </Row>
+        <Row>
+          <Cell>
+            <Term type="parameter">--reason</Term>
+          </Cell>
+          <Cell>
+            <Term type="type">java.lang.String</Term>
+          </Cell>
+          <Cell>
+            <Term type="expression">[1, 1]</Term>
+          </Cell>
+          <Cell>
+            <Term type="constant"/>
+          </Cell>
+          <Cell>The ban reason.</Cell>
+        </Row>
+      </Table>
+    </FormalItem>
+  </Subsection>
+  <Subsection title="Example">
+    <FormalItem title="Example">
+      <Verbatim><![CDATA[[idstore]# admin-ban-create
+> --admin 3a193a61-9427-4c24-8bd4-667d19914970
+> --expires-on 2100-01-01T00:00:00+00:00
+> --reason "You did something objectionable"]]></Verbatim>
+    </FormalItem>
+  </Subsection>
+</Section>

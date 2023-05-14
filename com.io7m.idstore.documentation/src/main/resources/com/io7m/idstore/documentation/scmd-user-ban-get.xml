@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Section id="044585c8-baaf-3da6-8273-890d5a125ee4" title="user-ban-get" xmlns="urn:com.io7m.structural:8:0">
+  <Subsection title="Name">
+    <Paragraph>
+      <Term type="command">user-ban-get</Term>
+       - Retrieve the ban on a user, if one exists.
+    </Paragraph>
+  </Subsection>
+  <Subsection title="Description">
+    <Paragraph>
+      The 
+      <Term type="command">user-ban-get</Term>
+       command retrieves a ban for a user, if any.
+    </Paragraph>
+    <FormalItem title="Parameters">
+      <Table type="parameterTable">
+        <Columns>
+          <Column>Parameter</Column>
+          <Column>Type</Column>
+          <Column>Cardinality</Column>
+          <Column>Default</Column>
+          <Column>Description</Column>
+        </Columns>
+        <Row>
+          <Cell>
+            <Term type="parameter">--user</Term>
+          </Cell>
+          <Cell>
+            <Term type="type">java.util.UUID</Term>
+          </Cell>
+          <Cell>
+            <Term type="expression">[1, 1]</Term>
+          </Cell>
+          <Cell>
+            <Term type="constant"/>
+          </Cell>
+          <Cell>The user ID.</Cell>
+        </Row>
+      </Table>
+    </FormalItem>
+  </Subsection>
+</Section>
+

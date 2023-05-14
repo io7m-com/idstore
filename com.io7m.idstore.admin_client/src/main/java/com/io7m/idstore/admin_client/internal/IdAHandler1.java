@@ -198,6 +198,7 @@ public final class IdAHandler1 extends IdAHandlerAbstract
        * isn't.
        */
 
+      LOG.debug("server: response {}", responseActual.getClass());
       if (!Objects.equals(responseActual.getClass(), message.responseClass())) {
         return this.errorUnexpectedResponseType(message, responseActual);
       }

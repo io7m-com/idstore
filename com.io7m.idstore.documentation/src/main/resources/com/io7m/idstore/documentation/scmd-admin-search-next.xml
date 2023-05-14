@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Section id="c4950868-a988-3b94-b1f8-fa7db72aac03" title="admin-search-next" xmlns="urn:com.io7m.structural:8:0">
+  <Subsection title="Name">
+    <Paragraph>
+      <Term type="command">admin-search-next</Term>
+       - Go to the next page of admins.
+    </Paragraph>
+  </Subsection>
+  <Subsection title="Description">
+    <Paragraph>
+      The 
+      <Term type="command">admin-search-next</Term>
+       command moves to the next page of search results.
+    </Paragraph>
+  </Subsection>
+</Section>
+

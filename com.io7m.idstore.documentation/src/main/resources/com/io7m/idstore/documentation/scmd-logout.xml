@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<Section id="2ba15435-633b-3bc7-963e-ba08f2afd981"
+         title="logout"
+         xmlns="urn:com.io7m.structural:8:0">
+  <Subsection title="Name">
+    <Paragraph>
+      <Term type="command">logout</Term>
+      - Log out.
+    </Paragraph>
+  </Subsection>
+  <Subsection title="Description">
+    <Paragraph>
+      The
+      <Term type="command">logout</Term>
+      command logs out of a server. Has no effect if the
+      <Link target="7d69608f-4375-3727-993b-819e07c3e63d">login</Link>
+      command has not been executed.
+    </Paragraph>
+  </Subsection>
+</Section>
+

@@ -23,22 +23,22 @@ open module com.io7m.idstore.documentation
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires com.io7m.idstore.admin_client;
   requires com.io7m.idstore.admin_client.api;
+  requires com.io7m.idstore.admin_client;
   requires com.io7m.idstore.database.api;
   requires com.io7m.idstore.database.postgres;
   requires com.io7m.idstore.error_codes;
+  requires com.io7m.idstore.main;
   requires com.io7m.idstore.model;
-  requires com.io7m.idstore.protocol.admin;
   requires com.io7m.idstore.protocol.admin.cb;
+  requires com.io7m.idstore.protocol.admin;
   requires com.io7m.idstore.protocol.api;
-  requires com.io7m.idstore.protocol.user;
   requires com.io7m.idstore.protocol.user.cb;
+  requires com.io7m.idstore.protocol.user;
   requires com.io7m.idstore.server.admin_v1;
   requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server.controller;
   requires com.io7m.idstore.server.http;
-  requires com.io7m.idstore.server.main;
   requires com.io7m.idstore.server.security;
   requires com.io7m.idstore.server.service.branding;
   requires com.io7m.idstore.server.service.clock;
@@ -54,10 +54,10 @@ open module com.io7m.idstore.documentation
   requires com.io7m.idstore.server.user_v1;
   requires com.io7m.idstore.server.user_view;
   requires com.io7m.idstore.server.vanilla;
-  requires com.io7m.repetoir.core;
-  requires com.io7m.idstore.user_client;
   requires com.io7m.idstore.user_client.api;
+  requires com.io7m.idstore.user_client;
 
+  requires com.io7m.repetoir.core;
   requires com.io7m.claypot.core;
   requires java.xml;
   requires jcommander;

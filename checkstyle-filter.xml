@@ -180,4 +180,8 @@
   <suppress files="IdDatabaseMetricsMXBean\.java"
             checks="TypeName"/>
 
+  <!-- The shell refers to a lot of command types. -->
+  <suppress files="IdAShells\.java"
+            checks="ClassDataAbstractionCoupling"/>
+
 </suppressions>

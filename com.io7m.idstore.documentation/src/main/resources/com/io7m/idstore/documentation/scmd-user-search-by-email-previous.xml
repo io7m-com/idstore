@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Section id="b8976623-b733-3574-9e6d-3f74e43ae7d3" title="user-search-by-email-previous" xmlns="urn:com.io7m.structural:8:0">
+  <Subsection title="Name">
+    <Paragraph>
+      <Term type="command">user-search-by-email-previous</Term>
+       - Go to the previous page of users.
+    </Paragraph>
+  </Subsection>
+  <Subsection title="Description">
+    <Paragraph>
+      The 
+      <Term type="command">user-search-by-email-previous</Term>
+       command moves to the previous page of search results.
+    </Paragraph>
+  </Subsection>
+</Section>
+

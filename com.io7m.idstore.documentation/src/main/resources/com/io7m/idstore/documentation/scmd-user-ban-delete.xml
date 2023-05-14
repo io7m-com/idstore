@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Section id="d806b862-aba6-3345-86f8-9ed0a4f1db7f" title="user-ban-delete" xmlns="urn:com.io7m.structural:8:0">
+  <Subsection title="Name">
+    <Paragraph>
+      <Term type="command">user-ban-delete</Term>
+       - Unban a user.
+    </Paragraph>
+  </Subsection>
+  <Subsection title="Description">
+    <Paragraph>
+      The 
+      <Term type="command">user-ban-delete</Term>
+       command deletes a ban for a user.
+    </Paragraph>
+    <FormalItem title="Parameters">
+      <Table type="parameterTable">
+        <Columns>
+          <Column>Parameter</Column>
+          <Column>Type</Column>
+          <Column>Cardinality</Column>
+          <Column>Default</Column>
+          <Column>Description</Column>
+        </Columns>
+        <Row>
+          <Cell>
+            <Term type="parameter">--user</Term>
+          </Cell>
+          <Cell>
+            <Term type="type">java.util.UUID</Term>
+          </Cell>
+          <Cell>
+            <Term type="expression">[1, 1]</Term>
+          </Cell>
+          <Cell>
+            <Term type="constant"/>
+          </Cell>
+          <Cell>The user ID.</Cell>
+        </Row>
+      </Table>
+    </FormalItem>
+  </Subsection>
+</Section>
+

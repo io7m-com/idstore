@@ -9,7 +9,7 @@
   <parent>
     <groupId>com.io7m.idstore</groupId>
     <artifactId>com.io7m.idstore</artifactId>
-    <version>0.0.14</version>
+    <version>1.0.0-beta0001</version>
   </parent>
   <artifactId>com.io7m.idstore.tests</artifactId>
 
@@ -80,7 +80,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.server.main</artifactId>
+      <artifactId>com.io7m.idstore.main</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -91,6 +91,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.admin_client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.shell.admin</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -166,6 +171,10 @@
     <dependency>
       <groupId>com.io7m.quixote</groupId>
       <artifactId>com.io7m.quixote.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.quarrel</groupId>
+      <artifactId>com.io7m.quarrel.ext.xstructural</artifactId>
     </dependency>
   </dependencies>
 
