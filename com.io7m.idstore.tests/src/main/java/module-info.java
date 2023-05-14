@@ -16,22 +16,22 @@
 
 open module com.io7m.idstore.tests
 {
-  requires transitive com.io7m.idstore.admin_client;
   requires transitive com.io7m.idstore.admin_client.api;
+  requires transitive com.io7m.idstore.admin_client;
   requires transitive com.io7m.idstore.database.api;
   requires transitive com.io7m.idstore.database.postgres;
   requires transitive com.io7m.idstore.error_codes;
+  requires transitive com.io7m.idstore.main;
   requires transitive com.io7m.idstore.model;
-  requires transitive com.io7m.idstore.protocol.admin;
   requires transitive com.io7m.idstore.protocol.admin.cb;
+  requires transitive com.io7m.idstore.protocol.admin;
   requires transitive com.io7m.idstore.protocol.api;
-  requires transitive com.io7m.idstore.protocol.user;
   requires transitive com.io7m.idstore.protocol.user.cb;
+  requires transitive com.io7m.idstore.protocol.user;
   requires transitive com.io7m.idstore.server.admin_v1;
   requires transitive com.io7m.idstore.server.api;
   requires transitive com.io7m.idstore.server.controller;
   requires transitive com.io7m.idstore.server.http;
-  requires transitive com.io7m.idstore.server.main;
   requires transitive com.io7m.idstore.server.security;
   requires transitive com.io7m.idstore.server.service.branding;
   requires transitive com.io7m.idstore.server.service.clock;
@@ -51,8 +51,8 @@ open module com.io7m.idstore.tests
   requires transitive com.io7m.idstore.shell.admin;
   requires transitive com.io7m.idstore.tests.arbitraries;
   requires transitive com.io7m.idstore.tests.extensions;
-  requires transitive com.io7m.idstore.user_client;
   requires transitive com.io7m.idstore.user_client.api;
+  requires transitive com.io7m.idstore.user_client;
 
   requires com.io7m.cxbutton.core;
   requires com.io7m.jmulticlose.core;

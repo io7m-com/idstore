@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>0.0.15-SNAPSHOT</version>
+    <version>0.0.16-SNAPSHOT</version>
   </parent>
 
   <artifactId>com.io7m.idstore.oci</artifactId>
@@ -47,7 +47,7 @@
       <dependencies>
         <dependency>
           <groupId>${project.groupId}</groupId>
-          <artifactId>com.io7m.idstore.server.main</artifactId>
+          <artifactId>com.io7m.idstore.main</artifactId>
           <version>${project.version}</version>
           <classifier>distribution</classifier>
           <type>zip</type>
@@ -70,7 +70,7 @@
                 <configuration>
                   <excludes>module-info.java</excludes>
                   <includeGroupIds>${project.groupId}</includeGroupIds>
-                  <includeArtifactIds>com.io7m.idstore.server.main</includeArtifactIds>
+                  <includeArtifactIds>com.io7m.idstore.main</includeArtifactIds>
                   <type>zip</type>
                   <classifier>distribution</classifier>
                   <failOnMissingClassifierArtifact>true</failOnMissingClassifierArtifact>

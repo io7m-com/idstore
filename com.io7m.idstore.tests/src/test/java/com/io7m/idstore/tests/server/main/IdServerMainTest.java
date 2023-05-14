@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.tests.server.main;
 
-import com.io7m.idstore.server.main.IdServerMain;
+import com.io7m.idstore.main.IdMain;
 import com.io7m.idstore.tests.IdTestDirectories;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,7 +85,7 @@ public final class IdServerMainTest
   @Test
   public void testNoArguments()
   {
-    final var r = IdServerMain.mainExitless(new String[]{
+    final var r = IdMain.mainExitless(new String[]{
 
     });
     assertEquals(0, r);
@@ -94,7 +94,7 @@ public final class IdServerMainTest
   @Test
   public void testVersion()
   {
-    final var r = IdServerMain.mainExitless(new String[]{
+    final var r = IdMain.mainExitless(new String[]{
       "version"
     });
     assertEquals(0, r);
@@ -103,7 +103,7 @@ public final class IdServerMainTest
   @Test
   public void testHelpHelp()
   {
-    final var r = IdServerMain.mainExitless(new String[]{
+    final var r = IdMain.mainExitless(new String[]{
       "help", "help"
     });
     assertEquals(0, r);
@@ -112,7 +112,7 @@ public final class IdServerMainTest
   @Test
   public void testHelpServer()
   {
-    final var r = IdServerMain.mainExitless(new String[]{
+    final var r = IdMain.mainExitless(new String[]{
       "help", "server"
     });
     assertEquals(0, r);
@@ -121,7 +121,7 @@ public final class IdServerMainTest
   @Test
   public void testHelpInitialize()
   {
-    final var r = IdServerMain.mainExitless(new String[]{
+    final var r = IdMain.mainExitless(new String[]{
       "help", "initialize"
     });
     assertEquals(0, r);

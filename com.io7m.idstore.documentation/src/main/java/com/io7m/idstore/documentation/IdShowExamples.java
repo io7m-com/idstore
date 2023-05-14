@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.documentation;
 
-import com.io7m.idstore.server.main.IdServerMain;
+import com.io7m.idstore.main.IdMain;
 
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -54,6 +54,7 @@ public final class IdShowExamples
     final var commands = List.of(
       "server",
       "initialize",
+      "shell",
       "version"
     );
 
@@ -65,7 +66,7 @@ public final class IdShowExamples
              Files.newOutputStream(path, CREATE, WRITE, TRUNCATE_EXISTING)) {
         System.setOut(new PrintStream(output, true, UTF_8));
         System.setErr(new PrintStream(output, true, UTF_8));
-        IdServerMain.mainExitless(new String[]{
+        IdMain.mainExitless(new String[]{
           "help",
           command
         });
