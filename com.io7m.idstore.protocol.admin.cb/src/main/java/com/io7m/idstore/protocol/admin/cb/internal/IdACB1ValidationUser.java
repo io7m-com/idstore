@@ -47,7 +47,7 @@ import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchPrevious;
-import com.io7m.idstore.protocol.admin.IdACommandUserUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanGet;
@@ -76,7 +76,7 @@ import com.io7m.idstore.protocol.admin.cb.IdA1CommandUserSearchByEmailNext;
 import com.io7m.idstore.protocol.admin.cb.IdA1CommandUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.cb.IdA1CommandUserSearchNext;
 import com.io7m.idstore.protocol.admin.cb.IdA1CommandUserSearchPrevious;
-import com.io7m.idstore.protocol.admin.cb.IdA1CommandUserUpdate;
+import com.io7m.idstore.protocol.admin.cb.IdA1CommandUserUpdateCredentials;
 import com.io7m.idstore.protocol.admin.cb.IdA1ResponseUserBanCreate;
 import com.io7m.idstore.protocol.admin.cb.IdA1ResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.cb.IdA1ResponseUserBanGet;
@@ -285,10 +285,10 @@ public final class IdACB1ValidationUser
     );
   }
 
-  public static IdA1CommandUserUpdate toWireCommandUserUpdate(
-    final IdACommandUserUpdate c)
+  public static IdA1CommandUserUpdateCredentials toWireCommandUserUpdateCredentials(
+    final IdACommandUserUpdateCredentials c)
   {
-    return new IdA1CommandUserUpdate(
+    return new IdA1CommandUserUpdateCredentials(
       new CBUUID(c.user()),
       fromOptional(c.idName().map(IdName::value).map(CBString::new)),
       fromOptional(c.realName().map(IdRealName::value).map(CBString::new)),
@@ -706,11 +706,11 @@ public final class IdACB1ValidationUser
     return new IdACommandUserSearchByEmailPrevious();
   }
 
-  public static IdACommandUserUpdate fromWireCommandUserUpdate(
-    final IdA1CommandUserUpdate c)
+  public static IdACommandUserUpdateCredentials fromWireCommandUserUpdateCredentials(
+    final IdA1CommandUserUpdateCredentials c)
     throws IdPasswordException
   {
-    return new IdACommandUserUpdate(
+    return new IdACommandUserUpdateCredentials(
       c.fieldUserId().value(),
       c.fieldIdName().asOptional().map(n -> new IdName(n.value())),
       c.fieldRealName().asOptional().map(n -> new IdRealName(n.value())),

@@ -23,14 +23,19 @@ import static com.io7m.idstore.model.IdAdminPermission.ADMIN_BAN;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_READ;
-import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
-import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_SELF;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_CREDENTIALS;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_CREDENTIALS_SELF;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_EMAIL;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_EMAIL_SELF;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS_SELF;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
 import static com.io7m.idstore.model.IdAdminPermission.USER_BAN;
 import static com.io7m.idstore.model.IdAdminPermission.USER_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_READ;
-import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE_CREDENTIALS;
+import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE_EMAIL;
 
 /**
  * The default security policy.
@@ -163,8 +168,11 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     if (action instanceof IdSecAdminActionUserCreate e) {
       return checkAdminActionUserCreate(e);
     }
-    if (action instanceof IdSecAdminActionUserUpdate e) {
-      return checkAdminActionUserUpdate(e);
+    if (action instanceof IdSecAdminActionUserUpdateEmail e) {
+      return checkAdminActionUserUpdateEmail(e);
+    }
+    if (action instanceof IdSecAdminActionUserUpdateCredentials e) {
+      return checkAdminActionUserUpdateCredentials(e);
     }
     if (action instanceof IdSecAdminActionUserDelete e) {
       return checkAdminActionUserDelete(e);
@@ -280,15 +288,17 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   {
     final var admin = e.admin();
     if (Objects.equals(admin.id(), e.targetAdmin())) {
-      if (!admin.permissions().implies(ADMIN_WRITE_SELF)) {
+      if (!admin.permissions().implies(ADMIN_WRITE_PERMISSIONS_SELF)) {
         return new IdSecPolicyResultDenied(
-          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE_SELF)
+          "Modifying admins requires the %s permission."
+            .formatted(ADMIN_WRITE_PERMISSIONS_SELF)
         );
       }
     } else {
-      if (!admin.permissions().implies(ADMIN_WRITE)) {
+      if (!admin.permissions().implies(ADMIN_WRITE_PERMISSIONS)) {
         return new IdSecPolicyResultDenied(
-          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+          "Modifying admins requires the %s permission."
+            .formatted(ADMIN_WRITE_PERMISSIONS)
         );
       }
     }
@@ -309,15 +319,17 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   {
     final var admin = e.admin();
     if (Objects.equals(admin.id(), e.targetAdmin())) {
-      if (!admin.permissions().implies(ADMIN_WRITE_SELF)) {
+      if (!admin.permissions().implies(ADMIN_WRITE_PERMISSIONS_SELF)) {
         return new IdSecPolicyResultDenied(
-          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE_SELF)
+          "Modifying admins requires the %s permission."
+            .formatted(ADMIN_WRITE_PERMISSIONS_SELF)
         );
       }
     } else {
-      if (!admin.permissions().implies(ADMIN_WRITE)) {
+      if (!admin.permissions().implies(ADMIN_WRITE_PERMISSIONS)) {
         return new IdSecPolicyResultDenied(
-          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+          "Modifying admins requires the %s permission."
+            .formatted(ADMIN_WRITE_PERMISSIONS)
         );
       }
     }
@@ -338,15 +350,17 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   {
     final var admin = e.admin();
     if (Objects.equals(admin.id(), e.targetAdmin())) {
-      if (!admin.permissions().implies(ADMIN_WRITE_SELF)) {
+      if (!admin.permissions().implies(ADMIN_WRITE_EMAIL_SELF)) {
         return new IdSecPolicyResultDenied(
-          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE_SELF)
+          "Modifying admins requires the %s permission."
+            .formatted(ADMIN_WRITE_EMAIL_SELF)
         );
       }
     } else {
-      if (!admin.permissions().implies(ADMIN_WRITE)) {
+      if (!admin.permissions().implies(ADMIN_WRITE_EMAIL)) {
         return new IdSecPolicyResultDenied(
-          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+          "Modifying admins requires the %s permission."
+            .formatted(ADMIN_WRITE_EMAIL)
         );
       }
     }
@@ -359,15 +373,17 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   {
     final var admin = e.admin();
     if (Objects.equals(admin.id(), e.targetAdmin())) {
-      if (!admin.permissions().implies(ADMIN_WRITE_SELF)) {
+      if (!admin.permissions().implies(ADMIN_WRITE_EMAIL_SELF)) {
         return new IdSecPolicyResultDenied(
-          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE_SELF)
+          "Modifying admins requires the %s permission."
+            .formatted(ADMIN_WRITE_EMAIL_SELF)
         );
       }
     } else {
-      if (!admin.permissions().implies(ADMIN_WRITE)) {
+      if (!admin.permissions().implies(ADMIN_WRITE_EMAIL)) {
         return new IdSecPolicyResultDenied(
-          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+          "Modifying admins requires the %s permission."
+            .formatted(ADMIN_WRITE_EMAIL)
         );
       }
     }
@@ -427,16 +443,31 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     );
   }
 
-  private static IdSecPolicyResultType checkAdminActionUserUpdate(
-    final IdSecAdminActionUserUpdate e)
+  private static IdSecPolicyResultType checkAdminActionUserUpdateEmail(
+    final IdSecAdminActionUserUpdateEmail e)
   {
     final var permissions = e.admin().permissions();
-    if (permissions.implies(USER_WRITE)) {
+    if (permissions.implies(USER_WRITE_EMAIL)) {
       return new IdSecPolicyResultPermitted();
     }
 
     return new IdSecPolicyResultDenied(
-      "Updating users requires the %s permission.".formatted(USER_WRITE)
+      "Updating users requires the %s permission."
+        .formatted(USER_WRITE_EMAIL)
+    );
+  }
+
+  private static IdSecPolicyResultType checkAdminActionUserUpdateCredentials(
+    final IdSecAdminActionUserUpdateCredentials e)
+  {
+    final var permissions = e.admin().permissions();
+    if (permissions.implies(USER_WRITE_CREDENTIALS)) {
+      return new IdSecPolicyResultPermitted();
+    }
+
+    return new IdSecPolicyResultDenied(
+      "Updating users requires the %s permission."
+        .formatted(USER_WRITE_CREDENTIALS)
     );
   }
 
@@ -486,15 +517,17 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
     final var admin = e.admin();
     final var permissionsHeld = admin.permissions();
     if (Objects.equals(admin.id(), e.targetAdmin())) {
-      if (!permissionsHeld.implies(ADMIN_WRITE_SELF)) {
+      if (!permissionsHeld.implies(ADMIN_WRITE_CREDENTIALS_SELF)) {
         return new IdSecPolicyResultDenied(
-          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE_SELF)
+          "Modifying admins requires the %s permission."
+            .formatted(ADMIN_WRITE_CREDENTIALS_SELF)
         );
       }
     } else {
-      if (!permissionsHeld.implies(ADMIN_WRITE)) {
+      if (!permissionsHeld.implies(ADMIN_WRITE_CREDENTIALS)) {
         return new IdSecPolicyResultDenied(
-          "Modifying admins requires the %s permission.".formatted(ADMIN_WRITE)
+          "Modifying admins requires the %s permission."
+            .formatted(ADMIN_WRITE_CREDENTIALS)
         );
       }
     }

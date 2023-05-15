@@ -29,9 +29,9 @@ import java.util.Set;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_CREATE;
-import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS;
 import static com.io7m.idstore.model.IdAdminPermission.USER_READ;
-import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE_CREDENTIALS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -127,7 +127,7 @@ public final class IdACmdAdminPermissionGrantTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE, USER_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS, USER_WRITE_CREDENTIALS));
     final var admin1 =
       this.createAdmin("admin1", IdAdminPermissionSet.empty());
 
@@ -146,7 +146,7 @@ public final class IdACmdAdminPermissionGrantTest
         admin1.timeCreated(),
         admin1.timeUpdated(),
         admin1.password(),
-        IdAdminPermissionSet.of(USER_WRITE)
+        IdAdminPermissionSet.of(USER_WRITE_CREDENTIALS)
       ).withRedactedPassword();
 
     when(admins.adminGetRequire(admin1.id()))
@@ -164,7 +164,7 @@ public final class IdACmdAdminPermissionGrantTest
     final var handler = new IdACmdAdminPermissionGrant();
     handler.execute(
       context,
-      new IdACommandAdminPermissionGrant(admin1.id(), USER_WRITE)
+      new IdACommandAdminPermissionGrant(admin1.id(), USER_WRITE_CREDENTIALS)
     );
 
     /* Assert. */
@@ -181,7 +181,7 @@ public final class IdACmdAdminPermissionGrantTest
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
-        Optional.of(Set.of(USER_WRITE))
+        Optional.of(Set.of(USER_WRITE_CREDENTIALS))
       );
 
     verifyNoMoreInteractions(admins);

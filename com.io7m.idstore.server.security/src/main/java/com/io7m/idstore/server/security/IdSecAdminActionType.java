@@ -24,8 +24,7 @@ import com.io7m.idstore.model.IdAdmin;
  */
 
 public sealed interface IdSecAdminActionType
-  extends IdSecActionType permits
-  IdSecAdminActionAdminBanCreate,
+  extends IdSecActionType permits IdSecAdminActionAdminBanCreate,
   IdSecAdminActionAdminBanDelete,
   IdSecAdminActionAdminBanGet,
   IdSecAdminActionAdminCreate,
@@ -43,7 +42,8 @@ public sealed interface IdSecAdminActionType
   IdSecAdminActionUserCreate,
   IdSecAdminActionUserDelete,
   IdSecAdminActionUserRead,
-  IdSecAdminActionUserUpdate
+  IdSecAdminActionUserUpdateCredentials,
+  IdSecAdminActionUserUpdateEmail
 {
   /**
    * @return The admin performing the action

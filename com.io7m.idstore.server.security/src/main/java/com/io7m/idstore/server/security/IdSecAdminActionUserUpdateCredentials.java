@@ -21,12 +21,12 @@ import com.io7m.idstore.model.IdAdmin;
 import java.util.Objects;
 
 /**
- * An admin wants to update a user.
+ * An admin wants to update a user's credentials.
  *
  * @param admin The admin
  */
 
-public record IdSecAdminActionUserUpdate(IdAdmin admin)
+public record IdSecAdminActionUserUpdateCredentials(IdAdmin admin)
   implements IdSecAdminActionType
 {
   /**
@@ -35,7 +35,7 @@ public record IdSecAdminActionUserUpdate(IdAdmin admin)
    * @param admin The admin
    */
 
-  public IdSecAdminActionUserUpdate
+  public IdSecAdminActionUserUpdateCredentials
   {
     Objects.requireNonNull(admin, "admin");
   }

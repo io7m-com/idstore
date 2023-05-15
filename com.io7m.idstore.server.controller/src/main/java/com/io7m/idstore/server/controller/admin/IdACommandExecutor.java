@@ -35,7 +35,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
-import com.io7m.idstore.protocol.admin.IdACommandAdminUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
@@ -57,7 +57,7 @@ import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchPrevious;
-import com.io7m.idstore.protocol.admin.IdACommandUserUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutorType;
@@ -144,8 +144,8 @@ public final class IdACommandExecutor
     if (command instanceof IdACommandUserCreate c) {
       return new IdACmdUserCreate().execute(context, c);
     }
-    if (command instanceof IdACommandUserUpdate c) {
-      return new IdACmdUserUpdate().execute(context, c);
+    if (command instanceof IdACommandUserUpdateCredentials c) {
+      return new IdACmdUserUpdateCredentials().execute(context, c);
     }
     if (command instanceof IdACommandUserDelete c) {
       return new IdACmdUserDelete().execute(context, c);
@@ -176,8 +176,8 @@ public final class IdACommandExecutor
     if (command instanceof IdACommandAdminCreate c) {
       return new IdACmdAdminCreate().execute(context, c);
     }
-    if (command instanceof IdACommandAdminUpdate c) {
-      return new IdACmdAdminUpdate().execute(context, c);
+    if (command instanceof IdACommandAdminUpdateCredentials c) {
+      return new IdACmdAdminUpdateCredentials().execute(context, c);
     }
     if (command instanceof IdACommandAdminDelete c) {
       return new IdACmdAdminDelete().execute(context, c);

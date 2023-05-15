@@ -25,36 +25,36 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Update the given user.
+ * Update the given admin.
  *
- * @param user     The user to be updated
- * @param idName   The user's ID name
- * @param realName The user's realname
- * @param password The user's password
+ * @param admin    The admin to be updated
+ * @param idName   The admin's ID name
+ * @param realName The admin's realname
+ * @param password The admin's password
  */
 
-public record IdACommandUserUpdate(
-  UUID user,
+public record IdACommandAdminUpdateCredentials(
+  UUID admin,
   Optional<IdName> idName,
   Optional<IdRealName> realName,
   Optional<IdPassword> password)
-  implements IdACommandType<IdAResponseUserUpdate>
+  implements IdACommandType<IdAResponseAdminUpdate>
 {
   /**
-   * Update the given user.
+   * Update the given admin.
    */
 
-  public IdACommandUserUpdate
+  public IdACommandAdminUpdateCredentials
   {
-    Objects.requireNonNull(user, "user");
+    Objects.requireNonNull(admin, "admin");
     Objects.requireNonNull(idName, "idName");
     Objects.requireNonNull(realName, "realName");
     Objects.requireNonNull(password, "password");
   }
 
   @Override
-  public Class<IdAResponseUserUpdate> responseClass()
+  public Class<IdAResponseAdminUpdate> responseClass()
   {
-    return IdAResponseUserUpdate.class;
+    return IdAResponseAdminUpdate.class;
   }
 }

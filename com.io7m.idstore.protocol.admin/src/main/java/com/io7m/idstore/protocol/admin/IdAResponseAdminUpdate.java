@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * A response to {@link IdACommandAdminUpdate}.
+ * A response to {@link IdACommandAdminUpdateCredentials}.
  *
  * @param requestId The request ID
  * @param admin     The admin
@@ -34,7 +34,7 @@ public record IdAResponseAdminUpdate(
   implements IdAResponseType
 {
   /**
-   * A response to {@link IdACommandAdminUpdate}.
+   * A response to {@link IdACommandAdminUpdateCredentials}.
    */
 
   public IdAResponseAdminUpdate

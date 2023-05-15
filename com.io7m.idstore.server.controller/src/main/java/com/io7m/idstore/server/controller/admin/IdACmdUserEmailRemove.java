@@ -23,7 +23,7 @@ import com.io7m.idstore.protocol.admin.IdACommandUserEmailRemove;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.security.IdSecAdminActionUserUpdate;
+import com.io7m.idstore.server.security.IdSecAdminActionUserUpdateEmail;
 
 /**
  * IdACmdUserEmailRemove
@@ -53,7 +53,7 @@ public final class IdACmdUserEmailRemove
     final var admin =
       context.admin();
 
-    context.securityCheck(new IdSecAdminActionUserUpdate(admin));
+    context.securityCheck(new IdSecAdminActionUserUpdateEmail(admin));
 
     transaction.adminIdSet(admin.id());
 

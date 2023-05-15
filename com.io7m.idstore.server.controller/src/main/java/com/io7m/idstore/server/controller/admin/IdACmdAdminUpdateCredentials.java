@@ -20,7 +20,7 @@ package com.io7m.idstore.server.controller.admin;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.protocol.admin.IdACommandAdminUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.controller.IdServerStrings;
@@ -37,15 +37,15 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE
  * IdACmdAdminUpdate
  */
 
-public final class IdACmdAdminUpdate
+public final class IdACmdAdminUpdateCredentials
   extends IdACmdAbstract<
-  IdACommandContext, IdACommandAdminUpdate, IdAResponseType>
+  IdACommandContext, IdACommandAdminUpdateCredentials, IdAResponseType>
 {
   /**
    * IdACmdAdminUpdate
    */
 
-  public IdACmdAdminUpdate()
+  public IdACmdAdminUpdateCredentials()
   {
 
   }
@@ -53,7 +53,7 @@ public final class IdACmdAdminUpdate
   @Override
   protected IdAResponseType executeActual(
     final IdACommandContext context,
-    final IdACommandAdminUpdate command)
+    final IdACommandAdminUpdateCredentials command)
     throws IdException, IdCommandExecutionFailure
   {
     final var transaction =

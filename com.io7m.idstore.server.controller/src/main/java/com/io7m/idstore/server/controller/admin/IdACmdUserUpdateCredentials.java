@@ -20,12 +20,12 @@ package com.io7m.idstore.server.controller.admin;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.protocol.admin.IdACommandUserUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.security.IdSecAdminActionUserUpdate;
+import com.io7m.idstore.server.security.IdSecAdminActionUserUpdateCredentials;
 import com.io7m.jaffirm.core.Invariants;
 
 import java.util.Objects;
@@ -36,15 +36,15 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE
  * IdACmdUserUpdate
  */
 
-public final class IdACmdUserUpdate
+public final class IdACmdUserUpdateCredentials
   extends IdACmdAbstract<
-  IdACommandContext, IdACommandUserUpdate, IdAResponseType>
+  IdACommandContext, IdACommandUserUpdateCredentials, IdAResponseType>
 {
   /**
    * IdACmdUserUpdate
    */
 
-  public IdACmdUserUpdate()
+  public IdACmdUserUpdateCredentials()
   {
 
   }
@@ -52,7 +52,7 @@ public final class IdACmdUserUpdate
   @Override
   protected IdAResponseType executeActual(
     final IdACommandContext context,
-    final IdACommandUserUpdate command)
+    final IdACommandUserUpdateCredentials command)
     throws IdException, IdCommandExecutionFailure
   {
     final var transaction =
@@ -60,7 +60,7 @@ public final class IdACmdUserUpdate
     final var admin =
       context.admin();
 
-    context.securityCheck(new IdSecAdminActionUserUpdate(admin));
+    context.securityCheck(new IdSecAdminActionUserUpdateCredentials(admin));
 
     transaction.adminIdSet(admin.id());
 

@@ -23,9 +23,9 @@ import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.protocol.admin.IdACommandUserUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
-import com.io7m.idstore.server.controller.admin.IdACmdUserUpdate;
+import com.io7m.idstore.server.controller.admin.IdACmdUserUpdateCredentials;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,7 +36,7 @@ import java.util.Optional;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
-import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE_CREDENTIALS;
 import static java.util.Optional.empty;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +47,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-public final class IdACmdUserUpdateTest
+public final class IdACmdUserUpdateCredentialsTest
   extends IdACmdAbstractContract
 {
   /**
@@ -69,10 +69,10 @@ public final class IdACmdUserUpdateTest
 
     /* Act. */
 
-    final var handler = new IdACmdUserUpdate();
+    final var handler = new IdACmdUserUpdateCredentials();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdACommandUserUpdate(
+        handler.execute(context, new IdACommandUserUpdateCredentials(
           randomUUID(),
           empty(),
           empty(),
@@ -104,10 +104,10 @@ public final class IdACmdUserUpdateTest
 
     /* Act. */
 
-    final var handler = new IdACmdUserUpdate();
+    final var handler = new IdACmdUserUpdateCredentials();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdACommandUserUpdate(
+        handler.execute(context, new IdACommandUserUpdateCredentials(
           admin.id(),
           empty(),
           empty(),
@@ -133,7 +133,7 @@ public final class IdACmdUserUpdateTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(USER_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(USER_WRITE_CREDENTIALS));
     final var user0 =
       this.createUser("user0");
 
@@ -156,12 +156,12 @@ public final class IdACmdUserUpdateTest
 
     /* Act. */
 
-    final var handler = new IdACmdUserUpdate();
+    final var handler = new IdACmdUserUpdateCredentials();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
         handler.execute(
           context,
-          new IdACommandUserUpdate(
+          new IdACommandUserUpdateCredentials(
             user0.id(),
             empty(),
             empty(),
@@ -203,7 +203,7 @@ public final class IdACmdUserUpdateTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(USER_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(USER_WRITE_CREDENTIALS));
     final var user0 =
       this.createUser("user0");
 
@@ -237,11 +237,11 @@ public final class IdACmdUserUpdateTest
 
     /* Act. */
 
-    final var handler = new IdACmdUserUpdate();
+    final var handler = new IdACmdUserUpdateCredentials();
     final var response =
       handler.execute(
         context,
-        new IdACommandUserUpdate(
+        new IdACommandUserUpdateCredentials(
           user0.id(),
           Optional.of(new IdName("user1")),
           Optional.of(new IdRealName("Real Name")),
@@ -287,7 +287,7 @@ public final class IdACmdUserUpdateTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(USER_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(USER_WRITE_CREDENTIALS));
     final var user0 =
       this.createUser("user0");
 
@@ -310,12 +310,12 @@ public final class IdACmdUserUpdateTest
 
     /* Act. */
 
-    final var handler = new IdACmdUserUpdate();
+    final var handler = new IdACmdUserUpdateCredentials();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
         handler.execute(
           context,
-          new IdACommandUserUpdate(
+          new IdACommandUserUpdateCredentials(
             user0.id(),
             Optional.of(admin0.idName()),
             empty(),

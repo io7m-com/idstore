@@ -14,32 +14,29 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.protocol.admin;
+package com.io7m.idstore.server.security;
 
-import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdAdmin;
 
 import java.util.Objects;
-import java.util.UUID;
 
 /**
- * A response to {@link IdACommandUserUpdateCredentials}.
+ * An admin wants to update a user's emails.
  *
- * @param requestId The request ID
- * @param user     The user
+ * @param admin The admin
  */
 
-public record IdAResponseUserUpdate(
-  UUID requestId,
-  IdUser user)
-  implements IdAResponseType
+public record IdSecAdminActionUserUpdateEmail(IdAdmin admin)
+  implements IdSecAdminActionType
 {
   /**
-   * A response to {@link IdACommandUserUpdateCredentials}.
+   * An admin wants to update a user.
+   *
+   * @param admin The admin
    */
 
-  public IdAResponseUserUpdate
+  public IdSecAdminActionUserUpdateEmail
   {
-    Objects.requireNonNull(requestId, "requestId");
-    Objects.requireNonNull(user, "user");
+    Objects.requireNonNull(admin, "admin");
   }
 }

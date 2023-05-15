@@ -50,7 +50,6 @@ open module com.io7m.idstore.tests
   requires transitive com.io7m.idstore.server.vanilla;
   requires transitive com.io7m.idstore.shell.admin;
   requires transitive com.io7m.idstore.tests.arbitraries;
-  requires transitive com.io7m.idstore.tests.extensions;
   requires transitive com.io7m.idstore.user_client.api;
   requires transitive com.io7m.idstore.user_client;
 

@@ -44,7 +44,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
-import com.io7m.idstore.protocol.admin.IdACommandAdminUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
@@ -66,7 +66,7 @@ import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchPrevious;
-import com.io7m.idstore.protocol.admin.IdACommandUserUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanDelete;
@@ -132,7 +132,7 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireCommandAdminSearchNext;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireCommandAdminSearchPrevious;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireCommandAdminSelf;
-import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireCommandAdminUpdate;
+import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireCommandAdminUpdateCredentials;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireResponseAdminBanCreate;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireResponseAdminBanDelete;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireResponseAdminBanGet;
@@ -166,7 +166,7 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireCommandAdminSearchNext;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireCommandAdminSearchPrevious;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireCommandAdminSelf;
-import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireCommandAdminUpdate;
+import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireCommandAdminUpdateCredentials;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireResponseAdminBanCreate;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireResponseAdminBanDelete;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.toWireResponseAdminBanGet;
@@ -200,7 +200,7 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.f
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireCommandUserSearchByEmailPrevious;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireCommandUserSearchNext;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireCommandUserSearchPrevious;
-import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireCommandUserUpdate;
+import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireCommandUserUpdateCredentials;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireResponseUserBanCreate;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireResponseUserBanDelete;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.fromWireResponseUserBanGet;
@@ -229,7 +229,7 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.t
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireCommandUserSearchByEmailPrevious;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireCommandUserSearchNext;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireCommandUserSearchPrevious;
-import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireCommandUserUpdate;
+import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireCommandUserUpdateCredentials;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireResponseUserBanCreate;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireResponseUserBanDelete;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.toWireResponseUserBanGet;
@@ -456,8 +456,8 @@ public final class IdACB1Validation
       return toWireCommandAdminSearchPrevious(c);
     } else if (command instanceof IdACommandAdminSelf c) {
       return toWireCommandAdminSelf(c);
-    } else if (command instanceof IdACommandAdminUpdate c) {
-      return toWireCommandAdminUpdate(c);
+    } else if (command instanceof IdACommandAdminUpdateCredentials c) {
+      return toWireCommandAdminUpdateCredentials(c);
     } else if (command instanceof IdACommandAuditSearchBegin c) {
       return toWireCommandAuditSearchBegin(c);
     } else if (command instanceof IdACommandAuditSearchNext c) {
@@ -499,8 +499,8 @@ public final class IdACB1Validation
       return toWireCommandUserSearchNext(c);
     } else if (command instanceof IdACommandUserSearchPrevious c) {
       return toWireCommandUserSearchPrevious(c);
-    } else if (command instanceof IdACommandUserUpdate c) {
-      return toWireCommandUserUpdate(c);
+    } else if (command instanceof IdACommandUserUpdateCredentials c) {
+      return toWireCommandUserUpdateCredentials(c);
     } else if (command instanceof IdACommandUserLoginHistory c) {
       return toWireCommandUserLoginHistory(c);
     }
@@ -679,8 +679,8 @@ public final class IdACB1Validation
         return fromWireCommandAdminSearchPrevious(c);
       } else if (message instanceof IdA1CommandAdminSelf c) {
         return fromWireCommandAdminSelf(c);
-      } else if (message instanceof IdA1CommandAdminUpdate c) {
-        return fromWireCommandAdminUpdate(c);
+      } else if (message instanceof IdA1CommandAdminUpdateCredentials c) {
+        return fromWireCommandAdminUpdateCredentials(c);
       } else if (message instanceof IdA1CommandAuditSearchBegin c) {
         return fromWireCommandAuditSearchBegin(c);
       } else if (message instanceof IdA1CommandAuditSearchNext c) {
@@ -766,8 +766,8 @@ public final class IdACB1Validation
         return fromWireCommandUserSearchNext(c);
       } else if (message instanceof IdA1CommandUserSearchPrevious c) {
         return fromWireCommandUserSearchPrevious(c);
-      } else if (message instanceof IdA1CommandUserUpdate c) {
-        return fromWireCommandUserUpdate(c);
+      } else if (message instanceof IdA1CommandUserUpdateCredentials c) {
+        return fromWireCommandUserUpdateCredentials(c);
       } else if (message instanceof IdA1CommandUserLoginHistory c) {
         return fromWireCommandUserLoginHistory(c);
 

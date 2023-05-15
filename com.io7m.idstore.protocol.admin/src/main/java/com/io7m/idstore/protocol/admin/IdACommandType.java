@@ -46,7 +46,7 @@ public sealed interface IdACommandType<R extends IdAResponseType>
   IdACommandAdminSearchNext,
   IdACommandAdminSearchPrevious,
   IdACommandAdminSelf,
-  IdACommandAdminUpdate,
+  IdACommandAdminUpdateCredentials,
   IdACommandAuditSearchBegin,
   IdACommandAuditSearchNext,
   IdACommandAuditSearchPrevious,
@@ -67,7 +67,7 @@ public sealed interface IdACommandType<R extends IdAResponseType>
   IdACommandUserSearchByEmailPrevious,
   IdACommandUserSearchNext,
   IdACommandUserSearchPrevious,
-  IdACommandUserUpdate
+  IdACommandUserUpdateCredentials
 {
   /**
    * @return The response type associated with this command

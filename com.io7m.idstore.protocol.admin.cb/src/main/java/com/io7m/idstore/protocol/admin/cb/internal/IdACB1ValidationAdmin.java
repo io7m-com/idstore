@@ -53,7 +53,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
-import com.io7m.idstore.protocol.admin.IdACommandAdminUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanGet;
@@ -72,6 +72,14 @@ import com.io7m.idstore.protocol.admin.cb.IdA1Admin;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminColumn;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminColumnOrdering;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission;
+import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWriteCredentials;
+import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWriteCredentialsSelf;
+import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWriteEmail;
+import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWriteEmailSelf;
+import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWritePermissions;
+import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWritePermissionsSelf;
+import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.UserWriteCredentials;
+import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.UserWriteEmail;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminSearchByEmailParameters;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminSearchParameters;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminSummary;
@@ -93,7 +101,7 @@ import com.io7m.idstore.protocol.admin.cb.IdA1CommandAdminSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.cb.IdA1CommandAdminSearchNext;
 import com.io7m.idstore.protocol.admin.cb.IdA1CommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin.cb.IdA1CommandAdminSelf;
-import com.io7m.idstore.protocol.admin.cb.IdA1CommandAdminUpdate;
+import com.io7m.idstore.protocol.admin.cb.IdA1CommandAdminUpdateCredentials;
 import com.io7m.idstore.protocol.admin.cb.IdA1ResponseAdminBanCreate;
 import com.io7m.idstore.protocol.admin.cb.IdA1ResponseAdminBanDelete;
 import com.io7m.idstore.protocol.admin.cb.IdA1ResponseAdminBanGet;
@@ -131,14 +139,11 @@ import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminBan;
 import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminCreate;
 import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminDelete;
 import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminRead;
-import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWrite;
-import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWriteSelf;
 import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AuditRead;
 import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.UserBan;
 import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.UserCreate;
 import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.UserDelete;
 import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.UserRead;
-import static com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.UserWrite;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.fromWireBan;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.fromWireEmails;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationGeneral.fromWirePage;
@@ -323,10 +328,10 @@ public final class IdACB1ValidationAdmin
     );
   }
 
-  public static IdA1CommandAdminUpdate toWireCommandAdminUpdate(
-    final IdACommandAdminUpdate c)
+  public static IdA1CommandAdminUpdateCredentials toWireCommandAdminUpdateCredentials(
+    final IdACommandAdminUpdateCredentials c)
   {
-    return new IdA1CommandAdminUpdate(
+    return new IdA1CommandAdminUpdateCredentials(
       new CBUUID(c.admin()),
       fromOptional(c.idName().map(IdName::value).map(CBString::new)),
       fromOptional(c.realName().map(IdRealName::value).map(CBString::new)),
@@ -540,14 +545,19 @@ public final class IdACB1ValidationAdmin
       case ADMIN_CREATE -> new AdminCreate();
       case ADMIN_DELETE -> new AdminDelete();
       case ADMIN_READ -> new AdminRead();
-      case ADMIN_WRITE -> new AdminWrite();
-      case ADMIN_WRITE_SELF -> new AdminWriteSelf();
+      case ADMIN_WRITE_CREDENTIALS -> new AdminWriteCredentials();
+      case ADMIN_WRITE_CREDENTIALS_SELF -> new AdminWriteCredentialsSelf();
+      case ADMIN_WRITE_EMAIL -> new AdminWriteEmail();
+      case ADMIN_WRITE_EMAIL_SELF -> new AdminWriteEmailSelf();
+      case ADMIN_WRITE_PERMISSIONS -> new AdminWritePermissions();
+      case ADMIN_WRITE_PERMISSIONS_SELF -> new AdminWritePermissionsSelf();
       case AUDIT_READ -> new AuditRead();
       case USER_BAN -> new UserBan();
       case USER_CREATE -> new UserCreate();
       case USER_DELETE -> new UserDelete();
       case USER_READ -> new UserRead();
-      case USER_WRITE -> new UserWrite();
+      case USER_WRITE_CREDENTIALS -> new UserWriteCredentials();
+      case USER_WRITE_EMAIL -> new UserWriteEmail();
     };
   }
 
@@ -827,11 +837,11 @@ public final class IdACB1ValidationAdmin
     return new IdACommandAdminSearchByEmailPrevious();
   }
 
-  public static IdACommandAdminUpdate fromWireCommandAdminUpdate(
-    final IdA1CommandAdminUpdate c)
+  public static IdACommandAdminUpdateCredentials fromWireCommandAdminUpdateCredentials(
+    final IdA1CommandAdminUpdateCredentials c)
     throws IdPasswordException
   {
-    return new IdACommandAdminUpdate(
+    return new IdACommandAdminUpdateCredentials(
       c.fieldAdminId().value(),
       c.fieldIdName().asOptional().map(n -> new IdName(n.value())),
       c.fieldRealName().asOptional().map(n -> new IdRealName(n.value())),
@@ -929,10 +939,18 @@ public final class IdACB1ValidationAdmin
       return IdAdminPermission.ADMIN_BAN;
     } else if (p instanceof AdminCreate) {
       return IdAdminPermission.ADMIN_CREATE;
-    } else if (p instanceof AdminWrite) {
-      return IdAdminPermission.ADMIN_WRITE;
-    } else if (p instanceof AdminWriteSelf) {
-      return IdAdminPermission.ADMIN_WRITE_SELF;
+    } else if (p instanceof AdminWritePermissionsSelf) {
+      return IdAdminPermission.ADMIN_WRITE_PERMISSIONS_SELF;
+    } else if (p instanceof AdminWritePermissions) {
+      return IdAdminPermission.ADMIN_WRITE_PERMISSIONS;
+    } else if (p instanceof AdminWriteEmail) {
+      return IdAdminPermission.ADMIN_WRITE_EMAIL;
+    } else if (p instanceof AdminWriteEmailSelf) {
+      return IdAdminPermission.ADMIN_WRITE_EMAIL_SELF;
+    } else if (p instanceof AdminWriteCredentials) {
+      return IdAdminPermission.ADMIN_WRITE_CREDENTIALS;
+    } else if (p instanceof AdminWriteCredentialsSelf) {
+      return IdAdminPermission.ADMIN_WRITE_CREDENTIALS_SELF;
     } else if (p instanceof UserBan) {
       return IdAdminPermission.USER_BAN;
     } else if (p instanceof UserCreate) {
@@ -941,8 +959,10 @@ public final class IdACB1ValidationAdmin
       return IdAdminPermission.USER_DELETE;
     } else if (p instanceof UserRead) {
       return IdAdminPermission.USER_READ;
-    } else if (p instanceof UserWrite) {
-      return IdAdminPermission.USER_WRITE;
+    } else if (p instanceof UserWriteCredentials) {
+      return IdAdminPermission.USER_WRITE_CREDENTIALS;
+    } else if (p instanceof UserWriteEmail) {
+      return IdAdminPermission.USER_WRITE_EMAIL;
     } else if (p instanceof AuditRead) {
       return IdAdminPermission.AUDIT_READ;
     } else {

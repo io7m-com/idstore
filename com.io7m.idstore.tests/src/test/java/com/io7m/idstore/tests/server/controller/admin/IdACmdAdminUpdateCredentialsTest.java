@@ -23,9 +23,9 @@ import com.io7m.idstore.model.IdAdminPermissionSet;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdRealName;
-import com.io7m.idstore.protocol.admin.IdACommandAdminUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
-import com.io7m.idstore.server.controller.admin.IdACmdAdminUpdate;
+import com.io7m.idstore.server.controller.admin.IdACmdAdminUpdateCredentials;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,7 +36,7 @@ import java.util.Optional;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
-import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_CREDENTIALS;
 import static java.util.Optional.empty;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +47,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-public final class IdACmdAdminUpdateTest
+public final class IdACmdAdminUpdateCredentialsTest
   extends IdACmdAbstractContract
 {
   /**
@@ -69,10 +69,10 @@ public final class IdACmdAdminUpdateTest
 
     /* Act. */
 
-    final var handler = new IdACmdAdminUpdate();
+    final var handler = new IdACmdAdminUpdateCredentials();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdACommandAdminUpdate(
+        handler.execute(context, new IdACommandAdminUpdateCredentials(
           randomUUID(),
           Optional.empty(),
           Optional.empty(),
@@ -104,10 +104,10 @@ public final class IdACmdAdminUpdateTest
 
     /* Act. */
 
-    final var handler = new IdACmdAdminUpdate();
+    final var handler = new IdACmdAdminUpdateCredentials();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdACommandAdminUpdate(
+        handler.execute(context, new IdACommandAdminUpdateCredentials(
           admin.id(),
           Optional.empty(),
           Optional.empty(),
@@ -133,7 +133,7 @@ public final class IdACmdAdminUpdateTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE_CREDENTIALS));
     final var admin1 =
       this.createAdmin("admin1", IdAdminPermissionSet.empty());
 
@@ -156,12 +156,12 @@ public final class IdACmdAdminUpdateTest
 
     /* Act. */
 
-    final var handler = new IdACmdAdminUpdate();
+    final var handler = new IdACmdAdminUpdateCredentials();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
         handler.execute(
           context,
-          new IdACommandAdminUpdate(
+          new IdACommandAdminUpdateCredentials(
             admin1.id(),
             Optional.empty(),
             Optional.empty(),
@@ -204,7 +204,7 @@ public final class IdACmdAdminUpdateTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE_CREDENTIALS));
     final var admin1 =
       this.createAdmin("admin1", IdAdminPermissionSet.empty());
 
@@ -239,11 +239,11 @@ public final class IdACmdAdminUpdateTest
 
     /* Act. */
 
-    final var handler = new IdACmdAdminUpdate();
+    final var handler = new IdACmdAdminUpdateCredentials();
     final var response =
       handler.execute(
         context,
-        new IdACommandAdminUpdate(
+        new IdACommandAdminUpdateCredentials(
           admin1.id(),
           Optional.of(new IdName("admin2")),
           Optional.of(new IdRealName("Real Name")),
@@ -290,7 +290,7 @@ public final class IdACmdAdminUpdateTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE_CREDENTIALS));
     final var admin1 =
       this.createAdmin("admin1", IdAdminPermissionSet.empty());
 
@@ -313,12 +313,12 @@ public final class IdACmdAdminUpdateTest
 
     /* Act. */
 
-    final var handler = new IdACmdAdminUpdate();
+    final var handler = new IdACmdAdminUpdateCredentials();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
         handler.execute(
           context,
-          new IdACommandAdminUpdate(
+          new IdACommandAdminUpdateCredentials(
             admin1.id(),
             Optional.of(admin0.idName()),
             Optional.empty(),
