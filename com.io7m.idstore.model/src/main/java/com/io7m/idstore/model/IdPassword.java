@@ -66,6 +66,17 @@ public record IdPassword(
   }
 
   /**
+   * @return This object as a string, with the hash redacted so that it cannot
+   * appear in logs
+   */
+
+  @Override
+  public String toString()
+  {
+    return "%s|<REDACTED>|%s".formatted(this.algorithm.identifier(), this.salt);
+  }
+
+  /**
    * Check the given plain text password against this hashed password.
    *
    * @param passwordText The plain text password
@@ -90,6 +101,16 @@ public record IdPassword(
     );
   }
 
+  /**
+   * Format this object as a string, with the hash redacted so that it cannot
+   * appear in logs.
+   *
+   * @param flags     The formatting flags
+   * @param formatter The formatter
+   * @param width     The width
+   * @param precision The precision
+   */
+
   @Override
   public void formatTo(
     final Formatter formatter,
@@ -97,6 +118,10 @@ public record IdPassword(
     final int width,
     final int precision)
   {
-    formatter.format("%s|%s|%s", this.algorithm.identifier(), this.hash, this.salt);
+    formatter.format(
+      "%s|<REDACTED>|%s",
+      this.algorithm.identifier(),
+      this.salt
+    );
   }
 }

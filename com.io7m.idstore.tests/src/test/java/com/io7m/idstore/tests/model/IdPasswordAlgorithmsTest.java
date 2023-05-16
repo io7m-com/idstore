@@ -21,6 +21,7 @@ import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdPasswordAlgorithmRedacted;
 import com.io7m.idstore.model.IdPasswordAlgorithms;
 import com.io7m.idstore.model.IdPasswordException;
+import com.io7m.idstore.model.IdValidityException;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import org.junit.jupiter.api.Assertions;
@@ -35,6 +36,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdPasswordAlgorithmsTest
@@ -47,10 +49,10 @@ public final class IdPasswordAlgorithmsTest
     throws Exception
   {
     final var p =
-      IdPasswordAlgorithms.parse("PBKDF2WithHmacSHA256:10000:256");
+      IdPasswordAlgorithms.parse("PBKDF2WithHmacSHA256:10000");
 
     assertInstanceOf(IdPasswordAlgorithmPBKDF2HmacSHA256.class, p);
-    assertEquals("PBKDF2WithHmacSHA256:10000:256", p.identifier());
+    assertEquals("PBKDF2WithHmacSHA256:10000", p.identifier());
   }
 
   @Test
@@ -69,7 +71,7 @@ public final class IdPasswordAlgorithmsTest
     throws Exception
   {
     final var algorithm =
-      IdPasswordAlgorithmPBKDF2HmacSHA256.create(10000, 256);
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create(10000);
 
     final byte[] salt = new byte[4];
     salt[0] = (byte) 0x10;
@@ -93,10 +95,17 @@ public final class IdPasswordAlgorithmsTest
     return Stream.of(
       "",
       "PBKDF2WithHmacSHA256",
-      "PBKDF2WithHmacSHA256:10000",
       "PBKDF2WithHmacSHA256:10000:x",
       "PBKDF2WithHmacSHA256:y:245"
     ).map(IdPasswordAlgorithmsTest::testUnparseableOf);
+  }
+
+  @Test
+  public void testTooManyIterations()
+  {
+    assertThrows(IdValidityException.class, () -> {
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create(1_000_001);
+    });
   }
 
   private static DynamicTest testUnparseableOf(

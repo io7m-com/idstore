@@ -14,7 +14,6 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.model;
 
 import javax.crypto.SecretKeyFactory;
@@ -36,31 +35,33 @@ import static java.util.Locale.ROOT;
 public final class IdPasswordAlgorithmPBKDF2HmacSHA256
   implements IdPasswordAlgorithmType
 {
+  private static final int DEFAULT_ITERATION_COUNT = 100_000;
+  private static final int MAX_ITERATION_COUNT = 1000_000;
   private final int iterationCount;
-  private final int keyLength;
 
   private IdPasswordAlgorithmPBKDF2HmacSHA256(
-    final int inIterationCount,
-    final int inKeyLength)
+    final int inIterationCount)
   {
+    if (Integer.compareUnsigned(inIterationCount, MAX_ITERATION_COUNT) > 0) {
+      throw new IdValidityException(
+        "It is not permitted to use more than %d iterations of PBKDF2."
+          .formatted(Integer.valueOf(MAX_ITERATION_COUNT))
+      );
+    }
     this.iterationCount = inIterationCount;
-    this.keyLength = inKeyLength;
   }
 
   /**
    * Create an algorithm with the given iteration count and key length.
    *
    * @param iterationCount The iteration count
-   * @param keyLength      The key length
-   *
    * @return An algorithm
    */
 
   public static IdPasswordAlgorithmType create(
-    final int iterationCount,
-    final int keyLength)
+    final int iterationCount)
   {
-    return new IdPasswordAlgorithmPBKDF2HmacSHA256(iterationCount, keyLength);
+    return new IdPasswordAlgorithmPBKDF2HmacSHA256(iterationCount);
   }
 
   /**
@@ -71,7 +72,7 @@ public final class IdPasswordAlgorithmPBKDF2HmacSHA256
 
   public static IdPasswordAlgorithmType create()
   {
-    return create(10000, 256);
+    return create(DEFAULT_ITERATION_COUNT);
   }
 
   @Override
@@ -85,15 +86,14 @@ public final class IdPasswordAlgorithmPBKDF2HmacSHA256
       return false;
     }
     final IdPasswordAlgorithmPBKDF2HmacSHA256 that = (IdPasswordAlgorithmPBKDF2HmacSHA256) o;
-    return this.iterationCount == that.iterationCount && this.keyLength == that.keyLength;
+    return this.iterationCount == that.iterationCount;
   }
 
   @Override
   public int hashCode()
   {
     return Objects.hash(
-      Integer.valueOf(this.iterationCount),
-      Integer.valueOf(this.keyLength)
+      Integer.valueOf(this.iterationCount)
     );
   }
 
@@ -119,7 +119,7 @@ public final class IdPasswordAlgorithmPBKDF2HmacSHA256
           receivedPassword.toCharArray(),
           salt,
           this.iterationCount,
-          this.keyLength
+          256
         );
 
       final var expectedHashU =
@@ -168,7 +168,12 @@ public final class IdPasswordAlgorithmPBKDF2HmacSHA256
       final var keyFactory =
         SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
       final var keySpec =
-        new PBEKeySpec(passwordText.toCharArray(), salt, 10000, 256);
+        new PBEKeySpec(
+          passwordText.toCharArray(),
+          salt,
+          this.iterationCount,
+          256
+        );
       final var hash =
         keyFactory.generateSecret(keySpec).getEncoded();
       final var passwordHash =
@@ -194,10 +199,9 @@ public final class IdPasswordAlgorithmPBKDF2HmacSHA256
   public String identifier()
   {
     return String.format(
-      "%s:%s:%s",
+      "%s:%s",
       "PBKDF2WithHmacSHA256",
-      Integer.toUnsignedString(this.iterationCount),
-      Integer.toUnsignedString(this.keyLength)
+      Integer.toUnsignedString(this.iterationCount)
     );
   }
 }

@@ -63,10 +63,9 @@ public final class IdPasswordAlgorithms
 
       case "PBKDF2WithHmacSHA256" -> {
         try {
-          if (segments.size() == 3) {
+          if (segments.size() == 2) {
             yield IdPasswordAlgorithmPBKDF2HmacSHA256.create(
-              Integer.parseUnsignedInt(segments.get(1)),
-              Integer.parseUnsignedInt(segments.get(2))
+              Integer.parseUnsignedInt(segments.get(1))
             );
           }
 
@@ -76,7 +75,7 @@ public final class IdPasswordAlgorithms
             Map.ofEntries(
               Map.entry(
                 "Expected",
-                "'PBKDF2WithHmacSHA256' : <iteration count> : <key length>"),
+                "'PBKDF2WithHmacSHA256' : <iteration count>"),
               Map.entry("Received", text)
             ),
             Optional.of("Use the correct syntax.")
