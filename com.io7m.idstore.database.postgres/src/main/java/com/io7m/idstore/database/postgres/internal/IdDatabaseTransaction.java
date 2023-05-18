@@ -62,13 +62,20 @@ final class IdDatabaseTransaction
   private UUID currentUserId;
   private UUID currentAdminId;
 
-  /**
-   * @return The transaction span for metrics
-   */
-
-  public Span span()
+  IdDatabaseTransaction(
+    final IdDatabaseConnection inConnection,
+    final Span inTransactionScope)
   {
-    return this.transactionSpan;
+    this.connection =
+      Objects.requireNonNull(inConnection, "connection");
+    this.transactionSpan =
+      Objects.requireNonNull(inTransactionScope, "inMetricsScope");
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[IdDatabaseTransaction]";
   }
 
   /**
@@ -88,16 +95,6 @@ final class IdDatabaseTransaction
       .setAttribute(DB_SYSTEM, POSTGRESQL)
       .setSpanKind(INTERNAL)
       .startSpan();
-  }
-
-  IdDatabaseTransaction(
-    final IdDatabaseConnection inConnection,
-    final Span inTransactionScope)
-  {
-    this.connection =
-      Objects.requireNonNull(inConnection, "connection");
-    this.transactionSpan =
-      Objects.requireNonNull(inTransactionScope, "inMetricsScope");
   }
 
   void setRole(
@@ -348,7 +345,7 @@ final class IdDatabaseTransaction
    * @return The metrics tracer
    */
 
-  public Tracer tracer()
+  Tracer tracer()
   {
     return this.connection.database().tracer();
   }

@@ -22,7 +22,6 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandAdminEmailRemove;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminEmailRemove;
 
 /**
@@ -46,7 +45,7 @@ public final class IdACmdAdminEmailRemove
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandAdminEmailRemove command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

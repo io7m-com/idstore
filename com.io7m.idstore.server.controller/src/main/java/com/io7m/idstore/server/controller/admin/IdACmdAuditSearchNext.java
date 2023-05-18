@@ -22,7 +22,6 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAuditRead;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
@@ -48,7 +47,7 @@ public final class IdACmdAuditSearchNext
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandAuditSearchNext command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

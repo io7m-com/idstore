@@ -96,39 +96,39 @@ public final class IdServerMailService implements IdServerMailServiceType
     final var transport =
       configuration.transportConfiguration();
 
-    final var props = new Properties();
-    if (transport instanceof IdServerMailTransportSMTP smtp) {
-      props.put("mail.transport.protocol", "smtp");
-      props.put("mail.smtp.host", transport.host());
-      props.put("mail.smtp.port", Integer.toUnsignedString(transport.port()));
-      props.put("mail.smtp.starttls.enable", "true");
-      props.put("mail.smtp.starttls.required", "false");
+    final var p = new Properties();
+    if (transport instanceof IdServerMailTransportSMTP) {
+      p.setProperty("mail.transport.protocol", "smtp");
+      p.setProperty("mail.smtp.host", transport.host());
+      p.setProperty("mail.smtp.port", Integer.toUnsignedString(transport.port()));
+      p.setProperty("mail.smtp.starttls.enable", "true");
+      p.setProperty("mail.smtp.starttls.required", "false");
       authOpt.ifPresent(auth -> {
-        props.put("mail.smtp.username", auth.userName());
-        props.put("mail.smtp.password", auth.password());
+        p.setProperty("mail.smtp.username", auth.userName());
+        p.setProperty("mail.smtp.password", auth.password());
       });
-    } else if (transport instanceof IdServerMailTransportSMTP_TLS smtpTls) {
-      props.put("mail.transport.protocol", "smtp");
-      props.put("mail.smtp.host", transport.host());
-      props.put("mail.smtp.port", Integer.toUnsignedString(transport.port()));
-      props.put("mail.smtp.starttls.enable", "true");
-      props.put("mail.smtp.starttls.required", "true");
+    } else if (transport instanceof IdServerMailTransportSMTP_TLS) {
+      p.setProperty("mail.transport.protocol", "smtp");
+      p.setProperty("mail.smtp.host", transport.host());
+      p.setProperty("mail.smtp.port", Integer.toUnsignedString(transport.port()));
+      p.setProperty("mail.smtp.starttls.enable", "true");
+      p.setProperty("mail.smtp.starttls.required", "true");
       authOpt.ifPresent(auth -> {
-        props.put("mail.smtp.username", auth.userName());
-        props.put("mail.smtp.password", auth.password());
+        p.setProperty("mail.smtp.username", auth.userName());
+        p.setProperty("mail.smtp.password", auth.password());
       });
-    } else if (transport instanceof IdServerMailTransportSMTPS smtps) {
-      props.put("mail.transport.protocol", "smtps");
-      props.put("mail.smtps.quitwait", "false");
-      props.put("mail.smtps.host", transport.host());
-      props.put("mail.smtps.port", Integer.toUnsignedString(transport.port()));
+    } else if (transport instanceof IdServerMailTransportSMTPS) {
+      p.setProperty("mail.transport.protocol", "smtps");
+      p.setProperty("mail.smtps.quitwait", "false");
+      p.setProperty("mail.smtps.host", transport.host());
+      p.setProperty("mail.smtps.port", Integer.toUnsignedString(transport.port()));
       authOpt.ifPresent(auth -> {
-        props.put("mail.smtps.username", auth.userName());
-        props.put("mail.smtps.password", auth.password());
+        p.setProperty("mail.smtps.username", auth.userName());
+        p.setProperty("mail.smtps.password", auth.password());
       });
     }
 
-    final var session = Session.getDefaultInstance(props, null);
+    final var session = Session.getDefaultInstance(p, null);
     session.setDebug(false);
 
     return new IdServerMailService(

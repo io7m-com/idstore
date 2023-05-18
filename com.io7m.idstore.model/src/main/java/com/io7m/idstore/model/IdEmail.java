@@ -19,6 +19,7 @@ package com.io7m.idstore.model;
 import com.sanctionco.jmail.EmailValidator;
 import com.sanctionco.jmail.JMail;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -35,6 +36,23 @@ public record IdEmail(String value)
       .disallowQuotedIdentifiers();
 
   /**
+   * Check that a string is a valid email address.
+   *
+   * @param text The text
+   *
+   * @return The string
+   */
+
+  public static String check(
+    final String text)
+  {
+    if (!VALIDATOR.isValid(text)) {
+      throw new IdValidityException("Invalid email address.");
+    }
+    return text;
+  }
+
+  /**
    * A user email.
    *
    * @param value The email value
@@ -43,12 +61,7 @@ public record IdEmail(String value)
   public IdEmail(final String value)
   {
     Objects.requireNonNull(value, "value");
-
-    if (!VALIDATOR.isValid(value)) {
-      throw new IdValidityException("Invalid email address.");
-    }
-
-    this.value = value.toLowerCase();
+    this.value = check(value).toLowerCase(Locale.getDefault());
   }
 
   @Override

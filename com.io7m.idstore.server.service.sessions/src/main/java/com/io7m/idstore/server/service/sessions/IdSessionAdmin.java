@@ -192,4 +192,10 @@ public final class IdSessionAdmin implements IdSessionType
   {
     return this.sessionId;
   }
+
+  @Override
+  public String toString()
+  {
+    return "[IdSessionAdmin]";
+  }
 }

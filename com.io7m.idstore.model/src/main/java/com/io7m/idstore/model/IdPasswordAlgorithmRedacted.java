@@ -41,7 +41,7 @@ public final class IdPasswordAlgorithmRedacted
    * @return An algorithm
    */
 
-  public static IdPasswordAlgorithmType create()
+  public static IdPasswordAlgorithmRedacted create()
   {
     return INSTANCE;
   }
@@ -51,7 +51,6 @@ public final class IdPasswordAlgorithmRedacted
     final String expectedHash,
     final String receivedPassword,
     final byte[] salt)
-    throws IdPasswordException
   {
     Objects.requireNonNull(expectedHash, "expectedHash");
     Objects.requireNonNull(receivedPassword, "receivedPassword");
@@ -64,7 +63,6 @@ public final class IdPasswordAlgorithmRedacted
   public IdPassword createHashed(
     final String passwordText,
     final byte[] salt)
-    throws IdPasswordException
   {
     Objects.requireNonNull(passwordText, "passwordText");
     Objects.requireNonNull(salt, "salt");

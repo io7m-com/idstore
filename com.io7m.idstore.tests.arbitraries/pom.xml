@@ -18,6 +18,10 @@
   <description>Identity server (Arbitrary instances)</description>
   <url>https://www.io7m.com/software/idstore</url>
 
+  <properties>
+    <spotbugs.skip>true</spotbugs.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

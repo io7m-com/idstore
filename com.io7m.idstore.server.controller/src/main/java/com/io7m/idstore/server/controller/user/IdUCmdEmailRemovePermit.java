@@ -23,11 +23,9 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdEmailVerificationOperation;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
 import com.io7m.idstore.protocol.user.IdUResponseEmailRemovePermit;
 import com.io7m.idstore.protocol.user.IdUResponseType;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecUserActionEmailRemovePermit;
 
 import java.util.Objects;
@@ -56,7 +54,7 @@ public final class IdUCmdEmailRemovePermit
   protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandEmailRemovePermit command)
-    throws IdValidityException, IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var token = command.token();
     final var user = context.user();

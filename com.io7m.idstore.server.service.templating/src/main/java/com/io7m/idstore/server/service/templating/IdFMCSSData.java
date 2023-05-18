@@ -22,9 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static java.lang.Double.max;
-import static java.lang.Double.min;
-
 /**
  * A color scheme.
  *
@@ -35,7 +32,6 @@ public record IdFMCSSData(
   IdServerColorScheme colorScheme
 ) implements IdFMDataModelType
 {
-
   /**
    * A color scheme.
    *
@@ -45,12 +41,6 @@ public record IdFMCSSData(
   public IdFMCSSData
   {
     Objects.requireNonNull(colorScheme, "colorScheme");
-  }
-
-  private static int color(
-    final double x)
-  {
-    return (int) max(min(x * 255.0, 255.0), 0.0);
   }
 
   @Override

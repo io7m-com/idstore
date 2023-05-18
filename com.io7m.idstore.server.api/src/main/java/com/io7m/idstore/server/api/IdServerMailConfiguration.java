@@ -58,6 +58,6 @@ public record IdServerMailConfiguration(
     Objects.requireNonNull(
       verificationExpiration, "verificationExpiration");
 
-    new IdEmail(senderAddress);
+    IdEmail.check(senderAddress);
   }
 }

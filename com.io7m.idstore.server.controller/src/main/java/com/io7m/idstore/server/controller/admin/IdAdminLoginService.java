@@ -25,7 +25,6 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
-import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
 import com.io7m.repetoir.core.RPServiceType;
 import com.io7m.seltzer.api.SStructuredErrorType;
@@ -68,28 +67,6 @@ public final class IdAdminLoginService implements RPServiceType
       Objects.requireNonNull(inStrings, "strings");
     this.sessions =
       Objects.requireNonNull(inSessions, "inSessions");
-  }
-
-  /**
-   * A record of an admin logging in.
-   *
-   * @param session The created session
-   * @param admin   The admin
-   */
-
-  public record IdAdminLoggedIn(
-    IdSessionAdmin session,
-    IdAdmin admin)
-  {
-    /**
-     * A record of an admin logging in.
-     */
-
-    public IdAdminLoggedIn
-    {
-      Objects.requireNonNull(session, "session");
-      Objects.requireNonNull(admin, "user");
-    }
   }
 
   /**
@@ -257,5 +234,12 @@ public final class IdAdminLoginService implements RPServiceType
   public String description()
   {
     return "Admin login service.";
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[IdAdminLoginService 0x%s]"
+      .formatted(Integer.toUnsignedString(this.hashCode(), 16));
   }
 }

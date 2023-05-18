@@ -80,7 +80,6 @@ public final class IdAShellCmdVersion implements IdAShellCmdType
   @Override
   public QCommandStatus onExecute(
     final QCommandContextType context)
-    throws Exception
   {
     final var w = context.output();
     w.append("com.io7m.idstore ");
@@ -95,5 +94,11 @@ public final class IdAShellCmdVersion implements IdAShellCmdType
   public QCommandMetadata metadata()
   {
     return this.metadata;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[%s]".formatted(this.getClass().getSimpleName());
   }
 }

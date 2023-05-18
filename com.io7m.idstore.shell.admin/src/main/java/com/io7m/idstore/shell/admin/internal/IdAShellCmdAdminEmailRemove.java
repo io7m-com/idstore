@@ -22,7 +22,6 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminEmailRemove;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
-import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QParametersPositionalNone;
@@ -105,7 +104,6 @@ public final class IdAShellCmdAdminEmailRemove
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminUpdate response)
-    throws QException
   {
 
   }

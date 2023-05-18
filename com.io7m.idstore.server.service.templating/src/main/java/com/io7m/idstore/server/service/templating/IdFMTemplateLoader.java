@@ -114,7 +114,6 @@ public final class IdFMTemplateLoader implements TemplateLoader
   @Override
   public void closeTemplateSource(
     final Object templateSource)
-    throws IOException
   {
 
   }

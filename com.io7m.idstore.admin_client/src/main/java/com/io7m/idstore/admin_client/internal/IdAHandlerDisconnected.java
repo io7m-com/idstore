@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_CLIENT;
+
 /**
  * The initial "disconnected" protocol handler.
  */
@@ -69,7 +71,8 @@ public final class IdAHandlerDisconnected extends IdAHandlerAbstract
         this.strings().format("notLoggedIn"),
         IdStandardErrorCodes.NOT_LOGGED_IN,
         Map.of(),
-        Optional.empty()
+        Optional.empty(),
+        BLAME_CLIENT
       )
     );
   }
@@ -119,7 +122,8 @@ public final class IdAHandlerDisconnected extends IdAHandlerAbstract
           e.message(),
           e.errorCode(),
           e.attributes(),
-          Optional.empty()
+          Optional.empty(),
+          BLAME_CLIENT
         )
       );
     }

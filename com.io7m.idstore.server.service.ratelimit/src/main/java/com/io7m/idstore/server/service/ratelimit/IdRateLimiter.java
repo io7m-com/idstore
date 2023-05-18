@@ -106,6 +106,13 @@ public final class IdRateLimiter
     return true;
   }
 
+  @Override
+  public String toString()
+  {
+    return "[IdRateLimiter %s]"
+      .formatted(Integer.toUnsignedString(this.hashCode(), 16));
+  }
+
   private record Operation(
     String host,
     String user,

@@ -296,14 +296,12 @@ public final class IdACB1ValidationUser
     );
   }
 
-  public static IdA1CommandUserSearchByEmailNext toWireCommandUserSearchByEmailNext(
-    final IdACommandUserSearchByEmailNext c)
+  public static IdA1CommandUserSearchByEmailNext toWireCommandUserSearchByEmailNext()
   {
     return new IdA1CommandUserSearchByEmailNext();
   }
 
-  public static IdA1CommandUserSearchByEmailPrevious toWireCommandUserSearchByEmailPrevious(
-    final IdACommandUserSearchByEmailPrevious c)
+  public static IdA1CommandUserSearchByEmailPrevious toWireCommandUserSearchByEmailPrevious()
   {
     return new IdA1CommandUserSearchByEmailPrevious();
   }
@@ -328,14 +326,12 @@ public final class IdACB1ValidationUser
     );
   }
 
-  public static IdA1CommandUserSearchNext toWireCommandUserSearchNext(
-    final IdACommandUserSearchNext c)
+  public static IdA1CommandUserSearchNext toWireCommandUserSearchNext()
   {
     return new IdA1CommandUserSearchNext();
   }
 
-  public static IdA1CommandUserSearchPrevious toWireCommandUserSearchPrevious(
-    final IdACommandUserSearchPrevious c)
+  public static IdA1CommandUserSearchPrevious toWireCommandUserSearchPrevious()
   {
     return new IdA1CommandUserSearchPrevious();
   }
@@ -674,14 +670,12 @@ public final class IdACB1ValidationUser
     );
   }
 
-  public static IdACommandUserSearchNext fromWireCommandUserSearchNext(
-    final IdA1CommandUserSearchNext c)
+  public static IdACommandUserSearchNext fromWireCommandUserSearchNext()
   {
     return new IdACommandUserSearchNext();
   }
 
-  public static IdACommandUserSearchPrevious fromWireCommandUserSearchPrevious(
-    final IdA1CommandUserSearchPrevious c)
+  public static IdACommandUserSearchPrevious fromWireCommandUserSearchPrevious()
   {
     return new IdACommandUserSearchPrevious();
   }
@@ -694,14 +688,12 @@ public final class IdACB1ValidationUser
     );
   }
 
-  public static IdACommandUserSearchByEmailNext fromWireCommandUserSearchByEmailNext(
-    final IdA1CommandUserSearchByEmailNext c)
+  public static IdACommandUserSearchByEmailNext fromWireCommandUserSearchByEmailNext()
   {
     return new IdACommandUserSearchByEmailNext();
   }
 
-  public static IdACommandUserSearchByEmailPrevious fromWireCommandUserSearchByEmailPrevious(
-    final IdA1CommandUserSearchByEmailPrevious c)
+  public static IdACommandUserSearchByEmailPrevious fromWireCommandUserSearchByEmailPrevious()
   {
     return new IdACommandUserSearchByEmailPrevious();
   }

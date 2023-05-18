@@ -22,7 +22,6 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandAdminCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminCreate;
 
 import java.util.UUID;
@@ -48,7 +47,7 @@ public final class IdACmdAdminCreate
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandAdminCreate command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();
@@ -64,7 +63,7 @@ public final class IdACmdAdminCreate
       transaction.queries(IdDatabaseAdminsQueriesType.class);
 
     final var id =
-      command.id().orElse(UUID.randomUUID());
+      command.id().orElseGet(UUID::randomUUID);
     final var idName =
       command.idName();
     final var realName =

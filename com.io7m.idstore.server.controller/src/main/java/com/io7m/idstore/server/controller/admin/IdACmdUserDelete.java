@@ -22,7 +22,6 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandUserDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserDelete;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionUserDelete;
 
 /**
@@ -46,7 +45,7 @@ public final class IdACmdUserDelete
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandUserDelete command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

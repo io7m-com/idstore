@@ -17,13 +17,18 @@
 
 package com.io7m.idstore.server.service.reqlimit;
 
+import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.error_codes.IdStandardErrorCodes;
+
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * An exception indicating that a request size limit was exceeded.
  */
 
-public final class IdRequestLimitExceeded extends Exception
+public final class IdRequestLimitExceeded extends IdException
 {
   private final long sizeLimit;
   private final long sizeProvided;
@@ -41,7 +46,15 @@ public final class IdRequestLimitExceeded extends Exception
     final long inSizeLimit,
     final long inSizeProvided)
   {
-    super(Objects.requireNonNull(message, "message"));
+    super(
+      Objects.requireNonNull(message, "message"),
+      IdStandardErrorCodes.HTTP_ERROR,
+      Map.ofEntries(
+        Map.entry("Size Limit", Long.toUnsignedString(inSizeLimit)),
+        Map.entry("Size", Long.toUnsignedString(inSizeProvided))
+      ),
+      Optional.empty()
+    );
     this.sizeLimit = inSizeLimit;
     this.sizeProvided = inSizeProvided;
   }

@@ -22,7 +22,6 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandUserCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserCreate;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionUserCreate;
 
 import java.util.UUID;
@@ -48,7 +47,7 @@ public final class IdACmdUserCreate
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandUserCreate command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();
@@ -63,7 +62,7 @@ public final class IdACmdUserCreate
       transaction.queries(IdDatabaseUsersQueriesType.class);
 
     final var id =
-      command.id().orElse(UUID.randomUUID());
+      command.id().orElseGet(UUID::randomUUID);
     final var idName =
       command.idName();
     final var realName =

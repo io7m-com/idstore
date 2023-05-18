@@ -23,6 +23,8 @@ module com.io7m.idstore.server.service.reqlimit
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
+  requires transitive com.io7m.idstore.error_codes;
+
   requires com.io7m.repetoir.core;
   requires jetty.servlet.api;
   requires org.apache.commons.io;

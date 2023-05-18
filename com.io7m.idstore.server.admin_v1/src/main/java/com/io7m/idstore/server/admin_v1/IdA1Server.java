@@ -18,7 +18,6 @@
 package com.io7m.idstore.server.admin_v1;
 
 import com.io7m.idstore.server.http.IdPlainErrorHandler;
-import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.http.IdServletHolders;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
@@ -33,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 
 /**
  * The Admin API v1 server.
@@ -116,17 +114,9 @@ public final class IdA1Server
     final var gzip = new GzipHandler();
     gzip.setHandler(sessionHandler);
 
-    /*
-     * Add a connector listener that adds unique identifiers to all requests.
-     */
-
-    Arrays.stream(server.getConnectors()).forEach(
-      connector -> connector.addBean(new IdRequestUniqueIDs(services))
-    );
-
     server.setErrorHandler(new IdPlainErrorHandler());
     server.setRequestLog((request, response) -> {
-
+      // Logging is via telemetry.
     });
     server.setHandler(gzip);
     server.start();
@@ -152,20 +142,20 @@ public final class IdA1Server
   {
     servlets.addServlet(
       servletHolders.create(
-        IdA1Versions.class,
-        IdA1Versions::new),
+        IdA1ServletVersions.class,
+        IdA1ServletVersions::new),
       "/"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdA1Login.class,
-        IdA1Login::new),
+        IdA1ServletLogin.class,
+        IdA1ServletLogin::new),
       "/admin/1/0/login"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdA1CommandServlet.class,
-        IdA1CommandServlet::new),
+        IdA1ServletCommand.class,
+        IdA1ServletCommand::new),
       "/admin/1/0/command"
     );
   }

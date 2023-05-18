@@ -31,7 +31,6 @@ import java.util.function.Supplier;
 public final class IdServletHolder<T extends Servlet>
   extends ServletHolder
 {
-  private final Class<T> clazz;
   private final Supplier<T> constructor;
 
   /**
@@ -45,12 +44,12 @@ public final class IdServletHolder<T extends Servlet>
     final Class<T> inClazz,
     final Supplier<T> inConstructor)
   {
-    this.clazz =
+    final Class<T> clazz =
       Objects.requireNonNull(inClazz, "clazz");
     this.constructor =
       Objects.requireNonNull(inConstructor, "constructor");
 
-    this.setHeldClass(this.clazz);
+    this.setHeldClass(clazz);
   }
 
   @Override

@@ -23,7 +23,6 @@ import com.io7m.idstore.shell.admin.IdAShells;
 import com.io7m.quarrel.core.QCommandOrGroupType;
 import com.io7m.quarrel.core.QCommandParserConfiguration;
 import com.io7m.quarrel.core.QCommandParsers;
-import com.io7m.quarrel.core.QValueConverterDirectory;
 import com.io7m.quarrel.ext.xstructural.QCommandXS;
 
 import java.io.PrintWriter;

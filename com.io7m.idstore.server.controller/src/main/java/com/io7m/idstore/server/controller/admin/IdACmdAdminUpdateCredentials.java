@@ -24,7 +24,6 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.controller.IdServerStrings;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminUpdate;
 import com.io7m.jaffirm.core.Invariants;
 
@@ -54,7 +53,7 @@ public final class IdACmdAdminUpdateCredentials
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandAdminUpdateCredentials command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();
@@ -72,12 +71,14 @@ public final class IdACmdAdminUpdateCredentials
 
     final var oldAdmin =
       admins.adminGetRequire(newAdmin);
+    final var adminId =
+      oldAdmin.id();
 
     Invariants.checkInvariantV(
-      Objects.equals(newAdmin, oldAdmin.id()),
+      Objects.equals(newAdmin, adminId),
       "New admin ID %s must match old admin ID %s",
       newAdmin,
-      oldAdmin.id()
+      adminId
     );
 
     final var strings =

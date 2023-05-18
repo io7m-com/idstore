@@ -38,6 +38,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSelf;
+import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
@@ -174,7 +175,8 @@ public final class IdAClientIT extends IdWithServerContract
             "error",
             AUTHENTICATION_ERROR,
             Map.of(),
-            Optional.empty()
+            Optional.empty(),
+            IdAResponseBlame.BLAME_CLIENT
           ))
       );
 

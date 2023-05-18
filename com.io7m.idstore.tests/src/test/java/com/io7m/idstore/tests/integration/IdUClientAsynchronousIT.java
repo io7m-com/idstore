@@ -24,6 +24,7 @@ import com.io7m.idstore.model.IdNonEmptyList;
 import com.io7m.idstore.model.IdPasswordAlgorithmRedacted;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
@@ -74,6 +75,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_M
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -178,7 +180,9 @@ public final class IdUClientAsynchronousIT extends IdWithServerContract
             "error",
             AUTHENTICATION_ERROR,
             Map.of(),
-            Optional.empty()))
+            Optional.empty(),
+            BLAME_CLIENT
+          ))
       );
 
     this.webServer.addResponse()

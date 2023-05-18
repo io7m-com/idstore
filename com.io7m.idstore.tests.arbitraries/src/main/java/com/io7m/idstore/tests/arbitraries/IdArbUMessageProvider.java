@@ -33,6 +33,7 @@ import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUMessageType;
+import com.io7m.idstore.protocol.user.IdUResponseBlame;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddDeny;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddPermit;
@@ -283,6 +284,8 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
       Arbitraries.strings();
     final var s1 =
       Arbitraries.defaultFor(IdErrorCode.class);
+    final var b =
+      Arbitraries.defaultFor(IdUResponseBlame.class);
 
     final var s2 =
       Arbitraries.strings();
@@ -295,7 +298,7 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
       Arbitraries.strings()
         .optional();
 
-    return Combinators.combine(id, s0, s1, ms, os).as(IdUResponseError::new);
+    return Combinators.combine(id, s0, s1, ms, os, b).as(IdUResponseError::new);
   }
 
   /**

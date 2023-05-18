@@ -24,7 +24,6 @@ import com.io7m.idstore.protocol.admin.IdACommandUserUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
 import com.io7m.idstore.server.controller.IdServerStrings;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionUserUpdateCredentials;
 import com.io7m.jaffirm.core.Invariants;
 
@@ -53,7 +52,7 @@ public final class IdACmdUserUpdateCredentials
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandUserUpdateCredentials command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

@@ -588,6 +588,14 @@
 ; Admin responses.
 ;
 
+[documentation IdA1ResponseBlame "A blame assignment."]
+[variant IdA1ResponseBlame
+  [documentation BlameClient "The client sent a bad response."]
+  [case BlameClient]
+  [documentation BlameServer "Something went wrong on the server."]
+  [case BlameServer]
+]
+
 [documentation IdA1ResponseAdminBanCreate "A response to IdA1CommandAdminBanCreate."]
 [record IdA1ResponseAdminBanCreate
   [documentation requestId "The ID of the request that yielded this response."]
@@ -848,6 +856,8 @@
   [field attributes [cb:Map cb:String cb:String]]
   [documentation remediatingAction "The remediating action, if any."]
   [field remediatingAction [cb:Option cb:String]]
+  [documentation blame "The blame assignment."]
+  [field blame IdA1ResponseBlame]
 ]
 
 [documentation IdA1ResponseLogin "A response to IdA1CommandLogin."]

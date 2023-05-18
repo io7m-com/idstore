@@ -339,20 +339,17 @@ public final class IdACB1ValidationAdmin
     );
   }
 
-  public static IdA1CommandAdminSelf toWireCommandAdminSelf(
-    final IdACommandAdminSelf c)
+  public static IdA1CommandAdminSelf toWireCommandAdminSelf()
   {
     return new IdA1CommandAdminSelf();
   }
 
-  public static IdA1CommandAdminSearchByEmailNext toWireCommandAdminSearchByEmailNext(
-    final IdACommandAdminSearchByEmailNext c)
+  public static IdA1CommandAdminSearchByEmailNext toWireCommandAdminSearchByEmailNext()
   {
     return new IdA1CommandAdminSearchByEmailNext();
   }
 
-  public static IdA1CommandAdminSearchByEmailPrevious toWireCommandAdminSearchByEmailPrevious(
-    final IdACommandAdminSearchByEmailPrevious c)
+  public static IdA1CommandAdminSearchByEmailPrevious toWireCommandAdminSearchByEmailPrevious()
   {
     return new IdA1CommandAdminSearchByEmailPrevious();
   }
@@ -377,14 +374,12 @@ public final class IdACB1ValidationAdmin
     );
   }
 
-  public static IdA1CommandAdminSearchNext toWireCommandAdminSearchNext(
-    final IdACommandAdminSearchNext c)
+  public static IdA1CommandAdminSearchNext toWireCommandAdminSearchNext()
   {
     return new IdA1CommandAdminSearchNext();
   }
 
-  public static IdA1CommandAdminSearchPrevious toWireCommandAdminSearchPrevious(
-    final IdACommandAdminSearchPrevious c)
+  public static IdA1CommandAdminSearchPrevious toWireCommandAdminSearchPrevious()
   {
     return new IdA1CommandAdminSearchPrevious();
   }
@@ -805,14 +800,12 @@ public final class IdACB1ValidationAdmin
     );
   }
 
-  public static IdACommandAdminSearchNext fromWireCommandAdminSearchNext(
-    final IdA1CommandAdminSearchNext c)
+  public static IdACommandAdminSearchNext fromWireCommandAdminSearchNext()
   {
     return new IdACommandAdminSearchNext();
   }
 
-  public static IdACommandAdminSearchPrevious fromWireCommandAdminSearchPrevious(
-    final IdA1CommandAdminSearchPrevious c)
+  public static IdACommandAdminSearchPrevious fromWireCommandAdminSearchPrevious()
   {
     return new IdACommandAdminSearchPrevious();
   }
@@ -825,14 +818,12 @@ public final class IdACB1ValidationAdmin
     );
   }
 
-  public static IdACommandAdminSearchByEmailNext fromWireCommandAdminSearchByEmailNext(
-    final IdA1CommandAdminSearchByEmailNext c)
+  public static IdACommandAdminSearchByEmailNext fromWireCommandAdminSearchByEmailNext()
   {
     return new IdACommandAdminSearchByEmailNext();
   }
 
-  public static IdACommandAdminSearchByEmailPrevious fromWireCommandAdminSearchByEmailPrevious(
-    final IdA1CommandAdminSearchByEmailPrevious c)
+  public static IdACommandAdminSearchByEmailPrevious fromWireCommandAdminSearchByEmailPrevious()
   {
     return new IdACommandAdminSearchByEmailPrevious();
   }
@@ -849,8 +840,7 @@ public final class IdACB1ValidationAdmin
     );
   }
 
-  public static IdACommandAdminSelf fromWireCommandAdminSelf(
-    final IdA1CommandAdminSelf c)
+  public static IdACommandAdminSelf fromWireCommandAdminSelf()
   {
     return new IdACommandAdminSelf();
   }

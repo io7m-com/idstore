@@ -44,10 +44,7 @@ public interface IdProtocolMessagesType<T extends IdProtocolMessageType>
    * @param message The message
    *
    * @return The serialized message as a byte array
-   *
-   * @throws IdProtocolException If serialization fails
    */
 
-  byte[] serialize(T message)
-    throws IdProtocolException;
+  byte[] serialize(T message);
 }

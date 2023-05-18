@@ -98,6 +98,13 @@ public final class IdPasswordAlgorithmPBKDF2HmacSHA256
   }
 
   @Override
+  public String toString()
+  {
+    return "[IdPasswordAlgorithmPBKDF2HmacSHA256 %d]"
+      .formatted(Integer.valueOf(this.iterationCount));
+  }
+
+  @Override
   public boolean check(
     final String expectedHash,
     final String receivedPassword,

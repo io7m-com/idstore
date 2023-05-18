@@ -145,4 +145,10 @@ public final class IdAShellCmdLogin implements IdAShellCmdType
   {
     return this.metadata;
   }
+
+  @Override
+  public String toString()
+  {
+    return "[%s]".formatted(this.getClass().getSimpleName());
+  }
 }

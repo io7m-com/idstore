@@ -23,7 +23,6 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUResponseType;
@@ -69,7 +68,7 @@ public final class IdUCmdEmailAddBegin
   protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandEmailAddBegin command)
-    throws IdValidityException, IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var services =
       context.services();

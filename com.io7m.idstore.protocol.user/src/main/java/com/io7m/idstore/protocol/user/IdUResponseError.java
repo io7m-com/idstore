@@ -32,6 +32,7 @@ import java.util.UUID;
  * @param message           The humanly-readable error message
  * @param attributes        The error attributes
  * @param remediatingAction The remediating action, if any
+ * @param blame             The blame assignment
  */
 
 public record IdUResponseError(
@@ -39,7 +40,8 @@ public record IdUResponseError(
   String message,
   IdErrorCode errorCode,
   Map<String, String> attributes,
-  Optional<String> remediatingAction)
+  Optional<String> remediatingAction,
+  IdUResponseBlame blame)
   implements IdUResponseType, SStructuredErrorType<IdErrorCode>
 {
   /**
@@ -50,6 +52,7 @@ public record IdUResponseError(
    * @param message           The humanly-readable error message
    * @param attributes        The error attributes
    * @param remediatingAction The remediating action, if any
+   * @param blame             The blame assignment
    */
 
   public IdUResponseError
@@ -59,6 +62,7 @@ public record IdUResponseError(
     Objects.requireNonNull(errorCode, "errorCode");
     Objects.requireNonNull(attributes, "attributes");
     Objects.requireNonNull(remediatingAction, "remediatingAction");
+    Objects.requireNonNull(blame, "blame");
   }
 
   /**

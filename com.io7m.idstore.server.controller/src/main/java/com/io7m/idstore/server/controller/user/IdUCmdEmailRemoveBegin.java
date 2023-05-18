@@ -24,7 +24,6 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUResponseType;
@@ -68,7 +67,7 @@ public final class IdUCmdEmailRemoveBegin
   protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandEmailRemoveBegin command)
-    throws IdValidityException, IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var services =
       context.services();

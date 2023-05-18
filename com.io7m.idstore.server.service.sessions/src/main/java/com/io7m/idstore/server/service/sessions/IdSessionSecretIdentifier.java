@@ -64,7 +64,7 @@ public record IdSessionSecretIdentifier(
   @Override
   public String toString()
   {
-    return this.value;
+    return "[IdSessionSecretIdentifier <redacted>]";
   }
 
   /**

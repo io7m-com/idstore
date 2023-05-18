@@ -22,7 +22,6 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminRead;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
@@ -48,7 +47,7 @@ public final class IdACmdAdminSearchByEmailPrevious
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandAdminSearchByEmailPrevious command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

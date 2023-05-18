@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.io7m.primogenitor</groupId>
     <artifactId>com.io7m.primogenitor.full</artifactId>
-    <version>7.5.0</version>
+    <version>7.6.0</version>
   </parent>
 
   <groupId>com.io7m.idstore</groupId>
@@ -67,7 +67,7 @@
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
     <com.io7m.cedarbridge.version>0.0.12</com.io7m.cedarbridge.version>
     <com.io7m.cxbutton.version>0.0.5</com.io7m.cxbutton.version>
-    <com.io7m.hibiscus.version>0.0.7</com.io7m.hibiscus.version>
+    <com.io7m.hibiscus.version>0.0.8</com.io7m.hibiscus.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jbssio.version>2.0.0</com.io7m.jbssio.version>
     <com.io7m.jqpage.version>0.0.2</com.io7m.jqpage.version>
@@ -292,7 +292,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.11.0</version>
+        <version>2.12.0</version>
       </dependency>
 
       <!-- Database -->
@@ -417,7 +417,7 @@
       <dependency>
         <groupId>com.io7m.primogenitor</groupId>
         <artifactId>com.io7m.primogenitor.support</artifactId>
-        <version>7.5.0</version>
+        <version>7.6.0</version>
       </dependency>
 
       <dependency>
@@ -457,7 +457,7 @@
       <dependency>
         <groupId>com.squareup.okio</groupId>
         <artifactId>okio-jvm</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
       </dependency>
 
       <dependency>
@@ -619,6 +619,15 @@
     </pluginManagement>
 
     <plugins>
+      <!-- Spot bugs -->
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <configuration>
+          <excludeFilterFile>spotbugs-filter.xml</excludeFilterFile>
+        </configuration>
+      </plugin>
+
       <!-- Generate a site -->
       <plugin>
         <groupId>com.io7m.minisite</groupId>

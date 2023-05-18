@@ -45,7 +45,6 @@ import static java.util.Objects.requireNonNullElse;
 
 public final class IdDatabase implements IdDatabaseType
 {
-  private final OpenTelemetry telemetry;
   private final Clock clock;
   private final HikariDataSource dataSource;
   private final Settings settings;
@@ -57,20 +56,20 @@ public final class IdDatabase implements IdDatabaseType
   /**
    * The default postgres server database implementation.
    *
-   * @param inOpenTelemetry A telemetry interface
-   * @param inClock         The clock
-   * @param inDataSource    A pooled data source
+   * @param telemetry    A telemetry interface
+   * @param inClock      The clock
+   * @param inDataSource A pooled data source
    */
 
   public IdDatabase(
-    final OpenTelemetry inOpenTelemetry,
+    final OpenTelemetry telemetry,
     final Clock inClock,
     final HikariDataSource inDataSource)
   {
-    this.telemetry =
-      Objects.requireNonNull(inOpenTelemetry, "inOpenTelemetry");
+    Objects.requireNonNull(telemetry, "inOpenTelemetry");
+
     this.tracer =
-      this.telemetry.getTracer("com.io7m.idstore.database.postgres", version());
+      telemetry.getTracer("com.io7m.idstore.database.postgres", version());
     this.clock =
       Objects.requireNonNull(inClock, "clock");
     this.dataSource =
@@ -79,8 +78,8 @@ public final class IdDatabase implements IdDatabaseType
       new Settings().withRenderNameCase(RenderNameCase.LOWER);
 
     final var meters =
-      this.telemetry.meterBuilder(
-        "com.io7m.idstore.database.postgres")
+      telemetry.meterBuilder(
+          "com.io7m.idstore.database.postgres")
         .build();
 
     this.transactions =
@@ -171,7 +170,7 @@ public final class IdDatabase implements IdDatabaseType
    * @return The jooq SQL settings
    */
 
-  public Settings settings()
+  Settings settings()
   {
     return this.settings;
   }
@@ -180,7 +179,7 @@ public final class IdDatabase implements IdDatabaseType
    * @return The clock used for time-related queries
    */
 
-  public Clock clock()
+  Clock clock()
   {
     return this.clock;
   }

@@ -17,10 +17,7 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.http.IdCommonCSSServlet;
-import com.io7m.idstore.server.http.IdCommonLogoServlet;
 import com.io7m.idstore.server.http.IdPlainErrorHandler;
-import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.http.IdServletHolders;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
@@ -35,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 
 /**
  * A user view server.
@@ -118,14 +114,6 @@ public final class IdUVServer
     final var gzip = new GzipHandler();
     gzip.setHandler(sessionHandler);
 
-    /*
-     * Add a connector listener that adds unique identifiers to all requests.
-     */
-
-    Arrays.stream(server.getConnectors()).forEach(
-      connector -> connector.addBean(new IdRequestUniqueIDs(services))
-    );
-
     server.setErrorHandler(new IdPlainErrorHandler());
     server.setRequestLog((request, response) -> {
 
@@ -154,228 +142,228 @@ public final class IdUVServer
   {
     servlets.addServlet(
       servletHolders.create(
-        IdUViewMain.class,
-        IdUViewMain::new),
+        IdUVMain.class,
+        IdUVMain::new),
       "/"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewLogout.class,
-        IdUViewLogout::new),
+        IdUVLogout.class,
+        IdUVLogout::new),
       "/logout"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewLogin.class,
-        IdUViewLogin::new),
+        IdUVLogin.class,
+        IdUVLogin::new),
       "/login"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewLogin.class,
-        IdUViewLogin::new),
+        IdUVLogin.class,
+        IdUVLogin::new),
       "/login/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdCommonCSSServlet.class,
-        IdCommonCSSServlet::new),
+        IdUVCSS.class,
+        IdUVCSS::new),
       "/css/*"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdCommonCSSServlet.class,
-        IdCommonCSSServlet::new),
+        IdUVCSS.class,
+        IdUVCSS::new),
       "/css"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdCommonLogoServlet.class,
-        IdCommonLogoServlet::new),
+        IdUVLogo.class,
+        IdUVLogo::new),
       "/logo/*"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdCommonLogoServlet.class,
-        IdCommonLogoServlet::new),
+        IdUVLogo.class,
+        IdUVLogo::new),
       "/logo"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdCommonLogoServlet.class,
-        IdCommonLogoServlet::new),
+        IdUVLogo.class,
+        IdUVLogo::new),
       "/favicon.ico"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewEmailAdd.class,
-        IdUViewEmailAdd::new),
+        IdUVEmailAdd.class,
+        IdUVEmailAdd::new),
       "/email-add"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewEmailAdd.class,
-        IdUViewEmailAdd::new),
+        IdUVEmailAdd.class,
+        IdUVEmailAdd::new),
       "/email-add/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewEmailAddRun.class,
-        IdUViewEmailAddRun::new),
+        IdUVEmailAddRun.class,
+        IdUVEmailAddRun::new),
       "/email-add-run"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewEmailAddRun.class,
-        IdUViewEmailAddRun::new),
+        IdUVEmailAddRun.class,
+        IdUVEmailAddRun::new),
       "/email-add-run/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewEmailRemoveRun.class,
-        IdUViewEmailRemoveRun::new),
+        IdUVEmailRemoveRun.class,
+        IdUVEmailRemoveRun::new),
       "/email-remove-run"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewEmailRemoveRun.class,
-        IdUViewEmailRemoveRun::new),
+        IdUVEmailRemoveRun.class,
+        IdUVEmailRemoveRun::new),
       "/email-remove-run/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewEmailVerificationPermit.class,
-        IdUViewEmailVerificationPermit::new),
+        IdUVEmailVerificationPermit.class,
+        IdUVEmailVerificationPermit::new),
       "/email-verification-permit"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewEmailVerificationPermit.class,
-        IdUViewEmailVerificationPermit::new),
+        IdUVEmailVerificationPermit.class,
+        IdUVEmailVerificationPermit::new),
       "/email-verification-permit/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewEmailVerificationDeny.class,
-        IdUViewEmailVerificationDeny::new),
+        IdUVEmailVerificationDeny.class,
+        IdUVEmailVerificationDeny::new),
       "/email-verification-deny"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewEmailVerificationDeny.class,
-        IdUViewEmailVerificationDeny::new),
+        IdUVEmailVerificationDeny.class,
+        IdUVEmailVerificationDeny::new),
       "/email-verification-deny/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewRealnameUpdate.class,
-        IdUViewRealnameUpdate::new),
+        IdUVRealnameUpdate.class,
+        IdUVRealnameUpdate::new),
       "/realname-update"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewRealnameUpdate.class,
-        IdUViewRealnameUpdate::new),
+        IdUVRealnameUpdate.class,
+        IdUVRealnameUpdate::new),
       "/realname-update/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewRealnameUpdateRun.class,
-        IdUViewRealnameUpdateRun::new),
+        IdUVRealnameUpdateRun.class,
+        IdUVRealnameUpdateRun::new),
       "/realname-update-run"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewRealnameUpdateRun.class,
-        IdUViewRealnameUpdateRun::new),
+        IdUVRealnameUpdateRun.class,
+        IdUVRealnameUpdateRun::new),
       "/realname-update-run/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordReset.class,
-        IdUViewPasswordReset::new),
+        IdUVPasswordReset.class,
+        IdUVPasswordReset::new),
       "/password-reset"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordReset.class,
-        IdUViewPasswordReset::new),
+        IdUVPasswordReset.class,
+        IdUVPasswordReset::new),
       "/password-reset/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordResetRun.class,
-        IdUViewPasswordResetRun::new),
+        IdUVPasswordResetRun.class,
+        IdUVPasswordResetRun::new),
       "/password-reset-run"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordResetRun.class,
-        IdUViewPasswordResetRun::new),
+        IdUVPasswordResetRun.class,
+        IdUVPasswordResetRun::new),
       "/password-reset-run/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordResetConfirm.class,
-        IdUViewPasswordResetConfirm::new),
+        IdUVPasswordResetConfirm.class,
+        IdUVPasswordResetConfirm::new),
       "/password-reset-confirm"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordResetConfirm.class,
-        IdUViewPasswordResetConfirm::new),
+        IdUVPasswordResetConfirm.class,
+        IdUVPasswordResetConfirm::new),
       "/password-reset-confirm/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordResetConfirmRun.class,
-        IdUViewPasswordResetConfirmRun::new),
+        IdUVPasswordResetConfirmRun.class,
+        IdUVPasswordResetConfirmRun::new),
       "/password-reset-confirm-run"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordResetConfirmRun.class,
-        IdUViewPasswordResetConfirmRun::new),
+        IdUVPasswordResetConfirmRun.class,
+        IdUVPasswordResetConfirmRun::new),
       "/password-reset-confirm-run/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordUpdate.class,
-        IdUViewPasswordUpdate::new),
+        IdUVPasswordUpdate.class,
+        IdUVPasswordUpdate::new),
       "/password-update"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordUpdate.class,
-        IdUViewPasswordUpdate::new),
+        IdUVPasswordUpdate.class,
+        IdUVPasswordUpdate::new),
       "/password-update/*"
     );
 
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordUpdateRun.class,
-        IdUViewPasswordUpdateRun::new),
+        IdUVPasswordUpdateRun.class,
+        IdUVPasswordUpdateRun::new),
       "/password-update-run"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdUViewPasswordUpdateRun.class,
-        IdUViewPasswordUpdateRun::new),
+        IdUVPasswordUpdateRun.class,
+        IdUVPasswordUpdateRun::new),
       "/password-update-run/*"
     );
   }

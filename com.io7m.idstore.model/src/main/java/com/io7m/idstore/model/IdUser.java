@@ -87,19 +87,15 @@ public record IdUser(
 
   public IdUser withRedactedPassword()
   {
-    try {
-      return new IdUser(
-        this.id,
-        this.idName,
-        this.realName,
-        this.emails,
-        this.timeCreated,
-        this.timeUpdated,
-        IdPasswordAlgorithmRedacted.create()
-          .createHashed("", new byte[0])
-      );
-    } catch (final IdPasswordException e) {
-      throw new IllegalStateException(e);
-    }
+    return new IdUser(
+      this.id,
+      this.idName,
+      this.realName,
+      this.emails,
+      this.timeCreated,
+      this.timeUpdated,
+      IdPasswordAlgorithmRedacted.create()
+        .createHashed("", new byte[0])
+    );
   }
 }

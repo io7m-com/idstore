@@ -91,6 +91,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanCreate;
@@ -332,6 +333,8 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       Arbitraries.strings();
     final var s1 =
       Arbitraries.defaultFor(IdErrorCode.class);
+    final var b =
+      Arbitraries.defaultFor(IdAResponseBlame.class);
 
     final var s2 =
       Arbitraries.strings();
@@ -344,7 +347,7 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       Arbitraries.strings()
         .optional();
 
-    return Combinators.combine(id, s0, s1, ms, os).as(IdAResponseError::new);
+    return Combinators.combine(id, s0, s1, ms, os, b).as(IdAResponseError::new);
   }
 
   /**

@@ -22,7 +22,6 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandAdminPermissionGrant;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminPermissionGrant;
 import com.io7m.jaffirm.core.Invariants;
 
@@ -50,7 +49,7 @@ public final class IdACmdAdminPermissionGrant
   public IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandAdminPermissionGrant command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();
