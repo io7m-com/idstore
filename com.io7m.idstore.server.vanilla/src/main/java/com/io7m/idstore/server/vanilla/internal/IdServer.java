@@ -31,7 +31,6 @@ import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.server.admin_v1.IdA1Server;
-import com.io7m.idstore.server.admin_v1.IdACB1Sends;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerException;
 import com.io7m.idstore.server.api.IdServerType;
@@ -61,7 +60,6 @@ import com.io7m.idstore.server.service.templating.IdFMTemplateService;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.verdant.IdVerdantMessages;
 import com.io7m.idstore.server.user_v1.IdU1Server;
-import com.io7m.idstore.server.user_v1.IdUCB1Sends;
 import com.io7m.idstore.server.user_view.IdUVServer;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
@@ -263,11 +261,9 @@ public final class IdServer implements IdServerType
 
     final var idA1Messages = new IdACB1Messages();
     services.register(IdACB1Messages.class, idA1Messages);
-    services.register(IdACB1Sends.class, new IdACB1Sends(idA1Messages));
 
     final var idU1Messages = new IdUCB1Messages();
     services.register(IdUCB1Messages.class, idU1Messages);
-    services.register(IdUCB1Sends.class, new IdUCB1Sends(idU1Messages));
 
     final var userPasswordRateLimitService =
       IdRateLimitPasswordResetService.create(
@@ -432,7 +428,7 @@ public final class IdServer implements IdServerType
               transaction.queries(IdDatabaseAdminsQueriesType.class);
 
             admins.adminCreateInitial(
-              adminId.orElse(UUID.randomUUID()),
+              adminId.orElseGet(UUID::randomUUID),
               adminName,
               adminRealName,
               adminEmail,
@@ -460,5 +456,12 @@ public final class IdServer implements IdServerType
         Optional.empty()
       );
     }
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[IdServer 0x%s]"
+      .formatted(Integer.toUnsignedString(this.hashCode(), 16));
   }
 }

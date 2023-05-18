@@ -53,6 +53,8 @@ import static com.io7m.idstore.admin_client.internal.IdACompression.decompressRe
 import static com.io7m.idstore.admin_client.internal.IdAUUIDs.nullUUID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_CLIENT;
+import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_SERVER;
 import static java.util.Objects.requireNonNullElse;
 
 /**
@@ -115,7 +117,7 @@ public final class IdAHandler1 extends IdAHandlerAbstract
     } else {
       version = "0.0.0";
     }
-    return "com.io7m.cardant.client/%s".formatted(version);
+    return "com.io7m.idstore.client/%s".formatted(version);
   }
 
   private <R extends IdAResponseType, C extends IdACommandType<R>>
@@ -215,7 +217,8 @@ public final class IdAHandler1 extends IdAHandlerAbstract
           e.message(),
           e.errorCode(),
           e.attributes(),
-          Optional.empty()
+          Optional.empty(),
+          BLAME_SERVER
         )
       );
     } catch (final IOException e) {
@@ -229,7 +232,8 @@ public final class IdAHandler1 extends IdAHandlerAbstract
           ),
           IO_ERROR,
           Map.of(),
-          Optional.empty()
+          Optional.empty(),
+          BLAME_CLIENT
         )
       );
     }
@@ -288,7 +292,8 @@ public final class IdAHandler1 extends IdAHandlerAbstract
         this.local("Received an unexpected content type."),
         PROTOCOL_ERROR,
         attributes,
-        Optional.empty()
+        Optional.empty(),
+        BLAME_SERVER
       )
     );
   }
@@ -315,7 +320,8 @@ public final class IdAHandler1 extends IdAHandlerAbstract
         this.local("Received an unexpected response type."),
         PROTOCOL_ERROR,
         attributes,
-        Optional.empty()
+        Optional.empty(),
+        BLAME_SERVER
       )
     );
   }

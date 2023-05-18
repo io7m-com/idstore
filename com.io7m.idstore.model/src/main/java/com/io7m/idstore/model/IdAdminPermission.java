@@ -73,22 +73,74 @@ public enum IdAdminPermission
   },
 
   /**
-   * A permission that allows for modifying admins.
+   * A permission that allows for modifying the email addresses of admins.
    */
 
-  ADMIN_WRITE {
+  ADMIN_WRITE_EMAIL {
     @Override
     public Set<IdAdminPermission> implies()
     {
-      return ADMIN_WRITE_SELF_IMPLIES;
+      return ADMIN_WRITE_EMAIL_IMPLIES_SELF;
     }
   },
 
   /**
-   * A permission that allows an admin to modify itself.
+   * A permission that allows for modifying the email addresses of the calling
+   * admin.
    */
 
-  ADMIN_WRITE_SELF {
+  ADMIN_WRITE_EMAIL_SELF {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
+
+  /**
+   * A permission that allows for modifying the permissions of admins.
+   */
+
+  ADMIN_WRITE_PERMISSIONS {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return ADMIN_WRITE_PERMISSIONS_IMPLIES_SELF;
+    }
+  },
+
+  /**
+   * A permission that allows for modifying the permissions of the calling
+   * admin.
+   */
+
+  ADMIN_WRITE_PERMISSIONS_SELF {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
+
+  /**
+   * A permission that allows for modifying the credentials (names, passwords)
+   * of admins.
+   */
+
+  ADMIN_WRITE_CREDENTIALS {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return ADMIN_WRITE_CREDENTIALS_IMPLIES_SELF;
+    }
+  },
+
+  /**
+   * A permission that allows for modifying the credentials (names, passwords)
+   * of the calling admin.
+   */
+
+  ADMIN_WRITE_CREDENTIALS_SELF {
     @Override
     public Set<IdAdminPermission> implies()
     {
@@ -145,10 +197,23 @@ public enum IdAdminPermission
   },
 
   /**
-   * A permission that allows modifying users.
+   * A permission that allows for modifying the email addresses of users.
    */
 
-  USER_WRITE {
+  USER_WRITE_EMAIL {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
+  },
+
+  /**
+   * A permission that allows for modifying the credentials (names, passwords)
+   * of users.
+   */
+
+  USER_WRITE_CREDENTIALS {
     @Override
     public Set<IdAdminPermission> implies()
     {
@@ -168,8 +233,14 @@ public enum IdAdminPermission
     }
   };
 
-  private static final Set<IdAdminPermission> ADMIN_WRITE_SELF_IMPLIES =
-    Set.of(ADMIN_WRITE_SELF);
+  private static final Set<IdAdminPermission> ADMIN_WRITE_EMAIL_IMPLIES_SELF =
+    Set.of(ADMIN_WRITE_EMAIL_SELF);
+
+  private static final Set<IdAdminPermission> ADMIN_WRITE_CREDENTIALS_IMPLIES_SELF =
+    Set.of(ADMIN_WRITE_CREDENTIALS_SELF);
+
+  private static final Set<IdAdminPermission> ADMIN_WRITE_PERMISSIONS_IMPLIES_SELF =
+    Set.of(ADMIN_WRITE_PERMISSIONS_SELF);
 
   /**
    * @return The set of permissions implied by this permission

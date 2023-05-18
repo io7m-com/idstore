@@ -18,16 +18,20 @@ package com.io7m.idstore.admin_client;
 
 import com.io7m.idstore.admin_client.api.IdAClientAsynchronousType;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
+import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientFactoryType;
 import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.admin_client.internal.IdAClientAsynchronous;
 import com.io7m.idstore.admin_client.internal.IdAClientSynchronous;
 import com.io7m.idstore.admin_client.internal.IdAStrings;
+import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.CookieManager;
 import java.net.http.HttpClient;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * The default client factory.
@@ -47,18 +51,14 @@ public final class IdAClients implements IdAClientFactoryType
   @Override
   public IdAClientAsynchronousType openAsynchronousClient(
     final IdAClientConfiguration configuration)
+    throws IdAClientException
   {
     final var cookieJar =
       new CookieManager();
     final var locale =
       configuration.locale();
-
-    final IdAStrings strings;
-    try {
-      strings = new IdAStrings(locale);
-    } catch (final IOException e) {
-      throw new UncheckedIOException(e);
-    }
+    final IdAStrings strings =
+      openStrings(locale);
 
     final var httpClient =
       HttpClient.newBuilder()
@@ -71,18 +71,14 @@ public final class IdAClients implements IdAClientFactoryType
   @Override
   public IdAClientSynchronousType openSynchronousClient(
     final IdAClientConfiguration configuration)
+    throws IdAClientException
   {
     final var cookieJar =
       new CookieManager();
     final var locale =
       configuration.locale();
-
-    final IdAStrings strings;
-    try {
-      strings = new IdAStrings(locale);
-    } catch (final IOException e) {
-      throw new UncheckedIOException(e);
-    }
+    final IdAStrings strings =
+      openStrings(locale);
 
     final var httpClient =
       HttpClient.newBuilder()
@@ -90,5 +86,23 @@ public final class IdAClients implements IdAClientFactoryType
         .build();
 
     return new IdAClientSynchronous(configuration, strings, httpClient);
+  }
+
+  private static IdAStrings openStrings(
+    final Locale locale)
+    throws IdAClientException
+  {
+    try {
+      return new IdAStrings(locale);
+    } catch (final IOException e) {
+      throw new IdAClientException(
+        e.getMessage(),
+        e,
+        IdStandardErrorCodes.IO_ERROR,
+        Map.of(),
+        Optional.empty(),
+        Optional.empty()
+      );
+    }
   }
 }

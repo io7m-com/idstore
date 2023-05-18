@@ -169,6 +169,12 @@ public final class IdAShell implements IdAShellType
     {
 
     }
+
+    ShellCommandFailed(
+      final Exception ex)
+    {
+      super(ex);
+    }
   }
 
   private void runForOneLine()
@@ -232,7 +238,7 @@ public final class IdAShell implements IdAShellType
       );
     } catch (final QException ex) {
       this.formatQException(ex);
-      throw new ShellCommandFailed();
+      throw new ShellCommandFailed(ex);
     }
 
     try {
@@ -240,14 +246,14 @@ public final class IdAShell implements IdAShellType
     } catch (final InterruptedException e) {
       Thread.currentThread().interrupt();
     } catch (final Exception e) {
-      if (e instanceof QException q) {
+      if (e instanceof final QException q) {
         this.formatQException(q);
       }
 
       e.printStackTrace(this.writer);
       this.writer.println();
       this.writer.flush();
-      throw new ShellCommandFailed();
+      throw new ShellCommandFailed(e);
     }
   }
 
@@ -270,5 +276,12 @@ public final class IdAShell implements IdAShellType
         }
       );
     });
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[IdAShell 0x%s]"
+      .formatted(Integer.toUnsignedString(this.hashCode(), 16));
   }
 }

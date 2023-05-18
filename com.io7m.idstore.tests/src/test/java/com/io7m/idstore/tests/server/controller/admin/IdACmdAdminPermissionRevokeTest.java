@@ -28,9 +28,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
-import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS;
 import static com.io7m.idstore.model.IdAdminPermission.USER_READ;
-import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE_EMAIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -54,7 +54,7 @@ public final class IdACmdAdminPermissionRevokeTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS));
     final var admin1 =
       this.createAdmin("admin1", IdAdminPermissionSet.of(USER_READ));
 
@@ -126,9 +126,9 @@ public final class IdACmdAdminPermissionRevokeTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE, USER_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS, USER_WRITE_EMAIL));
     final var admin1 =
-      this.createAdmin("admin1", IdAdminPermissionSet.of(USER_WRITE));
+      this.createAdmin("admin1", IdAdminPermissionSet.of(USER_WRITE_EMAIL));
 
     final var context =
       this.createContextAndSession(admin0);
@@ -163,7 +163,7 @@ public final class IdACmdAdminPermissionRevokeTest
     final var handler = new IdACmdAdminPermissionRevoke();
     handler.execute(
       context,
-      new IdACommandAdminPermissionRevoke(admin1.id(), USER_WRITE)
+      new IdACommandAdminPermissionRevoke(admin1.id(), USER_WRITE_EMAIL)
     );
 
     /* Assert. */

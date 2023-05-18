@@ -32,8 +32,6 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 
-import java.io.IOException;
-
 /**
  * A command executor for public commands.
  */
@@ -58,7 +56,7 @@ public final class IdUCommandExecutor
   public IdUResponseType execute(
     final IdUCommandContext context,
     final IdUCommandType<? extends IdUResponseType> command)
-    throws IdCommandExecutionFailure, IOException, InterruptedException
+    throws IdCommandExecutionFailure
   {
     final var span =
       context.tracer()
@@ -78,36 +76,36 @@ public final class IdUCommandExecutor
   private static IdUResponseType executeCommand(
     final IdUCommandContext context,
     final IdUCommandType<? extends IdUResponseType> command)
-    throws IdCommandExecutionFailure, IOException, InterruptedException
+    throws IdCommandExecutionFailure
   {
-    if (command instanceof IdUCommandLogin c) {
+    if (command instanceof final IdUCommandLogin c) {
       return new IdUCmdLogin().execute(context, c);
     }
-    if (command instanceof IdUCommandUserSelf c) {
+    if (command instanceof final IdUCommandUserSelf c) {
       return new IdUCmdUserSelf().execute(context, c);
     }
-    if (command instanceof IdUCommandEmailAddPermit c) {
+    if (command instanceof final IdUCommandEmailAddPermit c) {
       return new IdUCmdEmailAddPermit().execute(context, c);
     }
-    if (command instanceof IdUCommandEmailAddDeny c) {
+    if (command instanceof final IdUCommandEmailAddDeny c) {
       return new IdUCmdEmailAddDeny().execute(context, c);
     }
-    if (command instanceof IdUCommandEmailAddBegin c) {
+    if (command instanceof final IdUCommandEmailAddBegin c) {
       return new IdUCmdEmailAddBegin().execute(context, c);
     }
-    if (command instanceof IdUCommandEmailRemovePermit c) {
+    if (command instanceof final IdUCommandEmailRemovePermit c) {
       return new IdUCmdEmailRemovePermit().execute(context, c);
     }
-    if (command instanceof IdUCommandEmailRemoveDeny c) {
+    if (command instanceof final IdUCommandEmailRemoveDeny c) {
       return new IdUCmdEmailRemoveDeny().execute(context, c);
     }
-    if (command instanceof IdUCommandEmailRemoveBegin c) {
+    if (command instanceof final IdUCommandEmailRemoveBegin c) {
       return new IdUCmdEmailRemoveBegin().execute(context, c);
     }
-    if (command instanceof IdUCommandRealnameUpdate c) {
+    if (command instanceof final IdUCommandRealnameUpdate c) {
       return new IdUCmdRealNameUpdate().execute(context, c);
     }
-    if (command instanceof IdUCommandPasswordUpdate c) {
+    if (command instanceof final IdUCommandPasswordUpdate c) {
       return new IdUCmdPasswordUpdate().execute(context, c);
     }
 

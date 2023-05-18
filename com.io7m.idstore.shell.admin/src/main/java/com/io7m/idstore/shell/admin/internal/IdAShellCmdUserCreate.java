@@ -25,7 +25,6 @@ import com.io7m.idstore.protocol.admin.IdACommandUserCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseUserCreate;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
-import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
@@ -143,7 +142,6 @@ public final class IdAShellCmdUserCreate
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserCreate response)
-    throws QException
   {
 
   }

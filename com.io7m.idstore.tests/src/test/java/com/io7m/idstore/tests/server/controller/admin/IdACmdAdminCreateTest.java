@@ -38,7 +38,7 @@ import java.util.Set;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_CREATE;
-import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE_EMAIL;
 import static java.util.Optional.empty;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -117,7 +117,7 @@ public final class IdACmdAdminCreateTest
           new IdRealName("Someone"),
           new IdEmail("someone-else@example.com"),
           this.password(),
-          Set.of(ADMIN_CREATE, USER_WRITE)
+          Set.of(ADMIN_CREATE, USER_WRITE_EMAIL)
         ));
       });
 

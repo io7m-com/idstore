@@ -27,7 +27,6 @@ import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
-import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.repetoir.core.RPServiceType;
 
@@ -74,28 +73,6 @@ public final class IdUserLoginService implements RPServiceType
       Objects.requireNonNull(inSessions, "inSessions");
     this.configurations =
       Objects.requireNonNull(inConfigurations, "inConfigurations");
-  }
-
-  /**
-   * A record of a user logging in.
-   *
-   * @param session The created session
-   * @param user    The user
-   */
-
-  public record IdUserLoggedIn(
-    IdSessionUser session,
-    IdUser user)
-  {
-    /**
-     * A record of a user logging in.
-     */
-
-    public IdUserLoggedIn
-    {
-      Objects.requireNonNull(session, "session");
-      Objects.requireNonNull(user, "user");
-    }
   }
 
   /**
@@ -259,5 +236,12 @@ public final class IdUserLoginService implements RPServiceType
   public String description()
   {
     return "User login service.";
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[IdUserLoginService 0x%s]"
+      .formatted(Integer.toUnsignedString(this.hashCode(), 16));
   }
 }

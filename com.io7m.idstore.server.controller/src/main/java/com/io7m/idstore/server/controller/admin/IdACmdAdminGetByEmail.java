@@ -23,7 +23,6 @@ import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.protocol.admin.IdACommandAdminGetByEmail;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminGet;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminRead;
 
 /**
@@ -47,7 +46,7 @@ public final class IdACmdAdminGetByEmail
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandAdminGetByEmail command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

@@ -39,7 +39,7 @@ import com.io7m.idstore.server.security.IdSecAdminActionAuditRead;
 import com.io7m.idstore.server.security.IdSecAdminActionUserCreate;
 import com.io7m.idstore.server.security.IdSecAdminActionUserDelete;
 import com.io7m.idstore.server.security.IdSecAdminActionUserRead;
-import com.io7m.idstore.server.security.IdSecAdminActionUserUpdate;
+import com.io7m.idstore.server.security.IdSecAdminActionUserUpdateCredentials;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecPolicyResultPermitted;
 import com.io7m.idstore.server.security.IdSecurity;
@@ -55,13 +55,17 @@ import java.util.UUID;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_READ;
-import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE;
-import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_SELF;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_CREDENTIALS;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_CREDENTIALS_SELF;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_EMAIL;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_EMAIL_SELF;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS_SELF;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
 import static com.io7m.idstore.model.IdAdminPermission.USER_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_READ;
-import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE_CREDENTIALS;
 import static java.time.OffsetDateTime.now;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -131,12 +135,12 @@ public final class IdSecurityPolicyTest
           BAD_PASSWORD,
           IdAdminPermissionSet.of(ADMIN_CREATE)
         ),
-        Set.of(ADMIN_CREATE, ADMIN_WRITE)
+        Set.of(ADMIN_CREATE, ADMIN_WRITE_PERMISSIONS)
       );
 
     failsWith(
       action,
-      "The current admin cannot grant the following permissions: [ADMIN_WRITE]");
+      "The current admin cannot grant the following permissions: [ADMIN_WRITE_PERMISSIONS]");
   }
 
   /**
@@ -168,7 +172,7 @@ public final class IdSecurityPolicyTest
   }
 
   /**
-   * Admins cannot be updated by an admin without ADMIN_WRITE.
+   * Admins cannot be updated by an admin without ADMIN_WRITE_CREDENTIALS.
    *
    * @throws IdSecurityException On errors
    */
@@ -192,11 +196,11 @@ public final class IdSecurityPolicyTest
         UUID.randomUUID()
       );
 
-    failsWith(action, "Modifying admins requires the ADMIN_WRITE permission.");
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE_CREDENTIALS permission.");
   }
 
   /**
-   * Admins cannot be updated by an admin without ADMIN_WRITE.
+   * Admins cannot be updated by an admin without ADMIN_WRITE_CREDENTIALS_SELF.
    *
    * @throws IdSecurityException On errors
    */
@@ -221,7 +225,7 @@ public final class IdSecurityPolicyTest
         id
       );
 
-    failsWith(action, "Modifying admins requires the ADMIN_WRITE_SELF permission.");
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE_CREDENTIALS_SELF permission.");
   }
 
   /**
@@ -244,7 +248,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_CREDENTIALS)
         ),
         UUID.randomUUID()
       );
@@ -273,7 +277,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_CREDENTIALS)
         ),
         id
       );
@@ -302,7 +306,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE_SELF)
+          IdAdminPermissionSet.of(ADMIN_WRITE_CREDENTIALS_SELF)
         ),
         id
       );
@@ -330,7 +334,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_CREDENTIALS)
         )
       );
 
@@ -479,7 +483,7 @@ public final class IdSecurityPolicyTest
   }
 
   /**
-   * Users cannot be updated by an admin without USER_UPDATE.
+   * Users cannot be updated by an admin without USER_WRITE_CREDENTIALS.
    *
    * @throws IdSecurityException On errors
    */
@@ -489,7 +493,7 @@ public final class IdSecurityPolicyTest
     throws IdSecurityException
   {
     final var action =
-      new IdSecAdminActionUserUpdate(
+      new IdSecAdminActionUserUpdateCredentials(
         new IdAdmin(
           UUID.randomUUID(),
           new IdName("admin-0"),
@@ -502,7 +506,7 @@ public final class IdSecurityPolicyTest
         )
       );
 
-    failsWith(action, "Updating users requires the USER_WRITE permission.");
+    failsWith(action, "Updating users requires the USER_WRITE_CREDENTIALS permission.");
   }
 
   /**
@@ -516,7 +520,7 @@ public final class IdSecurityPolicyTest
     throws IdSecurityException
   {
     final var action =
-      new IdSecAdminActionUserUpdate(
+      new IdSecAdminActionUserUpdateCredentials(
         new IdAdmin(
           UUID.randomUUID(),
           new IdName("admin-0"),
@@ -525,7 +529,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(USER_WRITE)
+          IdAdminPermissionSet.of(USER_WRITE_CREDENTIALS)
         )
       );
 
@@ -552,7 +556,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(USER_WRITE)
+          IdAdminPermissionSet.of(USER_WRITE_CREDENTIALS)
         )
       );
 
@@ -721,7 +725,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_EMAIL)
         ),
         UUID.randomUUID()
       );
@@ -750,7 +754,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE_SELF)
+          IdAdminPermissionSet.of(ADMIN_WRITE_EMAIL_SELF)
         ),
         id
       );
@@ -779,7 +783,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_EMAIL)
         ),
         id
       );
@@ -815,7 +819,7 @@ public final class IdSecurityPolicyTest
 
     failsWith(
       action,
-      "Modifying admins requires the ADMIN_WRITE_SELF permission.");
+      "Modifying admins requires the ADMIN_WRITE_EMAIL_SELF permission.");
   }
 
   /**
@@ -843,7 +847,7 @@ public final class IdSecurityPolicyTest
         UUID.randomUUID()
       );
 
-    failsWith(action, "Modifying admins requires the ADMIN_WRITE permission.");
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE_EMAIL permission.");
   }
 
   /**
@@ -866,7 +870,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_EMAIL)
         ),
         UUID.randomUUID()
       );
@@ -895,7 +899,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE_SELF)
+          IdAdminPermissionSet.of(ADMIN_WRITE_EMAIL_SELF)
         ),
         id
       );
@@ -924,7 +928,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_EMAIL)
         ),
         id
       );
@@ -960,7 +964,7 @@ public final class IdSecurityPolicyTest
 
     failsWith(
       action,
-      "Modifying admins requires the ADMIN_WRITE_SELF permission.");
+      "Modifying admins requires the ADMIN_WRITE_EMAIL_SELF permission.");
   }
 
   /**
@@ -988,7 +992,7 @@ public final class IdSecurityPolicyTest
         UUID.randomUUID()
       );
 
-    failsWith(action, "Modifying admins requires the ADMIN_WRITE permission.");
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE_EMAIL permission.");
   }
 
   /**
@@ -1011,10 +1015,10 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS)
         ),
         UUID.randomUUID(),
-        ADMIN_WRITE
+        ADMIN_WRITE_PERMISSIONS
       );
 
     succeeds(action);
@@ -1041,10 +1045,10 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE_SELF)
+          IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS_SELF)
         ),
         id,
-        ADMIN_WRITE_SELF
+        ADMIN_WRITE_PERMISSIONS_SELF
       );
 
     succeeds(action);
@@ -1071,10 +1075,10 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS)
         ),
         id,
-        ADMIN_WRITE
+        ADMIN_WRITE_PERMISSIONS
       );
 
     succeeds(action);
@@ -1104,12 +1108,12 @@ public final class IdSecurityPolicyTest
           IdAdminPermissionSet.of()
         ),
         id,
-        ADMIN_WRITE
+        ADMIN_WRITE_EMAIL
       );
 
     failsWith(
       action,
-      "Modifying admins requires the ADMIN_WRITE_SELF permission.");
+      "Modifying admins requires the ADMIN_WRITE_PERMISSIONS_SELF permission.");
   }
 
   /**
@@ -1135,10 +1139,10 @@ public final class IdSecurityPolicyTest
           IdAdminPermissionSet.of()
         ),
         UUID.randomUUID(),
-        ADMIN_WRITE
+        ADMIN_WRITE_EMAIL
       );
 
-    failsWith(action, "Modifying admins requires the ADMIN_WRITE permission.");
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE_PERMISSIONS permission.");
   }
 
   /**
@@ -1161,7 +1165,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS)
         ),
         UUID.randomUUID(),
         ADMIN_READ
@@ -1193,7 +1197,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS_SELF)
         ),
         id,
         ADMIN_READ
@@ -1225,10 +1229,10 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS)
         ),
         UUID.randomUUID(),
-        ADMIN_WRITE
+        ADMIN_WRITE_PERMISSIONS
       );
 
     succeeds(action);
@@ -1255,10 +1259,10 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE_SELF)
+          IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS_SELF)
         ),
         id,
-        ADMIN_WRITE_SELF
+        ADMIN_WRITE_PERMISSIONS_SELF
       );
 
     succeeds(action);
@@ -1285,10 +1289,10 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS_SELF)
         ),
         id,
-        ADMIN_WRITE
+        ADMIN_WRITE_PERMISSIONS_SELF
       );
 
     succeeds(action);
@@ -1318,12 +1322,12 @@ public final class IdSecurityPolicyTest
           IdAdminPermissionSet.of()
         ),
         id,
-        ADMIN_WRITE
+        ADMIN_READ
       );
 
     failsWith(
       action,
-      "Modifying admins requires the ADMIN_WRITE_SELF permission.");
+      "Modifying admins requires the ADMIN_WRITE_PERMISSIONS_SELF permission.");
   }
 
   /**
@@ -1349,10 +1353,10 @@ public final class IdSecurityPolicyTest
           IdAdminPermissionSet.of()
         ),
         UUID.randomUUID(),
-        ADMIN_WRITE
+        ADMIN_READ
       );
 
-    failsWith(action, "Modifying admins requires the ADMIN_WRITE permission.");
+    failsWith(action, "Modifying admins requires the ADMIN_WRITE_PERMISSIONS permission.");
   }
 
   /**
@@ -1375,7 +1379,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS)
         ),
         UUID.randomUUID(),
         ADMIN_READ
@@ -1407,7 +1411,7 @@ public final class IdSecurityPolicyTest
           now(),
           now(),
           BAD_PASSWORD,
-          IdAdminPermissionSet.of(ADMIN_WRITE)
+          IdAdminPermissionSet.of(ADMIN_WRITE_PERMISSIONS)
         ),
         id,
         ADMIN_READ

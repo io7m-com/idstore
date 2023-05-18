@@ -135,7 +135,6 @@ public final class IdUCB1Messages
   @Override
   public byte[] serialize(
     final IdUMessageType message)
-    throws IdProtocolException
   {
     try (var output = new ByteArrayOutputStream()) {
       final var context =
@@ -144,14 +143,8 @@ public final class IdUCB1Messages
           output);
       this.serializer.serialize(context, this.validator.convertToWire(message));
       return output.toByteArray();
-    } catch (final IOException e) {
-      throw new IdProtocolException(
-        Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
-        e,
-        IO_ERROR,
-        Map.of(),
-        Optional.empty()
-      );
+    } catch (final IOException | IdProtocolException e) {
+      throw new IllegalStateException(e);
     }
   }
 

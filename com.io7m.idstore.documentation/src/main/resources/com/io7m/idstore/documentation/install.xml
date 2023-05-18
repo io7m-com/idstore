@@ -100,7 +100,8 @@ idstore: usage: idstore [command] [arguments ...]
         <Link target="c99d5d5d-769c-4616-8847-926b5d085270">configuration file</Link>
         in <Term type="expression">server.conf</Term>, it's necessary to tell
         <Term type="command">idstore</Term>
-        to configure the database and create an initial administrator user:
+        to configure the database and create an
+        <Link target="f3d98730-c3b1-4da7-8f82-94aa9c99d473">initial administrator</Link>:
       </Paragraph>
       <FormalItem title="Initialize">
         <Verbatim>

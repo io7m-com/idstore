@@ -40,6 +40,7 @@ import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUMessageType;
+import com.io7m.idstore.protocol.user.IdUResponseBlame;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddDeny;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddPermit;
@@ -85,25 +86,25 @@ public final class IdUCB1Validation
     final IdUResponseType response)
     throws IdProtocolException
   {
-    if (response instanceof IdUResponseError c) {
+    if (response instanceof final IdUResponseError c) {
       return toWireResponseError(c);
-    } else if (response instanceof IdUResponseLogin c) {
+    } else if (response instanceof final IdUResponseLogin c) {
       return toWireResponseLogin(c);
-    } else if (response instanceof IdUResponseUserSelf c) {
+    } else if (response instanceof final IdUResponseUserSelf c) {
       return toWireResponseUserSelf(c);
-    } else if (response instanceof IdUResponseUserUpdate c) {
+    } else if (response instanceof final IdUResponseUserUpdate c) {
       return toWireResponseUserUpdate(c);
-    } else if (response instanceof IdUResponseEmailRemovePermit c) {
+    } else if (response instanceof final IdUResponseEmailRemovePermit c) {
       return toWireResponseEmailRemovePermit(c);
-    } else if (response instanceof IdUResponseEmailRemoveDeny c) {
+    } else if (response instanceof final IdUResponseEmailRemoveDeny c) {
       return toWireResponseEmailRemoveDeny(c);
-    } else if (response instanceof IdUResponseEmailRemoveBegin c) {
+    } else if (response instanceof final IdUResponseEmailRemoveBegin c) {
       return toWireResponseEmailRemoveBegin(c);
-    } else if (response instanceof IdUResponseEmailAddPermit c) {
+    } else if (response instanceof final IdUResponseEmailAddPermit c) {
       return toWireResponseEmailAddPermit(c);
-    } else if (response instanceof IdUResponseEmailAddDeny c) {
+    } else if (response instanceof final IdUResponseEmailAddDeny c) {
       return toWireResponseEmailAddDeny(c);
-    } else if (response instanceof IdUResponseEmailAddBegin c) {
+    } else if (response instanceof final IdUResponseEmailAddBegin c) {
       return toWireResponseEmailAddBegin(c);
     }
 
@@ -177,8 +178,18 @@ public final class IdUCB1Validation
       new CBString(error.errorCode().id()),
       new CBString(error.message()),
       CBMaps.ofMapString(error.attributes()),
-      fromOptional(error.remediatingAction().map(CBString::new))
+      fromOptional(error.remediatingAction().map(CBString::new)),
+      fromBlame(error.blame())
     );
+  }
+
+  private static IdU1ResponseBlame fromBlame(
+    final IdUResponseBlame blame)
+  {
+    return switch (blame) {
+      case BLAME_SERVER -> new IdU1ResponseBlame.BlameServer();
+      case BLAME_CLIENT -> new IdU1ResponseBlame.BlameClient();
+    };
   }
 
   private static IdU1ResponseLogin toWireResponseLogin(
@@ -194,25 +205,25 @@ public final class IdUCB1Validation
     final IdUCommandType<?> command)
     throws IdProtocolException
   {
-    if (command instanceof IdUCommandLogin c) {
+    if (command instanceof final IdUCommandLogin c) {
       return toWireCommandLogin(c);
-    } else if (command instanceof IdUCommandUserSelf c) {
+    } else if (command instanceof final IdUCommandUserSelf c) {
       return toWireCommandUserSelf(c);
-    } else if (command instanceof IdUCommandEmailAddBegin c) {
+    } else if (command instanceof final IdUCommandEmailAddBegin c) {
       return toWireCommandEmailAddBegin(c);
-    } else if (command instanceof IdUCommandEmailAddPermit c) {
+    } else if (command instanceof final IdUCommandEmailAddPermit c) {
       return toWireCommandEmailAddPermit(c);
-    } else if (command instanceof IdUCommandEmailAddDeny c) {
+    } else if (command instanceof final IdUCommandEmailAddDeny c) {
       return toWireCommandEmailAddDeny(c);
-    } else if (command instanceof IdUCommandEmailRemoveBegin c) {
+    } else if (command instanceof final IdUCommandEmailRemoveBegin c) {
       return toWireCommandEmailRemoveBegin(c);
-    } else if (command instanceof IdUCommandEmailRemovePermit c) {
+    } else if (command instanceof final IdUCommandEmailRemovePermit c) {
       return toWireCommandEmailRemovePermit(c);
-    } else if (command instanceof IdUCommandEmailRemoveDeny c) {
+    } else if (command instanceof final IdUCommandEmailRemoveDeny c) {
       return toWireCommandEmailRemoveDeny(c);
-    } else if (command instanceof IdUCommandRealnameUpdate c) {
+    } else if (command instanceof final IdUCommandRealnameUpdate c) {
       return toWireCommandRealnameUpdate(c);
-    } else if (command instanceof IdUCommandPasswordUpdate c) {
+    } else if (command instanceof final IdUCommandPasswordUpdate c) {
       return toWireCommandPasswordUpdate(c);
     }
 
@@ -304,6 +315,7 @@ public final class IdUCB1Validation
 
   private static IdUResponseError fromWireResponseError(
     final IdU1ResponseError error)
+    throws IdProtocolException
   {
     return new IdUResponseError(
       error.fieldRequestId().value(),
@@ -312,7 +324,26 @@ public final class IdUCB1Validation
       CBMaps.toMapString(error.fieldAttributes()),
       error.fieldRemediatingAction()
         .asOptional()
-        .map(CBString::value)
+        .map(CBString::value),
+      fromWireBlame(error.fieldBlame())
+    );
+  }
+
+  private static IdUResponseBlame fromWireBlame(
+    final IdU1ResponseBlame blame)
+    throws IdProtocolException
+  {
+    if (blame instanceof IdU1ResponseBlame.BlameClient) {
+      return IdUResponseBlame.BLAME_CLIENT;
+    }
+    if (blame instanceof IdU1ResponseBlame.BlameServer) {
+      return IdUResponseBlame.BLAME_SERVER;
+    }
+    throw new IdProtocolException(
+      "Unrecognized blame: %s".formatted(blame),
+      PROTOCOL_ERROR,
+      Map.of(),
+      Optional.empty()
     );
   }
 
@@ -351,9 +382,9 @@ public final class IdUCB1Validation
     final IdUMessageType message)
     throws IdProtocolException
   {
-    if (message instanceof IdUCommandType<?> command) {
+    if (message instanceof final IdUCommandType<?> command) {
       return convertToWireCommand(command);
-    } else if (message instanceof IdUResponseType response) {
+    } else if (message instanceof final IdUResponseType response) {
       return toWireResponse(response);
     } else {
       throw new IdProtocolException(
@@ -376,50 +407,50 @@ public final class IdUCB1Validation
        * Commands.
        */
 
-      if (message instanceof IdU1CommandLogin c) {
+      if (message instanceof final IdU1CommandLogin c) {
         return fromWireCommandLogin(c);
-      } else if (message instanceof IdU1CommandEmailAddBegin c) {
+      } else if (message instanceof final IdU1CommandEmailAddBegin c) {
         return fromWireCommandEmailAddBegin(c);
-      } else if (message instanceof IdU1CommandEmailAddPermit c) {
+      } else if (message instanceof final IdU1CommandEmailAddPermit c) {
         return fromWireCommandEmailAddPermit(c);
-      } else if (message instanceof IdU1CommandEmailAddDeny c) {
+      } else if (message instanceof final IdU1CommandEmailAddDeny c) {
         return fromWireCommandEmailAddDeny(c);
-      } else if (message instanceof IdU1CommandEmailRemoveBegin c) {
+      } else if (message instanceof final IdU1CommandEmailRemoveBegin c) {
         return fromWireCommandEmailRemoveBegin(c);
-      } else if (message instanceof IdU1CommandEmailRemovePermit c) {
+      } else if (message instanceof final IdU1CommandEmailRemovePermit c) {
         return fromWireCommandEmailRemovePermit(c);
-      } else if (message instanceof IdU1CommandEmailRemoveDeny c) {
+      } else if (message instanceof final IdU1CommandEmailRemoveDeny c) {
         return fromWireCommandEmailRemoveDeny(c);
-      } else if (message instanceof IdU1CommandUserSelf c) {
+      } else if (message instanceof final IdU1CommandUserSelf c) {
         return fromWireCommandUserSelf(c);
-      } else if (message instanceof IdU1CommandRealnameUpdate c) {
+      } else if (message instanceof final IdU1CommandRealnameUpdate c) {
         return fromWireCommandRealnameUpdate(c);
-      } else if (message instanceof IdU1CommandPasswordUpdate c) {
+      } else if (message instanceof final IdU1CommandPasswordUpdate c) {
         return fromWireCommandPasswordUpdate(c);
 
         /*
          * Responses.
          */
 
-      } else if (message instanceof IdU1ResponseLogin c) {
+      } else if (message instanceof final IdU1ResponseLogin c) {
         return fromWireResponseLogin(c);
-      } else if (message instanceof IdU1ResponseError c) {
+      } else if (message instanceof final IdU1ResponseError c) {
         return fromWireResponseError(c);
-      } else if (message instanceof IdU1ResponseUserSelf c) {
+      } else if (message instanceof final IdU1ResponseUserSelf c) {
         return fromWireResponseUserSelf(c);
-      } else if (message instanceof IdU1ResponseUserUpdate c) {
+      } else if (message instanceof final IdU1ResponseUserUpdate c) {
         return fromWireResponseUserUpdate(c);
-      } else if (message instanceof IdU1ResponseEmailAddBegin c) {
+      } else if (message instanceof final IdU1ResponseEmailAddBegin c) {
         return fromWireResponseEmailAddBegin(c);
-      } else if (message instanceof IdU1ResponseEmailAddPermit c) {
+      } else if (message instanceof final IdU1ResponseEmailAddPermit c) {
         return fromWireResponseEmailAddPermit(c);
-      } else if (message instanceof IdU1ResponseEmailAddDeny c) {
+      } else if (message instanceof final IdU1ResponseEmailAddDeny c) {
         return fromWireResponseEmailAddDeny(c);
-      } else if (message instanceof IdU1ResponseEmailRemoveBegin c) {
+      } else if (message instanceof final IdU1ResponseEmailRemoveBegin c) {
         return fromWireResponseEmailRemoveBegin(c);
-      } else if (message instanceof IdU1ResponseEmailRemovePermit c) {
+      } else if (message instanceof final IdU1ResponseEmailRemovePermit c) {
         return fromWireResponseEmailRemovePermit(c);
-      } else if (message instanceof IdU1ResponseEmailRemoveDeny c) {
+      } else if (message instanceof final IdU1ResponseEmailRemoveDeny c) {
         return fromWireResponseEmailRemoveDeny(c);
       }
     } catch (final Exception e) {

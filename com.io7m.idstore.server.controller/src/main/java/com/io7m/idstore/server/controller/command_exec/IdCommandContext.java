@@ -78,7 +78,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    * @param inRemoteUserAgent The remote user agent
    */
 
-  public IdCommandContext(
+  protected IdCommandContext(
     final RPServiceDirectoryType inServices,
     final UUID inRequestId,
     final IdDatabaseTransactionType inTransaction,
@@ -368,6 +368,34 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
   /**
    * Fail with a constant error message.
    *
+   * @param e          The exception
+   * @param statusCode The status code
+   * @param errorCode  The error code
+   * @param text       The message
+   *
+   * @return An exception
+   */
+
+  public final IdCommandExecutionFailure failExceptional(
+    final Exception e,
+    final int statusCode,
+    final IdErrorCode errorCode,
+    final String text)
+  {
+    return new IdCommandExecutionFailure(
+      text,
+      e,
+      errorCode,
+      Map.of(),
+      Optional.empty(),
+      this.requestId,
+      statusCode
+    );
+  }
+
+  /**
+   * Fail with a constant error message.
+   *
    * @param statusCode The status code
    * @param errorCode  The error code
    * @param text       The message
@@ -389,6 +417,15 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
       Optional.empty(),
       this.requestId,
       statusCode
+    );
+  }
+
+  @Override
+  public final String toString()
+  {
+    return "[%s 0x%s]".formatted(
+      this.getClass().getSimpleName(),
+      Integer.toUnsignedString(this.hashCode(), 16)
     );
   }
 }

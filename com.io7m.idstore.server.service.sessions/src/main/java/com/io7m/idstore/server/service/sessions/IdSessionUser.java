@@ -94,4 +94,10 @@ public final class IdSessionUser implements IdSessionType
   {
     return this.userId;
   }
+
+  @Override
+  public String toString()
+  {
+    return "[IdSessionUser]";
+  }
 }

@@ -21,7 +21,6 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanDelete;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
-import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QParametersPositionalNone;
@@ -94,7 +93,6 @@ public final class IdAShellCmdAdminBanDelete
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminBanDelete response)
-    throws QException
   {
 
   }

@@ -137,6 +137,14 @@
 ; Responses.
 ;
 
+[documentation IdU1ResponseBlame "A blame assignment."]
+[variant IdU1ResponseBlame
+  [documentation BlameClient "The client sent a bad response."]
+  [case BlameClient]
+  [documentation BlameServer "Something went wrong on the server."]
+  [case BlameServer]
+]
+
 [documentation IdU1ResponseError "An error response."]
 [record IdU1ResponseError
   [documentation requestId "The ID of the request that yielded this response."]
@@ -149,6 +157,8 @@
   [field attributes [cb:Map cb:String cb:String]]
   [documentation remediatingAction "The remediating action, if any."]
   [field remediatingAction [cb:Option cb:String]]
+  [documentation blame "The blame assignment."]
+  [field blame IdU1ResponseBlame]
 ]
 
 [documentation IdU1ResponseLogin "A response to IdU1CommandLogin."]

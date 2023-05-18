@@ -17,7 +17,6 @@
 package com.io7m.idstore.server.user_v1;
 
 import com.io7m.idstore.server.http.IdPlainErrorHandler;
-import com.io7m.idstore.server.http.IdRequestUniqueIDs;
 import com.io7m.idstore.server.http.IdServletHolders;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
@@ -32,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 
 /**
  * A user API v1 server.
@@ -115,14 +113,6 @@ public final class IdU1Server
     final var gzip = new GzipHandler();
     gzip.setHandler(sessionHandler);
 
-    /*
-     * Add a connector listener that adds unique identifiers to all requests.
-     */
-
-    Arrays.stream(server.getConnectors()).forEach(
-      connector -> connector.addBean(new IdRequestUniqueIDs(services))
-    );
-
     server.setErrorHandler(new IdPlainErrorHandler());
     server.setRequestLog((request, response) -> {
 
@@ -151,26 +141,26 @@ public final class IdU1Server
   {
     servlets.addServlet(
       servletHolders.create(
-        IdU1Versions.class,
-        IdU1Versions::new),
+        IdU1ServletVersions.class,
+        IdU1ServletVersions::new),
       "/"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdU1VersionServlet.class,
-        IdU1VersionServlet::new),
+        IdU1ServletVersion.class,
+        IdU1ServletVersion::new),
       "/version"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdU1Login.class,
-        IdU1Login::new),
+        IdU1ServletLogin.class,
+        IdU1ServletLogin::new),
       "/user/1/0/login"
     );
     servlets.addServlet(
       servletHolders.create(
-        IdU1CommandServlet.class,
-        IdU1CommandServlet::new),
+        IdU1ServletCommand.class,
+        IdU1ServletCommand::new),
       "/user/1/0/command"
     );
   }

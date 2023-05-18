@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0001</version>
+    <version>1.0.0-beta0002</version>
   </parent>
 
   <artifactId>com.io7m.idstore.oci</artifactId>
@@ -21,6 +21,7 @@
   <properties>
     <com.io7m.oci.versionAlpine>3.17.3</com.io7m.oci.versionAlpine>
     <com.io7m.oci.versionTemurin>17.0.7_7-jre-alpine</com.io7m.oci.versionTemurin>
+    <spotbugs.skip>true</spotbugs.skip>
   </properties>
 
   <build>
@@ -120,6 +121,8 @@
                   <executable>podman</executable>
                   <arguments>
                     <argument>build</argument>
+                    <argument>--timestamp</argument>
+                    <argument>1577836800</argument>
                     <argument>-t</argument>
                     <argument>quay.io/io7mcom/idstore:${project.version}</argument>
                     <argument>${project.build.directory}/oci</argument>

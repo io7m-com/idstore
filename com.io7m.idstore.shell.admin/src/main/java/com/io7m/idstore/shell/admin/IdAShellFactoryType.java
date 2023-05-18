@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.shell.admin;
 
-import java.io.IOException;
+import com.io7m.idstore.error_codes.IdException;
 
 /**
  * A shell factory.
@@ -31,9 +31,9 @@ public interface IdAShellFactoryType
    *
    * @return A new shell
    *
-   * @throws IOException On errors
+   * @throws IdException On errors
    */
 
   IdAShellType create(IdAShellConfiguration configuration)
-    throws IOException;
+    throws IdException;
 }

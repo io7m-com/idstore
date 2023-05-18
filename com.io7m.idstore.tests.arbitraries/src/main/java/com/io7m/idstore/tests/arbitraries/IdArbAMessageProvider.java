@@ -51,7 +51,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
-import com.io7m.idstore.protocol.admin.IdACommandAdminUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
@@ -72,7 +72,7 @@ import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchPrevious;
-import com.io7m.idstore.protocol.admin.IdACommandUserUpdate;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanDelete;
@@ -91,6 +91,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchPrevious;
+import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanCreate;
@@ -332,6 +333,8 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       Arbitraries.strings();
     final var s1 =
       Arbitraries.defaultFor(IdErrorCode.class);
+    final var b =
+      Arbitraries.defaultFor(IdAResponseBlame.class);
 
     final var s2 =
       Arbitraries.strings();
@@ -344,7 +347,7 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       Arbitraries.strings()
         .optional();
 
-    return Combinators.combine(id, s0, s1, ms, os).as(IdAResponseError::new);
+    return Combinators.combine(id, s0, s1, ms, os, b).as(IdAResponseError::new);
   }
 
   /**
@@ -542,13 +545,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
    * @return A message arbitrary
    */
 
-  public static Arbitrary<IdACommandUserUpdate> commandUserUpdate()
+  public static Arbitrary<IdACommandUserUpdateCredentials> commandUserUpdate()
   {
     final var users =
       Arbitraries.defaultFor(IdUser.class);
 
     return users.map((user) -> {
-      return new IdACommandUserUpdate(
+      return new IdACommandUserUpdateCredentials(
         user.id(),
         Optional.of(user.idName()),
         Optional.of(user.realName()),
@@ -1060,13 +1063,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
    * @return A message arbitrary
    */
 
-  public static Arbitrary<IdACommandAdminUpdate> commandAdminUpdate()
+  public static Arbitrary<IdACommandAdminUpdateCredentials> commandAdminUpdate()
   {
     final var users =
       Arbitraries.defaultFor(IdAdmin.class);
 
     return users.map((admin) -> {
-      return new IdACommandAdminUpdate(
+      return new IdACommandAdminUpdateCredentials(
         admin.id(),
         Optional.of(admin.idName()),
         Optional.of(admin.realName()),

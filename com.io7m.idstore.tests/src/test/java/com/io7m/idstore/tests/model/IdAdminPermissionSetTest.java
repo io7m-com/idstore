@@ -24,7 +24,9 @@ import net.jqwik.api.Property;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
-import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_SELF;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_CREDENTIALS_SELF;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_EMAIL_SELF;
+import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS_SELF;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +47,7 @@ public final class IdAdminPermissionSetTest
   }
 
   /**
-   * Removing a permission to a set results in that set not implying that
+   * Removing a permission from a set results in that set not implying that
    * permission.
    */
 
@@ -54,7 +56,9 @@ public final class IdAdminPermissionSetTest
     @ForAll final IdAdminPermissionSet permissions,
     @ForAll final IdAdminPermission permission)
   {
-    Assumptions.assumeFalse(permission == ADMIN_WRITE_SELF);
+    Assumptions.assumeFalse(permission == ADMIN_WRITE_PERMISSIONS_SELF);
+    Assumptions.assumeFalse(permission == ADMIN_WRITE_CREDENTIALS_SELF);
+    Assumptions.assumeFalse(permission == ADMIN_WRITE_EMAIL_SELF);
 
     final var without = permissions.minus(permission);
     assertFalse(without.implies(permission));
@@ -75,13 +79,35 @@ public final class IdAdminPermissionSetTest
   }
 
   /**
-   * ADMIN_WRITE implies ADMIN_WRITE_SELF.
+   * ADMIN_WRITE_PERMISSIONS implies ADMIN_WRITE_PERMISSIONS_SELF.
    */
 
   @Test
-  public void testParseIdentity()
+  public void testImplies0()
   {
-    final var s = IdAdminPermissionSet.of(IdAdminPermission.ADMIN_WRITE);
-    assertTrue(s.implies(ADMIN_WRITE_SELF));
+    final var s = IdAdminPermissionSet.of(IdAdminPermission.ADMIN_WRITE_PERMISSIONS);
+    assertTrue(s.implies(ADMIN_WRITE_PERMISSIONS_SELF));
+  }
+
+  /**
+   * ADMIN_WRITE_EMAIL implies ADMIN_WRITE_EMAIL_SELF.
+   */
+
+  @Test
+  public void testImplies1()
+  {
+    final var s = IdAdminPermissionSet.of(IdAdminPermission.ADMIN_WRITE_EMAIL);
+    assertTrue(s.implies(ADMIN_WRITE_EMAIL_SELF));
+  }
+
+  /**
+   * ADMIN_WRITE_CREDENTIALS implies ADMIN_WRITE_CREDENTIALS_SELF.
+   */
+
+  @Test
+  public void testImplies2()
+  {
+    final var s = IdAdminPermissionSet.of(IdAdminPermission.ADMIN_WRITE_CREDENTIALS);
+    assertTrue(s.implies(ADMIN_WRITE_CREDENTIALS_SELF));
   }
 }

@@ -32,7 +32,8 @@ import java.net.http.HttpClient;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
+
+import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_CLIENT;
 
 /**
  * The synchronous client.
@@ -73,22 +74,24 @@ public final class IdAClientSynchronous
   {
     if (ex instanceof final IdAClientException e) {
       return new IdAResponseError(
-        e.requestId().orElse(new UUID(0L, 0L)),
+        e.requestId().orElseGet(IdAUUIDs::nullUUID),
         e.message(),
         e.errorCode(),
         e.attributes(),
-        e.remediatingAction()
+        e.remediatingAction(),
+        BLAME_CLIENT
       );
     }
 
     return new IdAResponseError(
-      new UUID(0L, 0L),
+      IdAUUIDs.nullUUID(),
       Objects.requireNonNullElse(
         ex.getMessage(),
         ex.getClass().getSimpleName()),
       IdStandardErrorCodes.IO_ERROR,
       Map.of(),
-      Optional.empty()
+      Optional.empty(),
+      BLAME_CLIENT
     );
   }
 }

@@ -22,7 +22,6 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSelf;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 
 /**
  * IdACmdAdminSelf
@@ -45,7 +44,7 @@ public final class IdACmdAdminSelf
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandAdminSelf command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

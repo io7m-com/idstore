@@ -47,7 +47,6 @@ public abstract class IdAShellCmdAbstract<
   implements IdAShellCmdType
 {
   private final IdAClientSynchronousType client;
-  private final Class<C> commandClass;
   private final Class<R> responseClass;
   private final QCommandMetadata metadata;
 
@@ -60,7 +59,7 @@ public abstract class IdAShellCmdAbstract<
    * @param inClient        The client
    */
 
-  public IdAShellCmdAbstract(
+  protected IdAShellCmdAbstract(
     final IdAClientSynchronousType inClient,
     final QCommandMetadata inMetadata,
     final Class<C> inCommandClass,
@@ -70,8 +69,7 @@ public abstract class IdAShellCmdAbstract<
       Objects.requireNonNull(inClient, "client");
     this.metadata =
       Objects.requireNonNull(inMetadata, "metadata");
-    this.commandClass =
-      Objects.requireNonNull(inCommandClass, "commandClass");
+    Objects.requireNonNull(inCommandClass, "commandClass");
     this.responseClass =
       Objects.requireNonNull(inResponseClass, "responseClass");
   }
@@ -111,6 +109,12 @@ public abstract class IdAShellCmdAbstract<
         .map(QParameterType::name)
         .toList()
     );
+  }
+
+  @Override
+  public final String toString()
+  {
+    return "[%s]".formatted(this.getClass().getSimpleName());
   }
 
   @Override

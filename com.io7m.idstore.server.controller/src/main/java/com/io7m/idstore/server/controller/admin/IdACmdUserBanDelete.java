@@ -23,7 +23,6 @@ import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionUserBanDelete;
 
 import java.util.Optional;
@@ -49,7 +48,7 @@ public final class IdACmdUserBanDelete
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandUserBanDelete command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

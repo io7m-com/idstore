@@ -74,20 +74,16 @@ public record IdAdmin(
 
   public IdAdmin withRedactedPassword()
   {
-    try {
-      return new IdAdmin(
-        this.id,
-        this.idName,
-        this.realName,
-        this.emails,
-        this.timeCreated,
-        this.timeUpdated,
-        IdPasswordAlgorithmRedacted.create()
-          .createHashed("", new byte[0]),
-        this.permissions
-      );
-    } catch (final IdPasswordException e) {
-      throw new IllegalStateException(e);
-    }
+    return new IdAdmin(
+      this.id,
+      this.idName,
+      this.realName,
+      this.emails,
+      this.timeCreated,
+      this.timeUpdated,
+      IdPasswordAlgorithmRedacted.create()
+        .createHashed("", new byte[0]),
+      this.permissions
+    );
   }
 }

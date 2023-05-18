@@ -171,9 +171,9 @@ public final class IdDatabases implements IdDatabaseFactoryType
       final var url = new StringBuilder(128);
       url.append("jdbc:postgresql://");
       url.append(configuration.address());
-      url.append(":");
+      url.append(':');
       url.append(configuration.port());
-      url.append("/");
+      url.append('/');
       url.append(configuration.databaseName());
 
       final var config = new HikariConfig();

@@ -85,15 +85,18 @@ public final class IdServerConfigurations
     final var database =
       findDatabase(databaseFactories, fileDbConfig.kind());
 
+    final var fileHttp =
+      file.httpConfiguration();
+
     return new IdServerConfiguration(
       locale,
       clock,
       database,
       databaseConfiguration,
       file.mailConfiguration(),
-      file.httpConfiguration().userAPIService(),
-      file.httpConfiguration().userViewService(),
-      file.httpConfiguration().adminAPIService(),
+      fileHttp.userAPIService(),
+      fileHttp.userViewService(),
+      fileHttp.adminAPIService(),
       file.sessionConfiguration(),
       file.brandingConfiguration(),
       file.historyConfiguration(),

@@ -30,6 +30,7 @@ import com.io7m.repetoir.core.RPServiceType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -136,7 +137,6 @@ public final class IdACB1Messages
   @Override
   public byte[] serialize(
     final IdAMessageType message)
-    throws IdProtocolException
   {
     try (var output = new ByteArrayOutputStream()) {
       final var context =
@@ -146,13 +146,9 @@ public final class IdACB1Messages
       this.serializer.serialize(context, this.validator.convertToWire(message));
       return output.toByteArray();
     } catch (final IOException e) {
-      throw new IdProtocolException(
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
-        e,
-        IO_ERROR,
-        Map.of(),
-        Optional.empty()
-      );
+      throw new UncheckedIOException(e);
+    } catch (final IdProtocolException e) {
+      throw new IllegalStateException(e);
     }
   }
 

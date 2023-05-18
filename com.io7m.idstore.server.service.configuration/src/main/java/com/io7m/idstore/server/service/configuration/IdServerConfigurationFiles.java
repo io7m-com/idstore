@@ -71,6 +71,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static com.io7m.idstore.server.api.IdServerDatabaseKind.POSTGRESQL;
@@ -218,7 +219,7 @@ public final class IdServerConfigurationFiles
   private static IdServerDatabaseKind processDatabaseKind(
     final String kind)
   {
-    return switch (kind.toLowerCase()) {
+    return switch (kind.toLowerCase(Locale.ROOT)) {
       case "postgresql" -> POSTGRESQL;
       default -> {
         throw new IllegalArgumentException(

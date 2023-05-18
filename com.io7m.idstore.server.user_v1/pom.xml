@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0001</version>
+    <version>1.0.0-beta0002</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.user_v1</artifactId>
@@ -88,10 +88,6 @@
     <dependency>
       <groupId>com.io7m.repetoir</groupId>
       <artifactId>com.io7m.repetoir.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-http</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>

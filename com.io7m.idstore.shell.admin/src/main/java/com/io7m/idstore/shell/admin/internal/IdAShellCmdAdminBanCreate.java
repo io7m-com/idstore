@@ -22,7 +22,6 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanCreate;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
-import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
@@ -119,7 +118,6 @@ public final class IdAShellCmdAdminBanCreate
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminBanCreate response)
-    throws QException
   {
 
   }

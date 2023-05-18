@@ -20,11 +20,9 @@ import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddDeny;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddDeny;
 import com.io7m.idstore.protocol.user.IdUResponseType;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecUserActionEmailAddDeny;
 
 import java.util.Objects;
@@ -54,7 +52,7 @@ public final class IdUCmdEmailAddDeny
   protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandEmailAddDeny command)
-    throws IdValidityException, IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var token = command.token();
     final var user = context.user();

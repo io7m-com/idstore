@@ -15,4 +15,4 @@ LABEL "org.opencontainers.image.url"="https://www.io7m.com/software/idstore"
 LABEL "org.opencontainers.image.version"="${project.version}"
 LABEL "org.opencontainers.image.revision"="${buildNumber}"
 
-CMD ["/idstore/bin/idstore"]
+ENTRYPOINT ["/idstore/bin/idstore"]

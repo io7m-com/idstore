@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0001</version>
+    <version>1.0.0-beta0002</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.service.reqlimit</artifactId>
@@ -19,6 +19,12 @@
   <url>https://www.io7m.com/software/idstore</url>
 
   <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.error_codes</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>com.io7m.repetoir</groupId>
       <artifactId>com.io7m.repetoir.core</artifactId>

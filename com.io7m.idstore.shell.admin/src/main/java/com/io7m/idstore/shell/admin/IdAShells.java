@@ -18,6 +18,7 @@ package com.io7m.idstore.shell.admin;
 
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
+import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.shell.admin.internal.IdAShell;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminBanCreate;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminBanDelete;
@@ -91,7 +92,7 @@ public final class IdAShells implements IdAShellFactoryType
   @Override
   public IdAShellType create(
     final IdAShellConfiguration configuration)
-    throws IOException
+    throws IdException
   {
     final var client =
       new IdAClients()

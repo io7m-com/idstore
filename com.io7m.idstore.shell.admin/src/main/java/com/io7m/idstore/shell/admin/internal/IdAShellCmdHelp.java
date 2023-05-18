@@ -128,4 +128,10 @@ public final class IdAShellCmdHelp implements IdAShellCmdType
   {
     return this.metadata;
   }
+
+  @Override
+  public String toString()
+  {
+    return "[%s]".formatted(this.getClass().getSimpleName());
+  }
 }

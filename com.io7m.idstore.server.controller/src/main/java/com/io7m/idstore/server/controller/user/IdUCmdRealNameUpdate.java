@@ -18,11 +18,9 @@ package com.io7m.idstore.server.controller.user;
 
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecUserActionRealnameUpdate;
 
 import java.util.Optional;
@@ -47,7 +45,7 @@ public final class IdUCmdRealNameUpdate
   protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandRealnameUpdate command)
-    throws IdValidityException, IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var user = context.user();
     context.securityCheck(new IdSecUserActionRealnameUpdate(user));

@@ -19,11 +19,9 @@ package com.io7m.idstore.server.controller.user;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
-import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecUserActionPasswordUpdate;
 
 import java.util.Objects;
@@ -51,7 +49,7 @@ public final class IdUCmdPasswordUpdate
   protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandPasswordUpdate command)
-    throws IdValidityException, IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var user = context.user();
     context.securityCheck(new IdSecUserActionPasswordUpdate(user));

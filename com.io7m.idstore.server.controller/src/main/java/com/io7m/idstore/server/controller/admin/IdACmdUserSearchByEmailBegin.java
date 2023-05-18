@@ -22,7 +22,6 @@ import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailBegin;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionUserRead;
 
 /**
@@ -46,7 +45,7 @@ public final class IdACmdUserSearchByEmailBegin
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandUserSearchByEmailBegin command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

@@ -23,7 +23,6 @@ import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchBegin;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionUserRead;
 
 /**
@@ -47,7 +46,7 @@ public final class IdACmdUserSearchBegin
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandUserSearchBegin command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

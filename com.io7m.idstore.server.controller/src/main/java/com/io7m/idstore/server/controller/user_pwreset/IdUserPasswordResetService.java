@@ -361,10 +361,11 @@ public final class IdUserPasswordResetService
             IdPasswordAlgorithmPBKDF2HmacSHA256.create()
               .createHashed(this.password0);
 
-          transaction.userIdSet(reset.user());
+          final var user = reset.user();
+          transaction.userIdSet(user);
 
           queries.userUpdate(
-            reset.user(),
+            user,
             Optional.empty(),
             Optional.empty(),
             Optional.of(password)

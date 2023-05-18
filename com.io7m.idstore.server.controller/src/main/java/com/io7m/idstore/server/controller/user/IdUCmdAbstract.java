@@ -29,7 +29,6 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecurityException;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -50,7 +49,7 @@ public abstract class IdUCmdAbstract<C extends IdProtocolMessageType>
   public final IdUResponseType execute(
     final IdUCommandContext context,
     final C command)
-    throws IdCommandExecutionFailure, IOException, InterruptedException
+    throws IdCommandExecutionFailure
   {
     Objects.requireNonNull(context, "context");
     Objects.requireNonNull(command, "command");
@@ -70,7 +69,7 @@ public abstract class IdUCmdAbstract<C extends IdProtocolMessageType>
     } catch (final IdCommandExecutionFailure e) {
       throw e;
     } catch (final IdException e) {
-      throw context.fail(500, e.errorCode(), e.getMessage());
+      throw context.failExceptional(e, 500, e.errorCode(), e.getMessage());
     }
   }
 

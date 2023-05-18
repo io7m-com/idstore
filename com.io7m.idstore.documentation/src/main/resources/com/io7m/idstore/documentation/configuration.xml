@@ -76,7 +76,7 @@
     </Subsection>
     <Subsection title="HTTPServiceAdminAPI">
       <Paragraph>
-        The configuration for the Admin API service.
+        The configuration for the <Link target="f695a0a9-cec2-4db8-839d-e9eaaa8dace3">Admin API</Link> service.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ListenAddress</Term>
@@ -90,11 +90,14 @@
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
         use to connect to this server. This value is used in, for example, password reset emails to provide URLs that
         users can follow to reset their passwords.
+      </Paragraph>
+      <Paragraph>
+        By convention, the Admin API should listen on TCP port <Term type="constant">51000</Term>.
       </Paragraph>
     </Subsection>
     <Subsection title="HTTPServiceUserAPI">
       <Paragraph>
-        The configuration for the User API service.
+        The configuration for the <Link target="01d8e9c6-54c0-4501-8f45-e6988e0cb673">User API</Link> service.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ListenAddress</Term>
@@ -108,11 +111,14 @@
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
         use to connect to this server. This value is used in, for example, password reset emails to provide URLs that
         users can follow to reset their passwords.
+      </Paragraph>
+      <Paragraph>
+        By convention, the User API should listen on TCP port <Term type="constant">50000</Term>.
       </Paragraph>
     </Subsection>
     <Subsection title="HTTPServiceUserView">
       <Paragraph>
-        The configuration for the User View service.
+        The configuration for the <Link target="dae57724-5cd8-46b3-8650-1c3becce481e">User View</Link> service.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ListenAddress</Term>
@@ -126,6 +132,9 @@
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
         use to connect to this server. This value is used in, for example, password reset emails to provide URLs that
         users can follow to reset their passwords.
+      </Paragraph>
+      <Paragraph>
+        By convention, the User API should listen on TCP port <Term type="constant">50001</Term>.
       </Paragraph>
     </Subsection>
     <Subsection title="Example">

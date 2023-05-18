@@ -31,7 +31,7 @@ import java.util.Map;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
-import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE;
+import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE_EMAIL;
 import static java.util.Optional.empty;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -91,7 +91,7 @@ public final class IdACmdUserEmailRemoveTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(USER_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(USER_WRITE_EMAIL));
     final var context =
       this.createContextAndSession(admin0);
 
@@ -143,7 +143,7 @@ public final class IdACmdUserEmailRemoveTest
     /* Arrange. */
 
     final var admin0 =
-      this.createAdmin("admin0", IdAdminPermissionSet.of(USER_WRITE));
+      this.createAdmin("admin0", IdAdminPermissionSet.of(USER_WRITE_EMAIL));
     final var user0 =
       this.createUser("user0");
 

@@ -22,7 +22,6 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminBanCreate;
 
 /**
@@ -46,7 +45,7 @@ public final class IdACmdAdminBanCreate
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandAdminBanCreate command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();

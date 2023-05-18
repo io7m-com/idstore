@@ -24,10 +24,12 @@ import com.io7m.idstore.model.IdNonEmptyList;
 import com.io7m.idstore.model.IdPasswordAlgorithmRedacted;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUMessageType;
+import com.io7m.idstore.protocol.user.IdUResponseBlame;
 import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseLogin;
@@ -177,7 +179,8 @@ public final class IdUClientIT extends IdWithServerContract
             "error",
             AUTHENTICATION_ERROR,
             Map.of(),
-            Optional.empty()))
+            Optional.empty(),
+            IdUResponseBlame.BLAME_CLIENT))
       );
 
     this.webServer.addResponse()

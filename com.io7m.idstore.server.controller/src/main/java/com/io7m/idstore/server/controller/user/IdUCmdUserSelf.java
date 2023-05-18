@@ -19,7 +19,6 @@ package com.io7m.idstore.server.controller.user;
 
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserSelf;
@@ -44,7 +43,7 @@ public final class IdUCmdUserSelf
   protected IdUResponseType executeActual(
     final IdUCommandContext context,
     final IdUCommandUserSelf command)
-    throws IdValidityException, IdException
+    throws IdException
   {
     final var transaction =
       context.transaction();

@@ -86,10 +86,18 @@
   [case AdminCreate]
   [documentation AdminDelete "A permission that allows for deleting admins."]
   [case AdminDelete]
-  [documentation AdminWrite "A permission that allows updating admins."]
-  [case AdminWrite]
-  [documentation AdminWriteSelf "A permission that allows an admin to update itself."]
-  [case AdminWriteSelf]
+  [documentation AdminWriteCredentials "A permission that allows updating admin credentials."]
+  [case AdminWriteCredentials]
+  [documentation AdminWriteCredentialsSelf "A permission that allows an admin to update its own credentials."]
+  [case AdminWriteCredentialsSelf]
+  [documentation AdminWriteEmail "A permission that allows updating admin emails."]
+  [case AdminWriteEmail]
+  [documentation AdminWriteEmailSelf "A permission that allows an admin to update its own emails."]
+  [case AdminWriteEmailSelf]
+  [documentation AdminWritePermissions "A permission that allows updating admin permissions."]
+  [case AdminWritePermissions]
+  [documentation AdminWritePermissionsSelf "A permission that allows an admin to update its own permissions."]
+  [case AdminWritePermissionsSelf]
   [documentation AdminRead "A permission that allows reading admins."]
   [case AdminRead]
   [documentation AuditRead "A permission that allows reading the audit log."]
@@ -98,8 +106,10 @@
   [case UserDelete]
   [documentation UserCreate "A permission that allows creating users."]
   [case UserCreate]
-  [documentation UserWrite "A permission that allows updating users."]
-  [case UserWrite]
+  [documentation UserWriteCredentials "A permission that allows updating user credentials."]
+  [case UserWriteCredentials]
+  [documentation UserWriteEmail "A permission that allows updating user emails."]
+  [case UserWriteEmail]
   [documentation UserRead "A permission that allows reading users."]
   [case UserRead]
   [documentation UserBan "A permission that allows for banning users."]
@@ -428,8 +438,8 @@
 [documentation IdA1CommandAdminSelf "A request to fetch the admin's own profile."]
 [record IdA1CommandAdminSelf]
 
-[documentation IdA1CommandAdminUpdate "A request to fetch the admin's own profile."]
-[record IdA1CommandAdminUpdate
+[documentation IdA1CommandAdminUpdateCredentials "A request to edit an admin's credentials."]
+[record IdA1CommandAdminUpdateCredentials
   [documentation adminId "The admin."]
   [field adminId cb:UUID]
   [documentation idName "The admin's new ID name."]
@@ -562,8 +572,8 @@
 [documentation IdA1CommandUserSearchPrevious "Get the previous page of user search results."]
 [record IdA1CommandUserSearchPrevious]
 
-[documentation IdA1CommandUserUpdate "A request to fetch the user's own profile."]
-[record IdA1CommandUserUpdate
+[documentation IdA1CommandUserUpdateCredentials "A request to fetch the user's own profile."]
+[record IdA1CommandUserUpdateCredentials
   [documentation userId "The user."]
   [field userId cb:UUID]
   [documentation idName "The user's new ID name."]
@@ -577,6 +587,14 @@
 ;
 ; Admin responses.
 ;
+
+[documentation IdA1ResponseBlame "A blame assignment."]
+[variant IdA1ResponseBlame
+  [documentation BlameClient "The client sent a bad response."]
+  [case BlameClient]
+  [documentation BlameServer "Something went wrong on the server."]
+  [case BlameServer]
+]
 
 [documentation IdA1ResponseAdminBanCreate "A response to IdA1CommandAdminBanCreate."]
 [record IdA1ResponseAdminBanCreate
@@ -678,7 +696,7 @@
   [field admin IdA1Admin]
 ]
 
-[documentation IdA1ResponseAdminUpdate "A response to IdA1CommandAdminUpdate."]
+[documentation IdA1ResponseAdminUpdate "A response to IdA1CommandAdminUpdateCredentials."]
 [record IdA1ResponseAdminUpdate
   [documentation requestId "The ID of the request that yielded this response."]
   [field requestId cb:UUID]
@@ -806,7 +824,7 @@
   [field page [IdA1Page IdA1UserSummary]]
 ]
 
-[documentation IdA1ResponseUserUpdate "A response to IdA1CommandUserUpdate."]
+[documentation IdA1ResponseUserUpdate "A response to IdA1CommandUserUpdateCredentials."]
 [record IdA1ResponseUserUpdate
   [documentation requestId "The ID of the request that yielded this response."]
   [field requestId cb:UUID]
@@ -838,6 +856,8 @@
   [field attributes [cb:Map cb:String cb:String]]
   [documentation remediatingAction "The remediating action, if any."]
   [field remediatingAction [cb:Option cb:String]]
+  [documentation blame "The blame assignment."]
+  [field blame IdA1ResponseBlame]
 ]
 
 [documentation IdA1ResponseLogin "A response to IdA1CommandLogin."]
@@ -870,7 +890,7 @@
       IdA1CommandAdminSearchNext
       IdA1CommandAdminSearchPrevious
       IdA1CommandAdminSelf
-      IdA1CommandAdminUpdate
+      IdA1CommandAdminUpdateCredentials
       IdA1CommandAuditSearchBegin
       IdA1CommandAuditSearchNext
       IdA1CommandAuditSearchPrevious
@@ -891,7 +911,7 @@
       IdA1CommandUserSearchByEmailPrevious
       IdA1CommandUserSearchNext
       IdA1CommandUserSearchPrevious
-      IdA1CommandUserUpdate
+      IdA1CommandUserUpdateCredentials
       IdA1ResponseAdminBanCreate
       IdA1ResponseAdminBanDelete
       IdA1ResponseAdminBanGet

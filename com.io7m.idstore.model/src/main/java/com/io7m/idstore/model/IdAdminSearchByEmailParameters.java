@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.model;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -63,7 +64,7 @@ public record IdAdminSearchByEmailParameters(
       Objects.requireNonNull(timeUpdatedRange, "timeUpdatedRange");
     this.search =
       Objects.requireNonNull(search, "search")
-        .toLowerCase();
+        .toLowerCase(Locale.getDefault());
     this.ordering =
       Objects.requireNonNull(ordering, "ordering");
     this.limit =

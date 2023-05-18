@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         id="e7b8d1c0-1329-4bcd-aabb-276d0219593b"
+         title="Model">
+
+  <Subsection title="Overview">
+    <Paragraph>
+      The <Term type="package">idstore</Term> server is primarily intended to act as a single-source-of-truth for the
+      identities of users within arbitrary sets of decoupled services. It acts as a secure store for login credentials
+      for users, and is intended to relieve server application authors of the burden of having to constantly reimplement
+      login processes, credential stores, password reset workflows, and other miscellanea related to authentication.
+    </Paragraph>
+    <Paragraph>
+      This section of the documentation describes the internal <Term type="package">idstore</Term> model.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Users/Administrators"
+              id="c75582e9-741d-417d-9b65-1106d65e79bb">
+    <Subsection title="Separation">
+      <Paragraph>
+        The <Term type="package">idstore</Term> package contains two types of user accounts:
+        <Term type="term">users</Term>
+        and <Term type="term">administrators</Term>. A <Term type="term">user</Term> is an unprivileged account that is
+        permitted to log in to the server only via the <Link target="dae57724-5cd8-46b3-8650-1c3becce481e">user
+        view</Link>, and/or the <Link target="01d8e9c6-54c0-4501-8f45-e6988e0cb673">user API</Link>. An
+        <Term type="term">administrator</Term>
+        is an account that is permitted to log in to the server only via the
+        <Link target="f695a0a9-cec2-4db8-839d-e9eaaa8dace3">admin API</Link>, and is permitted to perform administrative
+        actions (subject to
+        <Link target="40fe0926-7d6e-41e3-8a3a-9776d6ac3a5d">permissions</Link>
+        checks) such as creating user accounts, reading the
+        <Link target="0610ec24-6507-4a19-9efe-f511c31ccc9a">audit log</Link>, etc.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Identifiers">
+      <Paragraph>
+        <Term type="term">User</Term>
+        and <Term type="term">administrator</Term> accounts have immutable, unique identifiers represented by
+        <LinkExternal target="https://www.rfc-editor.org/rfc/rfc4122">RFC 4122</LinkExternal>
+        UUID values. Identifiers are not secret and may be freely shared between systems.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Names">
+      <Paragraph>
+        <Term type="term">User</Term>
+        and <Term type="term">administrator</Term> accounts have names that are used for login operations. Names must
+        match the regular expression
+        <Term type="expression">\p{LC}[\p{LC}\p{N}_-]{0,255}</Term>. Names must be unique within a given
+        <Term type="package">idstore</Term>
+        server, but can be changed at the user/administrator's discretion at any time.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Email Addresses">
+      <Paragraph>
+        <Term type="term">User</Term>
+        and <Term type="term">administrator</Term> accounts must have at least one unique (within a given
+        <Term type="package">idstore</Term>
+        server) email address associated with them. Email addresses can be added and removed at any time, but it is not
+        permitted for the number of addresses on an account to be less than one.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Permissions">
+      <Paragraph>
+        Each <Term type="term">administrator</Term> account has a set of
+        <Link target="40fe0926-7d6e-41e3-8a3a-9776d6ac3a5d">permissions</Link>
+        associated with it. When the administrator account attempts to perform an operation on the server, the account's
+        permissions are checked to see if it has all the permissions required to perform the action.
+      </Paragraph>
+      <Paragraph>
+        An <Term type="term">administrator</Term> account holding the
+        <Term type="constant">ADMIN_WRITE_PERMISSIONS</Term>
+        permission may <Term type="term">grant</Term> any permissions it holds to another
+        <Term type="term">administrator</Term>
+        account. Similarly, An <Term type="term">administrator</Term> account holding the
+        <Term type="constant">ADMIN_WRITE_PERMISSIONS</Term>
+        permission may <Term type="term">revoke</Term> any permissions it holds from another <Term type="term">
+        administrator
+      </Term> account.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Initial Administrator"
+                id="f3d98730-c3b1-4da7-8f82-94aa9c99d473">
+      <Paragraph>
+        The <Term type="term">initial administrator</Term> is a designated adminstrator account that always has all of
+        the available <Link target="40fe0926-7d6e-41e3-8a3a-9776d6ac3a5d">permissions</Link>. For security reasons, this
+        account should have an extremely strong password, and should only be used to perform the necessary initial
+        configuration of the server; it is analogous to the UNIX <Term type="expression">root</Term> account.
+      </Paragraph>
+    </Subsection>
+  </Subsection>
+
+  <Subsection title="Permissions"
+              id="40fe0926-7d6e-41e3-8a3a-9776d6ac3a5d">
+    <Paragraph>
+      The following administrator permissions are available:
+    </Paragraph>
+    <FormalItem title="Permissions">
+      <Table type="genericTable">
+        <Columns>
+          <Column>Permission</Column>
+          <Column>Description</Column>
+        </Columns>
+        <Row>
+          <Cell>ADMIN_DELETE</Cell>
+          <Cell>The bearer of this permission is permitted to delete administrator accounts.</Cell>
+        </Row>
+        <Row>
+          <Cell>ADMIN_CREATE</Cell>
+          <Cell>The bearer of this permission is permitted to create new administrator accounts.</Cell>
+        </Row>
+        <Row>
+          <Cell>USER_BAN</Cell>
+          <Cell>The bearer of this permission is permitted to ban users.</Cell>
+        </Row>
+        <Row>
+          <Cell>ADMIN_BAN</Cell>
+          <Cell>The bearer of this permission is permitted to ban administrators.</Cell>
+        </Row>
+        <Row>
+          <Cell>ADMIN_WRITE_CREDENTIALS</Cell>
+          <Cell>The bearer of this permission is permitted to modify the credentials of administrators.</Cell>
+        </Row>
+        <Row>
+          <Cell>ADMIN_WRITE_CREDENTIALS_SELF</Cell>
+          <Cell>The bearer of this permission is permitted to modify its own credentials.</Cell>
+        </Row>
+        <Row>
+          <Cell>ADMIN_WRITE_EMAIL</Cell>
+          <Cell>The bearer of this permission is permitted to modify the email addresses of administrators.</Cell>
+        </Row>
+        <Row>
+          <Cell>ADMIN_WRITE_EMAIL_SELF</Cell>
+          <Cell>The bearer of this permission is permitted to modify its own email addresses.</Cell>
+        </Row>
+        <Row>
+          <Cell>ADMIN_WRITE_PERMISSIONS</Cell>
+          <Cell>The bearer of this permission is permitted to modify the permissions of administrators.</Cell>
+        </Row>
+        <Row>
+          <Cell>ADMIN_WRITE_PERMISSIONS_SELF</Cell>
+          <Cell>The bearer of this permission is permitted to modify its own permissions.</Cell>
+        </Row>
+        <Row>
+          <Cell>ADMIN_READ</Cell>
+          <Cell>The bearer of this permission is permitted to read the accounts of administrators.</Cell>
+        </Row>
+        <Row>
+          <Cell>AUDIT_READ</Cell>
+          <Cell>The bearer of this permission is permitted to read the audit log.</Cell>
+        </Row>
+        <Row>
+          <Cell>USER_DELETE</Cell>
+          <Cell>The bearer of this permission is permitted to delete user accounts.</Cell>
+        </Row>
+        <Row>
+          <Cell>USER_CREATE</Cell>
+          <Cell>The bearer of this permission is permitted to create new user accounts.</Cell>
+        </Row>
+        <Row>
+          <Cell>USER_WRITE_CREDENTIALS</Cell>
+          <Cell>The bearer of this permission is permitted to modify the credentials of existing user accounts.</Cell>
+        </Row>
+        <Row>
+          <Cell>USER_WRITE_EMAIL</Cell>
+          <Cell>The bearer of this permission is permitted to modify the email addresses existing user accounts.</Cell>
+        </Row>
+        <Row>
+          <Cell>USER_READ</Cell>
+          <Cell>The bearer of this permission is permitted to read existing user accounts.</Cell>
+        </Row>
+      </Table>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="Audit Log"
+              id="0610ec24-6507-4a19-9efe-f511c31ccc9a">
+    <Paragraph>
+      The server maintains an append-only <Term type="term">audit log</Term> consisting of a series of
+      <Term type="term">audit events</Term>. An <Term type="term">audit event</Term> has an integer
+      <Term type="term">id</Term>, an <Term type="term">owner</Term> (represented by an account UUID),
+      a <Term type="term">timestamp</Term>, a <Term type="term">type</Term>, and a
+      <Term type="term">message</Term>.
+    </Paragraph>
+    <FormalItem title="Audit Log">
+      <Image source="audit.png" width="640" height="517">Audit log.</Image>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="User View"
+              id="dae57724-5cd8-46b3-8650-1c3becce481e">
+    <Paragraph>
+      The <Term type="term">user view</Term> is the web interface exposed to users. It offers the
+      ability for users to see their own account information, and also to handle the email-based
+      password reset workflow.
+    </Paragraph>
+    <FormalItem title="Web Interface">
+      <Image source="web.png" width="640" height="503">Web interface.</Image>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="User API"
+              id="01d8e9c6-54c0-4501-8f45-e6988e0cb673">
+    <Paragraph>
+      The <Term type="term">user API</Term> is the interface exposed to user clients. It exposes
+      a <LinkExternal target="https://www.io7m.com/software/cedarbridge">Cedarbridge</LinkExternal>-based
+      API over HTTP, using the included
+      <Link target="5242f097-2f68-4f19-8293-7a7ce68a8b7e">schema</Link>.
+    </Paragraph>
+    <Paragraph>
+      The user API is largely intended to be used by other servers that want to use an
+      <Term type="package">idstore</Term> server to handle authentication.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Admin API"
+              id="f695a0a9-cec2-4db8-839d-e9eaaa8dace3">
+    <Paragraph>
+      The <Term type="term">admin API</Term> is the interface exposed to administrators. Like the
+      <Link target="01d8e9c6-54c0-4501-8f45-e6988e0cb673">user API</Link>, it exposes
+      a Cedarbridge-based API over HTTP, using the included
+      <Link target="894a0f26-590b-4d08-b445-1b687c87b583">schema</Link>. It is the service used
+      by the included <Link target="80d0af5f-505b-4dee-b733-296a6f3970a4">admin shell</Link>, and
+      by projects such as <LinkExternal target="https://github.com/io7m/idstore_gui">idstore_gui</LinkExternal>.
+    </Paragraph>
+  </Subsection>
+
+</Section>

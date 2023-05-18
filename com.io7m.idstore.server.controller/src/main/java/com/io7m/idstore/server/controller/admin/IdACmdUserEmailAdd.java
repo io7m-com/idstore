@@ -24,8 +24,7 @@ import com.io7m.idstore.protocol.admin.IdACommandUserEmailAdd;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
 import com.io7m.idstore.server.controller.IdServerStrings;
-import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.security.IdSecAdminActionUserUpdate;
+import com.io7m.idstore.server.security.IdSecAdminActionUserUpdateEmail;
 
 import java.util.Objects;
 
@@ -52,14 +51,14 @@ public final class IdACmdUserEmailAdd
   protected IdAResponseType executeActual(
     final IdACommandContext context,
     final IdACommandUserEmailAdd command)
-    throws IdException, IdCommandExecutionFailure
+    throws IdException
   {
     final var transaction =
       context.transaction();
     final var admin =
       context.admin();
 
-    context.securityCheck(new IdSecAdminActionUserUpdate(admin));
+    context.securityCheck(new IdSecAdminActionUserUpdateEmail(admin));
 
     final var strings =
       context.services().requireService(IdServerStrings.class);
