@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
+import com.io7m.idstore.model.IdVersion;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
@@ -83,9 +84,9 @@ public final class IdAShellCmdVersion implements IdAShellCmdType
   {
     final var w = context.output();
     w.append("com.io7m.idstore ");
-    w.append(IdAShellVersion.SHELL_VERSION);
+    w.append(IdVersion.MAIN_VERSION);
     w.append(" ");
-    w.append(IdAShellVersion.SHELL_BUILD);
+    w.append(IdVersion.MAIN_BUILD);
     w.println();
     return SUCCESS;
   }

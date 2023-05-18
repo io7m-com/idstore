@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.user_v1;
 
+import com.io7m.idstore.model.IdVersion;
 import com.io7m.idstore.server.http.IdHTTPServletFunctional;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
 import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
@@ -64,8 +65,8 @@ public final class IdU1ServletVersion
     final var text =
       String.format(
         "com.io7m.idstore %s %s\r\n\r\n",
-        IdU1Version.SERVER_VERSION,
-        IdU1Version.SERVER_BUILD
+        IdVersion.MAIN_VERSION,
+        IdVersion.MAIN_BUILD
       );
 
     return new IdHTTPServletResponseFixedSize(

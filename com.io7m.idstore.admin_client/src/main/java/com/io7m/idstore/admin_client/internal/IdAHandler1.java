@@ -26,6 +26,7 @@ import com.io7m.idstore.admin_client.api.IdAClientEventType;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdVersion;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdAMessageType;
@@ -110,14 +111,8 @@ public final class IdAHandler1 extends IdAHandlerAbstract
 
   private static String userAgent()
   {
-    final String version;
-    final var pack = IdAHandler1.class.getPackage();
-    if (pack != null) {
-      version = pack.getImplementationVersion();
-    } else {
-      version = "0.0.0";
-    }
-    return "com.io7m.idstore.client/%s".formatted(version);
+    return "com.io7m.idstore.client/%s (%s)"
+      .formatted(IdVersion.MAIN_VERSION, IdVersion.MAIN_BUILD);
   }
 
   private <R extends IdAResponseType, C extends IdACommandType<R>>

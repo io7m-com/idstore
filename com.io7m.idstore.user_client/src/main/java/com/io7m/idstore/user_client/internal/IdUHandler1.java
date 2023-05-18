@@ -22,6 +22,7 @@ import com.io7m.hibiscus.api.HBResultType;
 import com.io7m.hibiscus.basic.HBClientNewHandler;
 import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.model.IdName;
+import com.io7m.idstore.model.IdVersion;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
 import com.io7m.idstore.protocol.user.IdUCommandType;
@@ -113,14 +114,8 @@ public final class IdUHandler1 extends IdUHandlerAbstract
 
   private static String userAgent()
   {
-    final String version;
-    final var pack = IdUHandler1.class.getPackage();
-    if (pack != null) {
-      version = pack.getImplementationVersion();
-    } else {
-      version = "0.0.0";
-    }
-    return "com.io7m.idstore.client/%s".formatted(version);
+    return "com.io7m.idstore.client/%s (%s)"
+      .formatted(IdVersion.MAIN_VERSION, IdVersion.MAIN_BUILD);
   }
 
   private <R extends IdUResponseType, C extends IdUCommandType<R>>
