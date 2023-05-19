@@ -21,7 +21,7 @@
       <Term type="expression">/user/1/0/</Term>:
     </Paragraph>
     <FormalItem title="Verdant Example">
-      <Verbatim><![CDATA[$ curl https://idstore.example.com:51000/ | hexdump
+      <Verbatim><![CDATA[$ curl https://idstore.example.com:50000/ | hexdump
 0000:0000 | 00 00 00 01  00 00 00 01  EB 95 9D 58  3D 51 30 23 | ........ë..X=Q0#
 0000:0010 | B6 3B 13 6E  6C D3 8C 1C  00 00 00 01  00 00 00 00 | ¶;.nlÓ..........
 0000:0020 | 00 00 00 0A  2F 75 73 65  72 2F 31 2F  30 2F       | ..../user/1/0/
