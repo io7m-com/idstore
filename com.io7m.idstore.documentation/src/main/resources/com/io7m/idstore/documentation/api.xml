@@ -5,8 +5,8 @@
          id="7a497fd6-1559-46c7-9f2b-3004fb075c91"
          xmlns:xi="http://www.w3.org/2001/XInclude">
 
-  <xi:include href="proto_admin_v1.xml"/>
-  <xi:include href="proto_user_v1.xml"/>
+  <xi:include href="proto_admin.xml"/>
+  <xi:include href="proto_user.xml"/>
   <xi:include href="javadoc.xml"/>
 
 </Section>
