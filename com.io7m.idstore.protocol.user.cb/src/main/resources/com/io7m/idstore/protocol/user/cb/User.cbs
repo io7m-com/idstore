@@ -225,8 +225,8 @@
 ; Protocol.
 ;
 
-[documentation IdU1 "The User v1 protocol."]
-[protocol IdU1
+[documentation IdU "The User protocol."]
+[protocol IdU
   [version 1
     [types-added
       IdU1CommandEmailAddBegin

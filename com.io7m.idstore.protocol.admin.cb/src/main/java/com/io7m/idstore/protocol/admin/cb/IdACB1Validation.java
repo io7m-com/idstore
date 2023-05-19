@@ -251,7 +251,7 @@ import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationUser.t
  */
 
 public final class IdACB1Validation
-  implements IdProtocolMessageValidatorType<IdAMessageType, ProtocolIdA1v1Type>
+  implements IdProtocolMessageValidatorType<IdAMessageType, ProtocolIdAv1Type>
 {
   /**
    * Functions to translate between the core command set and the Admin v1
@@ -263,7 +263,7 @@ public final class IdACB1Validation
 
   }
 
-  private static ProtocolIdA1v1Type toWireResponse(
+  private static ProtocolIdAv1Type toWireResponse(
     final IdAResponseType response)
     throws IdProtocolException
   {
@@ -420,7 +420,7 @@ public final class IdACB1Validation
     );
   }
 
-  private static ProtocolIdA1v1Type convertToWireCommand(
+  private static ProtocolIdAv1Type convertToWireCommand(
     final IdACommandType<?> command)
     throws IdProtocolException
   {
@@ -637,7 +637,7 @@ public final class IdACB1Validation
   }
 
   @Override
-  public ProtocolIdA1v1Type convertToWire(
+  public ProtocolIdAv1Type convertToWire(
     final IdAMessageType message)
     throws IdProtocolException
   {
@@ -657,7 +657,7 @@ public final class IdACB1Validation
 
   @Override
   public IdAMessageType convertFromWire(
-    final ProtocolIdA1v1Type message)
+    final ProtocolIdAv1Type message)
     throws IdProtocolException
   {
     try {

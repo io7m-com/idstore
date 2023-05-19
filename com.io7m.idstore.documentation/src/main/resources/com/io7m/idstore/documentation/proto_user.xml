@@ -14,7 +14,7 @@
       <Term type="function">GET</Term> request to the root endpoint will yield a <Term type="package">verdant</Term>
       message showing which versions of the <Term type="term">User</Term> protocol are available.
       The <Term type="term">User</Term> protocol is assigned the protocol
-      identifier <Term type="constant">eb959d58-3d51-3023-b63b-136e6cd38c1c</Term>.
+      identifier <Term type="constant">ed628c5a-0182-36ab-bee3-5fe6f6a21894</Term>.
     </Paragraph>
     <Paragraph>
       As an example, the following shows that the <Term type="term">User</Term> protocol version 1 is available at
@@ -22,8 +22,8 @@
     </Paragraph>
     <FormalItem title="Verdant Example">
       <Verbatim><![CDATA[$ curl https://idstore.example.com:50000/ | hexdump
-0000:0000 | 00 00 00 01  00 00 00 01  EB 95 9D 58  3D 51 30 23 | ........ë..X=Q0#
-0000:0010 | B6 3B 13 6E  6C D3 8C 1C  00 00 00 01  00 00 00 00 | ¶;.nlÓ..........
+0000:0000 | 00 00 00 01  00 00 00 01  ED 62 8C 5A  01 82 36 AB | ........íb.Z..6«
+0000:0010 | BE E3 5F E6  F6 A2 18 94  00 00 00 01  00 00 00 00 | ¾ã_æö¢..........
 0000:0020 | 00 00 00 0A  2F 75 73 65  72 2F 31 2F  30 2F       | ..../user/1/0/
 ]]></Verbatim>
     </FormalItem>

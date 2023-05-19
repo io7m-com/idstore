@@ -46,7 +46,7 @@ import static java.util.Objects.requireNonNullElse;
 public final class IdACB1Messages
   implements IdProtocolMessagesType<IdAMessageType>, RPServiceType
 {
-  private static final ProtocolIdA1 PROTOCOL = new ProtocolIdA1();
+  private static final ProtocolIdA PROTOCOL = new ProtocolIdA();
 
   /**
    * The content type for the protocol.
@@ -58,7 +58,7 @@ public final class IdACB1Messages
   private final BSSReaderProviderType readers;
   private final BSSWriterProviderType writers;
   private final IdACB1Validation validator;
-  private final CBProtocolMessageVersionedSerializerType<ProtocolIdA1Type> serializer;
+  private final CBProtocolMessageVersionedSerializerType<ProtocolIdAType> serializer;
 
   /**
    * The protocol messages for Admin v1 Cedarbridge.
@@ -121,7 +121,7 @@ public final class IdACB1Messages
 
     try {
       return this.validator.convertFromWire(
-        (ProtocolIdA1v1Type) this.serializer.deserialize(context)
+        (ProtocolIdAv1Type) this.serializer.deserialize(context)
       );
     } catch (final IOException e) {
       throw new IdProtocolException(
