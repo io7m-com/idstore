@@ -17,10 +17,14 @@
 
 package com.io7m.idstore.tests.protocol.user.cb;
 
+import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.user.IdUMessageType;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
+import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -40,5 +44,14 @@ public final class IdUCB1MessagesTest
       MESSAGES.parse(data);
 
     assertEquals(message, m);
+  }
+
+  @Test
+  public void testProtocolId()
+  {
+    assertEquals(
+      UUID.fromString("eb959d58-3d51-3023-b63b-136e6cd38c1c"),
+      IdUCB1Messages.protocolId()
+    );
   }
 }

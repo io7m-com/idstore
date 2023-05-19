@@ -19,7 +19,7 @@ package com.io7m.idstore.main;
 import com.io7m.idstore.main.internal.IdMCmdInitialize;
 import com.io7m.idstore.main.internal.IdMCmdServer;
 import com.io7m.idstore.main.internal.IdMCmdShell;
-import com.io7m.idstore.main.internal.IdMVersion;
+import com.io7m.idstore.model.IdVersion;
 import com.io7m.quarrel.core.QApplication;
 import com.io7m.quarrel.core.QApplicationMetadata;
 import com.io7m.quarrel.core.QApplicationType;
@@ -59,8 +59,8 @@ public final class IdMain implements Runnable
       new QApplicationMetadata(
         "idstore",
         "com.io7m.idstore",
-        IdMVersion.MAIN_VERSION,
-        IdMVersion.MAIN_BUILD,
+        IdVersion.MAIN_VERSION,
+        IdVersion.MAIN_BUILD,
         "The idstore server and command-line application.",
         Optional.of(URI.create("https://www.io7m.com/software/idstore/"))
       );

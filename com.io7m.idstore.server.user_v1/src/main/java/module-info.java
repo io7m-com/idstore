@@ -25,6 +25,7 @@ module com.io7m.idstore.server.user_v1
 
   requires com.io7m.idstore.database.api;
   requires com.io7m.idstore.error_codes;
+  requires com.io7m.idstore.model;
   requires com.io7m.idstore.protocol.user.cb;
   requires com.io7m.idstore.protocol.user;
   requires com.io7m.idstore.server.controller;
@@ -34,12 +35,13 @@ module com.io7m.idstore.server.user_v1
   requires com.io7m.idstore.server.service.reqlimit;
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.verdant;
+
   requires com.io7m.verdant.core;
+  requires io.opentelemetry.api;
   requires org.eclipse.jetty.http;
   requires org.eclipse.jetty.server;
   requires org.eclipse.jetty.servlet;
   requires org.slf4j;
-  requires io.opentelemetry.api;
 
   exports com.io7m.idstore.server.user_v1;
 }

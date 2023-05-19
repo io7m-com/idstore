@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0002</version>
+    <version>1.0.0-beta0003</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.user_v1</artifactId>
@@ -125,38 +125,5 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.io7m.stmp</groupId>
-        <artifactId>string-template-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-version</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>render</goal>
-            </goals>
-            <configuration>
-              <templates>
-                <template>
-                  <directory>src/main/string-template</directory>
-                  <name>IdU1Version</name>
-                  <target>
-                    ${project.build.directory}/generated-sources/string-template/com/io7m/idstore/server/user_v1/IdU1Version.java
-                  </target>
-                  <properties>
-                    <appVersion>${project.version}</appVersion>
-                    <appBuild>${buildNumber}</appBuild>
-                  </properties>
-                </template>
-              </templates>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

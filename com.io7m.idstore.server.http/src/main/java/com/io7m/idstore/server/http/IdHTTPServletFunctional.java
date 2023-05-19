@@ -30,6 +30,9 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.io7m.idstore.model.IdVersion.MAIN_BUILD;
+import static com.io7m.idstore.model.IdVersion.MAIN_VERSION;
+
 /**
  * A functional servlet.
  */
@@ -72,6 +75,11 @@ public abstract class IdHTTPServletFunctional extends HttpServlet
 
       final var output =
         this.core.execute(request, information);
+
+      response.setHeader(
+        "Server",
+        String.format("idstore %s %s", MAIN_VERSION, MAIN_BUILD)
+      );
 
       if (output instanceof final IdHTTPServletResponseFixedSize fixed) {
         response.setStatus(fixed.statusCode());

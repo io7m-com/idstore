@@ -1,4 +1,4 @@
-IdAShellVersion(
+IdVersion(
   appVersion,
   appBuild) ::= <<
 
@@ -18,14 +18,14 @@ IdAShellVersion(
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.shell.admin.internal;
+package com.io7m.idstore.model;
 
-public final class IdAShellVersion
+public final class IdVersion
 {
-  public static final String SHELL_VERSION = "<appVersion>";
-  public static final String SHELL_BUILD = "<appBuild>";
+  public static final String MAIN_VERSION = "<appVersion>";
+  public static final String MAIN_BUILD = "<appBuild>";
 
-  private IdAShellVersion()
+  private IdVersion()
   {
 
   }

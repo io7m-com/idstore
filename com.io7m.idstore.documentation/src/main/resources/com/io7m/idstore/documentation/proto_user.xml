@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         id="5242f097-2f68-4f19-8293-7a7ce68a8b7e"
+         title="User Protocol">
+
+  <Subsection title="Versioning">
+    <Paragraph>
+      The <Link target="01d8e9c6-54c0-4501-8f45-e6988e0cb673">User API</Link> service exposes one or more
+      versions of the <Term type="term">User</Term> protocol. The service uses the
+      <LinkExternal target="https://github.com/io7m/verdant">verdant</LinkExternal> protocol to advertise
+      which versions of the <Term type="term">User</Term> protocol are available. Executing a
+      <Term type="function">GET</Term> request to the root endpoint will yield a <Term type="package">verdant</Term>
+      message showing which versions of the <Term type="term">User</Term> protocol are available.
+      The <Term type="term">User</Term> protocol is assigned the protocol
+      identifier <Term type="constant">eb959d58-3d51-3023-b63b-136e6cd38c1c</Term>.
+    </Paragraph>
+    <Paragraph>
+      As an example, the following shows that the <Term type="term">User</Term> protocol version 1 is available at
+      <Term type="expression">/user/1/0/</Term>:
+    </Paragraph>
+    <FormalItem title="Verdant Example">
+      <Verbatim><![CDATA[$ curl https://idstore.example.com:50000/ | hexdump
+0000:0000 | 00 00 00 01  00 00 00 01  EB 95 9D 58  3D 51 30 23 | ........ë..X=Q0#
+0000:0010 | B6 3B 13 6E  6C D3 8C 1C  00 00 00 01  00 00 00 00 | ¶;.nlÓ..........
+0000:0020 | 00 00 00 0A  2F 75 73 65  72 2F 31 2F  30 2F       | ..../user/1/0/
+]]></Verbatim>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="Version 1.0">
+    <Subsection title="Encoding">
+      <Paragraph>
+        The version 1 User protocol uses
+        <LinkExternal target="https://www.io7m.com/software/cedarbridge">cedarbridge</LinkExternal>
+        encoded messages over HTTP(s).
+      </Paragraph>
+    </Subsection>
+
+    <Subsection title="Login" id="f85b9cf5-4d9d-42d2-a2af-e2ace9a1eb8e">
+      <Paragraph>
+        Send an <Term type="type">IdU1CommandLogin</Term> command to <Term type="expression">/user/1/0/login</Term>. If
+        the login succeeds, a cookie named <Term type="expression">IDSTORE_USER_API_SESSION</Term> will be set.
+        This cookie must be included with all subsequent requests.
+      </Paragraph>
+    </Subsection>
+
+    <Subsection title="Commands">
+      <Paragraph>
+        After <Link target="f85b9cf5-4d9d-42d2-a2af-e2ace9a1eb8e">logging in successfully</Link>, send commands of
+        type <Term type="type">IdU1Command*</Term> to <Term type="expression">/user/1/0/command</Term>. Failed commands
+        will yield a value of type <Term type="type">IdU1ResponseError</Term>, whilst successful results will yield
+        values of type <Term type="type">IdU1Response*</Term>.
+      </Paragraph>
+    </Subsection>
+
+    <xi:include href="proto_user_v1_xhtml.xml"/>
+  </Subsection>
+
+  <Subsection title="Schemas">
+    <FormalItem title="Schemas">
+      <Verbatim><xi:include href="com/io7m/idstore/protocol/user/cb/User.cbs" parse="text"/></Verbatim>
+    </FormalItem>
+  </Subsection>
+
+</Section>
