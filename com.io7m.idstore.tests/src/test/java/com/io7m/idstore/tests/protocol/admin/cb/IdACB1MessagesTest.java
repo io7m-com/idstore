@@ -48,7 +48,7 @@ public final class IdACB1MessagesTest
   public void testProtocolId()
   {
     assertEquals(
-      UUID.fromString("0440b002-e594-3e03-b278-2038395c754b"),
+      UUID.fromString("de1ef9f2-5ea7-388a-9b79-788c132abfd1"),
       IdACB1Messages.protocolId()
     );
   }

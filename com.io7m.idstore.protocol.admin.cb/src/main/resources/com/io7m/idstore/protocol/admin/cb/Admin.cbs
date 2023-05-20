@@ -868,8 +868,8 @@
   [field admin IdA1Admin]
 ]
 
-[documentation IdA1 "The Admin v1 protocol."]
-[protocol IdA1
+[documentation IdA "The Admin protocol."]
+[protocol IdA
   [version 1
     [types-added
       IdA1CommandAdminBanCreate

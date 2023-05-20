@@ -70,7 +70,7 @@ import static java.util.Map.entry;
  */
 
 public final class IdUCB1Validation
-  implements IdProtocolMessageValidatorType<IdUMessageType, ProtocolIdU1v1Type>
+  implements IdProtocolMessageValidatorType<IdUMessageType, ProtocolIdUv1Type>
 {
   /**
    * Functions to translate between the core command set and the User v1
@@ -82,7 +82,7 @@ public final class IdUCB1Validation
 
   }
 
-  private static ProtocolIdU1v1Type toWireResponse(
+  private static ProtocolIdUv1Type toWireResponse(
     final IdUResponseType response)
     throws IdProtocolException
   {
@@ -201,7 +201,7 @@ public final class IdUCB1Validation
     );
   }
 
-  private static ProtocolIdU1v1Type convertToWireCommand(
+  private static ProtocolIdUv1Type convertToWireCommand(
     final IdUCommandType<?> command)
     throws IdProtocolException
   {
@@ -378,7 +378,7 @@ public final class IdUCB1Validation
   }
 
   @Override
-  public ProtocolIdU1v1Type convertToWire(
+  public ProtocolIdUv1Type convertToWire(
     final IdUMessageType message)
     throws IdProtocolException
   {
@@ -398,7 +398,7 @@ public final class IdUCB1Validation
 
   @Override
   public IdUMessageType convertFromWire(
-    final ProtocolIdU1v1Type message)
+    final ProtocolIdUv1Type message)
     throws IdProtocolException
   {
     try {

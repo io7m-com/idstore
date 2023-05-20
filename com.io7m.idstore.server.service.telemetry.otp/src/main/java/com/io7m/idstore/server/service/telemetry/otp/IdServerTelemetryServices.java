@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.service.telemetry.otp;
 
+import com.io7m.idstore.model.IdVersion;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceFactoryType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.SERVICE_NAME;
+import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.SERVICE_VERSION;
 
 /**
  * An OpenTelemetry service factory.
@@ -81,10 +83,11 @@ public final class IdServerTelemetryServices
     final var resource =
       Resource.getDefault()
         .merge(Resource.create(
-          Attributes.of(
-            SERVICE_NAME,
-            telemetryConfiguration.logicalServiceName()))
-        );
+          Attributes.builder()
+            .put(SERVICE_NAME, telemetryConfiguration.logicalServiceName())
+            .put(SERVICE_VERSION, IdVersion.MAIN_VERSION)
+            .build()
+        ));
 
     final var spanExporter =
       OtlpGrpcSpanExporter.builder()
@@ -127,24 +130,14 @@ public final class IdServerTelemetryServices
         .buildAndRegisterGlobal();
 
     final var tracer =
-      openTelemetry.getTracer("com.io7m.idstore", version());
+      openTelemetry.getTracer(
+        "com.io7m.idstore",
+        IdVersion.MAIN_VERSION
+      );
 
     return new IdServerTelemetryService(
       openTelemetry,
       tracer
     );
-  }
-
-  private static String version()
-  {
-    final var p =
-      IdServerTelemetryService.class.getPackage();
-    final var v =
-      p.getImplementationVersion();
-
-    if (v == null) {
-      return "0.0.0";
-    }
-    return v;
   }
 }

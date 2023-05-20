@@ -20,6 +20,7 @@ import com.io7m.idstore.database.api.IdDatabaseConnectionType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseRole;
 import com.io7m.idstore.database.api.IdDatabaseType;
+import com.io7m.idstore.model.IdVersion;
 import com.zaxxer.hikari.HikariDataSource;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.metrics.LongCounter;
@@ -69,7 +70,10 @@ public final class IdDatabase implements IdDatabaseType
     Objects.requireNonNull(telemetry, "inOpenTelemetry");
 
     this.tracer =
-      telemetry.getTracer("com.io7m.idstore.database.postgres", version());
+      telemetry.getTracer(
+        "com.io7m.idstore.database.postgres",
+        IdVersion.MAIN_VERSION
+      );
     this.clock =
       Objects.requireNonNull(inClock, "clock");
     this.dataSource =
@@ -91,19 +95,6 @@ public final class IdDatabase implements IdDatabaseType
     this.transactionRollbacks =
       meters.counterBuilder("IdDatabase.commits")
         .build();
-  }
-
-  private static String version()
-  {
-    final var p =
-      IdDatabase.class.getPackage();
-    final var v =
-      p.getImplementationVersion();
-
-    if (v == null) {
-      return "0.0.0";
-    }
-    return v;
   }
 
   LongCounter counterTransactions()

@@ -44,7 +44,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 public final class IdUCB1Messages
   implements IdProtocolMessagesType<IdUMessageType>, RPServiceType
 {
-  private static final ProtocolIdU1 PROTOCOL = new ProtocolIdU1();
+  private static final ProtocolIdU PROTOCOL = new ProtocolIdU();
 
   /**
    * The content type for the protocol.
@@ -56,7 +56,7 @@ public final class IdUCB1Messages
   private final BSSReaderProviderType readers;
   private final BSSWriterProviderType writers;
   private final IdUCB1Validation validator;
-  private final CBProtocolMessageVersionedSerializerType<ProtocolIdU1Type> serializer;
+  private final CBProtocolMessageVersionedSerializerType<ProtocolIdUType> serializer;
 
   /**
    * The protocol messages for Admin v1 Cedarbridge.
@@ -119,7 +119,7 @@ public final class IdUCB1Messages
 
     try {
       return this.validator.convertFromWire(
-        (ProtocolIdU1v1Type) this.serializer.deserialize(context)
+        (ProtocolIdUv1Type) this.serializer.deserialize(context)
       );
     } catch (final IOException e) {
       throw new IdProtocolException(

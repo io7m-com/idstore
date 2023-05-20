@@ -276,6 +276,17 @@
         <LinkExternal target="https://opentelemetry.io/">Open Telemetry</LinkExternal>. This section is optional and
         telemetry is disabled if the section is not present.
       </Paragraph>
+      <Paragraph>
+        The logical service name should be provided in the <Term type="expression">LogicalServiceName</Term>
+        attribute, and the address of a suitable <Term type="package">gRPC</Term> endpoint of an
+        <Term type="package">OTLP</Term> collector should be provided in the
+        <Term type="expression">OTELCollectorAddress</Term> attribute.
+      </Paragraph>
+      <FormalItem title="Telemetry">
+        <Image source="telemetry3.png" width="640" height="484">
+          Telemetry displayed in Grafana.
+        </Image>
+      </FormalItem>
     </Subsection>
     <Subsection title="Example">
       <Paragraph>
