@@ -19,6 +19,7 @@ package com.io7m.idstore.server.service.telemetry.otp;
 
 import com.io7m.idstore.model.IdVersion;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration;
+import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceFactoryType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.idstore.server.service.telemetry.otp.internal.IdServerTelemetryService;
@@ -26,6 +27,8 @@ import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.exporter.otlp.http.metrics.OtlpHttpMetricExporter;
+import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
 import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
@@ -75,10 +78,16 @@ public final class IdServerTelemetryServices
   {
     Objects.requireNonNull(telemetryConfiguration, "configuration");
 
-    final var telemetryEndpoint =
-      telemetryConfiguration.collectorAddress().toString();
+    final var metricsOpt =
+      telemetryConfiguration.metrics();
+    final var tracesOpt =
+      telemetryConfiguration.traces();
 
-    LOG.debug("sending telemetry to {}", telemetryEndpoint);
+    if (metricsOpt.isEmpty() && tracesOpt.isEmpty()) {
+      LOG.warn(
+        "Neither metrics nor trace configurations were provided; no telemetry will be sent!");
+      return IdServerTelemetryNoOp.noop();
+    }
 
     final var resource =
       Resource.getDefault()
@@ -89,44 +98,22 @@ public final class IdServerTelemetryServices
             .build()
         ));
 
-    final var spanExporter =
-      OtlpGrpcSpanExporter.builder()
-        .setEndpoint(telemetryEndpoint)
-        .build();
+    final var builder =
+      OpenTelemetrySdk.builder();
 
-    final var batchSpanProcessor =
-      BatchSpanProcessor.builder(spanExporter)
-        .build();
+    metricsOpt.ifPresent(metrics -> {
+      builder.setMeterProvider(createMeterProvider(resource, metrics));
+    });
 
-    final var sdkTracerProvider =
-      SdkTracerProvider.builder()
-        .addSpanProcessor(batchSpanProcessor)
-        .setResource(resource)
-        .build();
-
-    final var metricExporter =
-      OtlpGrpcMetricExporter.builder()
-        .setEndpoint(telemetryEndpoint)
-        .build();
-
-    final var periodicMetricReader =
-      PeriodicMetricReader.builder(metricExporter)
-        .build();
-
-    final var sdkMeterProvider =
-      SdkMeterProvider.builder()
-        .registerMetricReader(periodicMetricReader)
-        .setResource(resource)
-        .build();
+    tracesOpt.ifPresent(traces -> {
+      builder.setTracerProvider(createTracerProvider(resource, traces));
+    });
 
     final var contextPropagators =
       ContextPropagators.create(W3CTraceContextPropagator.getInstance());
 
     final OpenTelemetry openTelemetry =
-      OpenTelemetrySdk.builder()
-        .setTracerProvider(sdkTracerProvider)
-        .setMeterProvider(sdkMeterProvider)
-        .setPropagators(contextPropagators)
+      builder.setPropagators(contextPropagators)
         .buildAndRegisterGlobal();
 
     final var tracer =
@@ -139,5 +126,75 @@ public final class IdServerTelemetryServices
       openTelemetry,
       tracer
     );
+  }
+
+  private static SdkMeterProvider createMeterProvider(
+    final Resource resource,
+    final IdServerOpenTelemetryConfiguration.IdMetrics metrics)
+  {
+    final var endpoint = metrics.endpoint().toString();
+    LOG.info(
+      "metrics data will be sent to {} using {}",
+      endpoint,
+      metrics.protocol()
+    );
+
+    final var metricExporter =
+      switch (metrics.protocol()) {
+        case HTTP -> {
+          yield OtlpHttpMetricExporter.builder()
+            .setEndpoint(endpoint)
+            .build();
+        }
+        case GRPC -> {
+          yield OtlpGrpcMetricExporter.builder()
+            .setEndpoint(endpoint)
+            .build();
+        }
+      };
+
+    final var periodicMetricReader =
+      PeriodicMetricReader.builder(metricExporter)
+        .build();
+
+    return SdkMeterProvider.builder()
+      .registerMetricReader(periodicMetricReader)
+      .setResource(resource)
+      .build();
+  }
+
+  private static SdkTracerProvider createTracerProvider(
+    final Resource resource,
+    final IdServerOpenTelemetryConfiguration.IdTraces traces)
+  {
+    final var endpoint = traces.endpoint().toString();
+    LOG.info(
+      "trace data will be sent to {} using {}",
+      endpoint,
+      traces.protocol()
+    );
+
+    final var spanExporter =
+      switch (traces.protocol()) {
+        case HTTP -> {
+          yield OtlpHttpSpanExporter.builder()
+            .setEndpoint(endpoint)
+            .build();
+        }
+        case GRPC -> {
+          yield OtlpGrpcSpanExporter.builder()
+            .setEndpoint(endpoint)
+            .build();
+        }
+      };
+
+    final var batchSpanProcessor =
+      BatchSpanProcessor.builder(spanExporter)
+        .build();
+
+    return SdkTracerProvider.builder()
+      .addSpanProcessor(batchSpanProcessor)
+      .setResource(resource)
+      .build();
   }
 }

@@ -167,8 +167,12 @@
           Port="25"/>
   </Mail>
 
-  <OpenTelemetry LogicalServiceName="idstore"
-                 OTELCollectorAddress="http://localhost:4317"/>
+  <OpenTelemetry LogicalServiceName="idstore">
+    <Metrics Endpoint="http://metrics.example.com:4317"
+            Protocol="GRPC"/>
+    <Traces Endpoint="http://traces.example.com:4317"
+            Protocol="GRPC"/>
+  </OpenTelemetry>
 
   <RateLimiting EmailVerificationRateLimit="PT10M"
                 PasswordResetRateLimit="PT10M"/>

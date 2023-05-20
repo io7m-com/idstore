@@ -35,6 +35,9 @@ import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTPS;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP_TLS;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration;
+import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdMetrics;
+import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdOTLPProtocol;
+import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdTraces;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerSessionConfiguration;
 import com.io7m.idstore.server.service.configuration.jaxb.Branding;
@@ -50,6 +53,7 @@ import com.io7m.idstore.server.service.configuration.jaxb.History;
 import com.io7m.idstore.server.service.configuration.jaxb.Mail;
 import com.io7m.idstore.server.service.configuration.jaxb.MailAuthentication;
 import com.io7m.idstore.server.service.configuration.jaxb.OpenTelemetry;
+import com.io7m.idstore.server.service.configuration.jaxb.OpenTelemetryProtocol;
 import com.io7m.idstore.server.service.configuration.jaxb.RateLimiting;
 import com.io7m.idstore.server.service.configuration.jaxb.SMTPSType;
 import com.io7m.idstore.server.service.configuration.jaxb.SMTPTLSType;
@@ -154,18 +158,41 @@ public final class IdServerConfigurationFiles
 
   private static Optional<IdServerOpenTelemetryConfiguration> processOpenTelemetry(
     final OpenTelemetry openTelemetry)
-    throws URISyntaxException
   {
     if (openTelemetry == null) {
       return Optional.empty();
     }
 
+    final var metrics =
+      Optional.ofNullable(openTelemetry.getMetrics())
+        .map(m -> new IdMetrics(
+          URI.create(m.getEndpoint()),
+          processProtocol(m.getProtocol())
+        ));
+
+    final var traces =
+      Optional.ofNullable(openTelemetry.getTraces())
+        .map(m -> new IdTraces(
+          URI.create(m.getEndpoint()),
+          processProtocol(m.getProtocol())
+        ));
+
     return Optional.of(
       new IdServerOpenTelemetryConfiguration(
         openTelemetry.getLogicalServiceName(),
-        new URI(openTelemetry.getOTELCollectorAddress())
+        metrics,
+        traces
       )
     );
+  }
+
+  private static IdOTLPProtocol processProtocol(
+    final OpenTelemetryProtocol protocol)
+  {
+    return switch (protocol) {
+      case GRPC -> IdOTLPProtocol.GRPC;
+      case HTTP -> IdOTLPProtocol.HTTP;
+    };
   }
 
   private static IdServerRateLimitConfiguration processRateLimit(
