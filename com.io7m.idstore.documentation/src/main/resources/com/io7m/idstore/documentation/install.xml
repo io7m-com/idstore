@@ -85,8 +85,8 @@ idstore: usage: idstore [command] [arguments ...]
       <LinkExternal target="https://www.docker.com/">docker</LinkExternal>.
     </Paragraph>
     <FormalItem title="Podman/Docker">
-      <Verbatim><![CDATA[$ podman pull quay.io/io7mcom/idstore
-$ podman run quay.io/io7mcom/idstore
+      <Verbatim><![CDATA[$ podman pull quay.io/io7mcom/idstore:${project.version}
+$ podman run quay.io/io7mcom/idstore:${project.version}
 idstore: usage: idstore [command] [arguments ...]
 ...
 ]]></Verbatim>
@@ -130,7 +130,7 @@ idstore: usage: idstore [command] [arguments ...]
 
   <Subsection title="Running The Shell">
     <Paragraph>
-      Run <Term type="expression">idstore shell</Term>.
+      Run <Term type="expression">idstore shell</Term> <LinkFootnote target="508acbe2-3c25-4454-a306-54929caa444c"/>.
     </Paragraph>
     <FormalItem title="Shell">
       <Verbatim>
@@ -139,5 +139,10 @@ idstore: usage: idstore [command] [arguments ...]
       </Verbatim>
     </FormalItem>
   </Subsection>
+
+  <Footnote id="508acbe2-3c25-4454-a306-54929caa444c">
+    If running under <Term type="package">podman</Term> or <Term type="package">docker</Term>, remember to use
+    the <Term type="parameter">-i</Term> and <Term type="parameter">-t</Term> options.
+  </Footnote>
 
 </Section>
