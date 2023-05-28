@@ -294,4 +294,27 @@ create table user_password_resets (
     <Statement>grant insert, select, delete on user_password_resets to idstore</Statement>
   </Schema>
 
+  <Schema versionCurrent="2">
+    <Comment>
+      The idstore_read_only role is a read-only role that can read all data but cannot change anything.
+    </Comment>
+
+    <Statement><![CDATA[
+drop role if exists idstore_read_only;
+]]></Statement>
+    <Statement><![CDATA[
+create role idstore_read_only with nosuperuser nocreatedb nocreaterole noinherit;
+]]></Statement>
+
+    <Statement>grant select on admins to idstore_read_only</Statement>
+    <Statement>grant select on audit to idstore_read_only</Statement>
+    <Statement>grant select on bans to idstore_read_only</Statement>
+    <Statement>grant select on email_verifications to idstore_read_only</Statement>
+    <Statement>grant select on emails to idstore_read_only</Statement>
+    <Statement>grant select on login_history to idstore_read_only</Statement>
+    <Statement>grant select on schema_version to idstore_read_only</Statement>
+    <Statement>grant select on user_ids to idstore_read_only</Statement>
+    <Statement>grant select on user_password_resets to idstore_read_only</Statement>
+    <Statement>grant select on users to idstore_read_only</Statement>
+  </Schema>
 </Schemas>

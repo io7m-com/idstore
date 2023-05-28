@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [ -z "${IDSTORE_HEALTHCHECK_PORT}" ]
+then
+  echo "IDSTORE_HEALTHCHECK_PORT is unset" 1>&2
+  exit 1
+fi
+
+STATUS=$(wget -q -U 'idstore-healthcheck' -O - "http://localhost:${IDSTORE_HEALTHCHECK_PORT}/health") || exit 1
+
+echo "${STATUS}"
+if [ "${STATUS}" = 'OK' ]
+then
+  exit 0
+else
+  exit 1
+fi

@@ -18,28 +18,96 @@ package com.io7m.idstore.server.api;
 
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Configuration information for OpenTelemetry.
  *
  * @param logicalServiceName The logical service name
- * @param collectorAddress   The address of the OTEL collector
+ * @param metrics            The configuration for OTLP metrics
+ * @param traces             The configuration for OTLP traces
  */
 
 public record IdServerOpenTelemetryConfiguration(
   String logicalServiceName,
-  URI collectorAddress)
+  Optional<IdMetrics> metrics,
+  Optional<IdTraces> traces)
 {
   /**
    * Configuration information for OpenTelemetry.
    *
-   * @param collectorAddress   The address of the OTEL collector
    * @param logicalServiceName The logical service name
+   * @param metrics            The configuration for OTLP metrics
+   * @param traces             The configuration for OTLP traces
    */
 
   public IdServerOpenTelemetryConfiguration
   {
     Objects.requireNonNull(logicalServiceName, "logicalServiceName");
-    Objects.requireNonNull(collectorAddress, "collectorAddress");
+    Objects.requireNonNull(metrics, "metrics");
+    Objects.requireNonNull(traces, "traces");
+  }
+
+  /**
+   * The protocol used to deliver OpenTelemetry data.
+   */
+
+  public enum IdOTLPProtocol
+  {
+    /**
+     * gRPC
+     */
+
+    GRPC,
+
+    /**
+     * HTTP(s)
+     */
+
+    HTTP
+  }
+
+  /**
+   * Metrics configuration.
+   *
+   * @param endpoint The endpoint to which OTLP metrics data will be sent.
+   * @param protocol The protocol used to deliver OpenTelemetry data.
+   */
+
+  public record IdMetrics(
+    URI endpoint,
+    IdOTLPProtocol protocol)
+  {
+    /**
+     * Metrics configuration.
+     */
+
+    public IdMetrics
+    {
+      Objects.requireNonNull(endpoint, "endpoint");
+      Objects.requireNonNull(protocol, "protocol");
+    }
+  }
+
+  /**
+   * Trace configuration.
+   *
+   * @param endpoint The endpoint to which OTLP trace data will be sent.
+   * @param protocol The protocol used to deliver OpenTelemetry data.
+   */
+
+  public record IdTraces(
+    URI endpoint,
+    IdOTLPProtocol protocol)
+  {
+    /**
+     * Trace configuration.
+     */
+
+    public IdTraces
+    {
+      Objects.requireNonNull(endpoint, "endpoint");
+      Objects.requireNonNull(protocol, "protocol");
+    }
   }
 }

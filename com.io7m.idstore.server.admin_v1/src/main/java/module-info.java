@@ -32,15 +32,17 @@ module com.io7m.idstore.server.admin_v1
   requires com.io7m.idstore.server.http;
   requires com.io7m.idstore.server.service.clock;
   requires com.io7m.idstore.server.service.configuration;
+  requires com.io7m.idstore.server.service.health;
   requires com.io7m.idstore.server.service.reqlimit;
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.verdant;
+
   requires com.io7m.verdant.core;
+  requires io.opentelemetry.api;
   requires org.eclipse.jetty.http;
   requires org.eclipse.jetty.server;
   requires org.eclipse.jetty.servlet;
   requires org.slf4j;
-  requires io.opentelemetry.api;
 
   exports com.io7m.idstore.server.admin_v1;
 }

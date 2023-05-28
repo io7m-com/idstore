@@ -20,6 +20,55 @@
     </Paragraph>
   </Subsection>
 
+  <Subsection title="Smallest Working Configuration">
+    <Paragraph>
+      The smallest working configuration file, assuming a database at
+      <Term type="expression">db.example.com</Term> and an SMTP server at
+      <Term type="expression">mail.example.com</Term>:
+    </Paragraph>
+    <FormalItem title="Example">
+      <Verbatim><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Configuration xmlns="urn:com.io7m.idstore:configuration:1">
+  <Branding ProductTitle="idstore"/>
+
+  <Database Name="idstore"
+            Kind="POSTGRESQL"
+            User="test"
+            Password="test"
+            Address="db.example.com"
+            Port="5432"
+            Create="true"
+            Upgrade="true"/>
+
+  <HTTPServices>
+    <HTTPServiceAdminAPI ListenAddress="[::]"
+                         ListenPort="51000"
+                         ExternalURI="http://[::]:51000/"/>
+    <HTTPServiceUserAPI ListenAddress="[::]"
+                        ListenPort="50000"
+                        ExternalURI="http://[::]:50000/"/>
+    <HTTPServiceUserView ListenAddress="[::]"
+                         ListenPort="50001"
+                         ExternalURI="http://[::]:50001/"/>
+  </HTTPServices>
+
+  <History UserLoginHistoryLimit="10" AdminLoginHistoryLimit="100"/>
+
+  <Mail SenderAddress="no-reply@example.com" VerificationExpiration="PT24H">
+    <SMTP Host="mail.example.com"
+          Port="25"/>
+  </Mail>
+
+  <RateLimiting EmailVerificationRateLimit="PT10M" PasswordResetRateLimit="PT10M"/>
+
+  <Sessions UserSessionExpiration="PT30M" AdminSessionExpiration="PT30M"/>
+</Configuration>
+]]></Verbatim>
+    </FormalItem>
+  </Subsection>
+
   <Subsection title="Mail">
     <Subsection title="Overview">
       <Paragraph>
@@ -278,9 +327,7 @@
       </Paragraph>
       <Paragraph>
         The logical service name should be provided in the <Term type="expression">LogicalServiceName</Term>
-        attribute, and the address of a suitable <Term type="package">gRPC</Term> endpoint of an
-        <Term type="package">OTLP</Term> collector should be provided in the
-        <Term type="expression">OTELCollectorAddress</Term> attribute.
+        attribute.
       </Paragraph>
       <FormalItem title="Telemetry">
         <Image source="telemetry3.png" width="640" height="484">
@@ -288,14 +335,38 @@
         </Image>
       </FormalItem>
     </Subsection>
+    <Subsection title="Traces">
+      <Paragraph>
+        If the <Term type="expression">OpenTelemetry</Term> element contains a
+        <Term type="expression">Traces</Term> element, OTLP <LinkExternal
+        target="https://opentelemetry.io/docs/concepts/signals/traces/">traces</LinkExternal>
+        will be sent to a specified endpoint. The <Term type="expression">Endpoint</Term> attribute
+        specifies the endpoint, and the <Term type="expression">Protocol</Term> attribute can either
+        be <Term type="constant">GRPC</Term> or <Term type="constant">HTTP</Term>.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Metrics">
+      <Paragraph>
+        If the <Term type="expression">OpenTelemetry</Term> element contains a
+        <Term type="expression">Metrics</Term> element, OTLP <LinkExternal
+        target="https://opentelemetry.io/docs/concepts/signals/metrics/">metrics</LinkExternal>
+        will be sent to a specified endpoint. The <Term type="expression">Endpoint</Term> attribute
+        specifies the endpoint, and the <Term type="expression">Protocol</Term> attribute can either
+        be <Term type="constant">GRPC</Term> or <Term type="constant">HTTP</Term>.
+      </Paragraph>
+    </Subsection>
     <Subsection title="Example">
       <Paragraph>
         An example Open Telemetry configuration:
       </Paragraph>
       <FormalItem title="Example">
         <Verbatim><![CDATA[
-<OpenTelemetry LogicalServiceName="idstore"
-               OTELCollectorAddress="http://localhost:4317"/>
+<OpenTelemetry LogicalServiceName="idstore">
+  <Metrics Endpoint="http://metrics.example.com:4317"
+          Protocol="GRPC"/>
+  <Traces Endpoint="http://traces.example.com:4317"
+          Protocol="GRPC"/>
+</OpenTelemetry>
 ]]></Verbatim>
       </FormalItem>
     </Subsection>

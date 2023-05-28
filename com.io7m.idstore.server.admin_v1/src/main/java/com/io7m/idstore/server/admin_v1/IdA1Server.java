@@ -158,5 +158,11 @@ public final class IdA1Server
         IdA1ServletCommand::new),
       "/admin/1/0/command"
     );
+    servlets.addServlet(
+      servletHolders.create(
+        IdA1ServletHealth.class,
+        IdA1ServletHealth::new),
+      "/health"
+    );
   }
 }

@@ -35,6 +35,12 @@ public enum IdDatabaseRole
   IDSTORE,
 
   /**
+   * The main read-only idstore role.
+   */
+
+  IDSTORE_READ_ONLY,
+
+  /**
    * The null role; has no privileges and cannot do anything.
    */
 
