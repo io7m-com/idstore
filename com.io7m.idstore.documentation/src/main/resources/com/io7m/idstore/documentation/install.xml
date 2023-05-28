@@ -30,7 +30,7 @@
               id="c19831a6-1d7b-44c5-8145-af542e97e39a">
     <Paragraph>
       The <Term type="package">idstore</Term> server requires a
-      <LinkExternal target="https://www.postgresql.org/">PostgreSQL</LinkExternal>
+      <Link target="597de78a-82a1-49e0-960e-b2ca01ffb038">PostgreSQL</Link>
       server. The <Term type="package">idstore</Term> server will create the required tables and database objects on
       first startup, given the name of a running PostgreSQL database, and a PostgreSQL role and password.
     </Paragraph>
@@ -138,6 +138,58 @@ idstore: usage: idstore [command] [arguments ...]
                     parse="text"/>
       </Verbatim>
     </FormalItem>
+  </Subsection>
+
+  <Subsection title="Database" id="597de78a-82a1-49e0-960e-b2ca01ffb038">
+    <Subsection title="Overview">
+      <Paragraph>
+        The <Term type="package">idstore</Term> package uses
+        <LinkExternal target="https://www.postgresql.org/">PostgreSQL</LinkExternal> for all persistent data.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Roles">
+      <Paragraph>
+        The <Term type="package">idstore</Term> package sets up multiple roles during database initialization. The
+        configured roles have different degrees of privileges in order to allow, for example, external systems such as
+        database metrics collectors read-only access to the database. All the defined rules are declared with
+        the built-in PostgreSQL restrictions such as <Term type="constant">nocreatedb</Term>,
+        <Term type="constant">nocreaterole</Term>, etc.
+      </Paragraph>
+      <FormalItem title="Database Roles">
+        <Table>
+          <Columns>
+            <Column>Role</Column>
+            <Column>Description</Column>
+          </Columns>
+          <Row>
+            <Cell>
+              <Term type="constant">idstore</Term>
+            </Cell>
+            <Cell>
+              A role that has read/write access to all tables (except for
+              the <Link target="0610ec24-6507-4a19-9efe-f511c31ccc9a">audit log</Link> which is restricted to
+              being append-only).
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="constant">idstore_read_only</Term>
+            </Cell>
+            <Cell>
+              A role that has read access to all tables.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="constant">idstore_none</Term>
+            </Cell>
+            <Cell>
+              A role that has no access to any tables.
+            </Cell>
+          </Row>
+        </Table>
+      </FormalItem>
+    </Subsection>
   </Subsection>
 
   <Footnote id="508acbe2-3c25-4454-a306-54929caa444c">
