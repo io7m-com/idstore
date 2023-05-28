@@ -265,7 +265,7 @@
         and email it to the requested email address. Assuming the user really does control this email account, they can
         read the resulting email and recite this token back to the
         <Term type="package">idstore</Term>
-        server to have the address removed to their account.
+        server to have the address removed from their account.
       </Paragraph>
     </Subsection>
   </Subsection>
