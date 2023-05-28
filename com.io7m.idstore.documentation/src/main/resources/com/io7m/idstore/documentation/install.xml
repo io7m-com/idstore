@@ -218,6 +218,13 @@ OK]]></Verbatim>
     </Subsection>
   </Subsection>
 
+  <Subsection title="Mail" id="80273d86-63fe-461b-9d37-8181053636ac">
+    <Paragraph>
+      The <Term type="package">idstore</Term> package requires a working SMTP MTA. The MTA is used to send
+      <Link target="0ad1864f-7eac-4700-ae06-66a4f0a3b97f">email</Link> to users.
+    </Paragraph>
+  </Subsection>
+
   <Footnote id="508acbe2-3c25-4454-a306-54929caa444c">
     If running under <Term type="package">podman</Term> or <Term type="package">docker</Term>, remember to use
     the <Term type="parameter">-i</Term> and <Term type="parameter">-t</Term> options.
