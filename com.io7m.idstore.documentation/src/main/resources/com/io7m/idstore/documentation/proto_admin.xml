@@ -29,6 +29,17 @@
     </FormalItem>
   </Subsection>
 
+  <Subsection title="Health" id="ddd9f938-5941-405f-ba78-1f256b614759">
+    <Paragraph>
+      The Admin API service exposes a health check endpoint at <Term type="expression">/health</Term>. The
+      endpoint returns a <Term type="constant">200</Term> status code and the string
+      <Term type="expression">OK</Term> if the server's most recent internal health checks succeeded. The
+      server returns a <Term type="constant">500</Term> status code and string not equal to
+      <Term type="expression">OK</Term> if the server's most recent internal health checks failed. In
+      both cases, the string is returned directly as a <Term type="expression">text/plain</Term> UTF-8 value.
+    </Paragraph>
+  </Subsection>
+
   <Subsection title="Version 1.0">
     <Subsection title="Encoding">
       <Paragraph>

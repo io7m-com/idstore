@@ -3,6 +3,7 @@ FROM docker.io/library/eclipse-temurin:${com.io7m.oci.versionTemurin}
 
 ENV PATH="/idstore/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/java/openjdk/bin"
 ENV IDSTORE_HOME="/idstore"
+ENV IDSTORE_HEALTHCHECK_PORT=51000
 
 COPY idstore /idstore
 
@@ -14,5 +15,7 @@ LABEL "org.opencontainers.image.title"="Idstore"
 LABEL "org.opencontainers.image.url"="https://www.io7m.com/software/idstore"
 LABEL "org.opencontainers.image.version"="${project.version}"
 LABEL "org.opencontainers.image.revision"="${buildNumber}"
+
+HEALTHCHECK CMD /idstore/bin/idstore-healthcheck
 
 ENTRYPOINT ["/idstore/bin/idstore"]

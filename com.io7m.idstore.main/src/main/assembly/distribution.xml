@@ -36,6 +36,11 @@
       <outputDirectory>/bin</outputDirectory>
       <fileMode>0755</fileMode>
     </file>
+    <file>
+      <source>src/main/sh/idstore-healthcheck</source>
+      <outputDirectory>/bin</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
   </files>
 
 </assembly>

@@ -43,6 +43,7 @@ import com.io7m.idstore.server.service.branding.IdServerBrandingService;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.health.IdServerHealth;
 import com.io7m.idstore.server.service.mail.IdServerMailService;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.maintenance.IdMaintenanceService;
@@ -309,6 +310,9 @@ public final class IdServer implements IdServerType
       IdUserPasswordResetServiceType.class,
       userPasswordResetService
     );
+
+    final var health = IdServerHealth.create(services);
+    services.register(IdServerHealth.class, health);
 
     final var maintenance =
       IdMaintenanceService.create(clock, this.telemetry, newDatabase);

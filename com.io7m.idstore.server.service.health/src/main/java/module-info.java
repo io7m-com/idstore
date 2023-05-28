@@ -15,34 +15,15 @@
  */
 
 /**
- * Identity server (Server user v1 API)
+ * Identity server (Server health service)
  */
 
-module com.io7m.idstore.server.user_v1
+module com.io7m.idstore.server.service.health
 {
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
   requires com.io7m.idstore.database.api;
-  requires com.io7m.idstore.error_codes;
-  requires com.io7m.idstore.model;
-  requires com.io7m.idstore.protocol.user.cb;
-  requires com.io7m.idstore.protocol.user;
-  requires com.io7m.idstore.server.controller;
-  requires com.io7m.idstore.server.http;
-  requires com.io7m.idstore.server.service.clock;
-  requires com.io7m.idstore.server.service.configuration;
-  requires com.io7m.idstore.server.service.health;
-  requires com.io7m.idstore.server.service.reqlimit;
-  requires com.io7m.idstore.server.service.sessions;
-  requires com.io7m.idstore.server.service.verdant;
 
-  requires com.io7m.verdant.core;
-  requires io.opentelemetry.api;
-  requires org.eclipse.jetty.http;
-  requires org.eclipse.jetty.server;
-  requires org.eclipse.jetty.servlet;
-  requires org.slf4j;
-
-  exports com.io7m.idstore.server.user_v1;
+  exports com.io7m.idstore.server.service.health;
 }

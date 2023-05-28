@@ -77,20 +77,46 @@ idstore: usage: idstore [command] [arguments ...]
     </FormalItem>
   </Subsection>
 
-  <Subsection title="Quay.io" id="8d8acfdb-ab75-42c8-a066-33b646e19eb5">
-    <Paragraph>
-      <LinkExternal target="https://opencontainers.org/">OCI</LinkExternal> images are available
-      from <LinkExternal target="https://quay.io/repository/io7mcom/idstore">Quay.io</LinkExternal>
-      for use with <LinkExternal target="https://podman.io/">podman</LinkExternal> or
-      <LinkExternal target="https://www.docker.com/">docker</LinkExternal>.
-    </Paragraph>
-    <FormalItem title="Podman/Docker">
-      <Verbatim><![CDATA[$ podman pull quay.io/io7mcom/idstore:${project.version}
+  <Subsection title="OCI Images" id="8d8acfdb-ab75-42c8-a066-33b646e19eb5">
+    <Subsection title="Quay.io">
+      <Paragraph>
+        <LinkExternal target="https://opencontainers.org/">OCI</LinkExternal> images are available
+        from <LinkExternal target="https://quay.io/repository/io7mcom/idstore">Quay.io</LinkExternal>
+        for use with <LinkExternal target="https://podman.io/">podman</LinkExternal> or
+        <LinkExternal target="https://www.docker.com/">docker</LinkExternal>.
+      </Paragraph>
+      <FormalItem title="Podman/Docker">
+        <Verbatim><![CDATA[$ podman pull quay.io/io7mcom/idstore:${project.version}
 $ podman run quay.io/io7mcom/idstore:${project.version}
 idstore: usage: idstore [command] [arguments ...]
 ...
 ]]></Verbatim>
-    </FormalItem>
+      </FormalItem>
+    </Subsection>
+    <Subsection title="Health Checks">
+      <Paragraph>
+        The OCI image includes a <Term type="command">idstore-healthcheck</Term> command that makes a
+        request to a health endpoint on the <Link target="f695a0a9-cec2-4db8-839d-e9eaaa8dace3">Admin API</Link>
+        server. The command expects the server to be accessible on <Term type="expression">localhost</Term>
+        inside the container, and requires that the <Term type="expression">IDSTORE_HEALTHCHECK_PORT</Term>
+        environment variable be set to the port used by the Admin API. By default, the container sets
+        <Term type="expression">IDSTORE_HEALTHCHECK_PORT</Term> to <Term type="expression">51000</Term> and
+        therefore there is no need to set this variable manually if the server is configured with the default
+        settings.
+      </Paragraph>
+      <Paragraph>
+        This feature may only be available when running the image under
+        <LinkExternal target="https://www.docker.com/">docker</LinkExternal> due to limitations in
+        the OCI image specification. The functionality of the
+        health check service can be used directly via
+        the <Link target="ddd9f938-5941-405f-ba78-1f256b614759">Admin API</Link> or
+        the <Link target="7ec91745-ba98-442f-9965-8db671a4a659">User API</Link>.
+      </Paragraph>
+      <FormalItem title="Health Example">
+        <Verbatim><![CDATA[$ curl http://localhost:51000/health
+OK]]></Verbatim>
+      </FormalItem>
+    </Subsection>
   </Subsection>
 
   <Subsection title="Running The Server">

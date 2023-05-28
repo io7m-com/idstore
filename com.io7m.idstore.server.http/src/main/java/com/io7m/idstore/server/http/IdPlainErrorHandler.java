@@ -59,7 +59,7 @@ public final class IdPlainErrorHandler extends ErrorHandler
 
     try (var out = response.getOutputStream()) {
       try (var w = new BufferedWriter(new OutputStreamWriter(out, UTF_8))) {
-        w.write(Optional.ofNullable(exception.getMessage()).orElse(""));
+        w.write("Internal server error.");
         w.write('\r');
         w.write('\n');
       }

@@ -147,6 +147,12 @@ public final class IdU1Server
     );
     servlets.addServlet(
       servletHolders.create(
+        IdU1ServletHealth.class,
+        IdU1ServletHealth::new),
+      "/health"
+    );
+    servlets.addServlet(
+      servletHolders.create(
         IdU1ServletVersion.class,
         IdU1ServletVersion::new),
       "/version"

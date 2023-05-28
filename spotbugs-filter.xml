@@ -527,6 +527,16 @@
     <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
   </Match>
 
+  <!--                                        -->
+  <!-- com.io7m.idstore.server.service.health -->
+  <!--                                        -->
+
+  <!-- It's an API. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.service.health.IdServerHealth"/>
+    <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+  </Match>
+
   <!--                                      -->
   <!-- com.io7m.idstore.server.service.mail -->
   <!--                                      -->
