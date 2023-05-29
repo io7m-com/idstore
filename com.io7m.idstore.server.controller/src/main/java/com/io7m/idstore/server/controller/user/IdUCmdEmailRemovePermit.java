@@ -68,7 +68,7 @@ public final class IdUCmdEmailRemovePermit
       transaction.queries(IdDatabaseUsersQueriesType.class);
 
     final var verificationOpt =
-      emails.emailVerificationGet(token);
+      emails.emailVerificationGetPermit(token);
 
     if (verificationOpt.isEmpty()) {
       throw context.failFormatted(

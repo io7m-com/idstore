@@ -59,7 +59,7 @@ public non-sealed interface IdDatabaseEmailsQueriesType
     throws IdDatabaseException;
 
   /**
-   * Retrieve a verification.
+   * Retrieve a verification by the "permit" token.
    *
    * @param token The verification token
    *
@@ -68,7 +68,21 @@ public non-sealed interface IdDatabaseEmailsQueriesType
    * @throws IdDatabaseException On errors
    */
 
-  Optional<IdEmailVerification> emailVerificationGet(
+  Optional<IdEmailVerification> emailVerificationGetPermit(
+    IdToken token)
+    throws IdDatabaseException;
+
+  /**
+   * Retrieve a verification by the "deny" token.
+   *
+   * @param token The verification token
+   *
+   * @return The verification, if one exists
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  Optional<IdEmailVerification> emailVerificationGetDeny(
     IdToken token)
     throws IdDatabaseException;
 
@@ -85,5 +99,17 @@ public non-sealed interface IdDatabaseEmailsQueriesType
   void emailVerificationDelete(
     IdToken token,
     IdEmailVerificationResolution resolution)
+    throws IdDatabaseException;
+
+  /**
+   * Count the number of active email verifications for the current user.
+   *
+   * @return The number of active email verifications
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  @IdDatabaseRequiresUser
+  long emailVerificationCount()
     throws IdDatabaseException;
 }

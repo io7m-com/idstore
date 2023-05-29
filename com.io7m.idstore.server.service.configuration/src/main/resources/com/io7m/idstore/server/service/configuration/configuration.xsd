@@ -655,21 +655,46 @@
     </annotation>
 
     <complexType>
+      <attribute name="LoginDelay"
+                 type="duration"
+                 default="PT1S"
+                 use="optional">
+        <annotation>
+          <documentation>
+            A fixed delay added to login operations in order to reduce the feasibility of online password
+            brute-forcing.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="LoginRateLimit"
+                 type="duration"
+                 default="PT5S"
+                 use="optional">
+        <annotation>
+          <documentation>
+            Login attempts cannot be made more frequently than this duration, for a given IP address.
+          </documentation>
+        </annotation>
+      </attribute>
+
       <attribute name="EmailVerificationRateLimit"
                  type="duration"
                  use="required">
         <annotation>
           <documentation>
-            Email verifications for various operations cannot be prompted more frequently than this duration.
+            Email verifications for various operations cannot be prompted more frequently than this duration,
+            for a given user account.
           </documentation>
         </annotation>
       </attribute>
+
       <attribute name="PasswordResetRateLimit"
                  type="duration"
                  use="required">
         <annotation>
           <documentation>
-            Passwords cannot be reset more frequently than this duration.
+            Passwords cannot be reset more frequently than this duration, for a given IP address.
           </documentation>
         </annotation>
       </attribute>

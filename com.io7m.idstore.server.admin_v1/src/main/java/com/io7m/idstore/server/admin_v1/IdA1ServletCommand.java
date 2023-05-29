@@ -38,7 +38,6 @@ import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import io.opentelemetry.api.trace.Span;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
@@ -53,6 +52,7 @@ import static com.io7m.idstore.server.admin_v1.IdA1Errors.errorResponseOf;
 import static com.io7m.idstore.server.admin_v1.IdA1ServletCoreAuthenticated.withAuthentication;
 import static com.io7m.idstore.server.admin_v1.IdA1ServletCoreTransactional.withTransaction;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 
 /**
  * The v1 command servlet.
@@ -153,8 +153,10 @@ public final class IdA1ServletCommand extends IdHTTPServletFunctional
     } catch (final IOException e) {
       throw new UncheckedIOException(e);
     } catch (final IdRequestLimitExceeded | IdProtocolException e) {
+      setSpanErrorCode(e.errorCode());
       return errorResponseOf(messages, information, BLAME_CLIENT, e);
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       return errorResponseOf(messages, information, BLAME_SERVER, e);
     }
   }
@@ -187,11 +189,12 @@ public final class IdA1ServletCommand extends IdHTTPServletFunctional
     try {
       result = executor.execute(context, command);
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       return errorResponseOf(messages, information, e);
     }
 
     if (result instanceof final IdAResponseError error) {
-      Span.current().setAttribute("idstore.errorCode", error.errorCode().id());
+      setSpanErrorCode(error.errorCode());
       return new IdHTTPServletResponseFixedSize(
         switch (error.blame()) {
           case BLAME_SERVER -> 500;

@@ -89,9 +89,13 @@ public final class IdUCmdEmailAddBegin
       configurationService.configuration();
     final var mailConfiguration =
       configuration.mailConfiguration();
+    final var transaction =
+      context.transaction();
+    final var emails =
+      transaction.queries(IdDatabaseEmailsQueriesType.class);
 
     final var user = context.user();
-    context.securityCheck(new IdSecUserActionEmailAddBegin(user));
+    transaction.userIdSet(user.id());
 
     if (!rateLimitService.isAllowedByRateLimit(user.id())) {
       throw context.fail(
@@ -101,12 +105,12 @@ public final class IdUCmdEmailAddBegin
       );
     }
 
+    context.securityCheck(
+      new IdSecUserActionEmailAddBegin(user, emails.emailVerificationCount())
+    );
+
     final var email =
       command.email();
-    final var transaction =
-      context.transaction();
-    final var emails =
-      transaction.queries(IdDatabaseEmailsQueriesType.class);
 
     checkPreconditions(context, emails, strings, email);
 
@@ -115,7 +119,31 @@ public final class IdUCmdEmailAddBegin
     final var verification =
       createVerification(context, emails, mailConfiguration, user, email);
 
-    sendVerificationMail(
+    /*
+     * Send a "deny" link to all registered email addresses except for the new
+     * one. In the case that a user's account is compromised, and a hostile
+     * party tries to add an email address to it, this prevents the operation
+     * from happening silently - the user will know something is wrong!
+     */
+
+    for (final var emailExisting : user.emails().toList()) {
+      sendVerificationMailWithoutPermitLink(
+        context,
+        templateService,
+        configuration,
+        mailService,
+        brandingService,
+        emailExisting,
+        verification
+      );
+    }
+
+    /*
+     * Send a "permit" (and a "deny") link to the requested email address. This
+     * forces the user to prove that they control the email address being added.
+     */
+
+    sendVerificationMailWithPermitLink(
       context,
       templateService,
       configuration,
@@ -128,7 +156,7 @@ public final class IdUCmdEmailAddBegin
     return new IdUResponseEmailAddBegin(context.requestId());
   }
 
-  private static void sendVerificationMail(
+  private static void sendVerificationMailWithoutPermitLink(
     final IdUCommandContext context,
     final IdFMTemplateServiceType templateService,
     final IdServerConfiguration configuration,
@@ -136,22 +164,16 @@ public final class IdUCmdEmailAddBegin
     final IdServerBrandingServiceType brandingService,
     final IdEmail email,
     final IdEmailVerification verification)
-    throws
-    IdCommandExecutionFailure
+    throws IdCommandExecutionFailure
   {
     final var template =
       templateService.emailVerificationTemplate();
 
-    final var linkPermit =
-      configuration.userViewAddress()
-        .externalAddress()
-        .resolve("/email-verification-permit/?token=%s".formatted(verification.token()))
-        .normalize();
-
     final var linkDeny =
       configuration.userViewAddress()
         .externalAddress()
-        .resolve("/email-verification-deny/?token=%s".formatted(verification.token()))
+        .resolve("/email-verification-deny/?token=%s"
+                   .formatted(verification.tokenDeny()))
         .normalize();
 
     final var writer = new StringWriter();
@@ -162,7 +184,7 @@ public final class IdUCmdEmailAddBegin
           verification,
           context.remoteHost(),
           context.remoteUserAgent(),
-          linkPermit,
+          Optional.empty(),
           linkDeny
         ),
         writer
@@ -182,8 +204,90 @@ public final class IdUCmdEmailAddBegin
     final var mailHeaders =
       Map.ofEntries(
         Map.entry(
-          "X-IDStore-Verification-Token",
-          verification.token().value()),
+          "X-IDStore-Verification-Token-Deny",
+          verification.tokenDeny().value()),
+        Map.entry(
+          "X-IDStore-Verification-From-Request",
+          context.requestId().toString()),
+        Map.entry(
+          "X-IDStore-Verification-Deny",
+          linkDeny.toString())
+      );
+
+    try {
+      mailService.sendMail(
+        Span.current(),
+        context.requestId(),
+        email,
+        mailHeaders,
+        brandingService.emailSubject("Email verification request"),
+        writer.toString()
+      ).get();
+    } catch (final Exception e) {
+      throw context.failMail(email, e);
+    }
+  }
+
+  private static void sendVerificationMailWithPermitLink(
+    final IdUCommandContext context,
+    final IdFMTemplateServiceType templateService,
+    final IdServerConfiguration configuration,
+    final IdServerMailServiceType mailService,
+    final IdServerBrandingServiceType brandingService,
+    final IdEmail email,
+    final IdEmailVerification verification)
+    throws IdCommandExecutionFailure
+  {
+    final var template =
+      templateService.emailVerificationTemplate();
+
+    final var linkPermit =
+      configuration.userViewAddress()
+        .externalAddress()
+        .resolve("/email-verification-permit/?token=%s"
+                   .formatted(verification.tokenPermit()))
+        .normalize();
+
+    final var linkDeny =
+      configuration.userViewAddress()
+        .externalAddress()
+        .resolve("/email-verification-deny/?token=%s"
+                   .formatted(verification.tokenDeny()))
+        .normalize();
+
+    final var writer = new StringWriter();
+    try {
+      template.process(
+        new IdFMEmailVerificationData(
+          brandingService.title(),
+          verification,
+          context.remoteHost(),
+          context.remoteUserAgent(),
+          Optional.of(linkPermit),
+          linkDeny
+        ),
+        writer
+      );
+    } catch (final Exception e) {
+      throw new IdCommandExecutionFailure(
+        e.getMessage(),
+        e,
+        IO_ERROR,
+        Map.of(),
+        Optional.empty(),
+        context.requestId(),
+        500
+      );
+    }
+
+    final var mailHeaders =
+      Map.ofEntries(
+        Map.entry(
+          "X-IDStore-Verification-Token-Permit",
+          verification.tokenPermit().value()),
+        Map.entry(
+          "X-IDStore-Verification-Token-Deny",
+          verification.tokenDeny().value()),
         Map.entry(
           "X-IDStore-Verification-From-Request",
           context.requestId().toString()),
@@ -217,12 +321,21 @@ public final class IdUCmdEmailAddBegin
     final IdEmail email)
     throws IdDatabaseException
   {
-    final var token =
+    final var tokenAllow =
+      IdToken.generate();
+    final var tokenDeny =
       IdToken.generate();
     final var expires =
       context.now().plus(mailConfiguration.verificationExpiration());
     final var verification =
-      new IdEmailVerification(user.id(), email, token, EMAIL_ADD, expires);
+      new IdEmailVerification(
+        user.id(),
+        email,
+        tokenAllow,
+        tokenDeny,
+        EMAIL_ADD,
+        expires
+      );
 
     emails.emailVerificationCreate(verification);
     return verification;

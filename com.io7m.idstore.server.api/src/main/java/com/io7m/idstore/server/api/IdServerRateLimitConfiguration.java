@@ -26,11 +26,15 @@ import java.util.Objects;
  *                                   verifications for a given user
  * @param passwordResetRateLimit     The minimum allowed time between password
  *                                   resets
+ * @param loginRateLimit             The minimum time allowed between logins for a host
+ * @param loginDelay                 A delay applied to each login attempt
  */
 
 public record IdServerRateLimitConfiguration(
   Duration emailVerificationRateLimit,
-  Duration passwordResetRateLimit)
+  Duration passwordResetRateLimit,
+  Duration loginRateLimit,
+  Duration loginDelay)
   implements IdServerJSONConfigurationElementType
 {
   /**
@@ -40,6 +44,8 @@ public record IdServerRateLimitConfiguration(
    *                                   verifications for a given user
    * @param passwordResetRateLimit     The minimum allowed time between password
    *                                   resets
+   * @param loginRateLimit             The minimum time allowed between logins for a host
+   * @param loginDelay                 A delay applied to each login attempt
    */
 
   public IdServerRateLimitConfiguration
@@ -48,5 +54,9 @@ public record IdServerRateLimitConfiguration(
       emailVerificationRateLimit, "emailVerificationRateLimit");
     Objects.requireNonNull(
       passwordResetRateLimit, "passwordResetRateLimit");
+    Objects.requireNonNull(
+      loginRateLimit, "loginRateLimit");
+    Objects.requireNonNull(
+      loginDelay, "loginDelay");
   }
 }

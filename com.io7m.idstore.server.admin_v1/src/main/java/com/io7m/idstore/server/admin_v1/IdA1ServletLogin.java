@@ -26,8 +26,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.server.controller.IdServerStrings;
-import com.io7m.idstore.server.controller.admin.IdAdminLoginService;
 import com.io7m.idstore.server.controller.admin.IdAdminLoggedIn;
+import com.io7m.idstore.server.controller.admin.IdAdminLoginService;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.http.IdHTTPServletFunctional;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
@@ -51,6 +51,7 @@ import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_SERVER;
 import static com.io7m.idstore.server.admin_v1.IdA1ServletCoreTransactional.withTransaction;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 
 /**
  * The v1 login servlet.
@@ -118,6 +119,7 @@ public final class IdA1ServletLogin extends IdHTTPServletFunctional
     } catch (final IOException e) {
       throw new UncheckedIOException(e);
     } catch (final IdException e) {
+      setSpanErrorCode(e.errorCode());
       return IdA1Errors.errorResponseOf(messages, information, BLAME_CLIENT, e);
     }
 
@@ -135,12 +137,14 @@ public final class IdA1ServletLogin extends IdHTTPServletFunctional
         meta
       );
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       return IdA1Errors.errorResponseOf(messages, information, e);
     }
 
     try {
       transaction.commit();
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       return IdA1Errors.errorResponseOf(messages, information, BLAME_SERVER, e);
     }
 

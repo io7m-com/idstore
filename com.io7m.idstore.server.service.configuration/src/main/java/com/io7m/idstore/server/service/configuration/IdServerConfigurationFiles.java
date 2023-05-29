@@ -199,14 +199,35 @@ public final class IdServerConfigurationFiles
     final RateLimiting rateLimiting)
   {
     return new IdServerRateLimitConfiguration(
-      processDuration(rateLimiting.getEmailVerificationRateLimit()),
-      processDuration(rateLimiting.getPasswordResetRateLimit())
+      processDuration(
+        rateLimiting.getEmailVerificationRateLimit()),
+      processDuration(
+        rateLimiting.getPasswordResetRateLimit()),
+      processDurationOrDefault(
+        rateLimiting.getLoginRateLimit(),
+        Duration.ofSeconds(5L)
+      ),
+      processDurationOrDefault(
+        rateLimiting.getLoginDelay(),
+        Duration.ofSeconds(1L)
+      )
     );
   }
 
   private static Duration processDuration(
     final javax.xml.datatype.Duration duration)
   {
+    return Duration.parse(duration.toString());
+  }
+
+  private static Duration processDurationOrDefault(
+    final javax.xml.datatype.Duration duration,
+    final Duration defaultValue)
+  {
+    if (duration == null) {
+      return defaultValue;
+    }
+
     return Duration.parse(duration.toString());
   }
 

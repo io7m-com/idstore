@@ -24,16 +24,19 @@ import java.util.Objects;
  * A request to add an email address to a user.
  *
  * @param user The user
+ * @param activeVerificationCount The number of in-progress email verifications the user already has
  */
 
 public record IdSecUserActionEmailAddBegin(
-  IdUser user)
+  IdUser user,
+  long activeVerificationCount)
   implements IdSecUserActionType
 {
   /**
    * A request to add an email address to a user.
    *
    * @param user The user
+   * @param activeVerificationCount The number of in-progress email verifications the user already has
    */
 
   public IdSecUserActionEmailAddBegin

@@ -16,8 +16,8 @@
 
 package com.io7m.idstore.tests.integration;
 
+import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.tests.server.IdWithServerContract;
-import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -28,6 +28,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.Objects;
 
 import static java.net.http.HttpClient.Redirect.ALWAYS;
 import static java.net.http.HttpClient.Redirect.NEVER;
@@ -266,7 +268,11 @@ public final class IdServerUserViewIT extends IdWithServerContract
       "/email-add-run?email=extras@example.com",
       "idstore: Verification");
 
-    this.permitEmailChallenge("/email-verification-permit/?token=%s");
+    this.completeEmailChallenge(
+      "extras@example.com",
+      "X-IDStore-Verification-Token-Permit",
+      "/email-verification-permit/?token=%s"
+    );
   }
 
   /**
@@ -291,7 +297,11 @@ public final class IdServerUserViewIT extends IdWithServerContract
       "/email-add-run?email=extras@example.com",
       "idstore: Verification");
 
-    this.permitEmailChallenge("/email-verification-deny/?token=%s");
+    this.completeEmailChallenge(
+      "extras@example.com",
+      "X-IDStore-Verification-Token-Deny",
+      "/email-verification-deny/?token=%s"
+    );
   }
 
   /**
@@ -513,11 +523,17 @@ public final class IdServerUserViewIT extends IdWithServerContract
     this.openPage(
       "/email-add-run?email=extras@example.com",
       "idstore: Verification");
-    this.permitEmailChallenge("/email-verification-permit/?token=%s");
+    this.completeEmailChallenge(
+      "extras@example.com",
+      "X-IDStore-Verification-Token-Permit",
+      "/email-verification-permit/?token=%s");
     this.openPage(
       "/email-remove-run?email=extras@example.com",
       "idstore: Verification");
-    this.permitEmailChallenge("/email-verification-permit/?token=%s");
+    this.completeEmailChallenge(
+      "extras@example.com",
+      "X-IDStore-Verification-Token-Permit",
+      "/email-verification-permit/?token=%s");
   }
 
   /**
@@ -541,11 +557,18 @@ public final class IdServerUserViewIT extends IdWithServerContract
     this.openPage(
       "/email-add-run?email=extras@example.com",
       "idstore: Verification");
-    this.permitEmailChallenge("/email-verification-permit/?token=%s");
+    this.completeEmailChallenge(
+      "extras@example.com",
+      "X-IDStore-Verification-Token-Permit",
+      "/email-verification-permit/?token=%s");
+
     this.openPage(
       "/email-remove-run?email=extras@example.com",
       "idstore: Verification");
-    this.permitEmailChallenge("/email-verification-deny/?token=%s");
+    this.completeEmailChallenge(
+      "extras@example.com",
+      "X-IDStore-Verification-Token-Deny",
+      "/email-verification-deny/?token=%s");
   }
 
   /**
@@ -1151,16 +1174,32 @@ public final class IdServerUserViewIT extends IdWithServerContract
     assertEquals(expected, res.statusCode());
   }
 
-  private void permitEmailChallenge(final String x)
-    throws IOException, InterruptedException, MessagingException
+  private void completeEmailChallenge(
+    final String emailTo,
+    final String header,
+    final String baseURL)
+    throws Exception
   {
-    final var email = this.emailsReceived().poll();
-    final var token =
-      email.getHeader("X-IDStore-Verification-Token")[0];
+    final var received = List.copyOf(this.emailsReceived());
+    this.emailsReceived().clear();
+
+    IdToken token = null;
+    for (final var email : received) {
+      if (Objects.equals(email.getAllRecipients()[0].toString(), emailTo)) {
+        token = new IdToken(
+          email.getHeader(header)[0]
+        );
+        break;
+      }
+    }
+
+    if (token == null) {
+      throw new IllegalStateException("No email available with a token");
+    }
 
     final var req =
       HttpRequest.newBuilder(
-          this.viewURL(x.formatted(token)))
+          this.viewURL(baseURL.formatted(token)))
         .build();
     final var res =
       this.httpClient.send(req, new IdXHTMLBodyHandler());
@@ -1216,7 +1255,9 @@ public final class IdServerUserViewIT extends IdWithServerContract
     {
       final var req =
         HttpRequest.newBuilder(this.viewURL("/login"))
-          .POST(ofString("username=%s&password=%s".formatted(username, password)))
+          .POST(ofString("username=%s&password=%s".formatted(
+            username,
+            password)))
           .header("Content-Type", "application/x-www-form-urlencoded")
           .build();
       final var res =

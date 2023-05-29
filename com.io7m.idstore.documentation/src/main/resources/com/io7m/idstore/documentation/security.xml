@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section id="06087569-709d-45cb-b9fd-cd89aa176f28"
+         title="Security"
+         xmlns="urn:com.io7m.structural:8:0"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <Section title="Overview">
+    <Paragraph>
+      This section of the manual attempts to describe the security properties of the
+      <Term type="package">idstore</Term> server.
+    </Paragraph>
+  </Section>
+
+  <xi:include href="sec-general.xml"/>
+  <xi:include href="sec-admin.xml"/>
+  <xi:include href="sec-user.xml"/>
+
+</Section>

@@ -36,6 +36,7 @@ import com.io7m.idstore.server.controller.user.IdUserLoginService;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.idstore.tests.IdFakeClock;
 import com.io7m.idstore.tests.IdTestDirectories;
@@ -59,6 +60,7 @@ import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static java.util.Optional.empty;
@@ -83,6 +85,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
   private IdDatabaseUsersQueriesType users;
   private IdServerConfigurationService configurationService;
   private Path directory;
+  private IdRateLimitLoginServiceType rateLimit;
 
   private static Times once()
   {
@@ -145,6 +148,12 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
       new IdServerStrings(Locale.ROOT);
     this.sessions =
       new IdSessionUserService(OpenTelemetry.noop(), Duration.ofDays(1L));
+    this.rateLimit =
+      mock(IdRateLimitLoginServiceType.class);
+
+    when(this.rateLimit.isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
+
     this.configurationService =
       new IdServerConfigurationService(configuration);
     this.login =
@@ -152,7 +161,8 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
         this.serverClock,
         this.strings,
         this.sessions,
-        this.configurationService
+        this.configurationService,
+        this.rateLimit
       );
     this.transaction =
       mock(IdDatabaseTransactionType.class);
@@ -188,6 +198,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
         this.login.userLogin(
           this.transaction,
           UUID.randomUUID(),
+          "127.0.0.1",
           "nonexistent",
           "password",
           Map.of()
@@ -218,6 +229,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
         this.login.userLogin(
           this.transaction,
           UUID.randomUUID(),
+          "127.0.0.1",
           "nonexistent",
           "password",
           Map.of()
@@ -243,7 +255,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     final var admin =
       this.createUser("user");
     final var ban =
-      new IdBan(admin.id(), "No reason.", Optional.empty());
+      new IdBan(admin.id(), "No reason.", empty());
 
     when(this.users.userGetForNameRequire(any()))
       .thenReturn(admin);
@@ -255,6 +267,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
         this.login.userLogin(
           this.transaction,
           UUID.randomUUID(),
+          "127.0.0.1",
           "user",
           "password",
           Map.of()
@@ -296,6 +309,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
         this.login.userLogin(
           this.transaction,
           UUID.randomUUID(),
+          "127.0.0.1",
           "user",
           "password",
           Map.of()
@@ -325,13 +339,14 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     when(this.users.userGetForNameRequire(any()))
       .thenReturn(admin);
     when(this.users.userBanGet(any()))
-      .thenReturn(Optional.empty());
+      .thenReturn(empty());
 
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
         this.login.userLogin(
           this.transaction,
           UUID.randomUUID(),
+          "127.0.0.1",
           "user",
           "not the password",
           Map.of()
@@ -339,6 +354,45 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
       });
 
     assertEquals(AUTHENTICATION_ERROR, ex.errorCode());
+
+    verify(this.users, once()).userGetForNameRequire(any());
+    verify(this.users, once()).userBanGet(any());
+    verifyNoMoreInteractions(this.users);
+  }
+
+  /**
+   * Rate limiting rejects logins.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserRateLimited()
+    throws Exception
+  {
+    final var admin =
+      this.createUser("user");
+
+    when(this.users.userGetForNameRequire(any()))
+      .thenReturn(admin);
+    when(this.users.userBanGet(any()))
+      .thenReturn(empty());
+    when(this.rateLimit.isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.FALSE);
+
+    final var ex =
+      assertThrows(IdCommandExecutionFailure.class, () -> {
+        this.login.userLogin(
+          this.transaction,
+          UUID.randomUUID(),
+          "127.0.0.1",
+          "user",
+          "x",
+          Map.of()
+        );
+      });
+
+    assertEquals(RATE_LIMIT_EXCEEDED, ex.errorCode());
 
     verify(this.users, once()).userGetForNameRequire(any());
     verify(this.users, once()).userBanGet(any());
@@ -361,12 +415,13 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     when(this.users.userGetForNameRequire(any()))
       .thenReturn(admin);
     when(this.users.userBanGet(any()))
-      .thenReturn(Optional.empty());
+      .thenReturn(empty());
 
     final var loggedIn =
       this.login.userLogin(
         this.transaction,
         UUID.randomUUID(),
+        "127.0.0.1",
         "user",
         "x",
         Map.of()
@@ -388,7 +443,8 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
       this.serverClock,
       this.strings,
       this.sessions,
-      this.configurationService
+      this.configurationService,
+      this.rateLimit
     );
   }
 
@@ -399,7 +455,8 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
       this.serverClock,
       this.strings,
       this.sessions,
-      this.configurationService
+      this.configurationService,
+      this.rateLimit
     );
   }
 }

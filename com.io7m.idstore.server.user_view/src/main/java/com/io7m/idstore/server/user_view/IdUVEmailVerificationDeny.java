@@ -172,7 +172,7 @@ public final class IdUVEmailVerificationDeny
         final var users =
           transaction.queries(IdDatabaseUsersQueriesType.class);
         final var verificationOpt =
-          emails.emailVerificationGet(idToken);
+          emails.emailVerificationGetDeny(idToken);
 
         if (verificationOpt.isEmpty()) {
           return IdUVErrorPage.showError(

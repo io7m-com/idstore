@@ -378,13 +378,25 @@
   </Match>
   <Match>
     <Class name="com.io7m.idstore.server.controller.user.IdUCmdEmailAddBegin"/>
-    <Method name="sendVerificationMail"/>
+    <Or>
+      <Method name="sendVerificationMailWithPermitLink"/>
+      <Method name="sendVerificationMailWithoutPermitLink"/>
+    </Or>
     <Bug pattern="REC_CATCH_EXCEPTION"/>
   </Match>
   <Match>
     <Class name="com.io7m.idstore.server.controller.user.IdUCmdEmailRemoveBegin"/>
-    <Method name="sendVerificationMail"/>
+    <Or>
+      <Method name="sendVerificationMailWithPermitLink"/>
+      <Method name="sendVerificationMailWithoutPermitLink"/>
+    </Or>
     <Bug pattern="REC_CATCH_EXCEPTION"/>
+  </Match>
+  <!-- A deliberate fixed delay for logins. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.controller.user.IdUserLoginService"/>
+    <Method name="applyFixedDelay"/>
+    <Bug pattern="MDM_THREAD_YIELD"/>
   </Match>
 
   <!-- It's an exception. Don't care about equality. -->

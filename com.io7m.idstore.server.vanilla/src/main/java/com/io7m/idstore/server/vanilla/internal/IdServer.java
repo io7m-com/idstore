@@ -49,6 +49,8 @@ import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.maintenance.IdMaintenanceService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitLoginService;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitLoginServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetServiceType;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
@@ -240,9 +242,29 @@ public final class IdServer implements IdServerType
     final var clock = new IdServerClock(this.configuration.clock());
     services.register(IdServerClock.class, clock);
 
+    final var loginRateLimitService =
+      IdRateLimitLoginService.create(
+        this.telemetry,
+        this.configuration.rateLimit()
+          .loginRateLimit()
+          .toSeconds(),
+        SECONDS
+      );
+
+    services.register(
+      IdRateLimitLoginServiceType.class,
+      loginRateLimitService
+    );
+
     services.register(
       IdUserLoginService.class,
-      new IdUserLoginService(clock, strings, sessionUserService, config)
+      new IdUserLoginService(
+        clock,
+        strings,
+        sessionUserService,
+        config,
+        loginRateLimitService
+      )
     );
 
     services.register(

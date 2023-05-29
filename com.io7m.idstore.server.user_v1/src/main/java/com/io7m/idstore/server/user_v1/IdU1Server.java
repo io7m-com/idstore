@@ -20,6 +20,8 @@ import com.io7m.idstore.server.http.IdPlainErrorHandler;
 import com.io7m.idstore.server.http.IdServletHolders;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
+import org.eclipse.jetty.server.ForwardedRequestCustomizer;
+import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
@@ -74,6 +76,23 @@ public final class IdU1Server
 
     final var server =
       new Server(address);
+
+    /*
+     * Add a request customizer that properly handles headers such as
+     * X-Forwarded-For and so on. Without this, running the idstore server
+     * behind a reverse proxy would result in rate-limiting decisions being
+     * applied to the address of the proxy rather than the address of the
+     * client making the request.
+     */
+
+    for (final var connector : server.getConnectors()) {
+      for (final var factory : connector.getConnectionFactories()) {
+        if (factory instanceof final HttpConfiguration.ConnectionFactory http) {
+          http.getHttpConfiguration()
+            .addCustomizer(new ForwardedRequestCustomizer());
+        }
+      }
+    }
 
     /*
      * Configure all the servlets.

@@ -133,7 +133,8 @@
         service will bind. It is recommended that the service be bound to
         <Term type="expression">localhost</Term>
         and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
-        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>.
+        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>
+        <LinkFootnote target="dffb7f36-a515-46c7-9ae1-f476b2257ce2"/>.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
@@ -154,7 +155,8 @@
         service will bind. It is recommended that the service be bound to
         <Term type="expression">localhost</Term>
         and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
-        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>.
+        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>
+        <LinkFootnote target="dffb7f36-a515-46c7-9ae1-f476b2257ce2"/>.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
@@ -175,7 +177,8 @@
         service will bind. It is recommended that the service be bound to
         <Term type="expression">localhost</Term>
         and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
-        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>.
+        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>
+        <LinkFootnote target="dffb7f36-a515-46c7-9ae1-f476b2257ce2"/>.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
@@ -285,7 +288,7 @@
     </Subsection>
   </Subsection>
 
-  <Subsection title="RateLimiting">
+  <Subsection title="RateLimiting" id="1d55d366-5883-4418-a61a-eef7a88eaca7">
     <Subsection title="Overview">
       <Paragraph>
         The <Term type="expression">RateLimiting</Term> section of the configuration file configures
@@ -304,6 +307,19 @@
         must elapse between any two password reset requests from a single IP address. The attribute must be specified
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
       </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">LoginRateLimit</Term> attribute specifies the minimum duration that
+        must elapse between any two login requests from a single IP address. The attribute must be specified
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        The default value, if unspecified, is five seconds.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">LoginDelay</Term> attribute specifies a fixed delay that is applied
+        to all login requests to reduce the practicality of online password brute forcing. The attribute must be
+        specified as an
+        <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        The default value, if unspecified, is one second.
+      </Paragraph>
     </Subsection>
     <Subsection title="Example">
       <Paragraph>
@@ -311,14 +327,17 @@
       </Paragraph>
       <FormalItem title="Example">
         <Verbatim><![CDATA[
-<RateLimiting EmailVerificationRateLimit="PT10M"
-              PasswordResetRateLimit="PT10M"/>
+<RateLimiting
+  EmailVerificationRateLimit="PT10M"
+  PasswordResetRateLimit="PT10M"
+  LoginRateLimit="PT5S"
+  LoginDelay="PT1S" />
 ]]></Verbatim>
       </FormalItem>
     </Subsection>
   </Subsection>
 
-  <Subsection title="OpenTelemetry">
+  <Subsection title="OpenTelemetry" id="694ad99a-9977-47bf-ae12-85fb7e9a204e">
     <Subsection title="Overview">
       <Paragraph>
         The <Term type="expression">OpenTelemetry</Term> section of the configuration file configures
@@ -534,5 +553,14 @@
       </Verbatim>
     </FormalItem>
   </Subsection>
+
+  <Footnote id="dffb7f36-a515-46c7-9ae1-f476b2257ce2">
+    Note: It is extremely important that any reverse proxy used provides the correct 
+    <LinkExternal target="https://datatracker.ietf.org/doc/html/rfc7239">RFC 7239</LinkExternal>
+    headers in order to tell the <Term type="expression">idstore</Term> server that a reverse proxy is present.
+    Otherwise, the <Term type="expression">idstore</Term> server will apply
+    <Link target="1d55d366-5883-4418-a61a-eef7a88eaca7">rate-limiting decisions</Link> to the address of the proxy
+    as opposed to the address of the user connecting through the proxy, as intended.
+  </Footnote>
 
 </Section>

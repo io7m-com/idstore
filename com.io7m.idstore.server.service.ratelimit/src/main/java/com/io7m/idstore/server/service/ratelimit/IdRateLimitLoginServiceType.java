@@ -14,41 +14,22 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.service.telemetry.api;
 
-import com.io7m.idstore.error_codes.IdErrorCode;
+package com.io7m.idstore.server.service.ratelimit;
+
 import com.io7m.repetoir.core.RPServiceType;
-import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
 
 /**
- * The type of server telemetry services.
+ * A rate limiting service for logins.
  */
 
-public interface IdServerTelemetryServiceType extends RPServiceType
+public interface IdRateLimitLoginServiceType extends RPServiceType
 {
   /**
-   * @return The main tracer
-   */
-
-  Tracer tracer();
-
-  /**
-   * @return The OpenTelemetry instance
-   */
-
-  OpenTelemetry openTelemetry();
-
-  /**
-   * Set the error code for the current span.
+   * @param host The host performing the action
    *
-   * @param errorCode The error code
+   * @return {@code true} if the given operation is allowed by rate limiting
    */
 
-  static void setSpanErrorCode(
-    final IdErrorCode errorCode)
-  {
-    Span.current().setAttribute("idstore.errorCode", errorCode.id());
-  }
+  boolean isAllowedByRateLimit(String host);
 }

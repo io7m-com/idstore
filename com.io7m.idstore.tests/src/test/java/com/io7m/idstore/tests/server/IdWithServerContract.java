@@ -324,8 +324,10 @@ public abstract class IdWithServerContract
 
     final var rateLimit =
       new IdServerRateLimitConfiguration(
-        Duration.of(10L, ChronoUnit.MINUTES),
-        Duration.of(10L, ChronoUnit.MINUTES)
+        Duration.of(0L, ChronoUnit.MILLIS),
+        Duration.of(0L, ChronoUnit.MILLIS),
+        Duration.of(0L, ChronoUnit.MILLIS),
+        Duration.of(0L, ChronoUnit.MILLIS)
       );
 
     final var sessions =

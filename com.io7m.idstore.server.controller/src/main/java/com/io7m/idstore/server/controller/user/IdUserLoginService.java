@@ -27,6 +27,7 @@ import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.repetoir.core.RPServiceType;
 
@@ -37,6 +38,7 @@ import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 
 /**
@@ -49,6 +51,7 @@ public final class IdUserLoginService implements RPServiceType
   private final IdServerStrings strings;
   private final IdSessionUserService sessions;
   private final IdServerConfigurationService configurations;
+  private final IdRateLimitLoginServiceType rateLimit;
 
   /**
    * A service that handles the logic for user logins.
@@ -57,13 +60,15 @@ public final class IdUserLoginService implements RPServiceType
    * @param inStrings        The string resources
    * @param inSessions       A session service
    * @param inConfigurations A configuration service
+   * @param inRateLimit      The rate limit
    */
 
   public IdUserLoginService(
     final IdServerClock inClock,
     final IdServerStrings inStrings,
     final IdSessionUserService inSessions,
-    final IdServerConfigurationService inConfigurations)
+    final IdServerConfigurationService inConfigurations,
+    final IdRateLimitLoginServiceType inRateLimit)
   {
     this.clock =
       Objects.requireNonNull(inClock, "clock");
@@ -73,6 +78,8 @@ public final class IdUserLoginService implements RPServiceType
       Objects.requireNonNull(inSessions, "inSessions");
     this.configurations =
       Objects.requireNonNull(inConfigurations, "inConfigurations");
+    this.rateLimit =
+      Objects.requireNonNull(inRateLimit, "inRateLimit");
   }
 
   /**
@@ -82,6 +89,7 @@ public final class IdUserLoginService implements RPServiceType
    *
    * @param transaction A database transaction
    * @param requestId   The ID of the request
+   * @param remoteHost  The remote host
    * @param username    The username
    * @param password    The password
    * @param metadata    The request metadata
@@ -94,6 +102,7 @@ public final class IdUserLoginService implements RPServiceType
   public IdUserLoggedIn userLogin(
     final IdDatabaseTransactionType transaction,
     final UUID requestId,
+    final String remoteHost,
     final String username,
     final String password,
     final Map<String, String> metadata)
@@ -112,20 +121,9 @@ public final class IdUserLoginService implements RPServiceType
         users.userGetForNameRequire(new IdName(username));
 
       this.checkBan(requestId, users, user);
-
-      final var ok =
-        user.password().check(password);
-
-      if (!ok) {
-        throw new IdCommandExecutionFailure(
-          this.strings.format("errorInvalidUsernamePassword"),
-          AUTHENTICATION_ERROR,
-          Map.of(),
-          Optional.empty(),
-          requestId,
-          401
-        );
-      }
+      this.checkRateLimit(requestId, remoteHost);
+      this.applyFixedDelay();
+      this.checkPassword(requestId, password, user);
 
       users.userLogin(
         user.id(),
@@ -159,6 +157,60 @@ public final class IdUserLoginService implements RPServiceType
         e.remediatingAction(),
         requestId,
         500
+      );
+    }
+  }
+
+  /**
+   * Apply a fixed delay for all login requests.
+   */
+
+  private void applyFixedDelay()
+  {
+    try {
+      Thread.sleep(
+        this.configurations.configuration()
+          .rateLimit()
+          .loginDelay()
+          .toMillis()
+      );
+    } catch (final InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
+  private void checkPassword(
+    final UUID requestId,
+    final String password,
+    final IdUser user)
+    throws IdPasswordException, IdCommandExecutionFailure
+  {
+    final var ok = user.password().check(password);
+    if (!ok) {
+      throw new IdCommandExecutionFailure(
+        this.strings.format("errorInvalidUsernamePassword"),
+        AUTHENTICATION_ERROR,
+        Map.of(),
+        Optional.empty(),
+        requestId,
+        401
+      );
+    }
+  }
+
+  private void checkRateLimit(
+    final UUID requestId,
+    final String remoteHost)
+    throws IdCommandExecutionFailure
+  {
+    if (!this.rateLimit.isAllowedByRateLimit(remoteHost)) {
+      throw new IdCommandExecutionFailure(
+        this.strings.format("loginRateLimited"),
+        RATE_LIMIT_EXCEEDED,
+        Map.of(),
+        Optional.empty(),
+        requestId,
+        400
       );
     }
   }

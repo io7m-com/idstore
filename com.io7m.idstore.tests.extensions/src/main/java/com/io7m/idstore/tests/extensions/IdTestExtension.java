@@ -282,7 +282,9 @@ public final class IdTestExtension
     this.rateLimitConfiguration =
       new IdServerRateLimitConfiguration(
         Duration.ofMinutes(5L),
-        Duration.ofMinutes(5L)
+        Duration.ofMinutes(5L),
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(1L)
       );
 
     this.serverConfiguration =

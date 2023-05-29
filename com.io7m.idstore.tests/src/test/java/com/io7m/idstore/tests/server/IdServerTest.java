@@ -169,7 +169,9 @@ public final class IdServerTest
     final var rateLimit =
       new IdServerRateLimitConfiguration(
         Duration.of(10L, ChronoUnit.MINUTES),
-        Duration.of(10L, ChronoUnit.MINUTES)
+        Duration.of(10L, ChronoUnit.MINUTES),
+        Duration.of(1L, ChronoUnit.MILLIS),
+        Duration.of(1L, ChronoUnit.MILLIS)
       );
 
     final var sessions =

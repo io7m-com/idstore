@@ -17,7 +17,6 @@
 
 package com.io7m.idstore.tests.protocol.user.cb;
 
-import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.user.IdUMessageType;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import net.jqwik.api.ForAll;

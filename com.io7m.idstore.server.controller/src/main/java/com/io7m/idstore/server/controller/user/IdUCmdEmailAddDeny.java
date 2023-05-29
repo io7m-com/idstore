@@ -64,7 +64,7 @@ public final class IdUCmdEmailAddDeny
       transaction.queries(IdDatabaseEmailsQueriesType.class);
 
     final var verificationOpt =
-      emails.emailVerificationGet(token);
+      emails.emailVerificationGetDeny(token);
 
     if (verificationOpt.isEmpty()) {
       throw context.failFormatted(

@@ -23,35 +23,39 @@ import java.util.UUID;
 /**
  * An email verification operation.
  *
- * @param email     The email address
- * @param operation The operation
- * @param token     The verification token
- * @param expires   The expiration date
- * @param user      The user
+ * @param email       The email address
+ * @param operation   The operation
+ * @param tokenPermit The verification token to permit the operation
+ * @param tokenDeny   The verification token to deny the operation
+ * @param expires     The expiration date
+ * @param user        The user
  */
 
 public record IdEmailVerification(
   UUID user,
   IdEmail email,
-  IdToken token,
+  IdToken tokenPermit,
+  IdToken tokenDeny,
   IdEmailVerificationOperation operation,
   OffsetDateTime expires)
 {
   /**
    * An email verification operation.
    *
-   * @param email     The email address
-   * @param operation The operation
-   * @param token     The verification token
-   * @param expires   The expiration date
-   * @param user      The user
+   * @param email       The email address
+   * @param operation   The operation
+   * @param tokenPermit The verification token to permit the operation
+   * @param tokenDeny   The verification token to deny the operation
+   * @param expires     The expiration date
+   * @param user        The user
    */
 
   public IdEmailVerification
   {
     Objects.requireNonNull(user, "user");
     Objects.requireNonNull(email, "email");
-    Objects.requireNonNull(token, "token");
+    Objects.requireNonNull(tokenPermit, "tokenPermit");
+    Objects.requireNonNull(tokenDeny, "tokenDeny");
     Objects.requireNonNull(operation, "operation");
     Objects.requireNonNull(expires, "expires");
   }

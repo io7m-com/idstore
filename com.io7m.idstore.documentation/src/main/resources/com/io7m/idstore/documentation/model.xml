@@ -61,7 +61,7 @@
         permitted for the number of addresses on an account to be less than one.
       </Paragraph>
     </Subsection>
-    <Subsection title="Permissions">
+    <Subsection title="Permissions" id="634db1a2-1705-44ae-abac-8fa281b100f4">
       <Paragraph>
         Each <Term type="term">administrator</Term> account has a set of
         <Link target="40fe0926-7d6e-41e3-8a3a-9776d6ac3a5d">permissions</Link>
@@ -238,34 +238,65 @@
         There are a number of situations where the <Term type="package">idstore</Term> server uses an external MTA.
       </Paragraph>
     </Subsection>
-    <Subsection title="Password Reset">
+    <Subsection title="Password Reset" id="f3535c44-486a-4236-ae34-765c7f763fe9">
       <Paragraph>
         If a user forgets their password, they can request a password reset <Term type="term">token</Term>. The server
-        will generate a strong random <Term type="term">token</Term> and email it to all email addresses associated with
-        the requesting user's account. The user can then retrieve this token from one of their email accounts, and
-        recite it back to the <Term type="package">idstore</Term> server to have their password reset.
+        will generate a strong random <Term type="term">token</Term> <Term type="expression">t</Term> with a
+        configurable expiration date. For each email address <Term type="expression">e</Term> associated
+        with the user's account, the server will email <Term type="expression">t</Term> to
+        <Term type="expression">e</Term>. The user can retrieve <Term type="expression">t</Term>
+        from one of their email accounts and recite <Term type="expression">t</Term> back to the server to
+        have their password reset.
       </Paragraph>
     </Subsection>
     <Subsection title="Email Additions">
       <Paragraph>
-        If a user wants to add an email to their account, they can request an email addition
-        <Term type="term">token</Term>. The server will generate a strong random
-        <Term type="term">token</Term>
-        and email it to the requested email address. Assuming the user really does control this email account, they can
-        read the resulting email and recite this token back to the
-        <Term type="package">idstore</Term>
-        server to have the new address added to their account.
+        If a user wants to add a new email address <Term type="expression">f</Term> to their account,
+        they can request email addition <Term type="term">tokens</Term>. The server
+        will generate a pair of strong random <Term type="term">tokens</Term> <Term type="expression">tpermit</Term>
+        and <Term type="expression">tdeny</Term>, each with a configurable expiration date.
+        For each email account <Term type="expression">e</Term> associated
+        with the user's account, the server will email <Term type="expression">tdeny</Term> to
+        <Term type="expression">e</Term>. The server will email <Term type="expression">tpermit</Term>
+        to <Term type="expression">f</Term>. Assuming the user really does have access to
+        <Term type="expression">f</Term>, they can read the resulting email and recite
+        <Term type="expression">tpermit</Term> back to the
+        <Term type="package">idstore</Term> server to have the new address added to their account.
+      </Paragraph>
+      <Paragraph>
+        In the event that the user's account is compromised, and a hostile party is attempting to add a new
+        email address to the user's account, the user can recite <Term type="expression">tdeny</Term> back
+        to the server from any of their other email accounts in order to deny the address addition. This potentially
+        alerts users to the fact that their account has been compromised, and allows them to mitigate the damage
+        if they act fast enough.
       </Paragraph>
     </Subsection>
     <Subsection title="Email Removals">
       <Paragraph>
-        If a user wants to remove an email from their account, they can request an email removal
-        <Term type="term">token</Term>. The server will generate a strong random
-        <Term type="term">token</Term>
-        and email it to the requested email address. Assuming the user really does control this email account, they can
-        read the resulting email and recite this token back to the
-        <Term type="package">idstore</Term>
-        server to have the address removed from their account.
+        If a user wants to remove an existing email address <Term type="expression">f</Term> from their account,
+        they can request email removal <Term type="term">tokens</Term>. The server
+        will generate a pair of strong random <Term type="term">tokens</Term> <Term type="expression">tpermit</Term>
+        and <Term type="expression">tdeny</Term>, each with a configurable expiration date.
+        For each email account <Term type="expression">e</Term> associated
+        with the user's account (where <Term type="expression">e != f</Term>),
+        the server will email <Term type="expression">tdeny</Term> to
+        <Term type="expression">e</Term>. The server will email <Term type="expression">tpermit</Term>
+        to <Term type="expression">f</Term>. Assuming the user really does have access to
+        <Term type="expression">f</Term>, they can read the resulting email and recite
+        <Term type="expression">tpermit</Term> back to the
+        <Term type="package">idstore</Term> server to have the address removed from their account.
+      </Paragraph>
+      <Paragraph>
+        In the event that the user's account is compromised, and a hostile party is attempting to remove the
+        user's existing email address from the compromised account, the user can recite
+        <Term type="expression">tdeny</Term> back
+        to the server from any of their other email accounts in order to deny the address removal. This
+        potentially alerts users to the fact that their account has been compromised, and allows them to mitigate
+        the damage if they act fast enough.
+      </Paragraph>
+      <Paragraph>
+        If the user no longer has access to <Term type="expression">f</Term>, they cannot remove it. In this
+        case, an administrator will need to remove the address manually.
       </Paragraph>
     </Subsection>
   </Subsection>

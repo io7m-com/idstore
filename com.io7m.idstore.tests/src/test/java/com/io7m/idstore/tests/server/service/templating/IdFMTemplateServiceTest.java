@@ -132,7 +132,7 @@ public final class IdFMTemplateServiceTest
   }
 
   @Test
-  public void testEmailVerification()
+  public void testEmailVerification0()
     throws IOException, TemplateException
   {
     final var service =
@@ -144,14 +144,17 @@ public final class IdFMTemplateServiceTest
     final var writer =
       new BufferedWriter(new OutputStreamWriter(System.out, UTF_8));
 
-    final var token =
+    final var tokenPermit =
+      IdToken.generate();
+    final var tokenDeny =
       IdToken.generate();
 
     final var verification =
       new IdEmailVerification(
         UUID.randomUUID(),
         new IdEmail("someone@example.com"),
-        token,
+        tokenPermit,
+        tokenDeny,
         IdEmailVerificationOperation.EMAIL_ADD,
         OffsetDateTime.now().plusDays(1L)
       );
@@ -162,8 +165,54 @@ public final class IdFMTemplateServiceTest
         verification,
         "[2610:1c1:1:606c::50:15]",
         "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0",
-        URI.create("https://id.example.com/allow?token=%s".formatted(token)),
-        URI.create("https://id.example.com/deny?token=%s".formatted(token))
+        Optional.of(
+          URI.create("https://id.example.com/allow?token=%s"
+                       .formatted(tokenPermit))
+        ),
+        URI.create("https://id.example.com/deny?token=%s".formatted(tokenDeny))
+      ),
+      writer
+    );
+
+    writer.flush();
+  }
+
+  @Test
+  public void testEmailVerification1()
+    throws IOException, TemplateException
+  {
+    final var service =
+      IdFMTemplateService.create();
+
+    final var template =
+      service.emailVerificationTemplate();
+
+    final var writer =
+      new BufferedWriter(new OutputStreamWriter(System.out, UTF_8));
+
+    final var tokenPermit =
+      IdToken.generate();
+    final var tokenDeny =
+      IdToken.generate();
+
+    final var verification =
+      new IdEmailVerification(
+        UUID.randomUUID(),
+        new IdEmail("someone@example.com"),
+        tokenPermit,
+        tokenDeny,
+        IdEmailVerificationOperation.EMAIL_ADD,
+        OffsetDateTime.now().plusDays(1L)
+      );
+
+    template.process(
+      new IdFMEmailVerificationData(
+        "idstore",
+        verification,
+        "[2610:1c1:1:606c::50:15]",
+        "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0",
+        Optional.empty(),
+        URI.create("https://id.example.com/deny?token=%s".formatted(tokenDeny))
       ),
       writer
     );
