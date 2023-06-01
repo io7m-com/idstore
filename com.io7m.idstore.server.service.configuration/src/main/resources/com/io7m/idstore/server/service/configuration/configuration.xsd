@@ -655,25 +655,48 @@
     </annotation>
 
     <complexType>
-      <attribute name="LoginDelay"
+      <attribute name="UserLoginDelay"
                  type="duration"
                  default="PT1S"
                  use="optional">
         <annotation>
           <documentation>
-            A fixed delay added to login operations in order to reduce the feasibility of online password
+            A fixed delay added to user login operations in order to reduce the feasibility of online password
             brute-forcing.
           </documentation>
         </annotation>
       </attribute>
 
-      <attribute name="LoginRateLimit"
+      <attribute name="UserLoginRateLimit"
                  type="duration"
                  default="PT5S"
                  use="optional">
         <annotation>
           <documentation>
-            Login attempts cannot be made more frequently than this duration, for a given IP address.
+            User login attempts cannot be made more frequently than this duration, for a given IP address.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="AdminLoginDelay"
+                 type="duration"
+                 default="PT1S"
+                 use="optional">
+        <annotation>
+          <documentation>
+            A fixed delay added to admin login operations in order to reduce the feasibility of online password
+            brute-forcing.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="AdminLoginRateLimit"
+                 type="duration"
+                 default="PT5S"
+                 use="optional">
+        <annotation>
+          <documentation>
+            Admin login attempts cannot be made more frequently than this duration, for a given IP address.
           </documentation>
         </annotation>
       </attribute>
@@ -786,6 +809,36 @@
     </complexType>
   </element>
 
+  <element name="Logs">
+    <annotation>
+      <documentation>
+        Configuration information for OpenTelemetry logs/events.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <attribute name="Endpoint"
+                 use="required"
+                 type="anyURI">
+        <annotation>
+          <documentation>
+            The endpoint to which OTLP log data will be sent.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Protocol"
+                 use="required"
+                 type="c:OpenTelemetryProtocol">
+        <annotation>
+          <documentation>
+            The protocol used to send log data.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
   <element name="OpenTelemetry">
     <annotation>
       <documentation>
@@ -795,6 +848,9 @@
 
     <complexType>
       <sequence>
+        <element ref="c:Logs"
+                 minOccurs="0"
+                 maxOccurs="1"/>
         <element ref="c:Metrics"
                  minOccurs="0"
                  maxOccurs="1"/>

@@ -12,6 +12,7 @@
     </Paragraph>
   </Section>
 
+  <xi:include href="sec-monitoring.xml"/>
   <xi:include href="sec-general.xml"/>
   <xi:include href="sec-admin.xml"/>
   <xi:include href="sec-user.xml"/>

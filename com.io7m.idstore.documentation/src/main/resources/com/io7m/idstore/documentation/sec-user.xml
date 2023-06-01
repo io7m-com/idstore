@@ -3,7 +3,7 @@
 <Section title="User API"
          xmlns="urn:com.io7m.structural:8:0">
 
-  <Subsection title="Login">
+  <Subsection title="Login" id="8a062886-81d1-4131-a4e8-ea044c99caf4">
     <Subsection title="Potential Attack: Online Brute Force">
       <Subsection title="Description">
         <Paragraph>
@@ -29,7 +29,7 @@
     </Subsection>
   </Subsection>
 
-  <Subsection title="Email Additions">
+  <Subsection title="Email Additions" id="4c369541-2b72-4c8f-82ed-9ad6556d72ff">
     <Subsection title="Potential Attack: Spam">
       <Subsection title="Description">
         <Paragraph>
@@ -87,7 +87,7 @@
     </Subsection>
   </Subsection>
 
-  <Subsection title="Password Resets">
+  <Subsection title="Password Resets" id="e1b0cc11-5b42-4454-9892-196d48734717">
     <Subsection title="Potential Attack: Spam">
       <Subsection title="Description">
         <Paragraph>

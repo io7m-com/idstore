@@ -24,12 +24,14 @@ import java.util.Optional;
  * Configuration information for OpenTelemetry.
  *
  * @param logicalServiceName The logical service name
+ * @param logs               The configuration for OTLP logs
  * @param metrics            The configuration for OTLP metrics
  * @param traces             The configuration for OTLP traces
  */
 
 public record IdServerOpenTelemetryConfiguration(
   String logicalServiceName,
+  Optional<IdLogs> logs,
   Optional<IdMetrics> metrics,
   Optional<IdTraces> traces)
 {
@@ -37,6 +39,7 @@ public record IdServerOpenTelemetryConfiguration(
    * Configuration information for OpenTelemetry.
    *
    * @param logicalServiceName The logical service name
+   * @param logs               The configuration for OTLP logs
    * @param metrics            The configuration for OTLP metrics
    * @param traces             The configuration for OTLP traces
    */
@@ -44,6 +47,7 @@ public record IdServerOpenTelemetryConfiguration(
   public IdServerOpenTelemetryConfiguration
   {
     Objects.requireNonNull(logicalServiceName, "logicalServiceName");
+    Objects.requireNonNull(logs, "logs");
     Objects.requireNonNull(metrics, "metrics");
     Objects.requireNonNull(traces, "traces");
   }
@@ -105,6 +109,28 @@ public record IdServerOpenTelemetryConfiguration(
      */
 
     public IdTraces
+    {
+      Objects.requireNonNull(endpoint, "endpoint");
+      Objects.requireNonNull(protocol, "protocol");
+    }
+  }
+
+  /**
+   * Log configuration.
+   *
+   * @param endpoint The endpoint to which OTLP log data will be sent.
+   * @param protocol The protocol used to deliver OpenTelemetry data.
+   */
+
+  public record IdLogs(
+    URI endpoint,
+    IdOTLPProtocol protocol)
+  {
+    /**
+     * Log configuration.
+     */
+
+    public IdLogs
     {
       Objects.requireNonNull(endpoint, "endpoint");
       Objects.requireNonNull(protocol, "protocol");

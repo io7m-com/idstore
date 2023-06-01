@@ -24,6 +24,7 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCmdEmailAddBegin;
+import com.io7m.idstore.server.service.events.IdEventUserEmailVerificationRateLimitExceeded;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.verification.Times;
@@ -89,6 +90,11 @@ public final class IdUCmdEmailAddBeginTest
     /* Assert. */
 
     assertEquals(RATE_LIMIT_EXCEEDED, ex.errorCode());
+
+    verify(this.events(), this.once())
+      .emit(new IdEventUserEmailVerificationRateLimitExceeded(user0.id(), email));
+
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -140,6 +146,7 @@ public final class IdUCmdEmailAddBeginTest
     /* Assert. */
 
     assertEquals(EMAIL_DUPLICATE, ex.errorCode());
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -289,6 +296,7 @@ public final class IdUCmdEmailAddBeginTest
     verifyNoMoreInteractions(rateLimitService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -411,6 +419,7 @@ public final class IdUCmdEmailAddBeginTest
     verifyNoMoreInteractions(rateLimitService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -521,6 +530,7 @@ public final class IdUCmdEmailAddBeginTest
     verifyNoMoreInteractions(rateLimitService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   private static boolean verificationHasUser(

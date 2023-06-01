@@ -20,7 +20,6 @@ package com.io7m.idstore.server.user_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
 import com.io7m.idstore.protocol.user.IdUResponseLogin;
@@ -45,6 +44,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
@@ -177,7 +177,7 @@ public final class IdU1ServletLogin extends IdHTTPServletFunctional
 
     throw new IdProtocolException(
       strings.format("commandNotHere"),
-      IdStandardErrorCodes.PROTOCOL_ERROR,
+      API_MISUSE_ERROR,
       Map.of(),
       Optional.empty()
     );

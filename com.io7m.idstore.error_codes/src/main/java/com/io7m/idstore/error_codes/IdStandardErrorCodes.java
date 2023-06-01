@@ -297,6 +297,13 @@ public final class IdStandardErrorCodes
   public static final IdErrorCode PASSWORD_RESET_MISMATCH =
     new IdErrorCode("error-password-reset-mismatch");
 
+  /**
+   * An API is being called incorrectly.
+   */
+
+  public static final IdErrorCode API_MISUSE_ERROR =
+    new IdErrorCode("error-api-misuse");
+
   private IdStandardErrorCodes()
   {
 

@@ -35,6 +35,7 @@ import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTPS;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP_TLS;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration;
+import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdLogs;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdMetrics;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdOTLPProtocol;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdTraces;
@@ -177,9 +178,17 @@ public final class IdServerConfigurationFiles
           processProtocol(m.getProtocol())
         ));
 
+    final var logs =
+      Optional.ofNullable(openTelemetry.getLogs())
+        .map(m -> new IdLogs(
+          URI.create(m.getEndpoint()),
+          processProtocol(m.getProtocol())
+        ));
+
     return Optional.of(
       new IdServerOpenTelemetryConfiguration(
         openTelemetry.getLogicalServiceName(),
+        logs,
         metrics,
         traces
       )
@@ -204,11 +213,19 @@ public final class IdServerConfigurationFiles
       processDuration(
         rateLimiting.getPasswordResetRateLimit()),
       processDurationOrDefault(
-        rateLimiting.getLoginRateLimit(),
+        rateLimiting.getUserLoginRateLimit(),
         Duration.ofSeconds(5L)
       ),
       processDurationOrDefault(
-        rateLimiting.getLoginDelay(),
+        rateLimiting.getUserLoginDelay(),
+        Duration.ofSeconds(1L)
+      ),
+      processDurationOrDefault(
+        rateLimiting.getAdminLoginRateLimit(),
+        Duration.ofSeconds(5L)
+      ),
+      processDurationOrDefault(
+        rateLimiting.getAdminLoginDelay(),
         Duration.ofSeconds(1L)
       )
     );

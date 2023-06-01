@@ -14,22 +14,45 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.server.service.events;
 
-package com.io7m.idstore.server.service.ratelimit;
-
-import com.io7m.repetoir.core.RPServiceType;
+import java.util.Map;
 
 /**
- * A rate limiting service for logins.
+ * The base type of events.
  */
 
-public interface IdRateLimitLoginServiceType extends RPServiceType
+public sealed interface IdEventType
+  permits IdEventAdminLoginRateLimitExceeded,
+  IdEventAdminType,
+  IdEventUserLoginRateLimitExceeded,
+  IdEventUserPasswordResetRateLimitExceeded,
+  IdEventUserType
 {
   /**
-   * @param host The host performing the action
-   *
-   * @return {@code true} if the given operation is allowed by rate limiting
+   * @return The event domain
    */
 
-  boolean isAllowedByRateLimit(String host);
+  default String domain()
+  {
+    return "server";
+  }
+
+  /**
+   * @return The event name
+   */
+
+  String name();
+
+  /**
+   * @return The formatted event message
+   */
+
+  String message();
+
+  /**
+   * @return The complete event attributes
+   */
+
+  Map<String, String> asAttributes();
 }

@@ -171,6 +171,8 @@ public final class IdServerTest
         Duration.of(10L, ChronoUnit.MINUTES),
         Duration.of(10L, ChronoUnit.MINUTES),
         Duration.of(1L, ChronoUnit.MILLIS),
+        Duration.of(1L, ChronoUnit.MILLIS),
+        Duration.of(1L, ChronoUnit.MILLIS),
         Duration.of(1L, ChronoUnit.MILLIS)
       );
 

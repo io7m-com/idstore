@@ -34,6 +34,8 @@ import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.events.IdEventUserPasswordResetRateLimitExceeded;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
@@ -79,6 +81,7 @@ public final class IdUserPasswordResetService
   private final IdDatabaseType database;
   private final IdServerStrings strings;
   private final IdRateLimitPasswordResetServiceType rateLimit;
+  private final IdEventServiceType events;
 
   private IdUserPasswordResetService(
     final IdServerTelemetryServiceType inTelemetry,
@@ -89,7 +92,8 @@ public final class IdUserPasswordResetService
     final IdServerClock inClock,
     final IdDatabaseType inDatabase,
     final IdServerStrings inStrings,
-    final IdRateLimitPasswordResetServiceType inRateLimit)
+    final IdRateLimitPasswordResetServiceType inRateLimit,
+    final IdEventServiceType inEvents)
   {
     this.telemetry =
       Objects.requireNonNull(inTelemetry, "telemetry");
@@ -109,6 +113,8 @@ public final class IdUserPasswordResetService
       Objects.requireNonNull(inStrings, "strings");
     this.rateLimit =
       Objects.requireNonNull(inRateLimit, "rateLimit");
+    this.events =
+      Objects.requireNonNull(inEvents, "inEvents");
   }
 
   /**
@@ -123,6 +129,7 @@ public final class IdUserPasswordResetService
    * @param inDatabase      The database service
    * @param inStrings       The string resources
    * @param inRateLimit     The rate limit service
+   * @param inEvents        The event service
    *
    * @return A password reset service
    */
@@ -136,7 +143,8 @@ public final class IdUserPasswordResetService
     final IdServerClock inClock,
     final IdDatabaseType inDatabase,
     final IdServerStrings inStrings,
-    final IdRateLimitPasswordResetServiceType inRateLimit)
+    final IdRateLimitPasswordResetServiceType inRateLimit,
+    final IdEventServiceType inEvents)
   {
     return new IdUserPasswordResetService(
       inTelemetry,
@@ -147,7 +155,8 @@ public final class IdUserPasswordResetService
       inClock,
       inDatabase,
       inStrings,
-      inRateLimit
+      inRateLimit,
+      inEvents
     );
   }
 
@@ -589,6 +598,13 @@ public final class IdUserPasswordResetService
     {
       try {
         if (!this.service.rateLimit.isAllowedByRateLimit(this.sourceHost)) {
+          this.service.events.emit(
+            new IdEventUserPasswordResetRateLimitExceeded(
+              this.sourceHost,
+              this.emailOpt.or(() -> this.userNameOpt).orElse("<unavailable>")
+            )
+          );
+
           throw new IdCommandExecutionFailure(
             this.service.strings.format("pwResetRateLimited"),
             RATE_LIMIT_EXCEEDED,

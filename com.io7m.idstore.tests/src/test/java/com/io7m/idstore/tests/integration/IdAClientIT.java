@@ -69,6 +69,7 @@ import java.util.stream.Stream;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_ID_NAME;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
@@ -465,8 +466,8 @@ public final class IdAClientIT extends IdWithServerContract
       ADMIN_NONEXISTENT,
       USER_NONEXISTENT,
       USER_DUPLICATE_ID_NAME,
-      PROTOCOL_ERROR,
-      EMAIL_DUPLICATE
+      EMAIL_DUPLICATE,
+      API_MISUSE_ERROR
     );
 
   /**

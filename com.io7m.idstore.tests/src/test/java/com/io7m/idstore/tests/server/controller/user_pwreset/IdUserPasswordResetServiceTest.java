@@ -40,6 +40,7 @@ import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetServic
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
@@ -114,6 +115,7 @@ public final class IdUserPasswordResetServiceTest
   private IdServerStrings strings;
   private IdServerTelemetryServiceType telemetry;
   private Path directory;
+  private IdEventServiceType events;
 
   @BeforeEach
   public void setup()
@@ -158,6 +160,8 @@ public final class IdUserPasswordResetServiceTest
       new IdServerStrings(Locale.ROOT);
     this.rateLimit =
       Mockito.mock(IdRateLimitPasswordResetServiceType.class);
+    this.events =
+      Mockito.mock(IdEventServiceType.class);
 
     this.emailTemplate =
       Mockito.mock(IdFMTemplateType.class);
@@ -187,7 +191,8 @@ public final class IdUserPasswordResetServiceTest
       this.serverClock,
       this.database,
       this.strings,
-      this.rateLimit
+      this.rateLimit,
+      this.events
     );
   }
 
@@ -203,7 +208,8 @@ public final class IdUserPasswordResetServiceTest
       this.serverClock,
       this.database,
       this.strings,
-      this.rateLimit
+      this.rateLimit,
+      this.events
     );
   }
 

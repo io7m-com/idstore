@@ -284,6 +284,8 @@ public final class IdTestExtension
         Duration.ofMinutes(5L),
         Duration.ofMinutes(5L),
         Duration.ofSeconds(1L),
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(1L),
         Duration.ofSeconds(1L)
       );
 

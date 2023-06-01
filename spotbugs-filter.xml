@@ -398,6 +398,11 @@
     <Method name="applyFixedDelay"/>
     <Bug pattern="MDM_THREAD_YIELD"/>
   </Match>
+  <Match>
+    <Class name="com.io7m.idstore.server.controller.admin.IdAdminLoginService"/>
+    <Method name="applyFixedDelay"/>
+    <Bug pattern="MDM_THREAD_YIELD"/>
+  </Match>
 
   <!-- It's an exception. Don't care about equality. -->
   <Match>
@@ -537,6 +542,36 @@
   <Match>
     <Class name="com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles"/>
     <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+  </Match>
+
+  <!--                                        -->
+  <!-- com.io7m.idstore.server.service.events -->
+  <!--                                        -->
+
+  <!-- Pattern matching... -->
+  <Match>
+    <Class name="com.io7m.idstore.server.service.events.IdEventService"/>
+    <Method name="emit"/>
+    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+  </Match>
+
+  <!-- Record types. -->
+  <Match>
+    <Or>
+      <Class name="com.io7m.idstore.server.service.events.IdEventAdminLoggedIn"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventAdminLoginAuthenticationFailed"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventAdminLoginRateLimitExceeded"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventUserEmailVerificationRateLimitExceeded"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventUserLoggedIn"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventUserLoginAuthenticationFailed"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventUserLoginRateLimitExceeded"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventUserPasswordResetRateLimitExceeded"/>
+    </Or>
+    <Or>
+      <Bug pattern="EI_EXPOSE_REP"/>
+      <Bug pattern="EI_EXPOSE_REP2"/>
+      <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+    </Or>
   </Match>
 
   <!--                                        -->

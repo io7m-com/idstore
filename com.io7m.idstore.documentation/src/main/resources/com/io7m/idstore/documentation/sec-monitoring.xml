@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section id="6351efb7-81d4-4e9a-be05-e913873b81dd"
+         title="Security"
+         xmlns="urn:com.io7m.structural:8:0"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <Subsection title="Overview">
+    <Paragraph>
+      All command execution in the <Term type="package">idstore</Term> server passes through a
+      single code path that captures <LinkExternal target="https://opentelemetry.io/">OpenTelemetry</LinkExternal>
+      traces and publishes events. Administrators should write alerting rules in their metrics system of choice to
+      watch for instances of the traces, metrics, and events described here; they almost certainly indicate malicious
+      behaviour.
+    </Paragraph>
+    <Paragraph>
+      At the time of writing, <Term type="term">events</Term> are published as part of a containing
+      <Term type="term">trace</Term>, and therefore the server must be
+      <Link target="1e5d55f4-0334-4613-bd0c-8e307de47af7">configured</Link> to publish traces in order
+      for an external monitoring system to be able to observe the events. The
+      reason for this is that the OpenTelemetry Events API specification is not yet stable and so
+      traces are currently the only way to publish events. It is expected that a stable version of the
+      Events API will be released soon, and then the <Term type="package">idstore</Term> server will
+      switch to using that API directly (and this will require only
+      <Link target="dea6eac7-9436-46aa-839a-a018ed497913">log</Link> telemetry to be configured
+      as opposed to full trace collection).
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Security Policy Violations">
+    <Paragraph>
+      If an operation attempts to violate the server's built-in security policy, an exception
+      will be raised with an <Term type="expression">idstore.errorCode</Term> attribute set to
+      <Term type="expression">error-security-policy-denied</Term>.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Admin Login">
+    <Paragraph>
+      If an administrator logs in successfully, the server emits an event of type
+      <Term type="type">IdEventAdminLoggedIn</Term>. Events of this type have the following
+      attributes:
+    </Paragraph>
+    <FormalItem title="IdEventAdminLoggedIn">
+      <Table type="genericTable">
+        <Columns>
+          <Column>Attribute</Column>
+          <Column>Description</Column>
+          <Column>Defined Value</Column>
+        </Columns>
+        <Row>
+          <Cell><Term type="expression">event.domain</Term></Cell>
+          <Cell>The OpenTelemetry event domain.</Cell>
+          <Cell><Term type="expression">server</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">event.name</Term></Cell>
+          <Cell>The OpenTelemetry event name.</Cell>
+          <Cell><Term type="expression">security.admin.login.succeeded</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.admin</Term></Cell>
+          <Cell>The ID of the administrator.</Cell>
+          <Cell/>
+        </Row>
+      </Table>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="Admin Login Authentication Failures">
+    <Paragraph>
+      If someone attempting to log into an administrator account provides invalid credentials, the server emits an
+      event of type <Term type="type">IdEventAdminLoginAuthenticationFailed</Term>. Events of this type have the
+      following attributes:
+    </Paragraph>
+    <FormalItem title="IdEventAdminLoginAuthenticationFailed">
+      <Table type="genericTable">
+        <Columns>
+          <Column>Attribute</Column>
+          <Column>Description</Column>
+          <Column>Defined Value</Column>
+        </Columns>
+        <Row>
+          <Cell><Term type="expression">event.domain</Term></Cell>
+          <Cell>The OpenTelemetry event domain.</Cell>
+          <Cell><Term type="expression">server</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">event.name</Term></Cell>
+          <Cell>The OpenTelemetry event name.</Cell>
+          <Cell><Term type="expression">security.admin.login.authentication_failed</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.admin</Term></Cell>
+          <Cell>The ID of the administrator.</Cell>
+          <Cell/>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.remote_host</Term></Cell>
+          <Cell>The remote host making the attempt.</Cell>
+          <Cell/>
+        </Row>
+      </Table>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="User Login Rate Limit Violations">
+    <Paragraph>
+      Login attempts to administrator accounts are
+      <Link target="8a062886-81d1-4131-a4e8-ea044c99caf4">rate limited</Link>.
+      If a rate limit is exceeded, the server emits an event of type
+      <Term type="type">IdEventAdminLoginRateLimitExceeded</Term>. Events of this type have the following
+      attributes:
+    </Paragraph>
+    <FormalItem title="IdEventAdminLoginRateLimitExceeded">
+      <Table type="genericTable">
+        <Columns>
+          <Column>Attribute</Column>
+          <Column>Description</Column>
+          <Column>Value</Column>
+        </Columns>
+        <Row>
+          <Cell><Term type="expression">event.domain</Term></Cell>
+          <Cell>The OpenTelemetry event domain.</Cell>
+          <Cell><Term type="expression">server</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">event.name</Term></Cell>
+          <Cell>The OpenTelemetry event name.</Cell>
+          <Cell><Term type="expression">security.admin.login.rate_limit_exceeded</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.remote_host</Term></Cell>
+          <Cell>The remote host making the login attempt.</Cell>
+          <Cell/>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.username</Term></Cell>
+          <Cell>The username associated with the login attempt.</Cell>
+          <Cell/>
+        </Row>
+      </Table>
+    </FormalItem>
+    <Paragraph>
+      In general, if an operation attempts to violate the server's various configured rate limits, an exception
+      will be raised with an <Term type="expression">idstore.errorCode</Term> attribute set to
+      <Term type="expression">error-rate-limit-exceeded</Term>.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="User Email Verification Rate Limit Violations">
+    <Paragraph>
+      Attempts to verify email addresses (either to add new addresses, or remove existing addresses) are
+      <Link target="4c369541-2b72-4c8f-82ed-9ad6556d72ff">rate limited</Link>.
+      If a rate limit is exceeded, the server emits an event of type
+      <Term type="type">IdEventUserEmailVerificationRateLimitExceeded</Term>. Events of this type have the following
+      attributes:
+    </Paragraph>
+    <FormalItem title="IdEventUserEmailVerificationRateLimitExceeded">
+      <Table type="genericTable">
+        <Columns>
+          <Column>Attribute</Column>
+          <Column>Description</Column>
+          <Column>Defined Value</Column>
+        </Columns>
+        <Row>
+          <Cell><Term type="expression">event.domain</Term></Cell>
+          <Cell>The OpenTelemetry event domain.</Cell>
+          <Cell><Term type="expression">server</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">event.name</Term></Cell>
+          <Cell>The OpenTelemetry event name.</Cell>
+          <Cell><Term type="expression">security.user.email.rate_limit_exceeded</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.email</Term></Cell>
+          <Cell>The email address.</Cell>
+          <Cell/>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.user</Term></Cell>
+          <Cell>The user ID associated with the operation.</Cell>
+          <Cell/>
+        </Row>
+      </Table>
+    </FormalItem>
+    <Paragraph>
+      In general, if an operation attempts to violate the server's various configured rate limits, an exception
+      will be raised with an <Term type="expression">idstore.errorCode</Term> attribute set to
+      <Term type="expression">error-rate-limit-exceeded</Term>.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="User Login Authentication Failures">
+    <Paragraph>
+      If someone attempting to log into an administrator account provides invalid credentials, the server emits an
+      event of type <Term type="type">IdEventAdminLoginAuthenticationFailed</Term>. Events of this type have the
+      following attributes:
+    </Paragraph>
+    <FormalItem title="IdEventAdminLoginAuthenticationFailed">
+      <Table type="genericTable">
+        <Columns>
+          <Column>Attribute</Column>
+          <Column>Description</Column>
+          <Column>Defined Value</Column>
+        </Columns>
+        <Row>
+          <Cell><Term type="expression">event.domain</Term></Cell>
+          <Cell>The OpenTelemetry event domain.</Cell>
+          <Cell><Term type="expression">server</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">event.name</Term></Cell>
+          <Cell>The OpenTelemetry event name.</Cell>
+          <Cell><Term type="expression">security.user.login.authentication_failed</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.remote_host</Term></Cell>
+          <Cell>The remote host making the attempt.</Cell>
+          <Cell/>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.user</Term></Cell>
+          <Cell>The username associated with the attempt.</Cell>
+          <Cell/>
+        </Row>
+      </Table>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="User Login">
+    <Paragraph>
+      If an administrator logs in successfully, the server emits an event of type
+      <Term type="type">IdEventUserLoggedIn</Term>. Events of this type have the following
+      attributes:
+    </Paragraph>
+    <FormalItem title="IdEventUserLoggedIn">
+      <Table type="genericTable">
+        <Columns>
+          <Column>Attribute</Column>
+          <Column>Description</Column>
+          <Column>Defined Value</Column>
+        </Columns>
+        <Row>
+          <Cell><Term type="expression">event.domain</Term></Cell>
+          <Cell>The OpenTelemetry event domain.</Cell>
+          <Cell><Term type="expression">server</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">event.name</Term></Cell>
+          <Cell>The OpenTelemetry event name.</Cell>
+          <Cell><Term type="expression">security.user.login.succeeded</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.user</Term></Cell>
+          <Cell>The ID of the user.</Cell>
+          <Cell/>
+        </Row>
+      </Table>
+    </FormalItem>
+  </Subsection>
+
+  <Subsection title="User Login Rate Limit Violations">
+    <Paragraph>
+      Login attempts to user accounts are <Link target="8a062886-81d1-4131-a4e8-ea044c99caf4">rate limited</Link>.
+      If a rate limit is exceeded, the server emits an event of type
+      <Term type="type">IdEventUserLoginRateLimitExceeded</Term>. Events of this type have the following
+      attributes:
+    </Paragraph>
+    <FormalItem title="IdEventUserLoginRateLimitExceeded">
+      <Table type="genericTable">
+        <Columns>
+          <Column>Attribute</Column>
+          <Column>Description</Column>
+          <Column>Value</Column>
+        </Columns>
+        <Row>
+          <Cell><Term type="expression">event.domain</Term></Cell>
+          <Cell>The OpenTelemetry event domain.</Cell>
+          <Cell><Term type="expression">server</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">event.name</Term></Cell>
+          <Cell>The OpenTelemetry event name.</Cell>
+          <Cell><Term type="expression">security.user.login.rate_limit_exceeded</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.remote_host</Term></Cell>
+          <Cell>The remote host making the login attempt.</Cell>
+          <Cell/>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.username</Term></Cell>
+          <Cell>The username associated with the login attempt.</Cell>
+          <Cell/>
+        </Row>
+      </Table>
+    </FormalItem>
+    <Paragraph>
+      In general, if an operation attempts to violate the server's various configured rate limits, an exception
+      will be raised with an <Term type="expression">idstore.errorCode</Term> attribute set to
+      <Term type="expression">error-rate-limit-exceeded</Term>.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="User Password Reset Rate Limit Violations">
+    <Paragraph>
+      Password reset attempts to user accounts are
+      <Link target="e1b0cc11-5b42-4454-9892-196d48734717">rate limited</Link>.
+      If a rate limit is exceeded, the server emits an event of type
+      <Term type="type">IdEventUserPasswordResetRateLimitExceeded</Term>. Events of this type have the following
+      attributes:
+    </Paragraph>
+    <FormalItem title="IdEventUserPasswordResetRateLimitExceeded">
+      <Table type="genericTable">
+        <Columns>
+          <Column>Attribute</Column>
+          <Column>Description</Column>
+          <Column>Value</Column>
+        </Columns>
+        <Row>
+          <Cell><Term type="expression">event.domain</Term></Cell>
+          <Cell>The OpenTelemetry event domain.</Cell>
+          <Cell><Term type="expression">server</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">event.name</Term></Cell>
+          <Cell>The OpenTelemetry event name.</Cell>
+          <Cell><Term type="expression">security.user.login.rate_limit_exceeded</Term></Cell>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.remote_host</Term></Cell>
+          <Cell>The remote host making the attempt.</Cell>
+          <Cell/>
+        </Row>
+        <Row>
+          <Cell><Term type="expression">idstore.target</Term></Cell>
+          <Cell>The username or the email address associated with the attempt (depending on which was specified).</Cell>
+          <Cell/>
+        </Row>
+      </Table>
+    </FormalItem>
+    <Paragraph>
+      In general, if an operation attempts to violate the server's various configured rate limits, an exception
+      will be raised with an <Term type="expression">idstore.errorCode</Term> attribute set to
+      <Term type="expression">error-rate-limit-exceeded</Term>.
+    </Paragraph>
+  </Subsection>
+
+</Section>

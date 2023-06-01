@@ -36,7 +36,11 @@ import com.io7m.idstore.server.controller.user.IdUserLoginService;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
-import com.io7m.idstore.server.service.ratelimit.IdRateLimitLoginServiceType;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
+import com.io7m.idstore.server.service.events.IdEventUserLoggedIn;
+import com.io7m.idstore.server.service.events.IdEventUserLoginAuthenticationFailed;
+import com.io7m.idstore.server.service.events.IdEventUserLoginRateLimitExceeded;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitUserLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.idstore.tests.IdFakeClock;
 import com.io7m.idstore.tests.IdTestDirectories;
@@ -85,7 +89,8 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
   private IdDatabaseUsersQueriesType users;
   private IdServerConfigurationService configurationService;
   private Path directory;
-  private IdRateLimitLoginServiceType rateLimit;
+  private IdRateLimitUserLoginServiceType rateLimit;
+  private IdEventServiceType events;
 
   private static Times once()
   {
@@ -149,7 +154,9 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     this.sessions =
       new IdSessionUserService(OpenTelemetry.noop(), Duration.ofDays(1L));
     this.rateLimit =
-      mock(IdRateLimitLoginServiceType.class);
+      mock(IdRateLimitUserLoginServiceType.class);
+    this.events =
+      mock(IdEventServiceType.class);
 
     when(this.rateLimit.isAllowedByRateLimit(any()))
       .thenReturn(Boolean.TRUE);
@@ -162,7 +169,8 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
         this.strings,
         this.sessions,
         this.configurationService,
-        this.rateLimit
+        this.rateLimit,
+        this.events
       );
     this.transaction =
       mock(IdDatabaseTransactionType.class);
@@ -209,6 +217,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
 
     verify(this.users, once()).userGetForNameRequire(any());
     verifyNoMoreInteractions(this.users);
+    verifyNoMoreInteractions(this.events);
   }
 
   /**
@@ -240,6 +249,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
 
     verify(this.users, once()).userGetForNameRequire(any());
     verifyNoMoreInteractions(this.users);
+    verifyNoMoreInteractions(this.events);
   }
 
   /**
@@ -279,6 +289,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     verify(this.users, once()).userGetForNameRequire(any());
     verify(this.users, once()).userBanGet(any());
     verifyNoMoreInteractions(this.users);
+    verifyNoMoreInteractions(this.events);
   }
 
   /**
@@ -321,6 +332,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     verify(this.users, once()).userGetForNameRequire(any());
     verify(this.users, once()).userBanGet(any());
     verifyNoMoreInteractions(this.users);
+    verifyNoMoreInteractions(this.events);
   }
 
   /**
@@ -333,11 +345,11 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
   public void testUserWrongPassword()
     throws Exception
   {
-    final var admin =
+    final var user =
       this.createUser("user");
 
     when(this.users.userGetForNameRequire(any()))
-      .thenReturn(admin);
+      .thenReturn(user);
     when(this.users.userBanGet(any()))
       .thenReturn(empty());
 
@@ -358,6 +370,11 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     verify(this.users, once()).userGetForNameRequire(any());
     verify(this.users, once()).userBanGet(any());
     verifyNoMoreInteractions(this.users);
+
+    verify(this.events, once())
+      .emit(new IdEventUserLoginAuthenticationFailed("127.0.0.1", user.id()));
+
+    verifyNoMoreInteractions(this.events);
   }
 
   /**
@@ -394,9 +411,9 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
 
     assertEquals(RATE_LIMIT_EXCEEDED, ex.errorCode());
 
-    verify(this.users, once()).userGetForNameRequire(any());
-    verify(this.users, once()).userBanGet(any());
     verifyNoMoreInteractions(this.users);
+    verify(this.events, once())
+      .emit(new IdEventUserLoginRateLimitExceeded("127.0.0.1", "user"));
   }
 
   /**
@@ -409,11 +426,11 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
   public void testUserCorrectPassword()
     throws Exception
   {
-    final var admin =
+    final var user =
       this.createUser("user");
 
     when(this.users.userGetForNameRequire(any()))
-      .thenReturn(admin);
+      .thenReturn(user);
     when(this.users.userBanGet(any()))
       .thenReturn(empty());
 
@@ -428,12 +445,16 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
       );
 
     assertTrue(this.sessions.findSession(loggedIn.session().id()).isPresent());
-    assertEquals(admin.withRedactedPassword(), loggedIn.user());
+    assertEquals(user.withRedactedPassword(), loggedIn.user());
 
     verify(this.users, once()).userGetForNameRequire(any());
     verify(this.users, once()).userBanGet(any());
     verify(this.users, once()).userLogin(any(), any(), anyInt());
     verifyNoMoreInteractions(this.users);
+
+    verify(this.events, once())
+      .emit(new IdEventUserLoggedIn(user.id()));
+    verifyNoMoreInteractions(this.events);
   }
 
   @Override
@@ -444,7 +465,8 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
       this.strings,
       this.sessions,
       this.configurationService,
-      this.rateLimit
+      this.rateLimit,
+      this.events
     );
   }
 
@@ -456,7 +478,8 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
       this.strings,
       this.sessions,
       this.configurationService,
-      this.rateLimit
+      this.rateLimit,
+      this.events
     );
   }
 }

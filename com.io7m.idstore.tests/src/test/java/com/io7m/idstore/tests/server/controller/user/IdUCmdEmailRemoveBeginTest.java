@@ -19,10 +19,13 @@ package com.io7m.idstore.tests.server.controller.user;
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdEmailVerification;
+import com.io7m.idstore.protocol.user.IdUCommandEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveBegin;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
+import com.io7m.idstore.server.controller.user.IdUCmdEmailAddBegin;
 import com.io7m.idstore.server.controller.user.IdUCmdEmailRemoveBegin;
+import com.io7m.idstore.server.service.events.IdEventUserEmailVerificationRateLimitExceeded;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.verification.Times;
@@ -37,6 +40,8 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_NONEXISTEN
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.MAIL_SYSTEM_FAILURE;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
+import static java.lang.Boolean.FALSE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,6 +57,47 @@ import static org.mockito.Mockito.when;
 public final class IdUCmdEmailRemoveBeginTest
   extends IdUCmdAbstractContract
 {
+  /**
+   * Requests are rejected by rate limiting.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testRateLimited()
+    throws Exception
+  {
+    /* Arrange. */
+
+    final var user0 =
+      this.createUser("user0");
+    final var context =
+      this.createContextAndSession(user0);
+
+    when(this.rateLimit().isAllowedByRateLimit(any()))
+      .thenReturn(FALSE);
+
+    final var email =
+      new IdEmail("someone-new@example.com");
+
+    /* Act. */
+
+    final var handler = new IdUCmdEmailRemoveBegin();
+    final var ex =
+      assertThrows(IdCommandExecutionFailure.class, () -> {
+        handler.execute(context, new IdUCommandEmailRemoveBegin(email));
+      });
+
+    /* Assert. */
+
+    assertEquals(RATE_LIMIT_EXCEEDED, ex.errorCode());
+
+    verify(this.events(), this.once())
+      .emit(new IdEventUserEmailVerificationRateLimitExceeded(user0.id(), email));
+
+    verifyNoMoreInteractions(this.events());
+  }
+
   /**
    * You cannot remove an email address you do not have.
    *
@@ -98,6 +144,7 @@ public final class IdUCmdEmailRemoveBeginTest
     /* Assert. */
 
     assertEquals(EMAIL_NONEXISTENT, ex.errorCode());
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -146,6 +193,7 @@ public final class IdUCmdEmailRemoveBeginTest
     /* Assert. */
 
     assertEquals(EMAIL_VERIFICATION_FAILED, ex.errorCode());
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -286,6 +334,7 @@ public final class IdUCmdEmailRemoveBeginTest
     verifyNoMoreInteractions(mailService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -399,6 +448,7 @@ public final class IdUCmdEmailRemoveBeginTest
     verifyNoMoreInteractions(mailService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -494,6 +544,7 @@ public final class IdUCmdEmailRemoveBeginTest
     verifyNoMoreInteractions(mailService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   private static boolean verificationHasUser(

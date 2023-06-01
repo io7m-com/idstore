@@ -327,6 +327,8 @@ public abstract class IdWithServerContract
         Duration.of(0L, ChronoUnit.MILLIS),
         Duration.of(0L, ChronoUnit.MILLIS),
         Duration.of(0L, ChronoUnit.MILLIS),
+        Duration.of(0L, ChronoUnit.MILLIS),
+        Duration.of(0L, ChronoUnit.MILLIS),
         Duration.of(0L, ChronoUnit.MILLIS)
       );
 

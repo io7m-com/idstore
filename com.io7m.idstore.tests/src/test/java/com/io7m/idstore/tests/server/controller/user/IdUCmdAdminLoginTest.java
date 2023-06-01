@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -60,6 +60,6 @@ public final class IdUCmdAdminLoginTest
 
     /* Assert. */
 
-    assertEquals(PROTOCOL_ERROR, ex.errorCode());
+    assertEquals(API_MISUSE_ERROR, ex.errorCode());
   }
 }

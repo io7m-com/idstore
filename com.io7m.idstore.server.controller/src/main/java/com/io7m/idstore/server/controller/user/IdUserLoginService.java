@@ -27,7 +27,11 @@ import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
-import com.io7m.idstore.server.service.ratelimit.IdRateLimitLoginServiceType;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
+import com.io7m.idstore.server.service.events.IdEventUserLoggedIn;
+import com.io7m.idstore.server.service.events.IdEventUserLoginAuthenticationFailed;
+import com.io7m.idstore.server.service.events.IdEventUserLoginRateLimitExceeded;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitUserLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.repetoir.core.RPServiceType;
 
@@ -51,7 +55,8 @@ public final class IdUserLoginService implements RPServiceType
   private final IdServerStrings strings;
   private final IdSessionUserService sessions;
   private final IdServerConfigurationService configurations;
-  private final IdRateLimitLoginServiceType rateLimit;
+  private final IdRateLimitUserLoginServiceType rateLimit;
+  private final IdEventServiceType events;
 
   /**
    * A service that handles the logic for user logins.
@@ -61,6 +66,7 @@ public final class IdUserLoginService implements RPServiceType
    * @param inSessions       A session service
    * @param inConfigurations A configuration service
    * @param inRateLimit      The rate limit
+   * @param inEvents         The event service
    */
 
   public IdUserLoginService(
@@ -68,7 +74,8 @@ public final class IdUserLoginService implements RPServiceType
     final IdServerStrings inStrings,
     final IdSessionUserService inSessions,
     final IdServerConfigurationService inConfigurations,
-    final IdRateLimitLoginServiceType inRateLimit)
+    final IdRateLimitUserLoginServiceType inRateLimit,
+    final IdEventServiceType inEvents)
   {
     this.clock =
       Objects.requireNonNull(inClock, "clock");
@@ -80,6 +87,8 @@ public final class IdUserLoginService implements RPServiceType
       Objects.requireNonNull(inConfigurations, "inConfigurations");
     this.rateLimit =
       Objects.requireNonNull(inRateLimit, "inRateLimit");
+    this.events =
+      Objects.requireNonNull(inEvents, "inEvents");
   }
 
   /**
@@ -89,7 +98,7 @@ public final class IdUserLoginService implements RPServiceType
    *
    * @param transaction A database transaction
    * @param requestId   The ID of the request
-   * @param remoteHost  The remote host
+   * @param remoteHost  The remote remoteHost
    * @param username    The username
    * @param password    The password
    * @param metadata    The request metadata
@@ -115,15 +124,16 @@ public final class IdUserLoginService implements RPServiceType
     Objects.requireNonNull(metadata, "metadata");
 
     try {
+      this.checkRateLimit(requestId, remoteHost, username);
+
       final var users =
         transaction.queries(IdDatabaseUsersQueriesType.class);
       final var user =
         users.userGetForNameRequire(new IdName(username));
 
       this.checkBan(requestId, users, user);
-      this.checkRateLimit(requestId, remoteHost);
       this.applyFixedDelay();
-      this.checkPassword(requestId, password, user);
+      this.checkPassword(requestId, remoteHost, password, user);
 
       users.userLogin(
         user.id(),
@@ -132,6 +142,8 @@ public final class IdUserLoginService implements RPServiceType
           .history()
           .userLoginHistoryLimit()
       );
+
+      this.events.emit(new IdEventUserLoggedIn(user.id()));
 
       final var session = this.sessions.createSession(user.id());
       return new IdUserLoggedIn(session, user.withRedactedPassword());
@@ -171,7 +183,7 @@ public final class IdUserLoginService implements RPServiceType
       Thread.sleep(
         this.configurations.configuration()
           .rateLimit()
-          .loginDelay()
+          .userLoginDelay()
           .toMillis()
       );
     } catch (final InterruptedException e) {
@@ -181,12 +193,17 @@ public final class IdUserLoginService implements RPServiceType
 
   private void checkPassword(
     final UUID requestId,
+    final String remoteHost,
     final String password,
     final IdUser user)
     throws IdPasswordException, IdCommandExecutionFailure
   {
     final var ok = user.password().check(password);
     if (!ok) {
+      this.events.emit(
+        new IdEventUserLoginAuthenticationFailed(remoteHost, user.id())
+      );
+
       throw new IdCommandExecutionFailure(
         this.strings.format("errorInvalidUsernamePassword"),
         AUTHENTICATION_ERROR,
@@ -200,10 +217,15 @@ public final class IdUserLoginService implements RPServiceType
 
   private void checkRateLimit(
     final UUID requestId,
-    final String remoteHost)
+    final String remoteHost,
+    final String username)
     throws IdCommandExecutionFailure
   {
     if (!this.rateLimit.isAllowedByRateLimit(remoteHost)) {
+      this.events.emit(
+        new IdEventUserLoginRateLimitExceeded(remoteHost, username)
+      );
+
       throw new IdCommandExecutionFailure(
         this.strings.format("loginRateLimited"),
         RATE_LIMIT_EXCEEDED,

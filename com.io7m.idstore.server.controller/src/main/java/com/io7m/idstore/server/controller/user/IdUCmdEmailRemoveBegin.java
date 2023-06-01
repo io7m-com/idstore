@@ -34,6 +34,8 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.security.IdSecUserActionEmailRemoveBegin;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
+import com.io7m.idstore.server.service.events.IdEventUserEmailVerificationRateLimitExceeded;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
 import com.io7m.idstore.server.service.templating.IdFMEmailVerificationData;
@@ -87,14 +89,21 @@ public final class IdUCmdEmailRemoveBegin
       services.requireService(IdServerBrandingServiceType.class);
     final var rateLimitService =
       services.requireService(IdRateLimitEmailVerificationServiceType.class);
+    final var eventService =
+      services.requireService(IdEventServiceType.class);
 
     final var configuration =
       configurationService.configuration();
     final var mailConfiguration =
       configuration.mailConfiguration();
 
+    final var email = command.email();
     final var user = context.user();
     if (!rateLimitService.isAllowedByRateLimit(user.id())) {
+      eventService.emit(
+        new IdEventUserEmailVerificationRateLimitExceeded(user.id(), email)
+      );
+
       throw context.fail(
         400,
         RATE_LIMIT_EXCEEDED,
@@ -115,7 +124,7 @@ public final class IdUCmdEmailRemoveBegin
       )
     );
 
-    final var email = command.email();
+
     checkPreconditions(context, user, email);
 
     transaction.userIdSet(user.id());

@@ -45,7 +45,7 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_SERVER;
 import static com.io7m.idstore.server.admin_v1.IdA1Errors.errorResponseOf;
@@ -144,7 +144,7 @@ public final class IdA1ServletCommand extends IdHTTPServletFunctional
         BLAME_CLIENT,
         new IdProtocolException(
           strings.format("commandNotHere"),
-          PROTOCOL_ERROR,
+          API_MISUSE_ERROR,
           Map.of(),
           Optional.empty()
         )

@@ -43,14 +43,18 @@ import com.io7m.idstore.server.service.branding.IdServerBrandingService;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.events.IdEventService;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.health.IdServerHealth;
 import com.io7m.idstore.server.service.mail.IdServerMailService;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.maintenance.IdMaintenanceService;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginService;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
-import com.io7m.idstore.server.service.ratelimit.IdRateLimitLoginService;
-import com.io7m.idstore.server.service.ratelimit.IdRateLimitLoginServiceType;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitUserLoginService;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitUserLoginServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetServiceType;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
@@ -71,6 +75,8 @@ import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.SpanKind;
 import org.eclipse.jetty.server.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -90,6 +96,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public final class IdServer implements IdServerType
 {
+  private static final Logger LOG =
+    LoggerFactory.getLogger(IdServer.class);
+
   private final IdServerConfiguration configuration;
   private final AtomicBoolean stopped;
   private CloseableCollectionType<IdServerException> resources;
@@ -219,22 +228,14 @@ public final class IdServer implements IdServerType
         this.telemetry.openTelemetry(),
         this.configuration.sessions().adminSessionExpiration()
       );
-
-    services.register(
-      IdSessionAdminService.class,
-      sessionAdminService
-    );
+    services.register(IdSessionAdminService.class, sessionAdminService);
 
     final var sessionUserService =
       new IdSessionUserService(
         this.telemetry.openTelemetry(),
         this.configuration.sessions().userSessionExpiration()
       );
-
-    services.register(
-      IdSessionUserService.class,
-      sessionUserService
-    );
+    services.register(IdSessionUserService.class, sessionUserService);
 
     final var config = new IdServerConfigurationService(this.configuration);
     services.register(IdServerConfigurationService.class, config);
@@ -242,19 +243,36 @@ public final class IdServer implements IdServerType
     final var clock = new IdServerClock(this.configuration.clock());
     services.register(IdServerClock.class, clock);
 
-    final var loginRateLimitService =
-      IdRateLimitLoginService.create(
+    final var userLoginRateLimitService =
+      IdRateLimitUserLoginService.create(
         this.telemetry,
         this.configuration.rateLimit()
-          .loginRateLimit()
+          .userLoginRateLimit()
           .toSeconds(),
         SECONDS
       );
 
     services.register(
-      IdRateLimitLoginServiceType.class,
-      loginRateLimitService
+      IdRateLimitUserLoginServiceType.class,
+      userLoginRateLimitService
     );
+
+    final var adminLoginRateLimitService =
+      IdRateLimitAdminLoginService.create(
+        this.telemetry,
+        this.configuration.rateLimit()
+          .userLoginRateLimit()
+          .toSeconds(),
+        SECONDS
+      );
+
+    services.register(
+      IdRateLimitAdminLoginServiceType.class,
+      adminLoginRateLimitService
+    );
+
+    final var eventService = IdEventService.create(services);
+    services.register(IdEventServiceType.class, eventService);
 
     services.register(
       IdUserLoginService.class,
@@ -263,13 +281,21 @@ public final class IdServer implements IdServerType
         strings,
         sessionUserService,
         config,
-        loginRateLimitService
+        userLoginRateLimitService,
+        eventService
       )
     );
 
     services.register(
       IdAdminLoginService.class,
-      new IdAdminLoginService(clock, strings, sessionAdminService)
+      new IdAdminLoginService(
+        clock,
+        strings,
+        sessionAdminService,
+        config,
+        adminLoginRateLimitService,
+        eventService
+      )
     );
 
     final var templates = IdFMTemplateService.create();
@@ -326,7 +352,8 @@ public final class IdServer implements IdServerType
         clock,
         this.database,
         strings,
-        userPasswordRateLimitService
+        userPasswordRateLimitService,
+        eventService
       );
     services.register(
       IdUserPasswordResetServiceType.class,
@@ -343,6 +370,10 @@ public final class IdServer implements IdServerType
     services.register(IdRequestLimits.class, new IdRequestLimits(size -> {
       return strings.format("requestTooLarge", size);
     }));
+
+    for (final var service : services.services()) {
+      LOG.debug("{} {}", service, service.description());
+    }
     return services;
   }
 

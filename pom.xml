@@ -43,6 +43,7 @@
     <module>com.io7m.idstore.server.service.branding</module>
     <module>com.io7m.idstore.server.service.clock</module>
     <module>com.io7m.idstore.server.service.configuration</module>
+    <module>com.io7m.idstore.server.service.events</module>
     <module>com.io7m.idstore.server.service.health</module>
     <module>com.io7m.idstore.server.service.mail</module>
     <module>com.io7m.idstore.server.service.maintenance</module>
@@ -449,6 +450,16 @@
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-semconv</artifactId>
         <version>1.18.0-alpha</version>
+      </dependency>
+      <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-api-logs</artifactId>
+        <version>1.26.0-alpha</version>
+      </dependency>
+      <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-sdk-logs</artifactId>
+        <version>1.26.0-alpha</version>
       </dependency>
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>

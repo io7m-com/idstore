@@ -61,7 +61,7 @@
           Port="25"/>
   </Mail>
 
-  <RateLimiting EmailVerificationRateLimit="PT10M" PasswordResetRateLimit="PT10M"/>
+  <RateLimiting EmailVerificationRateLimit="PT10M" PasswordResetRateLimit="PT10M" />
 
   <Sessions UserSessionExpiration="PT30M" AdminSessionExpiration="PT30M"/>
 </Configuration>
@@ -308,14 +308,27 @@
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
       </Paragraph>
       <Paragraph>
-        The optional <Term type="expression">LoginRateLimit</Term> attribute specifies the minimum duration that
-        must elapse between any two login requests from a single IP address. The attribute must be specified
+        The optional <Term type="expression">UserLoginRateLimit</Term> attribute specifies the minimum duration that
+        must elapse between any two user login requests from a single IP address. The attribute must be specified
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
         The default value, if unspecified, is five seconds.
       </Paragraph>
       <Paragraph>
-        The optional <Term type="expression">LoginDelay</Term> attribute specifies a fixed delay that is applied
-        to all login requests to reduce the practicality of online password brute forcing. The attribute must be
+        The optional <Term type="expression">UserLoginDelay</Term> attribute specifies a fixed delay that is applied
+        to all user login requests to reduce the practicality of online password brute forcing. The attribute must be
+        specified as an
+        <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        The default value, if unspecified, is one second.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">AdminLoginRateLimit</Term> attribute specifies the minimum duration that
+        must elapse between any two admin login requests from a single IP address. The attribute must be specified
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        The default value, if unspecified, is five seconds.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">AdminLoginDelay</Term> attribute specifies a fixed delay that is applied
+        to all admin login requests to reduce the practicality of online password brute forcing. The attribute must be
         specified as an
         <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
         The default value, if unspecified, is one second.
@@ -330,8 +343,10 @@
 <RateLimiting
   EmailVerificationRateLimit="PT10M"
   PasswordResetRateLimit="PT10M"
-  LoginRateLimit="PT5S"
-  LoginDelay="PT1S" />
+  UserLoginRateLimit="PT5S"
+  UserLoginDelay="PT1S"
+  AdminLoginRateLimit="PT5S"
+  AdminLoginDelay="PT1S" />
 ]]></Verbatim>
       </FormalItem>
     </Subsection>
@@ -354,7 +369,7 @@
         </Image>
       </FormalItem>
     </Subsection>
-    <Subsection title="Traces">
+    <Subsection title="Traces" id="1e5d55f4-0334-4613-bd0c-8e307de47af7">
       <Paragraph>
         If the <Term type="expression">OpenTelemetry</Term> element contains a
         <Term type="expression">Traces</Term> element, OTLP <LinkExternal
@@ -374,6 +389,16 @@
         be <Term type="constant">GRPC</Term> or <Term type="constant">HTTP</Term>.
       </Paragraph>
     </Subsection>
+    <Subsection title="Logs" id="dea6eac7-9436-46aa-839a-a018ed497913">
+      <Paragraph>
+        If the <Term type="expression">OpenTelemetry</Term> element contains a
+        <Term type="expression">Logs</Term> element, OTLP <LinkExternal
+        target="https://opentelemetry.io/docs/concepts/signals/logs/">logs</LinkExternal>
+        will be sent to a specified endpoint. The <Term type="expression">Endpoint</Term> attribute
+        specifies the endpoint, and the <Term type="expression">Protocol</Term> attribute can either
+        be <Term type="constant">GRPC</Term> or <Term type="constant">HTTP</Term>.
+      </Paragraph>
+    </Subsection>
     <Subsection title="Example">
       <Paragraph>
         An example Open Telemetry configuration:
@@ -381,8 +406,10 @@
       <FormalItem title="Example">
         <Verbatim><![CDATA[
 <OpenTelemetry LogicalServiceName="idstore">
+  <Logs Endpoint="http://logs.example.com:4317"
+        Protocol="GRPC"/>
   <Metrics Endpoint="http://metrics.example.com:4317"
-          Protocol="GRPC"/>
+           Protocol="GRPC"/>
   <Traces Endpoint="http://traces.example.com:4317"
           Protocol="GRPC"/>
 </OpenTelemetry>

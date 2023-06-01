@@ -67,12 +67,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_MISMATCH;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -425,11 +427,12 @@ public final class IdUClientAsynchronousIT extends IdWithServerContract
   private static final Set<IdErrorCode> ALLOWED_SMOKE_CODES =
     Set.of(
       ADMIN_NONEXISTENT,
+      API_MISUSE_ERROR,
       EMAIL_NONEXISTENT,
       EMAIL_VERIFICATION_NONEXISTENT,
       PASSWORD_RESET_MISMATCH,
-      PROTOCOL_ERROR,
       RATE_LIMIT_EXCEEDED,
+      SECURITY_POLICY_DENIED,
       USER_NONEXISTENT
     );
 

@@ -26,15 +26,19 @@ import java.util.Objects;
  *                                   verifications for a given user
  * @param passwordResetRateLimit     The minimum allowed time between password
  *                                   resets
- * @param loginRateLimit             The minimum time allowed between logins for a host
- * @param loginDelay                 A delay applied to each login attempt
+ * @param userLoginRateLimit         The minimum time allowed between (user) login attempts for a host
+ * @param userLoginDelay             A delay applied to each (user) login attempt
+ * @param adminLoginRateLimit        The minimum time allowed between (admin) login attempts for a host
+ * @param adminLoginDelay            A delay applied to each (admin) login attempt
  */
 
 public record IdServerRateLimitConfiguration(
   Duration emailVerificationRateLimit,
   Duration passwordResetRateLimit,
-  Duration loginRateLimit,
-  Duration loginDelay)
+  Duration userLoginRateLimit,
+  Duration userLoginDelay,
+  Duration adminLoginRateLimit,
+  Duration adminLoginDelay)
   implements IdServerJSONConfigurationElementType
 {
   /**
@@ -44,8 +48,10 @@ public record IdServerRateLimitConfiguration(
    *                                   verifications for a given user
    * @param passwordResetRateLimit     The minimum allowed time between password
    *                                   resets
-   * @param loginRateLimit             The minimum time allowed between logins for a host
-   * @param loginDelay                 A delay applied to each login attempt
+   * @param userLoginRateLimit         The minimum time allowed between (user) login attempts for a host
+   * @param userLoginDelay             A delay applied to each (user) login attempt
+   * @param adminLoginRateLimit        The minimum time allowed between (admin) login attempts for a host
+   * @param adminLoginDelay            A delay applied to each (admin) login attempt
    */
 
   public IdServerRateLimitConfiguration
@@ -55,8 +61,12 @@ public record IdServerRateLimitConfiguration(
     Objects.requireNonNull(
       passwordResetRateLimit, "passwordResetRateLimit");
     Objects.requireNonNull(
-      loginRateLimit, "loginRateLimit");
+      userLoginRateLimit, "userLoginRateLimit");
     Objects.requireNonNull(
-      loginDelay, "loginDelay");
+      userLoginDelay, "userLoginDelay");
+    Objects.requireNonNull(
+      adminLoginRateLimit, "adminLoginRateLimit");
+    Objects.requireNonNull(
+      adminLoginDelay, "adminLoginDelay");
   }
 }

@@ -30,18 +30,32 @@ import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
+import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.admin.IdAdminLoginService;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.events.IdEventAdminLoggedIn;
+import com.io7m.idstore.server.service.events.IdEventAdminLoginAuthenticationFailed;
+import com.io7m.idstore.server.service.events.IdEventAdminLoginRateLimitExceeded;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
 import com.io7m.idstore.tests.IdFakeClock;
+import com.io7m.idstore.tests.IdTestDirectories;
+import com.io7m.idstore.tests.server.api.IdServerConfigurationsTest;
 import com.io7m.idstore.tests.server.service.IdServiceContract;
 import io.opentelemetry.api.OpenTelemetry;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.verification.Times;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Locale;
@@ -52,6 +66,7 @@ import java.util.UUID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -72,6 +87,10 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
   private IdAdminLoginService login;
   private IdDatabaseTransactionType transaction;
   private IdDatabaseAdminsQueriesType admins;
+  private IdEventServiceType events;
+  private IdRateLimitAdminLoginServiceType rateLimit;
+  private Path directory;
+  private IdServerConfigurationService configurationService;
 
   private static Times once()
   {
@@ -107,6 +126,27 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
   public void setup()
     throws Exception
   {
+    this.directory =
+      IdTestDirectories.createTempDirectory();
+
+    final var file =
+      IdTestDirectories.resourceOf(
+        IdServerConfigurationsTest.class,
+        this.directory,
+        "server-config-0.xml"
+      );
+
+    final var configFile =
+      new IdServerConfigurationFiles()
+        .parse(file);
+
+    final var configuration =
+      IdServerConfigurations.ofFile(
+        Locale.getDefault(),
+        Clock.systemUTC(),
+        configFile
+      );
+
     this.clock =
       new IdFakeClock();
     this.serverClock =
@@ -115,8 +155,23 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
       new IdServerStrings(Locale.ROOT);
     this.sessions =
       new IdSessionAdminService(OpenTelemetry.noop(), Duration.ofDays(1L));
+    this.events =
+      mock(IdEventServiceType.class);
+    this.rateLimit =
+      mock(IdRateLimitAdminLoginServiceType.class);
+    this.configurationService =
+      new IdServerConfigurationService(configuration);
+
     this.login =
-      new IdAdminLoginService(this.serverClock, this.strings, this.sessions);
+      new IdAdminLoginService(
+        this.serverClock,
+        this.strings,
+        this.sessions,
+        this.configurationService,
+        this.rateLimit,
+        this.events
+      );
+
     this.transaction =
       mock(IdDatabaseTransactionType.class);
     this.admins =
@@ -124,6 +179,13 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
 
     when(this.transaction.queries(IdDatabaseAdminsQueriesType.class))
       .thenReturn(this.admins);
+  }
+
+  @AfterEach
+  public void tearDown()
+    throws IOException
+  {
+    IdTestDirectories.deleteDirectory(this.directory);
   }
 
   /**
@@ -136,14 +198,21 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
   public void testUserNonexistent()
     throws Exception
   {
+    when(this.rateLimit.isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
     when(this.admins.adminGetForNameRequire(any()))
-      .thenThrow(new IdDatabaseException("", ADMIN_NONEXISTENT, Map.of(), empty()));
+      .thenThrow(new IdDatabaseException(
+        "",
+        ADMIN_NONEXISTENT,
+        Map.of(),
+        empty()));
 
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
         this.login.adminLogin(
           this.transaction,
           UUID.randomUUID(),
+          "www.example.com",
           "nonexistent",
           "password",
           Map.of()
@@ -154,6 +223,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
 
     verify(this.admins, once()).adminGetForNameRequire(any());
     verifyNoMoreInteractions(this.admins);
+    verifyNoMoreInteractions(this.events);
   }
 
   /**
@@ -166,6 +236,8 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
   public void testDatabaseError0()
     throws Exception
   {
+    when(this.rateLimit.isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
     when(this.admins.adminGetForNameRequire(any()))
       .thenThrow(new IdDatabaseException("", SQL_ERROR, Map.of(), empty()));
 
@@ -174,6 +246,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
         this.login.adminLogin(
           this.transaction,
           UUID.randomUUID(),
+          "www.example.com",
           "nonexistent",
           "password",
           Map.of()
@@ -184,6 +257,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
 
     verify(this.admins, once()).adminGetForNameRequire(any());
     verifyNoMoreInteractions(this.admins);
+    verifyNoMoreInteractions(this.events);
   }
 
   /**
@@ -196,6 +270,9 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
   public void testUserBanned()
     throws Exception
   {
+    when(this.rateLimit.isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
+
     final var admin =
       this.createAdmin("admin", IdAdminPermissionSet.empty());
     final var ban =
@@ -211,6 +288,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
         this.login.adminLogin(
           this.transaction,
           UUID.randomUUID(),
+          "www.example.com",
           "admin",
           "password",
           Map.of()
@@ -222,6 +300,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     verify(this.admins, once()).adminGetForNameRequire(any());
     verify(this.admins, once()).adminBanGet(any());
     verifyNoMoreInteractions(this.admins);
+    verifyNoMoreInteractions(this.events);
   }
 
   /**
@@ -234,6 +313,9 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
   public void testUserBannedNotExpired()
     throws Exception
   {
+    when(this.rateLimit.isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
+
     final var admin =
       this.createAdmin("admin", IdAdminPermissionSet.empty());
     final var ban =
@@ -252,6 +334,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
         this.login.adminLogin(
           this.transaction,
           UUID.randomUUID(),
+          "www.example.com",
           "admin",
           "password",
           Map.of()
@@ -263,6 +346,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     verify(this.admins, once()).adminGetForNameRequire(any());
     verify(this.admins, once()).adminBanGet(any());
     verifyNoMoreInteractions(this.admins);
+    verifyNoMoreInteractions(this.events);
   }
 
   /**
@@ -275,6 +359,9 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
   public void testUserWrongPassword()
     throws Exception
   {
+    when(this.rateLimit.isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
+
     final var admin =
       this.createAdmin("admin", IdAdminPermissionSet.empty());
 
@@ -288,6 +375,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
         this.login.adminLogin(
           this.transaction,
           UUID.randomUUID(),
+          "www.example.com",
           "admin",
           "not the password",
           Map.of()
@@ -299,6 +387,10 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     verify(this.admins, once()).adminGetForNameRequire(any());
     verify(this.admins, once()).adminBanGet(any());
     verifyNoMoreInteractions(this.admins);
+
+    verify(this.events, once())
+      .emit(new IdEventAdminLoginAuthenticationFailed("www.example.com", admin.id()));
+    verifyNoMoreInteractions(this.events);
   }
 
   /**
@@ -311,6 +403,9 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
   public void testUserCorrectPassword()
     throws Exception
   {
+    when(this.rateLimit.isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
+
     final var admin =
       this.createAdmin("admin", IdAdminPermissionSet.empty());
 
@@ -323,6 +418,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
       this.login.adminLogin(
         this.transaction,
         UUID.randomUUID(),
+        "www.example.com",
         "admin",
         "x",
         Map.of()
@@ -335,6 +431,44 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     verify(this.admins, once()).adminBanGet(any());
     verify(this.admins, once()).adminLogin(any(), any());
     verifyNoMoreInteractions(this.admins);
+
+    verify(this.events, once())
+      .emit(new IdEventAdminLoggedIn(admin.id()));
+    verifyNoMoreInteractions(this.events);
+  }
+
+  /**
+   * Rate limiting rejects logins.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testUserRateLimited()
+    throws Exception
+  {
+    when(this.rateLimit.isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.FALSE);
+
+    final var ex =
+      assertThrows(IdCommandExecutionFailure.class, () -> {
+        this.login.adminLogin(
+          this.transaction,
+          UUID.randomUUID(),
+          "127.0.0.1",
+          "admin",
+          "x",
+          Map.of()
+        );
+      });
+
+    assertEquals(RATE_LIMIT_EXCEEDED, ex.errorCode());
+    verifyNoMoreInteractions(this.admins);
+
+    verify(this.events, once())
+      .emit(new IdEventAdminLoginRateLimitExceeded("127.0.0.1", "admin"));
+
+    verifyNoMoreInteractions(this.events);
   }
 
   @Override
@@ -343,7 +477,10 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     return new IdAdminLoginService(
       this.serverClock,
       this.strings,
-      this.sessions
+      this.sessions,
+      this.configurationService,
+      this.rateLimit,
+      this.events
     );
   }
 
@@ -353,7 +490,10 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     return new IdAdminLoginService(
       this.serverClock,
       this.strings,
-      this.sessions
+      this.sessions,
+      this.configurationService,
+      this.rateLimit,
+      this.events
     );
   }
 }

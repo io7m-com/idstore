@@ -25,12 +25,12 @@ import java.util.concurrent.TimeUnit;
  * A rate limiting service for logins.
  */
 
-public final class IdRateLimitLoginService
-  implements IdRateLimitLoginServiceType
+public final class IdRateLimitUserLoginService
+  implements IdRateLimitUserLoginServiceType
 {
   private final IdRateLimiter limiter;
 
-  private IdRateLimitLoginService(
+  private IdRateLimitUserLoginService(
     final IdRateLimiter inLimiter)
   {
     this.limiter = Objects.requireNonNull(inLimiter, "limiter");
@@ -46,15 +46,15 @@ public final class IdRateLimitLoginService
    * @return A rate limiter
    */
 
-  public static IdRateLimitLoginServiceType create(
+  public static IdRateLimitUserLoginServiceType create(
     final IdServerTelemetryServiceType telemetry,
     final long expiration,
     final TimeUnit timeUnit)
   {
-    return new IdRateLimitLoginService(
+    return new IdRateLimitUserLoginService(
       IdRateLimiter.create(
         telemetry,
-        "IdRateLimitLoginService",
+        "IdRateLimitUserLoginService",
         expiration,
         timeUnit)
     );
@@ -70,13 +70,13 @@ public final class IdRateLimitLoginService
   @Override
   public String description()
   {
-    return "Rate limiting service.";
+    return "User login rate limiting service.";
   }
 
   @Override
   public String toString()
   {
-    return "[IdRateLimitLoginService 0x%s]"
+    return "[IdRateLimitUserLoginService 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

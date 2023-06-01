@@ -33,7 +33,7 @@ public interface IdUserPasswordResetServiceType extends RPServiceType
   /**
    * Start a password reset.
    *
-   * @param sourceHost The source host of the request
+   * @param sourceHost The source remoteHost of the request
    * @param userAgent  The user agent
    * @param requestId  The request ID
    * @param email      The email
@@ -53,7 +53,7 @@ public interface IdUserPasswordResetServiceType extends RPServiceType
   /**
    * Check a password reset token.
    *
-   * @param sourceHost The source host of the request
+   * @param sourceHost The source remoteHost of the request
    * @param userAgent  The user agent
    * @param requestId  The request ID
    * @param token      The token
@@ -73,7 +73,7 @@ public interface IdUserPasswordResetServiceType extends RPServiceType
   /**
    * Confirm a password reset.
    *
-   * @param sourceHost   The source host of the request
+   * @param sourceHost   The source remoteHost of the request
    * @param userAgent    The user agent
    * @param requestId    The request ID
    * @param password0Opt The password

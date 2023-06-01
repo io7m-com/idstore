@@ -20,7 +20,6 @@ package com.io7m.idstore.server.admin_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
@@ -45,6 +44,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_CLIENT;
@@ -132,6 +132,7 @@ public final class IdA1ServletLogin extends IdHTTPServletFunctional
       loggedIn = logins.adminLogin(
         transaction,
         information.requestId(),
+        information.remoteAddress(),
         login.userName().value(),
         login.password(),
         meta
@@ -180,7 +181,7 @@ public final class IdA1ServletLogin extends IdHTTPServletFunctional
 
     throw new IdProtocolException(
       strings.format("commandNotHere"),
-      IdStandardErrorCodes.PROTOCOL_ERROR,
+      API_MISUSE_ERROR,
       Map.of(),
       Optional.empty()
     );
