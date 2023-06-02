@@ -301,17 +301,23 @@
         The <Term type="expression">EmailVerificationRateLimit</Term> attribute specifies the minimum duration that
         must elapse between any two email verification requests for a given user. The attribute must be specified
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">PasswordResetRateLimit</Term> attribute specifies the minimum duration that
         must elapse between any two password reset requests from a single IP address. The attribute must be specified
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
       </Paragraph>
       <Paragraph>
         The optional <Term type="expression">UserLoginRateLimit</Term> attribute specifies the minimum duration that
         must elapse between any two user login requests from a single IP address. The attribute must be specified
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
         The default value, if unspecified, is five seconds.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
       </Paragraph>
       <Paragraph>
         The optional <Term type="expression">UserLoginDelay</Term> attribute specifies a fixed delay that is applied
@@ -319,12 +325,16 @@
         specified as an
         <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
         The default value, if unspecified, is one second.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
       </Paragraph>
       <Paragraph>
         The optional <Term type="expression">AdminLoginRateLimit</Term> attribute specifies the minimum duration that
         must elapse between any two admin login requests from a single IP address. The attribute must be specified
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
         The default value, if unspecified, is five seconds.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
       </Paragraph>
       <Paragraph>
         The optional <Term type="expression">AdminLoginDelay</Term> attribute specifies a fixed delay that is applied
@@ -332,6 +342,8 @@
         specified as an
         <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
         The default value, if unspecified, is one second.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
       </Paragraph>
     </Subsection>
     <Subsection title="Example">

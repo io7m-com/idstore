@@ -182,7 +182,7 @@ OK]]></Verbatim>
         <Term type="constant">nocreaterole</Term>, etc.
       </Paragraph>
       <FormalItem title="Database Roles">
-        <Table>
+        <Table type="genericTable">
           <Columns>
             <Column>Role</Column>
             <Column>Description</Column>
