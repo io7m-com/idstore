@@ -95,7 +95,7 @@ idstore: usage: idstore [command] [arguments ...]
     </Subsection>
     <Subsection title="Health Checks">
       <Paragraph>
-        The OCI image includes a <Term type="command">idstore-healthcheck</Term> command that makes a
+        The OCI image includes an <Term type="command">idstore-healthcheck</Term> command that makes a
         request to a health endpoint on the <Link target="f695a0a9-cec2-4db8-839d-e9eaaa8dace3">Admin API</Link>
         server. The command expects the server to be accessible on <Term type="expression">localhost</Term>
         inside the container, and requires that the <Term type="expression">IDSTORE_HEALTHCHECK_PORT</Term>
