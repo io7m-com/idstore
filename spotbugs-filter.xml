@@ -392,18 +392,6 @@
     </Or>
     <Bug pattern="REC_CATCH_EXCEPTION"/>
   </Match>
-  <!-- A deliberate fixed delay for logins. -->
-  <Match>
-    <Class name="com.io7m.idstore.server.controller.user.IdUserLoginService"/>
-    <Method name="applyFixedDelay"/>
-    <Bug pattern="MDM_THREAD_YIELD"/>
-  </Match>
-  <Match>
-    <Class name="com.io7m.idstore.server.controller.admin.IdAdminLoginService"/>
-    <Method name="applyFixedDelay"/>
-    <Bug pattern="MDM_THREAD_YIELD"/>
-  </Match>
-
   <!-- It's an exception. Don't care about equality. -->
   <Match>
     <Class name="com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure"/>
@@ -456,6 +444,13 @@
     </Or>
   </Match>
 
+  <!-- A deliberate delay for rate limiting purposes. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.http.IdHTTPServletCoreFixedDelay"/>
+    <Method name="applyFixedDelay"/>
+    <Bug pattern="MDM_THREAD_YIELD"/>
+  </Match>
+
   <!-- Exception types shouldn't care about equality. -->
   <Match>
     <Class name="com.io7m.idstore.server.http.IdHTTPErrorStatusException"/>
@@ -465,6 +460,7 @@
   <!-- toString() isn't needed here. -->
   <Match>
     <Or>
+      <Class name="com.io7m.idstore.server.http.IdHTTPServletCoreFixedDelay"/>
       <Class name="com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented"/>
       <Class name="com.io7m.idstore.server.http.IdServletHolders"/>
     </Or>
@@ -763,6 +759,13 @@
     <Class name="com.io7m.idstore.server.user_view.IdUVServer"/>
     <Method name="createUserViewServerServlets"/>
     <Bug pattern="CE_CLASS_ENVY"/>
+  </Match>
+
+  <!-- A deliberate delay for rate limiting purposes. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.user_view.IdUVLogin"/>
+    <Method name="applyFixedDelay"/>
+    <Bug pattern="MDM_THREAD_YIELD"/>
   </Match>
 
   <!--                                 -->

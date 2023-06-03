@@ -292,7 +292,6 @@ public final class IdServer implements IdServerType
         clock,
         strings,
         sessionAdminService,
-        config,
         adminLoginRateLimitService,
         eventService
       )

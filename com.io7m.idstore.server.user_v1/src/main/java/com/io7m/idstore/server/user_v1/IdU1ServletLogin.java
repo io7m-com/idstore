@@ -33,6 +33,7 @@ import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
 import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
 import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
 import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
@@ -49,6 +50,7 @@ import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
+import static com.io7m.idstore.server.http.IdHTTPServletCoreFixedDelay.withFixedDelay;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreTransactional.withTransaction;
 
@@ -82,22 +84,35 @@ public final class IdU1ServletLogin extends IdHTTPServletFunctional
     final var logins =
       services.requireService(IdUserLoginService.class);
 
+    final var configuration =
+      services.requireService(IdServerConfigurationService.class);
+
+    final var delay =
+      configuration.configuration()
+        .rateLimit()
+        .userLoginDelay();
+
     return (request, information) -> {
       return withInstrumentation(
         services,
         (req0, info0) -> {
-          return withTransaction(
+          return withFixedDelay(
             services,
-            (req1, info1, transaction) -> {
-              return execute(
-                strings,
-                limits,
-                messages,
-                logins,
-                req1,
-                info1,
-                transaction
-              );
+            delay,
+            (req1, info1) -> {
+              return withTransaction(
+                services,
+                (req2, info2, transaction) -> {
+                  return execute(
+                    strings,
+                    limits,
+                    messages,
+                    logins,
+                    req2,
+                    info2,
+                    transaction
+                  );
+                }).execute(req1, info1);
             }).execute(req0, info0);
         }).execute(request, information);
     };
