@@ -23,17 +23,20 @@ import java.util.Objects;
 /**
  * A request to remove an email address from a user.
  *
- * @param user The user
+ * @param user                    The user
+ * @param activeVerificationCount The number of in-progress email verifications the user already has
  */
 
 public record IdSecUserActionEmailRemoveBegin(
-  IdUser user)
+  IdUser user,
+  long activeVerificationCount)
   implements IdSecUserActionType
 {
   /**
    * A request to remove an email address from a user.
    *
-   * @param user The user
+   * @param user                    The user
+   * @param activeVerificationCount The number of in-progress email verifications the user already has
    */
 
   public IdSecUserActionEmailRemoveBegin

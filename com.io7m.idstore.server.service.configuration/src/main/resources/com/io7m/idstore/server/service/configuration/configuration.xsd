@@ -647,6 +647,36 @@
     </complexType>
   </element>
 
+  <element name="PasswordExpiration">
+    <annotation>
+      <documentation>
+        Configuration information for password expiration.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <attribute name="UserPasswordValidityDuration"
+                 type="duration"
+                 use="optional">
+        <annotation>
+          <documentation>
+            The duration for which user passwords are valid. If unspecified, user passwords do not expire.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="AdminPasswordValidityDuration"
+                 type="duration"
+                 use="optional">
+        <annotation>
+          <documentation>
+            The duration for which admin passwords are valid. If unspecified, user passwords do not expire.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
   <element name="RateLimiting">
     <annotation>
       <documentation>
@@ -655,21 +685,69 @@
     </annotation>
 
     <complexType>
+      <attribute name="UserLoginDelay"
+                 type="duration"
+                 default="PT1S"
+                 use="optional">
+        <annotation>
+          <documentation>
+            A fixed delay added to user login operations in order to reduce the feasibility of online password
+            brute-forcing.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="UserLoginRateLimit"
+                 type="duration"
+                 default="PT5S"
+                 use="optional">
+        <annotation>
+          <documentation>
+            User login attempts cannot be made more frequently than this duration, for a given IP address.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="AdminLoginDelay"
+                 type="duration"
+                 default="PT1S"
+                 use="optional">
+        <annotation>
+          <documentation>
+            A fixed delay added to admin login operations in order to reduce the feasibility of online password
+            brute-forcing.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="AdminLoginRateLimit"
+                 type="duration"
+                 default="PT5S"
+                 use="optional">
+        <annotation>
+          <documentation>
+            Admin login attempts cannot be made more frequently than this duration, for a given IP address.
+          </documentation>
+        </annotation>
+      </attribute>
+
       <attribute name="EmailVerificationRateLimit"
                  type="duration"
                  use="required">
         <annotation>
           <documentation>
-            Email verifications for various operations cannot be prompted more frequently than this duration.
+            Email verifications for various operations cannot be prompted more frequently than this duration,
+            for a given user account.
           </documentation>
         </annotation>
       </attribute>
+
       <attribute name="PasswordResetRateLimit"
                  type="duration"
                  use="required">
         <annotation>
           <documentation>
-            Passwords cannot be reset more frequently than this duration.
+            Passwords cannot be reset more frequently than this duration, for a given IP address.
           </documentation>
         </annotation>
       </attribute>
@@ -761,6 +839,36 @@
     </complexType>
   </element>
 
+  <element name="Logs">
+    <annotation>
+      <documentation>
+        Configuration information for OpenTelemetry logs/events.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <attribute name="Endpoint"
+                 use="required"
+                 type="anyURI">
+        <annotation>
+          <documentation>
+            The endpoint to which OTLP log data will be sent.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Protocol"
+                 use="required"
+                 type="c:OpenTelemetryProtocol">
+        <annotation>
+          <documentation>
+            The protocol used to send log data.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
   <element name="OpenTelemetry">
     <annotation>
       <documentation>
@@ -770,6 +878,9 @@
 
     <complexType>
       <sequence>
+        <element ref="c:Logs"
+                 minOccurs="0"
+                 maxOccurs="1"/>
         <element ref="c:Metrics"
                  minOccurs="0"
                  maxOccurs="1"/>
@@ -805,6 +916,9 @@
         <element ref="c:History"/>
         <element ref="c:Mail"/>
         <element ref="c:OpenTelemetry"
+                 minOccurs="0"
+                 maxOccurs="1"/>
+        <element ref="c:PasswordExpiration"
                  minOccurs="0"
                  maxOccurs="1"/>
         <element ref="c:RateLimiting"/>

@@ -24,8 +24,6 @@ import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
-import com.io7m.quarrel.core.QParametersPositionalNone;
-import com.io7m.quarrel.core.QParametersPositionalType;
 import com.io7m.quarrel.core.QStringType.QConstant;
 
 import java.util.List;
@@ -82,12 +80,6 @@ public final class IdAShellCmdAdminEmailRemove
   public List<QParameterNamedType<?>> onListNamedParameters()
   {
     return List.of(USER_ID, EMAIL);
-  }
-
-  @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
   }
 
   @Override

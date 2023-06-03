@@ -106,6 +106,12 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   private static IdSecPolicyResultType checkUserActionEmailAddBegin(
     final IdSecUserActionEmailAddBegin e)
   {
+    if (Long.compareUnsigned(e.activeVerificationCount(), 10L) > 0) {
+      return new IdSecPolicyResultDenied(
+        "Too many email verification requests are currently active for this user."
+      );
+    }
+
     return new IdSecPolicyResultPermitted();
   }
 
@@ -124,6 +130,12 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   private static IdSecPolicyResultType checkUserActionEmailRemoveBegin(
     final IdSecUserActionEmailRemoveBegin e)
   {
+    if (Long.compareUnsigned(e.activeVerificationCount(), 10L) > 0) {
+      return new IdSecPolicyResultDenied(
+        "Too many email verification requests are currently active for this user."
+      );
+    }
+
     return new IdSecPolicyResultPermitted();
   }
 

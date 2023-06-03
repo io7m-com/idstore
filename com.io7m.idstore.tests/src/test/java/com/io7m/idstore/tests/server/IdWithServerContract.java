@@ -36,6 +36,7 @@ import com.io7m.idstore.server.api.IdServerHTTPServiceConfiguration;
 import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
+import com.io7m.idstore.server.api.IdServerPasswordExpirationConfiguration;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerSessionConfiguration;
 import com.io7m.idstore.server.api.IdServerType;
@@ -324,14 +325,24 @@ public abstract class IdWithServerContract
 
     final var rateLimit =
       new IdServerRateLimitConfiguration(
-        Duration.of(10L, ChronoUnit.MINUTES),
-        Duration.of(10L, ChronoUnit.MINUTES)
+        Duration.of(0L, ChronoUnit.MILLIS),
+        Duration.of(0L, ChronoUnit.MILLIS),
+        Duration.of(0L, ChronoUnit.MILLIS),
+        Duration.of(0L, ChronoUnit.MILLIS),
+        Duration.of(0L, ChronoUnit.MILLIS),
+        Duration.of(0L, ChronoUnit.MILLIS)
       );
 
     final var sessions =
       new IdServerSessionConfiguration(
         Duration.of(30L, ChronoUnit.MINUTES),
         Duration.of(30L, ChronoUnit.MINUTES)
+      );
+
+    final var passwordExpiration =
+      new IdServerPasswordExpirationConfiguration(
+        Optional.empty(),
+        Optional.empty()
       );
 
     return this.servers.createServer(
@@ -348,6 +359,7 @@ public abstract class IdWithServerContract
         branding,
         history,
         rateLimit,
+        passwordExpiration,
         Optional.empty()
       )
     );

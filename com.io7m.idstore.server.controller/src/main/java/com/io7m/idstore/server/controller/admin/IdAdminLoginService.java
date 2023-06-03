@@ -25,6 +25,12 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.events.IdEventAdminLoggedIn;
+import com.io7m.idstore.server.service.events.IdEventAdminLoginAuthenticationFailed;
+import com.io7m.idstore.server.service.events.IdEventAdminLoginRateLimitExceeded;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
+import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
 import com.io7m.repetoir.core.RPServiceType;
 import com.io7m.seltzer.api.SStructuredErrorType;
@@ -37,6 +43,7 @@ import java.util.UUID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 
 /**
  * A service that handles the logic for admin logins.
@@ -47,19 +54,28 @@ public final class IdAdminLoginService implements RPServiceType
   private final IdServerClock clock;
   private final IdServerStrings strings;
   private final IdSessionAdminService sessions;
+  private final IdServerConfigurationService configurations;
+  private final IdEventServiceType events;
+  private final IdRateLimitAdminLoginServiceType rateLimit;
 
   /**
    * A service that handles the logic for admin logins.
    *
-   * @param inClock    The clock
-   * @param inStrings  The string resources
-   * @param inSessions A session service
+   * @param inClock          The clock
+   * @param inStrings        The string resources
+   * @param inSessions       A session service
+   * @param inConfigurations A configuration service
+   * @param inRateLimit      The rate limit service
+   * @param inEvents         The event service
    */
 
   public IdAdminLoginService(
     final IdServerClock inClock,
     final IdServerStrings inStrings,
-    final IdSessionAdminService inSessions)
+    final IdSessionAdminService inSessions,
+    final IdServerConfigurationService inConfigurations,
+    final IdRateLimitAdminLoginServiceType inRateLimit,
+    final IdEventServiceType inEvents)
   {
     this.clock =
       Objects.requireNonNull(inClock, "clock");
@@ -67,6 +83,12 @@ public final class IdAdminLoginService implements RPServiceType
       Objects.requireNonNull(inStrings, "strings");
     this.sessions =
       Objects.requireNonNull(inSessions, "inSessions");
+    this.configurations =
+      Objects.requireNonNull(inConfigurations, "inConfigurations");
+    this.events =
+      Objects.requireNonNull(inEvents, "inEvents");
+    this.rateLimit =
+      Objects.requireNonNull(inRateLimit, "inRateLimit");
   }
 
   /**
@@ -76,6 +98,7 @@ public final class IdAdminLoginService implements RPServiceType
    *
    * @param transaction A database transaction
    * @param requestId   The ID of the request
+   * @param remoteHost  The remote remoteHost attempting to log in
    * @param username    The username
    * @param password    The password
    * @param metadata    The request metadata
@@ -88,6 +111,7 @@ public final class IdAdminLoginService implements RPServiceType
   public IdAdminLoggedIn adminLogin(
     final IdDatabaseTransactionType transaction,
     final UUID requestId,
+    final String remoteHost,
     final String username,
     final String password,
     final Map<String, String> metadata)
@@ -100,28 +124,20 @@ public final class IdAdminLoginService implements RPServiceType
     Objects.requireNonNull(metadata, "metadata");
 
     try {
+      this.checkRateLimit(requestId, remoteHost, username);
+
       final var admins =
         transaction.queries(IdDatabaseAdminsQueriesType.class);
       final var user =
         admins.adminGetForNameRequire(new IdName(username));
 
       this.checkBan(requestId, admins, user);
-
-      final var ok =
-        user.password().check(password);
-
-      if (!ok) {
-        throw new IdCommandExecutionFailure(
-          this.strings.format("errorInvalidUsernamePassword"),
-          AUTHENTICATION_ERROR,
-          Map.of(),
-          Optional.empty(),
-          requestId,
-          401
-        );
-      }
+      this.applyFixedDelay();
+      this.checkPassword(requestId, remoteHost, password, user);
 
       admins.adminLogin(user.id(), metadata);
+      this.events.emit(new IdEventAdminLoggedIn(user.id()));
+
       final var session = this.sessions.createSession(user.id());
       return new IdAdminLoggedIn(session, user.withRedactedPassword());
     } catch (final IdDatabaseException e) {
@@ -146,6 +162,73 @@ public final class IdAdminLoginService implements RPServiceType
         e.remediatingAction(),
         requestId,
         500
+      );
+    }
+  }
+
+  /**
+   * Apply a fixed delay for all login requests.
+   */
+
+  private void applyFixedDelay()
+  {
+    try {
+      Thread.sleep(
+        this.configurations.configuration()
+          .rateLimit()
+          .userLoginDelay()
+          .toMillis()
+      );
+    } catch (final InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
+  private void checkRateLimit(
+    final UUID requestId,
+    final String remoteHost,
+    final String username)
+    throws IdCommandExecutionFailure
+  {
+    if (!this.rateLimit.isAllowedByRateLimit(remoteHost)) {
+      this.events.emit(
+        new IdEventAdminLoginRateLimitExceeded(remoteHost, username)
+      );
+
+      throw new IdCommandExecutionFailure(
+        this.strings.format("loginRateLimited"),
+        RATE_LIMIT_EXCEEDED,
+        Map.of(),
+        Optional.empty(),
+        requestId,
+        400
+      );
+    }
+  }
+
+  private void checkPassword(
+    final UUID requestId,
+    final String remoteHost,
+    final String password,
+    final IdAdmin user)
+    throws IdPasswordException, IdCommandExecutionFailure
+  {
+    final var ok =
+      user.password()
+        .check(this.clock.clock(), password);
+
+    if (!ok) {
+      this.events.emit(
+        new IdEventAdminLoginAuthenticationFailed(remoteHost, user.id())
+      );
+
+      throw new IdCommandExecutionFailure(
+        this.strings.format("errorInvalidUsernamePassword"),
+        AUTHENTICATION_ERROR,
+        Map.of(),
+        Optional.empty(),
+        requestId,
+        401
       );
     }
   }
@@ -208,7 +291,7 @@ public final class IdAdminLoginService implements RPServiceType
     final UUID requestId,
     final Exception cause)
   {
-    if (cause instanceof SStructuredErrorType<?> struct) {
+    if (cause instanceof final SStructuredErrorType<?> struct) {
       return new IdCommandExecutionFailure(
         this.strings.format("errorInvalidUsernamePassword"),
         cause,

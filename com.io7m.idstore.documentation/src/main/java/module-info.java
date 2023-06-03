@@ -57,10 +57,10 @@ open module com.io7m.idstore.documentation
   requires com.io7m.idstore.user_client.api;
   requires com.io7m.idstore.user_client;
 
+  requires com.io7m.quarrel.core;
+  requires com.io7m.quarrel.ext.logback;
   requires com.io7m.repetoir.core;
-  requires com.io7m.claypot.core;
   requires java.xml;
-  requires jcommander;
 
   exports com.io7m.idstore.documentation;
 }

@@ -24,7 +24,7 @@ import com.io7m.idstore.server.service.sessions.IdSessionUser;
 
 import java.util.Objects;
 
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 
 /**
  * IdUCmdLogin
@@ -54,7 +54,7 @@ public final class IdUCmdLogin
 
     throw context.failFormatted(
       400,
-      PROTOCOL_ERROR,
+      API_MISUSE_ERROR,
       "commandNotHere"
     );
   }

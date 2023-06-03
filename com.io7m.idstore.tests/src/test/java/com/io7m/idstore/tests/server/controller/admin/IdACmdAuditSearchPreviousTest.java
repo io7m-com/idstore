@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -182,6 +182,6 @@ public final class IdACmdAuditSearchPreviousTest
 
     /* Assert. */
 
-    assertEquals(PROTOCOL_ERROR, ex.errorCode());
+    assertEquals(API_MISUSE_ERROR, ex.errorCode());
   }
 }

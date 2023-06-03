@@ -26,5 +26,6 @@
   <xi:include href="cmdline.xml"/>
   <xi:include href="shell-admin.xml"/>
   <xi:include href="api.xml"/>
+  <xi:include href="security.xml"/>
 
 </Document>

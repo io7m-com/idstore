@@ -22,8 +22,6 @@ import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QParameterType;
-import com.io7m.quarrel.core.QParametersPositionalNone;
-import com.io7m.quarrel.core.QParametersPositionalType;
 import com.io7m.quarrel.core.QStringType;
 import org.jline.reader.Completer;
 import org.jline.reader.impl.completer.StringsCompleter;
@@ -78,12 +76,6 @@ public final class IdAShellCmdLogout implements IdAShellCmdType
   public List<QParameterNamedType<?>> onListNamedParameters()
   {
     return List.of();
-  }
-
-  @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
   }
 
   @Override

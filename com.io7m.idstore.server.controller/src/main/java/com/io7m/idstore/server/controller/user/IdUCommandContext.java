@@ -44,7 +44,7 @@ public final class IdUCommandContext
    * @param inRequestId       The request ID
    * @param inTransaction     The transaction
    * @param inSession         The user session
-   * @param inRemoteHost      The remote host
+   * @param inRemoteHost      The remote remoteHost
    * @param inRemoteUserAgent The remote user agent
    * @param inUser            The user
    */

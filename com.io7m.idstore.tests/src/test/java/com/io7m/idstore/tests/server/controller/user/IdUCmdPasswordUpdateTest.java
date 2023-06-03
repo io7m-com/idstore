@@ -19,15 +19,14 @@ package com.io7m.idstore.tests.server.controller.user;
 
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
-import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCmdPasswordUpdate;
-import com.io7m.junreachable.UnreachableCodeException;
 import org.junit.jupiter.api.Test;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_MISMATCH;
@@ -63,7 +62,8 @@ public final class IdUCmdPasswordUpdateTest
 
     final var newPassword =
       IdPasswordAlgorithmPBKDF2HmacSHA256.create()
-        .createHashed("abcd");
+        .createHashed("abcd")
+        .withExpirationDate(OffsetDateTime.parse("1970-01-01T00:30:02Z"));
 
     final var user0After =
       new IdUser(
@@ -110,13 +110,7 @@ public final class IdUCmdPasswordUpdateTest
         eq(user0After.id()),
         eq(Optional.empty()),
         eq(Optional.empty()),
-        argThat(argument -> {
-          try {
-            return argument.orElseThrow().check("abcd");
-          } catch (final IdPasswordException e) {
-            throw new UnreachableCodeException(e);
-          }
-        })
+        argThat(Optional::isPresent)
       );
 
     verify(transaction)

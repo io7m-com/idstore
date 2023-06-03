@@ -61,7 +61,7 @@
           Port="25"/>
   </Mail>
 
-  <RateLimiting EmailVerificationRateLimit="PT10M" PasswordResetRateLimit="PT10M"/>
+  <RateLimiting EmailVerificationRateLimit="PT10M" PasswordResetRateLimit="PT10M" />
 
   <Sessions UserSessionExpiration="PT30M" AdminSessionExpiration="PT30M"/>
 </Configuration>
@@ -133,7 +133,8 @@
         service will bind. It is recommended that the service be bound to
         <Term type="expression">localhost</Term>
         and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
-        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>.
+        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>
+        <LinkFootnote target="dffb7f36-a515-46c7-9ae1-f476b2257ce2"/>.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
@@ -154,7 +155,8 @@
         service will bind. It is recommended that the service be bound to
         <Term type="expression">localhost</Term>
         and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
-        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>.
+        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>
+        <LinkFootnote target="dffb7f36-a515-46c7-9ae1-f476b2257ce2"/>.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
@@ -175,7 +177,8 @@
         service will bind. It is recommended that the service be bound to
         <Term type="expression">localhost</Term>
         and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
-        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>.
+        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>
+        <LinkFootnote target="dffb7f36-a515-46c7-9ae1-f476b2257ce2"/>.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
@@ -285,7 +288,7 @@
     </Subsection>
   </Subsection>
 
-  <Subsection title="RateLimiting">
+  <Subsection title="RateLimiting" id="1d55d366-5883-4418-a61a-eef7a88eaca7">
     <Subsection title="Overview">
       <Paragraph>
         The <Term type="expression">RateLimiting</Term> section of the configuration file configures
@@ -298,11 +301,49 @@
         The <Term type="expression">EmailVerificationRateLimit</Term> attribute specifies the minimum duration that
         must elapse between any two email verification requests for a given user. The attribute must be specified
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">PasswordResetRateLimit</Term> attribute specifies the minimum duration that
         must elapse between any two password reset requests from a single IP address. The attribute must be specified
         as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">UserLoginRateLimit</Term> attribute specifies the minimum duration that
+        must elapse between any two user login requests from a single IP address. The attribute must be specified
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        The default value, if unspecified, is five seconds.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">UserLoginDelay</Term> attribute specifies a fixed delay that is applied
+        to all user login requests to reduce the practicality of online password brute forcing. The attribute must be
+        specified as an
+        <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        The default value, if unspecified, is one second.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">AdminLoginRateLimit</Term> attribute specifies the minimum duration that
+        must elapse between any two admin login requests from a single IP address. The attribute must be specified
+        as an <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        The default value, if unspecified, is five seconds.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">AdminLoginDelay</Term> attribute specifies a fixed delay that is applied
+        to all admin login requests to reduce the practicality of online password brute forcing. The attribute must be
+        specified as an
+        <LinkExternal target="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601 duration string</LinkExternal>.
+        The default value, if unspecified, is one second.
+        Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
+        seconds) effectively disables this kind of rate limiting.
       </Paragraph>
     </Subsection>
     <Subsection title="Example">
@@ -311,14 +352,60 @@
       </Paragraph>
       <FormalItem title="Example">
         <Verbatim><![CDATA[
-<RateLimiting EmailVerificationRateLimit="PT10M"
-              PasswordResetRateLimit="PT10M"/>
+<RateLimiting
+  EmailVerificationRateLimit="PT10M"
+  PasswordResetRateLimit="PT10M"
+  UserLoginRateLimit="PT5S"
+  UserLoginDelay="PT1S"
+  AdminLoginRateLimit="PT5S"
+  AdminLoginDelay="PT1S" />
 ]]></Verbatim>
       </FormalItem>
     </Subsection>
   </Subsection>
 
-  <Subsection title="OpenTelemetry">
+  <Subsection title="Password Expiration" id="8e1b778b-f098-4058-83ee-59812308e6f2">
+    <Subsection title="Overview">
+      <Paragraph>
+        Passwords for both users and administrators can be configured with expiration dates. The
+        <Term type="expression">PasswordExpiration</Term> section of the configuration file, if
+        present, can specify durations for which passwords are valid after their initial creation.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">UserPasswordValidityDuration</Term> attribute specifies the duration
+        for which user passwords are valid. If the attribute is not present, user passwords do not expire.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">AdminPasswordValidityDuration</Term> attribute specifies the duration
+        for which admin passwords are valid. If the attribute is not present, user passwords do not expire.
+      </Paragraph>
+      <Paragraph>
+        Note that these configuration settings only apply to users and administrators that have not yet
+        been created; existing users and administrators will not be affected if these settings are changed
+        and the server restarted. New configuration settings <Term type="term">will</Term> take effect, however,
+        if the passwords of the users and administrators are changed.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Example">
+      <Paragraph>
+        An example password expiration configuration that configures user passwords to expire in 30 days (720 hours),
+        and administrator passwords to expire in 90 days (2160 hours):
+      </Paragraph>
+      <FormalItem title="Example">
+        <Verbatim><![CDATA[
+<PasswordExpiration
+  UserPasswordValidityDuration="PT720H"
+  AdminPasswordValidityDuration="PT2160H" />
+]]></Verbatim>
+      </FormalItem>
+      <Paragraph>
+        Note: These settings would likely annoy users and administrators alike, and would likely incentivize setting
+        weaker passwords.
+      </Paragraph>
+    </Subsection>
+  </Subsection>
+
+  <Subsection title="OpenTelemetry" id="694ad99a-9977-47bf-ae12-85fb7e9a204e">
     <Subsection title="Overview">
       <Paragraph>
         The <Term type="expression">OpenTelemetry</Term> section of the configuration file configures
@@ -335,7 +422,7 @@
         </Image>
       </FormalItem>
     </Subsection>
-    <Subsection title="Traces">
+    <Subsection title="Traces" id="1e5d55f4-0334-4613-bd0c-8e307de47af7">
       <Paragraph>
         If the <Term type="expression">OpenTelemetry</Term> element contains a
         <Term type="expression">Traces</Term> element, OTLP <LinkExternal
@@ -355,6 +442,16 @@
         be <Term type="constant">GRPC</Term> or <Term type="constant">HTTP</Term>.
       </Paragraph>
     </Subsection>
+    <Subsection title="Logs" id="dea6eac7-9436-46aa-839a-a018ed497913">
+      <Paragraph>
+        If the <Term type="expression">OpenTelemetry</Term> element contains a
+        <Term type="expression">Logs</Term> element, OTLP <LinkExternal
+        target="https://opentelemetry.io/docs/concepts/signals/logs/">logs</LinkExternal>
+        will be sent to a specified endpoint. The <Term type="expression">Endpoint</Term> attribute
+        specifies the endpoint, and the <Term type="expression">Protocol</Term> attribute can either
+        be <Term type="constant">GRPC</Term> or <Term type="constant">HTTP</Term>.
+      </Paragraph>
+    </Subsection>
     <Subsection title="Example">
       <Paragraph>
         An example Open Telemetry configuration:
@@ -362,8 +459,10 @@
       <FormalItem title="Example">
         <Verbatim><![CDATA[
 <OpenTelemetry LogicalServiceName="idstore">
+  <Logs Endpoint="http://logs.example.com:4317"
+        Protocol="GRPC"/>
   <Metrics Endpoint="http://metrics.example.com:4317"
-          Protocol="GRPC"/>
+           Protocol="GRPC"/>
   <Traces Endpoint="http://traces.example.com:4317"
           Protocol="GRPC"/>
 </OpenTelemetry>
@@ -534,5 +633,14 @@
       </Verbatim>
     </FormalItem>
   </Subsection>
+
+  <Footnote id="dffb7f36-a515-46c7-9ae1-f476b2257ce2">
+    Note: It is extremely important that any reverse proxy used provides the correct 
+    <LinkExternal target="https://datatracker.ietf.org/doc/html/rfc7239">RFC 7239</LinkExternal>
+    headers in order to tell the <Term type="expression">idstore</Term> server that a reverse proxy is present.
+    Otherwise, the <Term type="expression">idstore</Term> server will apply
+    <Link target="1d55d366-5883-4418-a61a-eef7a88eaca7">rate-limiting decisions</Link> to the address of the proxy
+    as opposed to the address of the user connecting through the proxy, as intended.
+  </Footnote>
 
 </Section>

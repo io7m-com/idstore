@@ -70,6 +70,7 @@ create table admins (
   password_algo    varchar(1000000)         not null,
   password_hash    varchar(1000000)         not null,
   password_salt    varchar(1000000)         not null,
+  password_expires timestamp with time zone,
   permissions      varchar(1000000)         not null,
   deleting         boolean                  not null,
   initial          boolean                  not null,
@@ -126,6 +127,7 @@ create table users (
   password_algo    varchar(1000000)         not null,
   password_hash    varchar(1000000)         not null,
   password_salt    varchar(1000000)         not null,
+  password_expires timestamp with time zone,
   deleting         boolean                  not null,
 
   foreign key (id) references user_ids (id)
@@ -248,13 +250,15 @@ create table login_history (
 
     <Statement><![CDATA[
 create table email_verifications (
-  user_id     uuid                      not null,
-  email       varchar(1000000)          not null,
-  token       varchar(1000000)          not null unique,
-  expires     timestamp with time zone  not null,
-  operation   varchar(1000000)          not null,
+  user_id       uuid                      not null,
+  email         varchar(1000000)          not null,
+  token_permit  varchar(1000000)          not null unique,
+  token_deny    varchar(1000000)          not null unique,
+  expires       timestamp with time zone  not null,
+  operation     varchar(1000000)          not null,
 
-  foreign key (user_id) references user_ids (id)
+  foreign key (user_id) references user_ids (id),
+  constraint tokens_not_equal check (token_permit <> token_deny)
 )
 ]]></Statement>
 

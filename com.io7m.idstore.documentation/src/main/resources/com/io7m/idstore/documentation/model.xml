@@ -61,7 +61,7 @@
         permitted for the number of addresses on an account to be less than one.
       </Paragraph>
     </Subsection>
-    <Subsection title="Permissions">
+    <Subsection title="Permissions" id="634db1a2-1705-44ae-abac-8fa281b100f4">
       <Paragraph>
         Each <Term type="term">administrator</Term> account has a set of
         <Link target="40fe0926-7d6e-41e3-8a3a-9776d6ac3a5d">permissions</Link>
@@ -184,19 +184,24 @@
       <Term type="term">message</Term>.
     </Paragraph>
     <FormalItem title="Audit Log">
-      <Image source="audit.png" width="640" height="517">Audit log.</Image>
+      <Image source="audit.png"
+             width="640"
+             height="517">Audit log.
+      </Image>
     </FormalItem>
   </Subsection>
 
   <Subsection title="User View"
               id="dae57724-5cd8-46b3-8650-1c3becce481e">
     <Paragraph>
-      The <Term type="term">user view</Term> is the web interface exposed to users. It offers the
-      ability for users to see their own account information, and also to handle the email-based
-      password reset workflow.
+      The <Term type="term">user view</Term> is the web interface exposed to users. It offers the ability for users to
+      see their own account information, and also to handle the email-based password reset workflow.
     </Paragraph>
     <FormalItem title="Web Interface">
-      <Image source="web.png" width="640" height="503">Web interface.</Image>
+      <Image source="web.png"
+             width="640"
+             height="503">Web interface.
+      </Image>
     </FormalItem>
   </Subsection>
 
@@ -204,13 +209,14 @@
               id="01d8e9c6-54c0-4501-8f45-e6988e0cb673">
     <Paragraph>
       The <Term type="term">user API</Term> is the interface exposed to user clients. It exposes
-      a <LinkExternal target="https://www.io7m.com/software/cedarbridge">Cedarbridge</LinkExternal>-based
-      API over HTTP, using the included
+      a <LinkExternal target="https://www.io7m.com/software/cedarbridge">Cedarbridge</LinkExternal>-based API over HTTP,
+      using the included
       <Link target="5242f097-2f68-4f19-8293-7a7ce68a8b7e">schema</Link>.
     </Paragraph>
     <Paragraph>
       The user API is largely intended to be used by other servers that want to use an
-      <Term type="package">idstore</Term> server to handle authentication.
+      <Term type="package">idstore</Term>
+      server to handle authentication.
     </Paragraph>
   </Subsection>
 
@@ -218,12 +224,81 @@
               id="f695a0a9-cec2-4db8-839d-e9eaaa8dace3">
     <Paragraph>
       The <Term type="term">admin API</Term> is the interface exposed to administrators. Like the
-      <Link target="01d8e9c6-54c0-4501-8f45-e6988e0cb673">user API</Link>, it exposes
-      a Cedarbridge-based API over HTTP, using the included
-      <Link target="894a0f26-590b-4d08-b445-1b687c87b583">schema</Link>. It is the service used
-      by the included <Link target="80d0af5f-505b-4dee-b733-296a6f3970a4">admin shell</Link>, and
-      by projects such as <LinkExternal target="https://github.com/io7m/idstore_gui">idstore_gui</LinkExternal>.
+      <Link target="01d8e9c6-54c0-4501-8f45-e6988e0cb673">user API</Link>, it exposes a Cedarbridge-based API over HTTP,
+      using the included
+      <Link target="894a0f26-590b-4d08-b445-1b687c87b583">schema</Link>. It is the service used by the
+      included <Link target="80d0af5f-505b-4dee-b733-296a6f3970a4">admin shell</Link>, and by projects such
+      as <LinkExternal target="https://github.com/io7m/idstore_gui">idstore_gui</LinkExternal>.
     </Paragraph>
+  </Subsection>
+
+  <Subsection title="Mail" id="0ad1864f-7eac-4700-ae06-66a4f0a3b97f">
+    <Subsection title="Overview">
+      <Paragraph>
+        There are a number of situations where the <Term type="package">idstore</Term> server uses an external MTA.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Password Reset" id="f3535c44-486a-4236-ae34-765c7f763fe9">
+      <Paragraph>
+        If a user forgets their password, they can request a password reset <Term type="term">token</Term>. The server
+        will generate a strong random <Term type="term">token</Term> <Term type="expression">t</Term> with a
+        configurable expiration date. For each email address <Term type="expression">e</Term> associated
+        with the user's account, the server will email <Term type="expression">t</Term> to
+        <Term type="expression">e</Term>. The user can retrieve <Term type="expression">t</Term>
+        from one of their email accounts and recite <Term type="expression">t</Term> back to the server to
+        have their password reset.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Email Additions">
+      <Paragraph>
+        If a user wants to add a new email address <Term type="expression">f</Term> to their account,
+        they can request email addition <Term type="term">tokens</Term>. The server
+        will generate a pair of strong random <Term type="term">tokens</Term> <Term type="expression">tpermit</Term>
+        and <Term type="expression">tdeny</Term>, each with a configurable expiration date.
+        For each email account <Term type="expression">e</Term> associated
+        with the user's account, the server will email <Term type="expression">tdeny</Term> to
+        <Term type="expression">e</Term>. The server will email <Term type="expression">tpermit</Term>
+        to <Term type="expression">f</Term>. Assuming the user really does have access to
+        <Term type="expression">f</Term>, they can read the resulting email and recite
+        <Term type="expression">tpermit</Term> back to the
+        <Term type="package">idstore</Term> server to have the new address added to their account.
+      </Paragraph>
+      <Paragraph>
+        In the event that the user's account is compromised, and a hostile party is attempting to add a new
+        email address to the user's account, the user can recite <Term type="expression">tdeny</Term> back
+        to the server from any of their other email accounts in order to deny the address addition. This potentially
+        alerts users to the fact that their account has been compromised, and allows them to mitigate the damage
+        if they act fast enough.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Email Removals">
+      <Paragraph>
+        If a user wants to remove an existing email address <Term type="expression">f</Term> from their account,
+        they can request email removal <Term type="term">tokens</Term>. The server
+        will generate a pair of strong random <Term type="term">tokens</Term> <Term type="expression">tpermit</Term>
+        and <Term type="expression">tdeny</Term>, each with a configurable expiration date.
+        For each email account <Term type="expression">e</Term> associated
+        with the user's account (where <Term type="expression">e != f</Term>),
+        the server will email <Term type="expression">tdeny</Term> to
+        <Term type="expression">e</Term>. The server will email <Term type="expression">tpermit</Term>
+        to <Term type="expression">f</Term>. Assuming the user really does have access to
+        <Term type="expression">f</Term>, they can read the resulting email and recite
+        <Term type="expression">tpermit</Term> back to the
+        <Term type="package">idstore</Term> server to have the address removed from their account.
+      </Paragraph>
+      <Paragraph>
+        In the event that the user's account is compromised, and a hostile party is attempting to remove the
+        user's existing email address from the compromised account, the user can recite
+        <Term type="expression">tdeny</Term> back
+        to the server from any of their other email accounts in order to deny the address removal. This
+        potentially alerts users to the fact that their account has been compromised, and allows them to mitigate
+        the damage if they act fast enough.
+      </Paragraph>
+      <Paragraph>
+        If the user no longer has access to <Term type="expression">f</Term>, they cannot remove it. In this
+        case, an administrator will need to remove the address manually.
+      </Paragraph>
+    </Subsection>
   </Subsection>
 
 </Section>

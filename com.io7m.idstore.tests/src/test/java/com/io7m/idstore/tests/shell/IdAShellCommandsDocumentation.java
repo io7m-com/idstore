@@ -94,7 +94,7 @@ public final class IdAShellCommandsDocumentation
           writer.flush();
 
           final var path =
-            Paths.get("/tmp/scmd-%s.xml".formatted(name));
+            Paths.get("/shared-tmp/scmd-%s.xml".formatted(name));
 
           Files.writeString(path, textWriter.toString(), StandardCharsets.UTF_8);
         } catch (final Exception e) {

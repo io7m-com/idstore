@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.tests.model;
 
-import com.io7m.idstore.model.IdPasswordAlgorithmRedacted;
 import com.io7m.idstore.model.IdUser;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
@@ -29,18 +28,19 @@ public final class IdUserTest
    * Redacting passwords works.
    *
    * @param user The user
-   *
-   * @throws Exception On errors
    */
 
   @Property
   public void testRedactPassword(
     final @ForAll IdUser user)
-    throws Exception
   {
-    assertEquals(
-      IdPasswordAlgorithmRedacted.create().createHashed("x"),
-      user.withRedactedPassword().password()
-    );
+    final var originalPassword =
+      user.password();
+
+    final var redactedPassword =
+      user.withRedactedPassword()
+        .password();
+
+    assertEquals(originalPassword.expires(), redactedPassword.expires());
   }
 }

@@ -18,12 +18,19 @@ message, then please click the following link to deny the request:
 
   ${linkDeny}
 
+[#if linkAllow == ""]
+Otherwise, if you are happy to allow this operation to proceed, you don't need
+to do anything.
+
+This request will expire at: ${verification.expires()}
+[#else]
 Otherwise, if you are happy to allow this operation to proceed, then please
 click the following link:
 
   ${linkAllow}
 
 If you do nothing, this request will expire at: ${verification.expires()}
+[/#if]
 
 Please note: This is an automated message, and it is not possible to reply to
 this email.

@@ -32,19 +32,21 @@ module com.io7m.idstore.server.controller
   requires com.io7m.idstore.server.service.branding;
   requires com.io7m.idstore.server.service.clock;
   requires com.io7m.idstore.server.service.configuration;
+  requires com.io7m.idstore.server.service.events;
   requires com.io7m.idstore.server.service.mail;
   requires com.io7m.idstore.server.service.ratelimit;
+  requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.telemetry.api;
   requires com.io7m.idstore.server.service.templating;
-  requires com.io7m.repetoir.core;
+
   requires com.io7m.jaffirm.core;
   requires com.io7m.jdeferthrow.core;
   requires com.io7m.jxtrand.vanilla;
+  requires com.io7m.repetoir.core;
   requires io.opentelemetry.api;
   requires io.opentelemetry.context;
   requires io.opentelemetry.semconv;
   requires org.slf4j;
-  requires com.io7m.idstore.server.service.sessions;
 
   opens com.io7m.idstore.server.controller
     to com.io7m.jxtrand.vanilla;

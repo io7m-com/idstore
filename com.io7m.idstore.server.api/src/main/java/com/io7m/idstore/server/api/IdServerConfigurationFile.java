@@ -29,6 +29,7 @@ import java.util.Optional;
  * @param mailConfiguration     The mail configuration
  * @param openTelemetry         The OpenTelemetry configuration
  * @param rateLimit             The rate limiting configuration
+ * @param passwordExpiration    The password expiration configuration
  * @param sessionConfiguration  The session configuration
  */
 
@@ -40,6 +41,7 @@ public record IdServerConfigurationFile(
   IdServerHistoryConfiguration historyConfiguration,
   IdServerSessionConfiguration sessionConfiguration,
   IdServerRateLimitConfiguration rateLimit,
+  IdServerPasswordExpirationConfiguration passwordExpiration,
   Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
   implements IdServerJSONConfigurationElementType
 {
@@ -53,6 +55,7 @@ public record IdServerConfigurationFile(
    * @param mailConfiguration     The mail configuration
    * @param openTelemetry         The OpenTelemetry configuration
    * @param rateLimit             The rate limiting configuration
+   * @param passwordExpiration    The password expiration configuration
    * @param sessionConfiguration  The session configuration
    */
 
@@ -65,6 +68,7 @@ public record IdServerConfigurationFile(
     Objects.requireNonNull(sessionConfiguration, "sessionConfiguration");
     Objects.requireNonNull(historyConfiguration, "historyConfiguration");
     Objects.requireNonNull(rateLimit, "rateLimit");
+    Objects.requireNonNull(passwordExpiration, "passwordExpiration");
     Objects.requireNonNull(openTelemetry, "openTelemetry");
   }
 }

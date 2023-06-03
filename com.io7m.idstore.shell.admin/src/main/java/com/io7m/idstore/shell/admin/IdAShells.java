@@ -34,6 +34,7 @@ import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchByEmailNext;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchByEmailPrevious;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchNext;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchPrevious;
+import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminUpdatePasswordExpiration;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAuditSearchBegin;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAuditSearchNext;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAuditSearchPrevious;
@@ -57,6 +58,7 @@ import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchByEmailNext;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchByEmailPrevious;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchNext;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchPrevious;
+import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserUpdatePasswordExpiration;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdVersion;
 import com.io7m.idstore.shell.admin.internal.IdAShellOptions;
 import org.jline.reader.LineReaderBuilder;
@@ -132,6 +134,7 @@ public final class IdAShells implements IdAShellFactoryType
         new IdAShellCmdAdminSearchByEmailPrevious(client),
         new IdAShellCmdAdminSearchNext(client),
         new IdAShellCmdAdminSearchPrevious(client),
+        new IdAShellCmdAdminUpdatePasswordExpiration(client),
         new IdAShellCmdAuditSearchBegin(client),
         new IdAShellCmdAuditSearchNext(client),
         new IdAShellCmdAuditSearchPrevious(client),
@@ -155,6 +158,7 @@ public final class IdAShells implements IdAShellFactoryType
         new IdAShellCmdUserSearchByEmailPrevious(client),
         new IdAShellCmdUserSearchNext(client),
         new IdAShellCmdUserSearchPrevious(client),
+        new IdAShellCmdUserUpdatePasswordExpiration(client),
         new IdAShellCmdVersion()
       );
 

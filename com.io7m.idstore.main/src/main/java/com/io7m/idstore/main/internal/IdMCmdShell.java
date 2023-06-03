@@ -23,8 +23,6 @@ import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
 import com.io7m.quarrel.core.QCommandType;
 import com.io7m.quarrel.core.QParameterNamedType;
-import com.io7m.quarrel.core.QParametersPositionalNone;
-import com.io7m.quarrel.core.QParametersPositionalType;
 import com.io7m.quarrel.core.QStringType.QConstant;
 import com.io7m.quarrel.ext.logback.QLogback;
 
@@ -64,12 +62,6 @@ public final class IdMCmdShell implements QCommandType
       Stream.of(),
       QLogback.parameters().stream()
     ).toList();
-  }
-
-  @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
   }
 
   @Override

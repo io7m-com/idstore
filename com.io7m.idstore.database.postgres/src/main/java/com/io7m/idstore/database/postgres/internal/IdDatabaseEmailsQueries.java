@@ -116,7 +116,8 @@ final class IdDatabaseEmailsQueries
     final var executor = transaction.userId();
 
     final var querySpan =
-      transaction.createQuerySpan("IdDatabaseEmailsQueries.emailVerificationCreate");
+      transaction.createQuerySpan(
+        "IdDatabaseEmailsQueries.emailVerificationCreate");
 
     final var attributes =
       Map.ofEntries(
@@ -132,32 +133,60 @@ final class IdDatabaseEmailsQueries
         .orElseThrow(() -> userDoesNotExist(attributes));
 
       {
+        final var tokenValue =
+          verification.tokenPermit().value();
         final var existing =
           context.selectFrom(EMAIL_VERIFICATIONS)
-            .where(EMAIL_VERIFICATIONS.TOKEN.eq(verification.token().value()))
+            .where(EMAIL_VERIFICATIONS.TOKEN_PERMIT.eq(tokenValue))
             .fetchOptional();
+
         if (existing.isPresent()) {
           throw new IdDatabaseException(
             "Email verification token already exists.",
             EMAIL_VERIFICATION_DUPLICATE,
-            Map.of("Token", verification.token().value()),
+            Map.of("Token", tokenValue),
+            Optional.of("Use a different token.")
+          );
+        }
+      }
+
+      {
+        final var tokenValue =
+          verification.tokenDeny().value();
+        final var existing =
+          context.selectFrom(EMAIL_VERIFICATIONS)
+            .where(EMAIL_VERIFICATIONS.TOKEN_DENY.eq(tokenValue))
+            .fetchOptional();
+
+        if (existing.isPresent()) {
+          throw new IdDatabaseException(
+            "Email verification token already exists.",
+            EMAIL_VERIFICATION_DUPLICATE,
+            Map.of("Token", tokenValue),
             Optional.of("Use a different token.")
           );
         }
       }
 
       context.insertInto(EMAIL_VERIFICATIONS)
-        .set(EMAIL_VERIFICATIONS.TOKEN, verification.token().value())
         .set(EMAIL_VERIFICATIONS.EMAIL, verification.email().value())
-        .set(EMAIL_VERIFICATIONS.USER_ID, verification.user())
-        .set(EMAIL_VERIFICATIONS.OPERATION, verification.operation().name())
         .set(EMAIL_VERIFICATIONS.EXPIRES, verification.expires())
+        .set(EMAIL_VERIFICATIONS.OPERATION, verification.operation().name())
+        .set(EMAIL_VERIFICATIONS.TOKEN_DENY, verification.tokenDeny().value())
+        .set(
+          EMAIL_VERIFICATIONS.TOKEN_PERMIT,
+          verification.tokenPermit().value())
+        .set(EMAIL_VERIFICATIONS.USER_ID, verification.user())
         .execute();
 
       context.insertInto(AUDIT)
         .set(AUDIT.USER_ID, executor)
-        .set(AUDIT.MESSAGE,
-             "%s|%s".formatted(verification.token(), verification.email()))
+        .set(
+          AUDIT.MESSAGE,
+          "%s|%s|%s".formatted(
+            verification.tokenPermit(),
+            verification.tokenDeny(),
+            verification.email()))
         .set(AUDIT.TYPE, "EMAIL_VERIFICATION_CREATED")
         .set(AUDIT.TIME, this.currentTime())
         .execute();
@@ -171,7 +200,7 @@ final class IdDatabaseEmailsQueries
   }
 
   @Override
-  public Optional<IdEmailVerification> emailVerificationGet(
+  public Optional<IdEmailVerification> emailVerificationGetPermit(
     final IdToken token)
     throws IdDatabaseException
   {
@@ -182,7 +211,8 @@ final class IdDatabaseEmailsQueries
     final var context =
       transaction.createContext();
     final var querySpan =
-      transaction.createQuerySpan("IdDatabaseEmailsQueries.emailVerificationGet");
+      transaction.createQuerySpan(
+        "IdDatabaseEmailsQueries.emailVerificationGetPermit");
 
     final var attributes =
       Map.ofEntries(
@@ -191,7 +221,40 @@ final class IdDatabaseEmailsQueries
 
     try {
       return context.selectFrom(EMAIL_VERIFICATIONS)
-        .where(EMAIL_VERIFICATIONS.TOKEN.eq(token.value()))
+        .where(EMAIL_VERIFICATIONS.TOKEN_PERMIT.eq(token.value()))
+        .fetchOptional()
+        .map(IdDatabaseEmailsQueries::mapVerification);
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e, attributes);
+    } finally {
+      querySpan.end();
+    }
+  }
+
+  @Override
+  public Optional<IdEmailVerification> emailVerificationGetDeny(
+    final IdToken token)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(token, "token");
+
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan(
+        "IdDatabaseEmailsQueries.emailVerificationGetDeny");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Token", token.value())
+      );
+
+    try {
+      return context.selectFrom(EMAIL_VERIFICATIONS)
+        .where(EMAIL_VERIFICATIONS.TOKEN_DENY.eq(token.value()))
         .fetchOptional()
         .map(IdDatabaseEmailsQueries::mapVerification);
     } catch (final DataAccessException e) {
@@ -208,7 +271,8 @@ final class IdDatabaseEmailsQueries
     return new IdEmailVerification(
       record.getUserId(),
       new IdEmail(record.getEmail()),
-      new IdToken(record.getToken()),
+      new IdToken(record.getTokenPermit()),
+      new IdToken(record.getTokenDeny()),
       IdEmailVerificationOperation.valueOf(record.getOperation()),
       record.getExpires()
     );
@@ -230,7 +294,8 @@ final class IdDatabaseEmailsQueries
     final var executor =
       transaction.userId();
     final var querySpan =
-      transaction.createQuerySpan("IdDatabaseEmailsQueries.emailVerificationDelete");
+      transaction.createQuerySpan(
+        "IdDatabaseEmailsQueries.emailVerificationDelete");
 
     final var attributes =
       Map.ofEntries(
@@ -239,8 +304,22 @@ final class IdDatabaseEmailsQueries
       );
 
     try {
+      final var condition =
+        switch (resolution) {
+          case PERMITTED -> {
+            yield EMAIL_VERIFICATIONS.TOKEN_PERMIT.eq(token.value());
+          }
+          case DENIED -> {
+            yield EMAIL_VERIFICATIONS.TOKEN_DENY.eq(token.value());
+          }
+          case EXPIRED -> {
+            yield EMAIL_VERIFICATIONS.TOKEN_DENY.eq(token.value())
+              .or(EMAIL_VERIFICATIONS.TOKEN_PERMIT.eq(token.value()));
+          }
+        };
+
       context.deleteFrom(EMAIL_VERIFICATIONS)
-        .where(EMAIL_VERIFICATIONS.TOKEN.eq(token.value()))
+        .where(condition)
         .execute();
 
       context.insertInto(AUDIT)
@@ -253,6 +332,32 @@ final class IdDatabaseEmailsQueries
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
       throw handleDatabaseException(transaction, e, attributes);
+    } finally {
+      querySpan.end();
+    }
+  }
+
+  @Override
+  public long emailVerificationCount()
+    throws IdDatabaseException
+  {
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var executor =
+      transaction.userId();
+    final var querySpan =
+      transaction.createQuerySpan(
+        "IdDatabaseEmailsQueries.emailVerificationCount");
+
+    try {
+      return Integer.toUnsignedLong(context.fetchCount(
+        EMAIL_VERIFICATIONS, EMAIL_VERIFICATIONS.USER_ID.eq(executor)
+      ));
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(transaction, e, Map.of());
     } finally {
       querySpan.end();
     }

@@ -19,6 +19,7 @@
   <entry key="requestTooLarge">A request of size {0} is too large.</entry>
   <entry key="unauthorized">Unauthorized.</entry>
   <entry key="userIdNameDuplicate">Duplicate user ID name: "{0}"</entry>
+  <entry key="loginRateLimited">Logins are rate-limited. Please try again shortly!</entry>
 
   <entry key="emailVerificationRateLimited">Email verifications are rate-limited. Please try again shortly!</entry>
   <entry key="emailVerificationSuccessTitle">Verified</entry>

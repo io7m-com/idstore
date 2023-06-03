@@ -705,6 +705,207 @@ public final class IdAShellIT
     assertEquals(1, this.exitCode);
   }
 
+  @Test
+  public void testShellAdminSetExpiration0(
+    final IdServerType server)
+    throws Exception
+  {
+    configureAdmin(server);
+    this.startShell();
+
+    final var w = this.terminal.sendInputToTerminalWriter();
+    w.printf("login %s admin 1234%n", server.adminAPI());
+    w.println("self");
+    w.println(
+      "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone " +
+      "--permission ADMIN_READ " +
+      "--permission AUDIT_READ "
+    );
+    w.println(
+      "admin-update-password-expiration " +
+      "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires never");
+    w.flush();
+    w.close();
+
+    this.waitForShell();
+    assertEquals(0, this.exitCode);
+
+    final var output = this.terminal.terminalProducedOutput();
+    assertTrue(output.toString().contains("The password will not expire."));
+  }
+
+  @Test
+  public void testShellAdminSetExpiration1(
+    final IdServerType server)
+    throws Exception
+  {
+    configureAdmin(server);
+    this.startShell();
+
+    final var w = this.terminal.sendInputToTerminalWriter();
+    w.printf("login %s admin 1234%n", server.adminAPI());
+    w.println("self");
+    w.println(
+      "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone " +
+      "--permission ADMIN_READ " +
+      "--permission AUDIT_READ "
+    );
+    w.println(
+      "admin-update-password-expiration " +
+      "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires default");
+    w.flush();
+    w.close();
+
+    this.waitForShell();
+    assertEquals(0, this.exitCode);
+
+    final var output = this.terminal.terminalProducedOutput();
+    assertTrue(output.toString().contains("The password will not expire."));
+  }
+
+  @Test
+  public void testShellAdminSetExpiration2(
+    final IdServerType server)
+    throws Exception
+  {
+    configureAdmin(server);
+    this.startShell();
+
+    final var w = this.terminal.sendInputToTerminalWriter();
+    w.printf("login %s admin 1234%n", server.adminAPI());
+    w.println("self");
+    w.println(
+      "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone " +
+      "--permission ADMIN_READ " +
+      "--permission AUDIT_READ "
+    );
+    w.println(
+      "admin-update-password-expiration " +
+      "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires 2100-01-01T00:00:00+00:00");
+    w.flush();
+    w.close();
+
+    this.waitForShell();
+    assertEquals(0, this.exitCode);
+
+    final var output = this.terminal.terminalProducedOutput();
+    assertTrue(output.toString().contains(
+      "The password will expire at 2100-01-01"));
+  }
+
+  @Test
+  public void testShellUserSetExpiration0(
+    final IdServerType server)
+    throws Exception
+  {
+    configureAdmin(server);
+    this.startShell();
+
+    final var w = this.terminal.sendInputToTerminalWriter();
+    w.printf("login %s admin 1234%n", server.adminAPI());
+    w.println("self");
+    w.println(
+      "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
+    );
+    w.println(
+      "user-update-password-expiration " +
+      "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires never");
+    w.flush();
+    w.close();
+
+    this.waitForShell();
+    assertEquals(0, this.exitCode);
+
+    final var output = this.terminal.terminalProducedOutput();
+    assertTrue(output.toString().contains("The password will not expire."));
+  }
+
+  @Test
+  public void testShellUserSetExpiration1(
+    final IdServerType server)
+    throws Exception
+  {
+    configureAdmin(server);
+    this.startShell();
+
+    final var w = this.terminal.sendInputToTerminalWriter();
+    w.printf("login %s admin 1234%n", server.adminAPI());
+    w.println("self");
+    w.println(
+      "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
+    );
+    w.println(
+      "user-update-password-expiration " +
+      "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires default");
+    w.flush();
+    w.close();
+
+    this.waitForShell();
+    assertEquals(0, this.exitCode);
+
+    final var output = this.terminal.terminalProducedOutput();
+    assertTrue(output.toString().contains("The password will not expire."));
+  }
+
+  @Test
+  public void testShellUserSetExpiration2(
+    final IdServerType server)
+    throws Exception
+  {
+    configureAdmin(server);
+    this.startShell();
+
+    final var w = this.terminal.sendInputToTerminalWriter();
+    w.printf("login %s admin 1234%n", server.adminAPI());
+    w.println("self");
+    w.println(
+      "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
+    );
+    w.println(
+      "user-update-password-expiration " +
+      "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires 2100-01-01T00:00:00+00:00");
+    w.flush();
+    w.close();
+
+    this.waitForShell();
+    assertEquals(0, this.exitCode);
+
+    final var output = this.terminal.terminalProducedOutput();
+    assertTrue(output.toString().contains(
+      "The password will expire at 2100-01-01"));
+  }
+
+
   private void startShell()
   {
     this.executor.execute(() -> {

@@ -22,6 +22,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Data for email verification templates.
@@ -39,7 +40,7 @@ public record IdFMEmailVerificationData(
   IdEmailVerification verification,
   String host,
   String userAgent,
-  URI linkAllow,
+  Optional<URI> linkAllow,
   URI linkDeny)
   implements IdFMDataModelType
 {
@@ -73,7 +74,7 @@ public record IdFMEmailVerificationData(
     m.put("host", this.host());
     m.put("userAgent", this.userAgent());
     m.put("linkDeny", this.linkDeny());
-    m.put("linkAllow", this.linkAllow());
+    m.put("linkAllow", this.linkAllow().map(URI::toString).orElse(""));
     return m;
   }
 }

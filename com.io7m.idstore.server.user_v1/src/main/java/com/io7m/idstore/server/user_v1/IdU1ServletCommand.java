@@ -38,7 +38,6 @@ import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import io.opentelemetry.api.trace.Span;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
@@ -46,10 +45,11 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_v1.IdU1Errors.errorResponseOf;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreAuthenticated.withAuthentication;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreTransactional.withTransaction;
@@ -144,7 +144,7 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
         BLAME_CLIENT,
         new IdProtocolException(
           strings.format("commandNotHere"),
-          PROTOCOL_ERROR,
+          API_MISUSE_ERROR,
           Map.of(),
           Optional.empty()
         )
@@ -153,8 +153,10 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
     } catch (final IOException e) {
       throw new UncheckedIOException(e);
     } catch (final IdRequestLimitExceeded | IdProtocolException e) {
+      setSpanErrorCode(e.errorCode());
       return errorResponseOf(messages, information, BLAME_CLIENT, e);
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       return errorResponseOf(messages, information, BLAME_SERVER, e);
     }
   }
@@ -187,11 +189,12 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
     try {
       result = executor.execute(context, command);
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       return errorResponseOf(messages, information, e);
     }
 
     if (result instanceof final IdUResponseError error) {
-      Span.current().setAttribute("idstore.errorCode", error.errorCode().id());
+      setSpanErrorCode(error.errorCode());
       return new IdHTTPServletResponseFixedSize(
         switch (error.blame()) {
           case BLAME_SERVER -> 500;

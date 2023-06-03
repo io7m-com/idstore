@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section title="Admin API"
+         xmlns="urn:com.io7m.structural:8:0">
+
+  <Subsection title="Trust">
+    <Paragraph>
+      Administrators enjoy a somewhat higher level of trust in the
+      <Term type="package">idstore</Term>
+      server; they are typically expected to be actual members of whatever organization happens to be running the
+      server. This documentation, therefore, does not attempt to cover all the ways a privileged administrator
+      could damage a running system. Administrators are individually subject to a fine-grained capability-based
+      security policy, so administrators should be granted the minimum privileges needed to do their jobs.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Possible Attack: Privilege Escalation">
+    <Subsection title="Description">
+      <Paragraph>
+        A malicious administrator could attempt to grant themselves more
+        <Link target="634db1a2-1705-44ae-abac-8fa281b100f4">permissions</Link>
+        than they currently have.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Mitigation">
+      <Paragraph>
+        The <Term type="package">idstore</Term> server has a hard-coded security policy that states that an arbitrary
+        administrator <Term type="expression">Z</Term> must first have the
+        <Term type="constant">ADMIN_WRITE_PERMISSIONS_SELF</Term>
+        permission to modify itself. Assuming <Term type="expression">Z</Term> passes this check, the security policy
+        then states that, for any administrators <Term type="expression">X</Term> and <Term type="expression">Y</Term>,
+        the only permissions <Term type="expression">X</Term> can grant to
+        <Term type="expression">Y</Term>
+        is the set of permissions held by <Term type="expression">X</Term>. As,
+        <Term type="expression">X = Y = Z</Term>, <Term type="expression">Z</Term> cannot grant any new permissions it
+        does not have to itself.
+      </Paragraph>
+    </Subsection>
+  </Subsection>
+
+  <Subsection title="Possible Attack: Privilege Escalation By Password">
+    <Subsection title="Description">
+      <Paragraph>
+        A malicious administrator could effectively grant themselves more
+        <Link target="634db1a2-1705-44ae-abac-8fa281b100f4">permissions</Link>
+        than they currently have by accessing the hashed password of another
+        administrator. By getting access to an account with sufficient privileges,
+        the administrator could use the compromised account to grant their existing account
+        more permissions.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Mitigation">
+      <Paragraph>
+        The only way to retrieve the complete account details of an administrator is
+        using the <Term type="expression">IdACommandAdminGet</Term> command internally.
+        The code that processes the <Term type="expression">IdACommandAdminGet</Term> command
+        redacts the password of any administrator that passes through it; it is not even possible
+        for an administrator to obtain their own hashed password. The system never stores plain-text
+        passwords in any form.
+      </Paragraph>
+      <Paragraph>
+        An administrator could attempt to guess the password of the
+        <Link target="f3d98730-c3b1-4da7-8f82-94aa9c99d473">initial administrator</Link>. There is
+        no mitigation against this; set a very strong password and do not use that account for regular
+        operations.
+      </Paragraph>
+    </Subsection>
+  </Subsection>
+
+</Section>

@@ -16,8 +16,10 @@
 
 package com.io7m.idstore.server.service.telemetry.api;
 
+import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.repetoir.core.RPServiceType;
 import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 
 /**
@@ -37,4 +39,16 @@ public interface IdServerTelemetryServiceType extends RPServiceType
    */
 
   OpenTelemetry openTelemetry();
+
+  /**
+   * Set the error code for the current span.
+   *
+   * @param errorCode The error code
+   */
+
+  static void setSpanErrorCode(
+    final IdErrorCode errorCode)
+  {
+    Span.current().setAttribute("idstore.errorCode", errorCode.id());
+  }
 }

@@ -27,6 +27,7 @@ import com.io7m.idstore.server.api.IdServerHTTPServiceConfiguration;
 import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
+import com.io7m.idstore.server.api.IdServerPasswordExpirationConfiguration;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerSessionConfiguration;
 import com.io7m.idstore.server.api.IdServerType;
@@ -282,7 +283,11 @@ public final class IdTestExtension
     this.rateLimitConfiguration =
       new IdServerRateLimitConfiguration(
         Duration.ofMinutes(5L),
-        Duration.ofMinutes(5L)
+        Duration.ofMinutes(5L),
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(1L),
+        Duration.ofSeconds(1L)
       );
 
     this.serverConfiguration =
@@ -299,6 +304,10 @@ public final class IdTestExtension
         this.brandingConfiguration,
         this.historyConfiguration,
         this.rateLimitConfiguration,
+        new IdServerPasswordExpirationConfiguration(
+          Optional.empty(),
+          Optional.empty()
+        ),
         Optional.empty()
       );
 

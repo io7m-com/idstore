@@ -66,12 +66,14 @@ public final class IdUCmdEmailAddPermitTest
       mock(IdDatabaseEmailsQueriesType.class);
     final var transaction =
       this.transaction();
-    final var token =
+    final var token0 =
+      IdToken.generate();
+    final var token1 =
       IdToken.generate();
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
-    when(emails.emailVerificationGet(any()))
+    when(emails.emailVerificationGetPermit(any()))
       .thenReturn(Optional.empty());
 
     /* Act. */
@@ -79,7 +81,7 @@ public final class IdUCmdEmailAddPermitTest
     final var handler = new IdUCmdEmailAddPermit();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdUCommandEmailAddPermit(token));
+        handler.execute(context, new IdUCommandEmailAddPermit(token0));
       });
 
     /* Assert. */
@@ -108,21 +110,24 @@ public final class IdUCmdEmailAddPermitTest
       mock(IdDatabaseEmailsQueriesType.class);
     final var transaction =
       this.transaction();
-    final var token =
+    final var token0 =
+      IdToken.generate();
+    final var token1 =
       IdToken.generate();
 
     final var verification =
       new IdEmailVerification(
         UUID.randomUUID(),
         user0.emails().first(),
-        token,
+        token0,
+        token1,
         EMAIL_ADD,
         this.timeStart().plusHours(6L)
       );
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
-    when(emails.emailVerificationGet(any()))
+    when(emails.emailVerificationGetPermit(any()))
       .thenReturn(Optional.of(verification));
 
     /* Act. */
@@ -130,7 +135,7 @@ public final class IdUCmdEmailAddPermitTest
     final var handler = new IdUCmdEmailAddPermit();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdUCommandEmailAddPermit(token));
+        handler.execute(context, new IdUCommandEmailAddPermit(token0));
       });
 
     /* Assert. */
@@ -159,21 +164,24 @@ public final class IdUCmdEmailAddPermitTest
       mock(IdDatabaseEmailsQueriesType.class);
     final var transaction =
       this.transaction();
-    final var token =
+    final var token0 =
+      IdToken.generate();
+    final var token1 =
       IdToken.generate();
 
     final var verification =
       new IdEmailVerification(
         user0.id(),
         user0.emails().first(),
-        token,
+        token0,
+        token1,
         EMAIL_ADD,
         this.timeStart().minusHours(6L)
       );
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
-    when(emails.emailVerificationGet(any()))
+    when(emails.emailVerificationGetPermit(any()))
       .thenReturn(Optional.of(verification));
 
     /* Act. */
@@ -181,7 +189,7 @@ public final class IdUCmdEmailAddPermitTest
     final var handler = new IdUCmdEmailAddPermit();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdUCommandEmailAddPermit(token));
+        handler.execute(context, new IdUCommandEmailAddPermit(token0));
       });
 
     /* Assert. */
@@ -210,21 +218,24 @@ public final class IdUCmdEmailAddPermitTest
       mock(IdDatabaseEmailsQueriesType.class);
     final var transaction =
       this.transaction();
-    final var token =
+    final var token0 =
+      IdToken.generate();
+    final var token1 =
       IdToken.generate();
 
     final var verification =
       new IdEmailVerification(
         user0.id(),
         user0.emails().first(),
-        token,
+        token0,
+        token1,
         EMAIL_REMOVE,
         this.timeStart().plusHours(6L)
       );
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
-    when(emails.emailVerificationGet(any()))
+    when(emails.emailVerificationGetPermit(any()))
       .thenReturn(Optional.of(verification));
 
     /* Act. */
@@ -232,7 +243,7 @@ public final class IdUCmdEmailAddPermitTest
     final var handler = new IdUCmdEmailAddPermit();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdUCommandEmailAddPermit(token));
+        handler.execute(context, new IdUCommandEmailAddPermit(token0));
       });
 
     /* Assert. */
@@ -264,14 +275,17 @@ public final class IdUCmdEmailAddPermitTest
 
     final var transaction =
       this.transaction();
-    final var token =
+    final var token0 =
+      IdToken.generate();
+    final var token1 =
       IdToken.generate();
 
     final var verification =
       new IdEmailVerification(
         user0.id(),
         user0.emails().first(),
-        token,
+        token0,
+        token1,
         EMAIL_ADD,
         this.timeStart().plusHours(6L)
       );
@@ -280,7 +294,7 @@ public final class IdUCmdEmailAddPermitTest
       .thenReturn(emails);
     when(transaction.queries(IdDatabaseUsersQueriesType.class))
       .thenReturn(users);
-    when(emails.emailVerificationGet(any()))
+    when(emails.emailVerificationGetPermit(any()))
       .thenReturn(Optional.of(verification));
 
     /* Act. */
@@ -288,7 +302,7 @@ public final class IdUCmdEmailAddPermitTest
     final var handler =
       new IdUCmdEmailAddPermit();
     final var response =
-      handler.execute(context, new IdUCommandEmailAddPermit(token));
+      handler.execute(context, new IdUCommandEmailAddPermit(token0));
 
     /* Assert. */
 
@@ -308,9 +322,9 @@ public final class IdUCmdEmailAddPermitTest
       .userEmailAdd(user0.id(), user0.emails().first());
 
     verify(emails, this.once())
-      .emailVerificationGet(token);
+      .emailVerificationGetPermit(token0);
     verify(emails, this.once())
-      .emailVerificationDelete(token, PERMITTED);
+      .emailVerificationDelete(token0, PERMITTED);
 
     verifyNoMoreInteractions(emails);
     verifyNoMoreInteractions(transaction);

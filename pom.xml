@@ -13,7 +13,7 @@
 
   <groupId>com.io7m.idstore</groupId>
   <artifactId>com.io7m.idstore</artifactId>
-  <version>1.0.0-beta0005</version>
+  <version>1.0.0-beta0006</version>
 
   <packaging>pom</packaging>
   <name>com.io7m.idstore</name>
@@ -43,6 +43,7 @@
     <module>com.io7m.idstore.server.service.branding</module>
     <module>com.io7m.idstore.server.service.clock</module>
     <module>com.io7m.idstore.server.service.configuration</module>
+    <module>com.io7m.idstore.server.service.events</module>
     <module>com.io7m.idstore.server.service.health</module>
     <module>com.io7m.idstore.server.service.mail</module>
     <module>com.io7m.idstore.server.service.maintenance</module>
@@ -66,7 +67,7 @@
 
   <properties>
     <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
-    <com.io7m.cedarbridge.version>0.0.12</com.io7m.cedarbridge.version>
+    <com.io7m.cedarbridge.version>1.2.0</com.io7m.cedarbridge.version>
     <com.io7m.cxbutton.version>0.0.5</com.io7m.cxbutton.version>
     <com.io7m.hibiscus.version>0.0.8</com.io7m.hibiscus.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
@@ -74,20 +75,20 @@
     <com.io7m.jqpage.version>0.0.2</com.io7m.jqpage.version>
     <com.io7m.jvindicator.version>0.0.1</com.io7m.jvindicator.version>
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
-    <com.io7m.quarrel.version>1.0.0-beta0001</com.io7m.quarrel.version>
+    <com.io7m.quarrel.version>1.0.0</com.io7m.quarrel.version>
     <com.io7m.quixote.version>0.0.2</com.io7m.quixote.version>
     <com.io7m.seltzer.version>0.0.1</com.io7m.seltzer.version>
     <com.io7m.trasco.version>0.0.6</com.io7m.trasco.version>
     <com.io7m.verdant.version>0.0.1</com.io7m.verdant.version>
     <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
-    <io7m.api.previousVersion>1.0.0-beta0005</io7m.api.previousVersion>
+    <io7m.api.previousVersion>1.0.0-beta0006</io7m.api.previousVersion>
     <jetty.version>11.0.15</jetty.version>
     <jooq.version>3.18.4</jooq.version>
     <logback.version>1.4.7</logback.version>
     <opentelemetry.version>1.26.0</opentelemetry.version>
     <org.jline.version>3.23.0</org.jline.version>
     <slf4j.version>2.0.7</slf4j.version>
-    <testcontainers.version>1.18.1</testcontainers.version>
+    <testcontainers.version>1.18.3</testcontainers.version>
   </properties>
 
   <licenses>
@@ -396,6 +397,11 @@
       </dependency>
       <dependency>
         <groupId>com.io7m.cedarbridge</groupId>
+        <artifactId>com.io7m.cedarbridge.runtime.time</artifactId>
+        <version>${com.io7m.cedarbridge.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.io7m.cedarbridge</groupId>
         <artifactId>com.io7m.cedarbridge.runtime.bssio</artifactId>
         <version>${com.io7m.cedarbridge.version}</version>
       </dependency>
@@ -449,6 +455,16 @@
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-semconv</artifactId>
         <version>1.18.0-alpha</version>
+      </dependency>
+      <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-api-logs</artifactId>
+        <version>1.26.0-alpha</version>
+      </dependency>
+      <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-sdk-logs</artifactId>
+        <version>1.26.0-alpha</version>
       </dependency>
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
@@ -525,7 +541,7 @@
       <dependency>
         <groupId>com.sanctionco.jmail</groupId>
         <artifactId>jmail</artifactId>
-        <version>1.5.0</version>
+        <version>1.5.1</version>
       </dependency>
       <dependency>
         <groupId>com.sun.mail</groupId>

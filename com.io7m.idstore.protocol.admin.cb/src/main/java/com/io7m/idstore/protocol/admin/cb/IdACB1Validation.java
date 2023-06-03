@@ -22,6 +22,7 @@ import com.io7m.cedarbridge.runtime.api.CBString;
 import com.io7m.cedarbridge.runtime.api.CBUUID;
 import com.io7m.cedarbridge.runtime.convenience.CBLists;
 import com.io7m.cedarbridge.runtime.convenience.CBMaps;
+import com.io7m.cedarbridge.runtime.time.CBOffsetDateTime;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdName;
@@ -45,6 +46,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
 import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdatePasswordExpiration;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
@@ -67,7 +69,12 @@ import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserUpdateCredentials;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdatePasswordExpiration;
 import com.io7m.idstore.protocol.admin.IdAMessageType;
+import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetNever;
+import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetRefresh;
+import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetSpecific;
+import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetType;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanGet;
@@ -469,6 +476,8 @@ public final class IdACB1Validation
       return toWireCommandAdminSelf();
     } else if (command instanceof final IdACommandAdminUpdateCredentials c) {
       return toWireCommandAdminUpdateCredentials(c);
+    } else if (command instanceof final IdACommandAdminUpdatePasswordExpiration c) {
+      return toWireCommandAdminUpdatePasswordExpiration(c);
     } else if (command instanceof final IdACommandAuditSearchBegin c) {
       return toWireCommandAuditSearchBegin(c);
     } else if (command instanceof final IdACommandAuditSearchNext c) {
@@ -514,6 +523,8 @@ public final class IdACB1Validation
       return toWireCommandUserUpdateCredentials(c);
     } else if (command instanceof final IdACommandUserLoginHistory c) {
       return toWireCommandUserLoginHistory(c);
+    } else if (command instanceof final IdACommandUserUpdatePasswordExpiration c) {
+      return toWireCommandUserUpdatePasswordExpiration(c);
     }
 
     throw new IdProtocolException(
@@ -522,6 +533,43 @@ public final class IdACB1Validation
       Map.of(),
       Optional.empty()
     );
+  }
+
+  private static IdA1CommandUserUpdatePasswordExpiration
+  toWireCommandUserUpdatePasswordExpiration(
+    final IdACommandUserUpdatePasswordExpiration c)
+  {
+    return new IdA1CommandUserUpdatePasswordExpiration(
+      new CBUUID(c.user()),
+      toWirePasswordExpirationSet(c.set())
+    );
+  }
+
+  private static IdA1CommandAdminUpdatePasswordExpiration
+  toWireCommandAdminUpdatePasswordExpiration(
+    final IdACommandAdminUpdatePasswordExpiration c)
+  {
+    return new IdA1CommandAdminUpdatePasswordExpiration(
+      new CBUUID(c.user()),
+      toWirePasswordExpirationSet(c.set())
+    );
+  }
+
+  private static IdA1PasswordExpirationSet toWirePasswordExpirationSet(
+    final IdAPasswordExpirationSetType set)
+  {
+    if (set instanceof IdAPasswordExpirationSetNever) {
+      return new IdA1PasswordExpirationSet.Never();
+    }
+    if (set instanceof IdAPasswordExpirationSetRefresh) {
+      return new IdA1PasswordExpirationSet.Refresh();
+    }
+    if (set instanceof final IdAPasswordExpirationSetSpecific s) {
+      return new IdA1PasswordExpirationSet.Specific(
+        new CBOffsetDateTime(s.time())
+      );
+    }
+    throw new IllegalStateException("Unrecognized set type: " + set);
   }
 
   private static IdA1CommandUserLoginHistory toWireCommandUserLoginHistory(
@@ -710,6 +758,8 @@ public final class IdACB1Validation
         return fromWireCommandAdminSelf();
       } else if (message instanceof final IdA1CommandAdminUpdateCredentials c) {
         return fromWireCommandAdminUpdateCredentials(c);
+      } else if (message instanceof final IdA1CommandAdminUpdatePasswordExpiration c) {
+        return fromWireCommandAdminUpdatePasswordExpiration(c);
       } else if (message instanceof final IdA1CommandAuditSearchBegin c) {
         return fromWireCommandAuditSearchBegin(c);
       } else if (message instanceof final IdA1CommandAuditSearchNext c) {
@@ -797,6 +847,8 @@ public final class IdACB1Validation
         return fromWireCommandUserSearchPrevious();
       } else if (message instanceof final IdA1CommandUserUpdateCredentials c) {
         return fromWireCommandUserUpdateCredentials(c);
+      } else if (message instanceof final IdA1CommandUserUpdatePasswordExpiration c) {
+        return fromWireCommandUserUpdatePasswordExpiration(c);
       } else if (message instanceof final IdA1CommandUserLoginHistory c) {
         return fromWireCommandUserLoginHistory(c);
 
@@ -851,6 +903,39 @@ public final class IdACB1Validation
       PROTOCOL_ERROR,
       Map.of(),
       Optional.empty()
+    );
+  }
+
+  private static IdAMessageType fromWireCommandAdminUpdatePasswordExpiration(
+    final IdA1CommandAdminUpdatePasswordExpiration c)
+  {
+    return new IdACommandAdminUpdatePasswordExpiration(
+      c.fieldUserId().value(),
+      fromWirePasswordExpirationSet(c.fieldSet())
+    );
+  }
+
+  private static IdAPasswordExpirationSetType fromWirePasswordExpirationSet(
+    final IdA1PasswordExpirationSet set)
+  {
+    if (set instanceof IdA1PasswordExpirationSet.Never) {
+      return new IdAPasswordExpirationSetNever();
+    }
+    if (set instanceof IdA1PasswordExpirationSet.Refresh) {
+      return new IdAPasswordExpirationSetRefresh();
+    }
+    if (set instanceof final IdA1PasswordExpirationSet.Specific s) {
+      return new IdAPasswordExpirationSetSpecific(s.fieldTime().value());
+    }
+    throw new IllegalStateException("Unrecognized set type: " + set);
+  }
+
+  private static IdAMessageType fromWireCommandUserUpdatePasswordExpiration(
+    final IdA1CommandUserUpdatePasswordExpiration c)
+  {
+    return new IdACommandUserUpdatePasswordExpiration(
+      c.fieldUserId().value(),
+      fromWirePasswordExpirationSet(c.fieldSet())
     );
   }
 

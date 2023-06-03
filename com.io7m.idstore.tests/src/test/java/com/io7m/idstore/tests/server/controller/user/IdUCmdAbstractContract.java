@@ -32,6 +32,7 @@ import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
@@ -69,6 +70,7 @@ public abstract class IdUCmdAbstractContract
   private IdServerMailServiceType mail;
   private IdServerBrandingServiceType branding;
   private IdRateLimitEmailVerificationServiceType rateLimit;
+  private IdEventServiceType eventService;
 
   protected final Times once()
   {
@@ -106,6 +108,11 @@ public abstract class IdUCmdAbstractContract
       OffsetDateTime.now(),
       this.password()
     );
+  }
+
+  protected final IdEventServiceType events()
+  {
+    return this.eventService;
   }
 
   @BeforeEach
@@ -156,10 +163,17 @@ public abstract class IdUCmdAbstractContract
       Mockito.mock(IdServerBrandingServiceType.class);
     this.rateLimit =
       Mockito.mock(IdRateLimitEmailVerificationServiceType.class);
+    this.eventService =
+      Mockito.mock(IdEventServiceType.class);
 
     this.services.register(
       IdServerClock.class,
       this.serverClock
+    );
+
+    this.services.register(
+      IdEventServiceType.class,
+      this.eventService
     );
 
     this.services.register(

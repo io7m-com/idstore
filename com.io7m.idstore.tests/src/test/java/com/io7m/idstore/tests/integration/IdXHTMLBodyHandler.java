@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Flow;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public final class IdXHTMLBodyHandler implements HttpResponse.BodySubscriber<Document>,
   HttpResponse.BodyHandler<Document>
 {
@@ -44,6 +46,8 @@ public final class IdXHTMLBodyHandler implements HttpResponse.BodySubscriber<Doc
     return this.bytes.getBody().thenApply(
       byteData -> {
         try {
+          System.out.println(new String(byteData, UTF_8));
+
           final var source =
             new InputSource(new ByteArrayInputStream(byteData));
           final var documents =

@@ -35,9 +35,11 @@ import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTPS;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP_TLS;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration;
+import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdLogs;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdMetrics;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdOTLPProtocol;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdTraces;
+import com.io7m.idstore.server.api.IdServerPasswordExpirationConfiguration;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerSessionConfiguration;
 import com.io7m.idstore.server.service.configuration.jaxb.Branding;
@@ -54,6 +56,7 @@ import com.io7m.idstore.server.service.configuration.jaxb.Mail;
 import com.io7m.idstore.server.service.configuration.jaxb.MailAuthentication;
 import com.io7m.idstore.server.service.configuration.jaxb.OpenTelemetry;
 import com.io7m.idstore.server.service.configuration.jaxb.OpenTelemetryProtocol;
+import com.io7m.idstore.server.service.configuration.jaxb.PasswordExpiration;
 import com.io7m.idstore.server.service.configuration.jaxb.RateLimiting;
 import com.io7m.idstore.server.service.configuration.jaxb.SMTPSType;
 import com.io7m.idstore.server.service.configuration.jaxb.SMTPTLSType;
@@ -152,7 +155,26 @@ public final class IdServerConfigurationFiles
       processHistory(input.getHistory()),
       processSessions(input.getSessions()),
       processRateLimit(input.getRateLimiting()),
+      processPasswordExpiration(input.getPasswordExpiration()),
       processOpenTelemetry(input.getOpenTelemetry())
+    );
+  }
+
+  private static IdServerPasswordExpirationConfiguration processPasswordExpiration(
+    final PasswordExpiration passwordExpiration)
+  {
+    if (passwordExpiration == null) {
+      return new IdServerPasswordExpirationConfiguration(
+        Optional.empty(),
+        Optional.empty()
+      );
+    }
+
+    return new IdServerPasswordExpirationConfiguration(
+      Optional.ofNullable(passwordExpiration.getUserPasswordValidityDuration())
+        .map(IdServerConfigurationFiles::processDuration),
+      Optional.ofNullable(passwordExpiration.getAdminPasswordValidityDuration())
+        .map(IdServerConfigurationFiles::processDuration)
     );
   }
 
@@ -177,9 +199,17 @@ public final class IdServerConfigurationFiles
           processProtocol(m.getProtocol())
         ));
 
+    final var logs =
+      Optional.ofNullable(openTelemetry.getLogs())
+        .map(m -> new IdLogs(
+          URI.create(m.getEndpoint()),
+          processProtocol(m.getProtocol())
+        ));
+
     return Optional.of(
       new IdServerOpenTelemetryConfiguration(
         openTelemetry.getLogicalServiceName(),
+        logs,
         metrics,
         traces
       )
@@ -199,14 +229,43 @@ public final class IdServerConfigurationFiles
     final RateLimiting rateLimiting)
   {
     return new IdServerRateLimitConfiguration(
-      processDuration(rateLimiting.getEmailVerificationRateLimit()),
-      processDuration(rateLimiting.getPasswordResetRateLimit())
+      processDuration(
+        rateLimiting.getEmailVerificationRateLimit()),
+      processDuration(
+        rateLimiting.getPasswordResetRateLimit()),
+      processDurationOrDefault(
+        rateLimiting.getUserLoginRateLimit(),
+        Duration.ofSeconds(5L)
+      ),
+      processDurationOrDefault(
+        rateLimiting.getUserLoginDelay(),
+        Duration.ofSeconds(1L)
+      ),
+      processDurationOrDefault(
+        rateLimiting.getAdminLoginRateLimit(),
+        Duration.ofSeconds(5L)
+      ),
+      processDurationOrDefault(
+        rateLimiting.getAdminLoginDelay(),
+        Duration.ofSeconds(1L)
+      )
     );
   }
 
   private static Duration processDuration(
     final javax.xml.datatype.Duration duration)
   {
+    return Duration.parse(duration.toString());
+  }
+
+  private static Duration processDurationOrDefault(
+    final javax.xml.datatype.Duration duration,
+    final Duration defaultValue)
+  {
+    if (duration == null) {
+      return defaultValue;
+    }
+
     return Duration.parse(duration.toString());
   }
 

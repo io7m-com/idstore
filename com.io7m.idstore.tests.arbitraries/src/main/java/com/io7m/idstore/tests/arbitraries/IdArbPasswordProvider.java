@@ -23,6 +23,8 @@ import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Combinators;
 import net.jqwik.api.providers.TypeUsage;
 
+import java.time.OffsetDateTime;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -62,7 +64,9 @@ public final class IdArbPasswordProvider extends IdArbAbstractProvider
 
     return Set.of(
       Combinators.combine(hex, hex)
-        .as((x0, x1) -> new IdPassword(a, x0, x1))
+        .as((x0, x1) -> {
+          return new IdPassword(a, x0, x1, Optional.of(OffsetDateTime.now()));
+        })
     );
   }
 }

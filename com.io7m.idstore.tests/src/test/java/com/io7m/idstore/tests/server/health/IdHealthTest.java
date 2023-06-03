@@ -20,6 +20,7 @@ import com.io7m.idstore.server.api.IdServerType;
 import com.io7m.idstore.tests.extensions.IdTestExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -27,6 +28,7 @@ import java.net.http.HttpResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Testcontainers(disabledWithoutDocker = true)
 @ExtendWith(IdTestExtension.class)
 public final class IdHealthTest
 {

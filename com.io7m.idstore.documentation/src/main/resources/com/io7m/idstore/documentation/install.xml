@@ -95,7 +95,7 @@ idstore: usage: idstore [command] [arguments ...]
     </Subsection>
     <Subsection title="Health Checks">
       <Paragraph>
-        The OCI image includes a <Term type="command">idstore-healthcheck</Term> command that makes a
+        The OCI image includes an <Term type="command">idstore-healthcheck</Term> command that makes a
         request to a health endpoint on the <Link target="f695a0a9-cec2-4db8-839d-e9eaaa8dace3">Admin API</Link>
         server. The command expects the server to be accessible on <Term type="expression">localhost</Term>
         inside the container, and requires that the <Term type="expression">IDSTORE_HEALTHCHECK_PORT</Term>
@@ -182,7 +182,7 @@ OK]]></Verbatim>
         <Term type="constant">nocreaterole</Term>, etc.
       </Paragraph>
       <FormalItem title="Database Roles">
-        <Table>
+        <Table type="genericTable">
           <Columns>
             <Column>Role</Column>
             <Column>Description</Column>
@@ -216,6 +216,13 @@ OK]]></Verbatim>
         </Table>
       </FormalItem>
     </Subsection>
+  </Subsection>
+
+  <Subsection title="Mail" id="80273d86-63fe-461b-9d37-8181053636ac">
+    <Paragraph>
+      The <Term type="package">idstore</Term> package requires a working SMTP MTA. The MTA is used to send
+      <Link target="0ad1864f-7eac-4700-ae06-66a4f0a3b97f">email</Link> to users.
+    </Paragraph>
   </Subsection>
 
   <Footnote id="508acbe2-3c25-4454-a306-54929caa444c">

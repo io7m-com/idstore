@@ -43,6 +43,7 @@ module com.io7m.idstore.server.admin_v1
   requires org.eclipse.jetty.server;
   requires org.eclipse.jetty.servlet;
   requires org.slf4j;
+  requires com.io7m.idstore.server.service.telemetry.api;
 
   exports com.io7m.idstore.server.admin_v1;
 }

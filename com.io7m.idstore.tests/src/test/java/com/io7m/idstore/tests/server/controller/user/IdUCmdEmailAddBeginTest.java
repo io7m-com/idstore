@@ -24,8 +24,10 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCmdEmailAddBegin;
+import com.io7m.idstore.server.service.events.IdEventUserEmailVerificationRateLimitExceeded;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.verification.Times;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -44,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -87,6 +90,11 @@ public final class IdUCmdEmailAddBeginTest
     /* Assert. */
 
     assertEquals(RATE_LIMIT_EXCEEDED, ex.errorCode());
+
+    verify(this.events(), this.once())
+      .emit(new IdEventUserEmailVerificationRateLimitExceeded(user0.id(), email));
+
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -138,6 +146,7 @@ public final class IdUCmdEmailAddBeginTest
     /* Assert. */
 
     assertEquals(EMAIL_DUPLICATE, ex.errorCode());
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -175,10 +184,13 @@ public final class IdUCmdEmailAddBeginTest
       mock(IdDatabaseEmailsQueriesType.class);
 
     final var email =
-      user0.emails().first();
+      new IdEmail("elsewhere@example.com");
 
     when(emails.emailExists(any()))
       .thenReturn(Optional.empty());
+
+    when(emails.emailVerificationCount())
+      .thenReturn(0L);
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
@@ -215,11 +227,14 @@ public final class IdUCmdEmailAddBeginTest
     verify(transaction, this.once())
       .queries(IdDatabaseEmailsQueriesType.class);
 
-    verify(transaction, this.once())
+    verify(transaction, atLeast(1))
       .userIdSet(user0.id());
 
     verify(emails, this.once())
       .emailExists(eq(email));
+
+    verify(emails, this.once())
+      .emailVerificationCount();
 
     verify(emails, this.once())
       .emailVerificationCreate(argThat(verification -> {
@@ -227,23 +242,52 @@ public final class IdUCmdEmailAddBeginTest
                && verificationHasUser(verification.user(), user0.id());
       }));
 
-    verify(brandingService, this.once())
+    /*
+     * The branding service is called once per existing email address, and
+     * once for the new address.
+     */
+
+    verify(brandingService, new Times(user0.emails().size() + 1))
       .title();
 
-    verify(brandingService, this.once())
+    verify(brandingService, new Times(user0.emails().size() + 1))
       .emailSubject(any());
+
+    /*
+     * The mail service is called once per existing email address, and
+     * once for the new address. The existing email addresses don't get
+     * a "Permit" token.
+     */
+
+    for (final var emailExisting : user0.emails().toList()) {
+      verify(mailService, this.once())
+        .sendMail(
+          any(),
+          eq(context.requestId()),
+          eq(emailExisting),
+          argThat(headers -> {
+            return headers.containsKey("X-IDStore-Verification-Token-Deny")
+              && !headers.containsKey("X-IDStore-Verification-Token-Permit");
+          }),
+          any(),
+          any()
+        );
+    }
 
     verify(mailService, this.once())
       .sendMail(
         any(),
         eq(context.requestId()),
         eq(email),
-        any(),
+        argThat(headers -> {
+          return headers.containsKey("X-IDStore-Verification-Token-Deny")
+            && headers.containsKey("X-IDStore-Verification-Token-Permit");
+        }),
         any(),
         any()
       );
 
-    verify(template, this.once())
+    verify(template, new Times(2))
       .process(any(), any());
 
     verifyNoMoreInteractions(brandingService);
@@ -252,6 +296,7 @@ public final class IdUCmdEmailAddBeginTest
     verifyNoMoreInteractions(rateLimitService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -294,6 +339,9 @@ public final class IdUCmdEmailAddBeginTest
     when(emails.emailExists(any()))
       .thenReturn(Optional.empty());
 
+    when(emails.emailVerificationCount())
+      .thenReturn(0L);
+
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
 
@@ -331,11 +379,14 @@ public final class IdUCmdEmailAddBeginTest
     verify(transaction, this.once())
       .queries(IdDatabaseEmailsQueriesType.class);
 
-    verify(transaction, this.once())
+    verify(transaction, atLeast(1))
       .userIdSet(user0.id());
 
     verify(emails, this.once())
       .emailExists(eq(email));
+
+    verify(emails, this.once())
+      .emailVerificationCount();
 
     verify(emails, this.once())
       .emailVerificationCreate(argThat(verification -> {
@@ -368,6 +419,7 @@ public final class IdUCmdEmailAddBeginTest
     verifyNoMoreInteractions(rateLimitService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -410,6 +462,9 @@ public final class IdUCmdEmailAddBeginTest
     when(emails.emailExists(any()))
       .thenReturn(Optional.empty());
 
+    when(emails.emailVerificationCount())
+      .thenReturn(0L);
+
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
 
@@ -448,11 +503,14 @@ public final class IdUCmdEmailAddBeginTest
     verify(transaction, this.once())
       .queries(IdDatabaseEmailsQueriesType.class);
 
-    verify(transaction, this.once())
+    verify(transaction, atLeast(1))
       .userIdSet(user0.id());
 
     verify(emails, this.once())
       .emailExists(eq(email));
+
+    verify(emails, this.once())
+      .emailVerificationCount();
 
     verify(emails, this.once())
       .emailVerificationCreate(argThat(verification -> {
@@ -472,6 +530,7 @@ public final class IdUCmdEmailAddBeginTest
     verifyNoMoreInteractions(rateLimitService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   private static boolean verificationHasUser(

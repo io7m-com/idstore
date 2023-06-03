@@ -65,12 +65,14 @@ public final class IdUCmdEmailRemoveDenyTest
       mock(IdDatabaseEmailsQueriesType.class);
     final var transaction =
       this.transaction();
-    final var token =
+    final var token0 =
+      IdToken.generate();
+    final var token1 =
       IdToken.generate();
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
-    when(emails.emailVerificationGet(any()))
+    when(emails.emailVerificationGetDeny(any()))
       .thenReturn(Optional.empty());
 
     /* Act. */
@@ -78,7 +80,7 @@ public final class IdUCmdEmailRemoveDenyTest
     final var handler = new IdUCmdEmailRemoveDeny();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdUCommandEmailRemoveDeny(token));
+        handler.execute(context, new IdUCommandEmailRemoveDeny(token1));
       });
 
     /* Assert. */
@@ -107,21 +109,24 @@ public final class IdUCmdEmailRemoveDenyTest
       mock(IdDatabaseEmailsQueriesType.class);
     final var transaction =
       this.transaction();
-    final var token =
+    final var token0 =
+      IdToken.generate();
+    final var token1 =
       IdToken.generate();
 
     final var verification =
       new IdEmailVerification(
         UUID.randomUUID(),
         user0.emails().first(),
-        token,
+        token0,
+        token1,
         EMAIL_ADD,
         this.timeStart().plusHours(6L)
       );
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
-    when(emails.emailVerificationGet(any()))
+    when(emails.emailVerificationGetDeny(any()))
       .thenReturn(Optional.of(verification));
 
     /* Act. */
@@ -129,7 +134,7 @@ public final class IdUCmdEmailRemoveDenyTest
     final var handler = new IdUCmdEmailRemoveDeny();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdUCommandEmailRemoveDeny(token));
+        handler.execute(context, new IdUCommandEmailRemoveDeny(token1));
       });
 
     /* Assert. */
@@ -158,21 +163,24 @@ public final class IdUCmdEmailRemoveDenyTest
       mock(IdDatabaseEmailsQueriesType.class);
     final var transaction =
       this.transaction();
-    final var token =
+    final var token0 =
+      IdToken.generate();
+    final var token1 =
       IdToken.generate();
 
     final var verification =
       new IdEmailVerification(
         user0.id(),
         user0.emails().first(),
-        token,
+        token0,
+        token1,
         EMAIL_ADD,
         this.timeStart().minusHours(6L)
       );
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
-    when(emails.emailVerificationGet(any()))
+    when(emails.emailVerificationGetDeny(any()))
       .thenReturn(Optional.of(verification));
 
     /* Act. */
@@ -180,7 +188,7 @@ public final class IdUCmdEmailRemoveDenyTest
     final var handler = new IdUCmdEmailRemoveDeny();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdUCommandEmailRemoveDeny(token));
+        handler.execute(context, new IdUCommandEmailRemoveDeny(token1));
       });
 
     /* Assert. */
@@ -209,21 +217,24 @@ public final class IdUCmdEmailRemoveDenyTest
       mock(IdDatabaseEmailsQueriesType.class);
     final var transaction =
       this.transaction();
-    final var token =
+    final var token0 =
+      IdToken.generate();
+    final var token1 =
       IdToken.generate();
 
     final var verification =
       new IdEmailVerification(
         user0.id(),
         user0.emails().first(),
-        token,
+        token0,
+        token1,
         EMAIL_ADD,
         this.timeStart().plusHours(6L)
       );
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
-    when(emails.emailVerificationGet(any()))
+    when(emails.emailVerificationGetDeny(any()))
       .thenReturn(Optional.of(verification));
 
     /* Act. */
@@ -231,7 +242,7 @@ public final class IdUCmdEmailRemoveDenyTest
     final var handler = new IdUCmdEmailRemoveDeny();
     final var ex =
       assertThrows(IdCommandExecutionFailure.class, () -> {
-        handler.execute(context, new IdUCommandEmailRemoveDeny(token));
+        handler.execute(context, new IdUCommandEmailRemoveDeny(token1));
       });
 
     /* Assert. */
@@ -260,21 +271,24 @@ public final class IdUCmdEmailRemoveDenyTest
       mock(IdDatabaseEmailsQueriesType.class);
     final var transaction =
       this.transaction();
-    final var token =
+    final var token0 =
+      IdToken.generate();
+    final var token1 =
       IdToken.generate();
 
     final var verification =
       new IdEmailVerification(
         user0.id(),
         user0.emails().first(),
-        token,
+        token0,
+        token1,
         EMAIL_REMOVE,
         this.timeStart().plusHours(6L)
       );
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
-    when(emails.emailVerificationGet(any()))
+    when(emails.emailVerificationGetDeny(any()))
       .thenReturn(Optional.of(verification));
 
     /* Act. */
@@ -282,7 +296,7 @@ public final class IdUCmdEmailRemoveDenyTest
     final var handler =
       new IdUCmdEmailRemoveDeny();
     final var response =
-      handler.execute(context, new IdUCommandEmailRemoveDeny(token));
+      handler.execute(context, new IdUCommandEmailRemoveDeny(token1));
 
     /* Assert. */
 
@@ -297,9 +311,9 @@ public final class IdUCmdEmailRemoveDenyTest
       .queries(IdDatabaseEmailsQueriesType.class);
 
     verify(emails, this.once())
-      .emailVerificationGet(token);
+      .emailVerificationGetDeny(token1);
     verify(emails, this.once())
-      .emailVerificationDelete(token, DENIED);
+      .emailVerificationDelete(token1, DENIED);
 
     verifyNoMoreInteractions(transaction);
     verifyNoMoreInteractions(emails);

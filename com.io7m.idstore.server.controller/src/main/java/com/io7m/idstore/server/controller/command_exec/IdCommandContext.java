@@ -74,7 +74,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    * @param inRequestId       The request ID
    * @param inTransaction     The transaction
    * @param inSession         The user session
-   * @param inRemoteHost      The remote host
+   * @param inRemoteHost      The remote remoteHost
    * @param inRemoteUserAgent The remote user agent
    */
 
@@ -118,7 +118,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
   }
 
   /**
-   * @return The remote host
+   * @return The remote remoteHost
    */
 
   public final String remoteHost()

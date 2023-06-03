@@ -378,13 +378,30 @@
   </Match>
   <Match>
     <Class name="com.io7m.idstore.server.controller.user.IdUCmdEmailAddBegin"/>
-    <Method name="sendVerificationMail"/>
+    <Or>
+      <Method name="sendVerificationMailWithPermitLink"/>
+      <Method name="sendVerificationMailWithoutPermitLink"/>
+    </Or>
     <Bug pattern="REC_CATCH_EXCEPTION"/>
   </Match>
   <Match>
     <Class name="com.io7m.idstore.server.controller.user.IdUCmdEmailRemoveBegin"/>
-    <Method name="sendVerificationMail"/>
+    <Or>
+      <Method name="sendVerificationMailWithPermitLink"/>
+      <Method name="sendVerificationMailWithoutPermitLink"/>
+    </Or>
     <Bug pattern="REC_CATCH_EXCEPTION"/>
+  </Match>
+  <!-- A deliberate fixed delay for logins. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.controller.user.IdUserLoginService"/>
+    <Method name="applyFixedDelay"/>
+    <Bug pattern="MDM_THREAD_YIELD"/>
+  </Match>
+  <Match>
+    <Class name="com.io7m.idstore.server.controller.admin.IdAdminLoginService"/>
+    <Method name="applyFixedDelay"/>
+    <Bug pattern="MDM_THREAD_YIELD"/>
   </Match>
 
   <!-- It's an exception. Don't care about equality. -->
@@ -412,6 +429,16 @@
   <Match>
     <Class name="com.io7m.idstore.server.controller.admin.IdACommandExecutor"/>
     <Method name="executeCommand"/>
+    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+  </Match>
+  <Match>
+    <Class name="com.io7m.idstore.server.controller.admin.IdACmdAdminUpdatePasswordExpiration"/>
+    <Method name="handlePasswordExpirationSet"/>
+    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+  </Match>
+  <Match>
+    <Class name="com.io7m.idstore.server.controller.admin.IdACmdUserUpdatePasswordExpiration"/>
+    <Method name="handlePasswordExpirationSet"/>
     <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
   </Match>
 
@@ -525,6 +552,36 @@
   <Match>
     <Class name="com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles"/>
     <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+  </Match>
+
+  <!--                                        -->
+  <!-- com.io7m.idstore.server.service.events -->
+  <!--                                        -->
+
+  <!-- Pattern matching... -->
+  <Match>
+    <Class name="com.io7m.idstore.server.service.events.IdEventService"/>
+    <Method name="emit"/>
+    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+  </Match>
+
+  <!-- Record types. -->
+  <Match>
+    <Or>
+      <Class name="com.io7m.idstore.server.service.events.IdEventAdminLoggedIn"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventAdminLoginAuthenticationFailed"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventAdminLoginRateLimitExceeded"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventUserEmailVerificationRateLimitExceeded"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventUserLoggedIn"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventUserLoginAuthenticationFailed"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventUserLoginRateLimitExceeded"/>
+      <Class name="com.io7m.idstore.server.service.events.IdEventUserPasswordResetRateLimitExceeded"/>
+    </Or>
+    <Or>
+      <Bug pattern="EI_EXPOSE_REP"/>
+      <Bug pattern="EI_EXPOSE_REP2"/>
+      <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+    </Or>
   </Match>
 
   <!--                                        -->
@@ -729,6 +786,10 @@
   <!-- JDK 21 pattern matching required. -->
   <Match>
     <Class name="com.io7m.idstore.shell.admin.internal.IdAShellCmdHelp"/>
+    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+  </Match>
+  <Match>
+    <Class name="com.io7m.idstore.shell.admin.internal.IdAPasswordExpirationSetConverter"/>
     <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
   </Match>
 

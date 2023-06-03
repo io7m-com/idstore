@@ -60,12 +60,17 @@ public final class IdDatabaseMaintenanceTest
 
     t.userIdSet(user);
 
-    final var emailToken = IdToken.generate();
+    final var emailToken0 =
+      IdToken.generate();
+    final var emailToken1 =
+      IdToken.generate();
+
     emails.emailVerificationCreate(
       new IdEmailVerification(
         user,
         new IdEmail("someone@example.com"),
-        emailToken,
+        emailToken0,
+        emailToken1,
         IdEmailVerificationOperation.EMAIL_ADD,
         timeNow().minusYears(30L)
       )
@@ -80,7 +85,8 @@ public final class IdDatabaseMaintenanceTest
     );
 
     maintenance.runMaintenance();
-    assertEquals(empty(), emails.emailVerificationGet(emailToken));
+    assertEquals(empty(), emails.emailVerificationGetPermit(emailToken0));
+    assertEquals(empty(), emails.emailVerificationGetDeny(emailToken1));
     assertEquals(empty(), users.userBanGet(user));
   }
 }

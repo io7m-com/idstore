@@ -23,8 +23,10 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveBegin;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCmdEmailRemoveBegin;
+import com.io7m.idstore.server.service.events.IdEventUserEmailVerificationRateLimitExceeded;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.verification.Times;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -36,11 +38,14 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_NONEXISTEN
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.MAIL_SYSTEM_FAILURE;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
+import static java.lang.Boolean.FALSE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -51,16 +56,60 @@ public final class IdUCmdEmailRemoveBeginTest
   extends IdUCmdAbstractContract
 {
   /**
+   * Requests are rejected by rate limiting.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testRateLimited()
+    throws Exception
+  {
+    /* Arrange. */
+
+    final var user0 =
+      this.createUser("user0");
+    final var context =
+      this.createContextAndSession(user0);
+
+    when(this.rateLimit().isAllowedByRateLimit(any()))
+      .thenReturn(FALSE);
+
+    final var email =
+      new IdEmail("someone-new@example.com");
+
+    /* Act. */
+
+    final var handler = new IdUCmdEmailRemoveBegin();
+    final var ex =
+      assertThrows(IdCommandExecutionFailure.class, () -> {
+        handler.execute(context, new IdUCommandEmailRemoveBegin(email));
+      });
+
+    /* Assert. */
+
+    assertEquals(RATE_LIMIT_EXCEEDED, ex.errorCode());
+
+    verify(this.events(), this.once())
+      .emit(new IdEventUserEmailVerificationRateLimitExceeded(user0.id(), email));
+
+    verifyNoMoreInteractions(this.events());
+  }
+
+  /**
    * You cannot remove an email address you do not have.
    *
    * @throws Exception On errors
    */
 
   @Test
-  public void testAddessNotOwned()
+  public void testAddressNotOwned()
     throws Exception
   {
     /* Arrange. */
+
+    when(this.rateLimit().isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
 
     final var user0 =
       this.createUserAndSessionWithEmails("user");
@@ -93,6 +142,7 @@ public final class IdUCmdEmailRemoveBeginTest
     /* Assert. */
 
     assertEquals(EMAIL_NONEXISTENT, ex.errorCode());
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -102,10 +152,13 @@ public final class IdUCmdEmailRemoveBeginTest
    */
 
   @Test
-  public void testAddessLast()
+  public void testAddressLast()
     throws Exception
   {
     /* Arrange. */
+
+    when(this.rateLimit().isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
 
     final var user0 =
       this.createUser("user");
@@ -138,6 +191,7 @@ public final class IdUCmdEmailRemoveBeginTest
     /* Assert. */
 
     assertEquals(EMAIL_VERIFICATION_FAILED, ex.errorCode());
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -151,6 +205,9 @@ public final class IdUCmdEmailRemoveBeginTest
     throws Exception
   {
     /* Arrange. */
+
+    when(this.rateLimit().isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
 
     final var user0 =
       this.createUserAndSessionWithEmails("user");
@@ -174,6 +231,9 @@ public final class IdUCmdEmailRemoveBeginTest
 
     when(emails.emailExists(any()))
       .thenReturn(Optional.empty());
+
+    when(emails.emailVerificationCount())
+      .thenReturn(0L);
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
@@ -207,7 +267,7 @@ public final class IdUCmdEmailRemoveBeginTest
     verify(transaction, this.once())
       .queries(IdDatabaseEmailsQueriesType.class);
 
-    verify(transaction, this.once())
+    verify(transaction, atLeast(1))
       .userIdSet(user0.id());
 
     verify(emails, this.once())
@@ -216,23 +276,55 @@ public final class IdUCmdEmailRemoveBeginTest
                && verificationHasUser(verification.user(), user0.id());
       }));
 
-    verify(brandingService, this.once())
-      .title();
+    verify(emails, this.once())
+      .emailVerificationCount();
 
-    verify(brandingService, this.once())
+    /*
+     * The branding service is called once per existing email.
+     */
+
+    verify(brandingService, new Times(user0.emails().size()))
+      .title();
+    verify(brandingService, new Times(user0.emails().size()))
       .emailSubject(any());
+
+    /*
+     * One email is sent per registered email address, and one extra one
+     * for the new address. The other email addresses don't get a "Permit"
+     * link.
+     */
+
+    for (final var emailExisting : user0.emails().toList()) {
+      if (!Objects.equals(emailExisting, email)) {
+        verify(mailService, this.once())
+          .sendMail(
+            any(),
+            eq(context.requestId()),
+            eq(emailExisting),
+            argThat(headers -> {
+              return headers.containsKey("X-IDStore-Verification-Token-Deny")
+                && !headers.containsKey("X-IDStore-Verification-Token-Permit");
+            }),
+            any(),
+            any()
+          );
+      }
+    }
 
     verify(mailService, this.once())
       .sendMail(
         any(),
         eq(context.requestId()),
         eq(email),
-        any(),
+        argThat(headers -> {
+          return headers.containsKey("X-IDStore-Verification-Token-Deny")
+            && headers.containsKey("X-IDStore-Verification-Token-Permit");
+        }),
         any(),
         any()
       );
 
-    verify(template, this.once())
+    verify(template, new Times(user0.emails().size()))
       .process(any(), any());
 
     verifyNoMoreInteractions(brandingService);
@@ -240,6 +332,7 @@ public final class IdUCmdEmailRemoveBeginTest
     verifyNoMoreInteractions(mailService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -268,6 +361,9 @@ public final class IdUCmdEmailRemoveBeginTest
     final var mailService =
       this.mail();
 
+    when(this.rateLimit().isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
+
     final var emails =
       mock(IdDatabaseEmailsQueriesType.class);
 
@@ -276,6 +372,9 @@ public final class IdUCmdEmailRemoveBeginTest
 
     when(emails.emailExists(any()))
       .thenReturn(Optional.empty());
+
+    when(emails.emailVerificationCount())
+      .thenReturn(0L);
 
     when(transaction.queries(IdDatabaseEmailsQueriesType.class))
       .thenReturn(emails);
@@ -311,7 +410,7 @@ public final class IdUCmdEmailRemoveBeginTest
     verify(transaction, this.once())
       .queries(IdDatabaseEmailsQueriesType.class);
 
-    verify(transaction, this.once())
+    verify(transaction, atLeast(1))
       .userIdSet(user0.id());
 
     verify(emails, this.once())
@@ -319,6 +418,9 @@ public final class IdUCmdEmailRemoveBeginTest
         return verificationHasEmail(verification, email)
                && verificationHasUser(verification.user(), user0.id());
       }));
+
+    verify(emails, this.once())
+      .emailVerificationCount();
 
     verify(brandingService, this.once())
       .title();
@@ -330,7 +432,7 @@ public final class IdUCmdEmailRemoveBeginTest
       .sendMail(
         any(),
         eq(context.requestId()),
-        eq(email),
+        any(),
         any(),
         any(),
         any()
@@ -344,6 +446,7 @@ public final class IdUCmdEmailRemoveBeginTest
     verifyNoMoreInteractions(mailService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   /**
@@ -357,6 +460,9 @@ public final class IdUCmdEmailRemoveBeginTest
     throws Exception
   {
     /* Arrange. */
+
+    when(this.rateLimit().isAllowedByRateLimit(any()))
+      .thenReturn(Boolean.TRUE);
 
     final var user0 =
       this.createUserAndSessionWithEmails("user");
@@ -413,7 +519,7 @@ public final class IdUCmdEmailRemoveBeginTest
     verify(transaction, this.once())
       .queries(IdDatabaseEmailsQueriesType.class);
 
-    verify(transaction, this.once())
+    verify(transaction, atLeast(1))
       .userIdSet(user0.id());
 
     verify(emails, this.once())
@@ -421,6 +527,9 @@ public final class IdUCmdEmailRemoveBeginTest
         return verificationHasEmail(verification, email)
                && verificationHasUser(verification.user(), user0.id());
       }));
+
+    verify(emails, this.once())
+      .emailVerificationCount();
 
     verify(brandingService, this.once())
       .title();
@@ -433,6 +542,7 @@ public final class IdUCmdEmailRemoveBeginTest
     verifyNoMoreInteractions(mailService);
     verifyNoMoreInteractions(template);
     verifyNoMoreInteractions(transaction);
+    verifyNoMoreInteractions(this.events());
   }
 
   private static boolean verificationHasUser(

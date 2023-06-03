@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section title="User API"
+         xmlns="urn:com.io7m.structural:8:0">
+
+  <Subsection title="Login" id="8a062886-81d1-4131-a4e8-ea044c99caf4">
+    <Subsection title="Potential Attack: Online Brute Force">
+      <Subsection title="Description">
+        <Paragraph>
+          An attacker could automate login requests to the user API in an attempt to repeatedly try to
+          guess the password of a given account, or simply to try to probe all accounts for weak passwords.
+        </Paragraph>
+      </Subsection>
+      <Subsection title="Mitigation">
+        <Paragraph>
+          The <Term type="package">idstore</Term> server currently applies configurable
+          <Link target="1d55d366-5883-4418-a61a-eef7a88eaca7">rate limiting</Link> to login operations. The
+          default setting is to require that no more than one login request be made from a given IP address
+          in a given five-second duration. Additionally, a configurable delay is automatically applied to every
+          login operation so that, by default, every login attempt takes at least one second to complete.
+        </Paragraph>
+        <Paragraph>
+          The <Term type="package">idstore</Term> server uses constant-time algorithms for checking password
+          hashes in the hope that this will avoid leaking timing information to clients. The
+          <Term type="package">idstore</Term> server should <Term type="emphasis">NOT</Term> be considered
+          timing-invariant in the general case.
+        </Paragraph>
+      </Subsection>
+    </Subsection>
+  </Subsection>
+
+  <Subsection title="Email Additions" id="4c369541-2b72-4c8f-82ed-9ad6556d72ff">
+    <Subsection title="Potential Attack: Spam">
+      <Subsection title="Description">
+        <Paragraph>
+          An attacker with access to a compromised user account could request the addition of lots of random email
+          addresses to the account. The intent of this attack would be to get the <Term type="package">idstore</Term>
+          server to send lots of mail to random addresses, either to annoy the owners of those addresses, or to try to
+          get the MTA associated with the server blacklisted as a sender of bulk unsolicited mail.
+        </Paragraph>
+      </Subsection>
+      <Subsection title="Mitigation">
+        <Paragraph>
+          The <Term type="package">idstore</Term> server currently applies configurable
+          <Link target="1d55d366-5883-4418-a61a-eef7a88eaca7">rate limiting</Link> for email verifications, with
+          the suggested default being one verification allowed every ten minutes. In this case, the limit is applied
+          on a per-user basis, so a compromised account trying to produce a flood of verification requests does not
+          affect any other user's ability to verify email addresses.
+        </Paragraph>
+        <Paragraph>
+          Additionally, a user may have at most <Term type="expression">10</Term> in-progress email verifications
+          at any given time. Any attempt to create another email verification beyond this limit will be denied by the
+          security policy. The user will have to either manually clear the verifications (by denying the
+          requests from an email account under the user's control), or wait for the requests to expire before
+          submitting more.
+        </Paragraph>
+      </Subsection>
+    </Subsection>
+  </Subsection>
+
+  <Subsection title="Email Removals">
+    <Subsection title="Potential Attack: Lockout">
+      <Subsection title="Description">
+        <Paragraph>
+          An attacker with access to a compromised user account could first add an email address under the
+          attacker's control to the account, and then remove the user's other email accounts in order to lock them
+          out of the account and prevent them using their email addresses for
+          <Link target="f3535c44-486a-4236-ae34-765c7f763fe9">password resets</Link>.
+        </Paragraph>
+      </Subsection>
+      <Subsection title="Mitigation">
+        <Paragraph>
+          When an attempt is made to remove an email address from an account, the <Term type="package">idstore</Term>
+          server sends a token to all the other addresses on the account that allows the owner of the email
+          address to deny the removal. This serves two purposes: The user whose account was compromised is
+          effectively notified of the compromise, and has an (albeit likely short-lived) opportunity to
+          mitigate the damage by refusing to allow the attacker to remove the address (assuming that the
+          user can deny the request before the attacker has the opportunity to permit it).
+        </Paragraph>
+        <Paragraph>
+          If the attacker does manage to succeed in removing the email address, the
+          <Link target="0610ec24-6507-4a19-9efe-f511c31ccc9a">audit log</Link> allows
+          the administrator to see the exact series of events that occurred, and manually reset the user's
+          account password and email addresses.
+        </Paragraph>
+      </Subsection>
+    </Subsection>
+  </Subsection>
+
+  <Subsection title="Password Resets" id="e1b0cc11-5b42-4454-9892-196d48734717">
+    <Subsection title="Potential Attack: Spam">
+      <Subsection title="Description">
+        <Paragraph>
+          An attacker with knowledge that a given email address is used by a user account in the system could
+          request lots of password resets for that address. The intent of this attack would be to get the
+          <Term type="package">idstore</Term> server to send lots of mail to the email address, either to annoy the
+          owner of the address, or to try to get the MTA associated with the server blacklisted as a sender
+          of bulk unsolicited mail.
+        </Paragraph>
+      </Subsection>
+      <Subsection title="Mitigation">
+        <Paragraph>
+          The <Term type="package">idstore</Term> server currently applies configurable
+          <Link target="1d55d366-5883-4418-a61a-eef7a88eaca7">rate limiting</Link> for password resets, with
+          the suggested default being one verification allowed every ten minutes. In this case, the limit is applied
+          on a per-IP basis.
+        </Paragraph>
+        <Paragraph>
+          This will, unfortunately, have the side effect of counting towards the user account in question's
+          email verification limit. A user may have at most <Term type="expression">10</Term> in-progress email
+          verifications at any given time. Any attempt to create another email verification beyond this limit will be
+          denied by the security policy. The user will have to either manually clear the verifications (by denying the
+          requests from an email account under the user's control), or wait for the requests to expire before
+          submitting more.
+        </Paragraph>
+      </Subsection>
+    </Subsection>
+  </Subsection>
+
+</Section>
