@@ -38,6 +38,7 @@ import java.util.Optional;
  * @param mailConfiguration     The mail server configuration
  * @param openTelemetry         The OpenTelemetry configuration
  * @param rateLimit             The rate limiting configuration
+ * @param passwordExpiration    The password expiration configuration
  * @param sessions              The session configuration
  * @param userApiAddress        The user API address
  * @param userViewAddress       The user view address
@@ -56,6 +57,7 @@ public record IdServerConfiguration(
   IdServerBrandingConfiguration branding,
   IdServerHistoryConfiguration history,
   IdServerRateLimitConfiguration rateLimit,
+  IdServerPasswordExpirationConfiguration passwordExpiration,
   Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
 {
   /**
@@ -71,6 +73,7 @@ public record IdServerConfiguration(
    * @param mailConfiguration     The mail server configuration
    * @param openTelemetry         The OpenTelemetry configuration
    * @param rateLimit             The rate limiting configuration
+   * @param passwordExpiration    The password expiration configuration
    * @param sessions              The session configuration
    * @param userApiAddress        The user API address
    * @param userViewAddress       The user view address
@@ -88,6 +91,7 @@ public record IdServerConfiguration(
     Objects.requireNonNull(mailConfiguration, "mailConfiguration");
     Objects.requireNonNull(openTelemetry, "openTelemetry");
     Objects.requireNonNull(rateLimit, "rateLimit");
+    Objects.requireNonNull(passwordExpiration, "passwordExpiration");
     Objects.requireNonNull(sessions, "sessions");
     Objects.requireNonNull(userApiAddress, "userApiAddress");
     Objects.requireNonNull(userViewAddress, "userViewAddress");

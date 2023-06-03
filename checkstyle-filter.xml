@@ -184,4 +184,8 @@
   <suppress files="IdAShells\.java"
             checks="ClassDataAbstractionCoupling"/>
 
+  <!-- The test message generator refers to a lot of command types. -->
+  <suppress files="IdArbAMessageProvider\.java"
+            checks="ClassDataAbstractionCoupling"/>
+
 </suppressions>

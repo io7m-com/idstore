@@ -20,9 +20,11 @@ package com.io7m.idstore.protocol.user.cb.internal;
 import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned32;
 import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned8;
 import com.io7m.cedarbridge.runtime.api.CBList;
+import com.io7m.cedarbridge.runtime.api.CBOptionType;
 import com.io7m.cedarbridge.runtime.api.CBString;
 import com.io7m.cedarbridge.runtime.api.CBUUID;
 import com.io7m.cedarbridge.runtime.convenience.CBLists;
+import com.io7m.cedarbridge.runtime.time.CBOffsetDateTime;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdNonEmptyList;
@@ -85,7 +87,8 @@ public final class IdUCB1ValidationGeneral
     return new IdPassword(
       IdPasswordAlgorithms.parse(fieldPassword.fieldAlgorithm().value()),
       fieldPassword.fieldHash().value(),
-      fieldPassword.fieldSalt().value()
+      fieldPassword.fieldSalt().value(),
+      fieldPassword.fieldExpires().asOptional().map(CBOffsetDateTime::value)
     );
   }
 
@@ -124,7 +127,8 @@ public final class IdUCB1ValidationGeneral
     return new IdU1Password(
       new CBString(password.algorithm().identifier()),
       new CBString(password.hash()),
-      new CBString(password.salt())
+      new CBString(password.salt()),
+      CBOptionType.fromOptional(password.expires().map(CBOffsetDateTime::new))
     );
   }
 

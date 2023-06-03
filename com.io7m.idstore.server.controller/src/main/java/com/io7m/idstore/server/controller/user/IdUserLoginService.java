@@ -198,7 +198,7 @@ public final class IdUserLoginService implements RPServiceType
     final IdUser user)
     throws IdPasswordException, IdCommandExecutionFailure
   {
-    final var ok = user.password().check(password);
+    final var ok = user.password().check(this.clock.clock(), password);
     if (!ok) {
       this.events.emit(
         new IdEventUserLoginAuthenticationFailed(remoteHost, user.id())

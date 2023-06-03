@@ -73,4 +73,13 @@ public final class IdServerClock implements RPServiceType
     return "[IdServerClock 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
+
+  /**
+   * @return The underlying clock
+   */
+
+  public Clock clock()
+  {
+    return this.clock;
+  }
 }

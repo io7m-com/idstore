@@ -77,10 +77,4 @@ public final class IdAShellCmdSelf
   {
     return List.of();
   }
-
-  @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
 }

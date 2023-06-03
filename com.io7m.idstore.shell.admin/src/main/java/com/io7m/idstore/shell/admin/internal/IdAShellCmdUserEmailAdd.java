@@ -85,12 +85,6 @@ public final class IdAShellCmdUserEmailAdd
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandUserEmailAdd onCreateCommand(
     final QCommandContextType context)
   {

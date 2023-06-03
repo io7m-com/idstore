@@ -189,7 +189,8 @@ public final class IdPasswordAlgorithmPBKDF2HmacSHA256
       return new IdPassword(
         this,
         passwordHash.toUpperCase(ROOT),
-        passwordSalt.toUpperCase(ROOT)
+        passwordSalt.toUpperCase(ROOT),
+        Optional.empty()
       );
     } catch (final NoSuchAlgorithmException | InvalidKeySpecException e) {
       throw new IdPasswordException(

@@ -75,12 +75,6 @@ public final class IdAShellCmdAdminBanDelete
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandAdminBanDelete onCreateCommand(
     final QCommandContextType context)
   {

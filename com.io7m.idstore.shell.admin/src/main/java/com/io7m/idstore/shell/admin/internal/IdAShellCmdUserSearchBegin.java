@@ -125,12 +125,6 @@ public final class IdAShellCmdUserSearchBegin
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandUserSearchBegin onCreateCommand(
     final QCommandContextType context)
   {

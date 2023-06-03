@@ -16,10 +16,13 @@
 
 package com.io7m.idstore.model;
 
+import java.time.Clock;
+import java.time.OffsetDateTime;
 import java.util.Formattable;
 import java.util.Formatter;
 import java.util.HexFormat;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -28,12 +31,14 @@ import java.util.regex.Pattern;
  * @param algorithm The hash algorithm
  * @param hash      The hashed password
  * @param salt      The salt value
+ * @param expires   The expiration date, if any
  */
 
 public record IdPassword(
   IdPasswordAlgorithmType algorithm,
   String hash,
-  String salt)
+  String salt,
+  Optional<OffsetDateTime> expires)
   implements Formattable
 {
   /**
@@ -49,6 +54,7 @@ public record IdPassword(
    * @param algorithm The hash algorithm
    * @param hash      The hashed password
    * @param salt      The salt value
+   * @param expires   The expiration date, if any
    */
 
   public IdPassword
@@ -56,6 +62,7 @@ public record IdPassword(
     Objects.requireNonNull(algorithm, "algorithm");
     Objects.requireNonNull(hash, "hash");
     Objects.requireNonNull(salt, "salt");
+    Objects.requireNonNull(expires, "expires");
 
     if (!VALID_HEX.matcher(hash).matches()) {
       throw new IdValidityException("Hash must match " + VALID_HEX);
@@ -73,12 +80,18 @@ public record IdPassword(
   @Override
   public String toString()
   {
-    return "%s|<REDACTED>|%s".formatted(this.algorithm.identifier(), this.salt);
+    return "%s|<REDACTED>|%s|%s"
+      .formatted(
+        this.algorithm.identifier(),
+        this.salt,
+        this.expires.map(OffsetDateTime::toString).orElse("")
+      );
   }
 
   /**
    * Check the given plain text password against this hashed password.
    *
+   * @param clock        The clock against which to check credentials
    * @param passwordText The plain text password
    *
    * @return {@code  true} iff the password matches
@@ -89,16 +102,31 @@ public record IdPassword(
    */
 
   public boolean check(
+    final Clock clock,
     final String passwordText)
     throws IdPasswordException
   {
     Objects.requireNonNull(passwordText, "passwordText");
+
+    if (!this.checkExpiration(clock)) {
+      return false;
+    }
 
     return this.algorithm.check(
       this.hash,
       passwordText,
       HexFormat.of().parseHex(this.salt)
     );
+  }
+
+  private boolean checkExpiration(
+    final Clock clock)
+  {
+    if (this.expires.isPresent()) {
+      final var expiration = this.expires.get();
+      return expiration.isAfter(OffsetDateTime.now(clock));
+    }
+    return true;
   }
 
   /**
@@ -119,9 +147,47 @@ public record IdPassword(
     final int precision)
   {
     formatter.format(
-      "%s|<REDACTED>|%s",
+      "%s|<REDACTED>|%s|%s",
       this.algorithm.identifier(),
-      this.salt
+      this.salt,
+      this.expires.map(OffsetDateTime::toString).orElse("")
+    );
+  }
+
+  /**
+   * @param date The date
+   *
+   * @return This password with the given expiration date
+   */
+
+  public IdPassword withExpirationDate(
+    final OffsetDateTime date)
+  {
+    return this.withExpirationDate(Optional.of(date));
+  }
+
+  /**
+   * @return This password without an expiration date
+   */
+
+  public IdPassword withoutExpirationDate()
+  {
+    return this.withExpirationDate(Optional.empty());
+  }
+
+  /**
+   * @param newExpiration The expiration date, if any
+   *
+   * @return This password with the given expiration date
+   */
+  public IdPassword withExpirationDate(
+    final Optional<OffsetDateTime> newExpiration)
+  {
+    return new IdPassword(
+      this.algorithm,
+      this.hash,
+      this.salt,
+      newExpiration
     );
   }
 }

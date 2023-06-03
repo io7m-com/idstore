@@ -77,12 +77,6 @@ public final class IdAShellCmdUserGetByEmail
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandUserGetByEmail onCreateCommand(
     final QCommandContextType context)
   {

@@ -23,6 +23,8 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminCreate;
+import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 
 import java.util.UUID;
 
@@ -49,6 +51,15 @@ public final class IdACmdAdminCreate
     final IdACommandAdminCreate command)
     throws IdException
   {
+    final var services =
+      context.services();
+    final var expiration =
+      services.requireService(IdServerConfigurationService.class)
+        .configuration()
+        .passwordExpiration();
+    final var clock =
+      services.requireService(IdServerClock.class);
+
     final var transaction =
       context.transaction();
     final var admin =
@@ -70,8 +81,12 @@ public final class IdACmdAdminCreate
       command.realName();
     final var email =
       command.email();
+
     final var password =
-      command.password();
+      expiration.expireAdminPasswordIfNecessary(
+        clock.clock(),
+        command.password()
+      );
 
     final var newAdmin =
       admins.adminCreate(
@@ -86,4 +101,5 @@ public final class IdACmdAdminCreate
 
     return new IdAResponseAdminCreate(context.requestId(), newAdmin);
   }
+
 }

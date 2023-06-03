@@ -75,12 +75,6 @@ public final class IdAShellCmdUserLoginHistory
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandUserLoginHistory onCreateCommand(
     final QCommandContextType context)
   {

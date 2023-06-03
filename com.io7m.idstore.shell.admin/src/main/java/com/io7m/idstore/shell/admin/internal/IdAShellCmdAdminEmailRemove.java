@@ -85,12 +85,6 @@ public final class IdAShellCmdAdminEmailRemove
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandAdminEmailRemove onCreateCommand(
     final QCommandContextType context)
   {

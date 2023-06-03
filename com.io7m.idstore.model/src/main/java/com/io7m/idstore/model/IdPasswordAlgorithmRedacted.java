@@ -18,6 +18,7 @@
 package com.io7m.idstore.model;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A "redacted" hashing algorithm used to represent passwords that should not be
@@ -70,7 +71,8 @@ public final class IdPasswordAlgorithmRedacted
     return new IdPassword(
       this,
       "0",
-      "DEADBEEF"
+      "DEADBEEF",
+      Optional.empty()
     );
   }
 

@@ -96,12 +96,6 @@ public final class IdAShellCmdUserBanCreate
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandUserBanCreate onCreateCommand(
     final QCommandContextType context)
   {

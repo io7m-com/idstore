@@ -117,7 +117,8 @@ final class IdDatabaseUsersQueries
       new IdPassword(
         IdPasswordAlgorithms.parse(userRecord.getPasswordAlgo()),
         userRecord.getPasswordHash().toUpperCase(Locale.ROOT),
-        userRecord.getPasswordSalt().toUpperCase(Locale.ROOT)
+        userRecord.getPasswordSalt().toUpperCase(Locale.ROOT),
+        Optional.ofNullable(userRecord.getPasswordExpires())
       )
     );
   }
@@ -200,6 +201,7 @@ final class IdDatabaseUsersQueries
         .set(USERS.PASSWORD_ALGO, password.algorithm().identifier())
         .set(USERS.PASSWORD_HASH, password.hash())
         .set(USERS.PASSWORD_SALT, password.salt())
+        .set(USERS.PASSWORD_EXPIRES, password.expires().orElse(null))
         .set(USERS.DELETING, Boolean.FALSE)
         .execute();
 
@@ -613,6 +615,7 @@ final class IdDatabaseUsersQueries
         record.setPasswordAlgo(pass.algorithm().identifier());
         record.setPasswordHash(pass.hash());
         record.setPasswordSalt(pass.salt());
+        record.setPasswordExpires(pass.expires().orElse(null));
 
         context.insertInto(AUDIT)
           .set(AUDIT.TIME, this.currentTime())

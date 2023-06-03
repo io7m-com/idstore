@@ -80,6 +80,7 @@
     <xi:include href="scmd-admin-search-by-email-previous.xml"/>
     <xi:include href="scmd-admin-search-next.xml"/>
     <xi:include href="scmd-admin-search-previous.xml"/>
+    <xi:include href="scmd-admin-update-password-expiration.xml"/>
     <xi:include href="scmd-audit-search-begin.xml"/>
     <xi:include href="scmd-audit-search-next.xml"/>
     <xi:include href="scmd-audit-search-previous.xml"/>
@@ -103,6 +104,7 @@
     <xi:include href="scmd-user-search-by-email-previous.xml"/>
     <xi:include href="scmd-user-search-next.xml"/>
     <xi:include href="scmd-user-search-previous.xml"/>
+    <xi:include href="scmd-user-update-password-expiration.xml"/>
     <xi:include href="scmd-version.xml"/>
   </Section>
 

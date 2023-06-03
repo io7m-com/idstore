@@ -167,6 +167,9 @@
           Port="25"/>
   </Mail>
 
+  <PasswordExpiration AdminPasswordValidityDuration="PT30M"
+                      UserPasswordValidityDuration="PT30M"/>
+
   <RateLimiting EmailVerificationRateLimit="PT10M"
                 PasswordResetRateLimit="PT10M"/>
 

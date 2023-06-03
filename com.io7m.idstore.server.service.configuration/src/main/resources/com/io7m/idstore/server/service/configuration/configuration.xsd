@@ -647,6 +647,36 @@
     </complexType>
   </element>
 
+  <element name="PasswordExpiration">
+    <annotation>
+      <documentation>
+        Configuration information for password expiration.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <attribute name="UserPasswordValidityDuration"
+                 type="duration"
+                 use="optional">
+        <annotation>
+          <documentation>
+            The duration for which user passwords are valid. If unspecified, user passwords do not expire.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="AdminPasswordValidityDuration"
+                 type="duration"
+                 use="optional">
+        <annotation>
+          <documentation>
+            The duration for which admin passwords are valid. If unspecified, user passwords do not expire.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
   <element name="RateLimiting">
     <annotation>
       <documentation>
@@ -886,6 +916,9 @@
         <element ref="c:History"/>
         <element ref="c:Mail"/>
         <element ref="c:OpenTelemetry"
+                 minOccurs="0"
+                 maxOccurs="1"/>
+        <element ref="c:PasswordExpiration"
                  minOccurs="0"
                  maxOccurs="1"/>
         <element ref="c:RateLimiting"/>

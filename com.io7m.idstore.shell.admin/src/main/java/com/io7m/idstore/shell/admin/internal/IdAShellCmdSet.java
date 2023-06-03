@@ -84,12 +84,6 @@ public final class IdAShellCmdSet implements IdAShellCmdType
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   public QCommandStatus onExecute(
     final QCommandContextType context)
   {

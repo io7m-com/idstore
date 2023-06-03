@@ -117,7 +117,8 @@ final class IdDatabaseAdminsQueries
       new IdPassword(
         IdPasswordAlgorithms.parse(adminRecord.getPasswordAlgo()),
         adminRecord.getPasswordHash().toUpperCase(Locale.ROOT),
-        adminRecord.getPasswordSalt().toUpperCase(Locale.ROOT)
+        adminRecord.getPasswordSalt().toUpperCase(Locale.ROOT),
+        Optional.ofNullable(adminRecord.getPasswordExpires())
       ),
       permissionsDeserializeRecord(adminRecord)
     );
@@ -233,6 +234,7 @@ final class IdDatabaseAdminsQueries
           .set(ADMINS.PASSWORD_ALGO, password.algorithm().identifier())
           .set(ADMINS.PASSWORD_HASH, password.hash())
           .set(ADMINS.PASSWORD_SALT, password.salt())
+          .set(ADMINS.PASSWORD_EXPIRES, password.expires().orElse(null))
           .set(ADMINS.PERMISSIONS, permissionString)
           .set(ADMINS.DELETING, FALSE)
           .set(ADMINS.INITIAL, TRUE);
@@ -337,6 +339,7 @@ final class IdDatabaseAdminsQueries
         .set(ADMINS.PASSWORD_ALGO, password.algorithm().identifier())
         .set(ADMINS.PASSWORD_HASH, password.hash())
         .set(ADMINS.PASSWORD_SALT, password.salt())
+        .set(ADMINS.PASSWORD_EXPIRES, password.expires().orElse(null))
         .set(ADMINS.PERMISSIONS, permissionString)
         .set(ADMINS.DELETING, FALSE)
         .set(ADMINS.INITIAL, FALSE)
@@ -708,6 +711,7 @@ final class IdDatabaseAdminsQueries
         record.setPasswordAlgo(pass.algorithm().identifier());
         record.setPasswordHash(pass.hash());
         record.setPasswordSalt(pass.salt());
+        record.setPasswordExpires(pass.expires().orElse(null));
 
         context.insertInto(AUDIT)
           .set(AUDIT.TIME, this.currentTime())

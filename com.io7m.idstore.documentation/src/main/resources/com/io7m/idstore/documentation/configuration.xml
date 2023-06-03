@@ -364,6 +364,47 @@
     </Subsection>
   </Subsection>
 
+  <Subsection title="Password Expiration" id="8e1b778b-f098-4058-83ee-59812308e6f2">
+    <Subsection title="Overview">
+      <Paragraph>
+        Passwords for both users and administrators can be configured with expiration dates. The
+        <Term type="expression">PasswordExpiration</Term> section of the configuration file, if
+        present, can specify durations for which passwords are valid after their initial creation.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">UserPasswordValidityDuration</Term> attribute specifies the duration
+        for which user passwords are valid. If the attribute is not present, user passwords do not expire.
+      </Paragraph>
+      <Paragraph>
+        The optional <Term type="expression">AdminPasswordValidityDuration</Term> attribute specifies the duration
+        for which admin passwords are valid. If the attribute is not present, user passwords do not expire.
+      </Paragraph>
+      <Paragraph>
+        Note that these configuration settings only apply to users and administrators that have not yet
+        been created; existing users and administrators will not be affected if these settings are changed
+        and the server restarted. New configuration settings <Term type="term">will</Term> take effect, however,
+        if the passwords of the users and administrators are changed.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Example">
+      <Paragraph>
+        An example password expiration configuration that configures user passwords to expire in 30 days (720 hours),
+        and administrator passwords to expire in 90 days (2160 hours):
+      </Paragraph>
+      <FormalItem title="Example">
+        <Verbatim><![CDATA[
+<PasswordExpiration
+  UserPasswordValidityDuration="PT720H"
+  AdminPasswordValidityDuration="PT2160H" />
+]]></Verbatim>
+      </FormalItem>
+      <Paragraph>
+        Note: These settings would likely annoy users and administrators alike, and would likely incentivize setting
+        weaker passwords.
+      </Paragraph>
+    </Subsection>
+  </Subsection>
+
   <Subsection title="OpenTelemetry" id="694ad99a-9977-47bf-ae12-85fb7e9a204e">
     <Subsection title="Overview">
       <Paragraph>
