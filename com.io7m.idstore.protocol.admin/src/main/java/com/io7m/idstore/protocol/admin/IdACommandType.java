@@ -27,8 +27,7 @@ import com.io7m.hibiscus.api.HBCommandType;
 
 public sealed interface IdACommandType<R extends IdAResponseType>
   extends IdAMessageType, HBCommandType
-  permits
-  IdACommandAdminBanCreate,
+  permits IdACommandAdminBanCreate,
   IdACommandAdminBanDelete,
   IdACommandAdminBanGet,
   IdACommandAdminCreate,
@@ -47,6 +46,7 @@ public sealed interface IdACommandType<R extends IdAResponseType>
   IdACommandAdminSearchPrevious,
   IdACommandAdminSelf,
   IdACommandAdminUpdateCredentials,
+  IdACommandAdminUpdatePasswordExpiration,
   IdACommandAuditSearchBegin,
   IdACommandAuditSearchNext,
   IdACommandAuditSearchPrevious,
@@ -67,7 +67,8 @@ public sealed interface IdACommandType<R extends IdAResponseType>
   IdACommandUserSearchByEmailPrevious,
   IdACommandUserSearchNext,
   IdACommandUserSearchPrevious,
-  IdACommandUserUpdateCredentials
+  IdACommandUserUpdateCredentials,
+  IdACommandUserUpdatePasswordExpiration
 {
   /**
    * @return The response type associated with this command

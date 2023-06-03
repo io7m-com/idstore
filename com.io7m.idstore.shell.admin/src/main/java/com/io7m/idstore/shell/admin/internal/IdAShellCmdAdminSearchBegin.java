@@ -125,12 +125,6 @@ public final class IdAShellCmdAdminSearchBegin
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandAdminSearchBegin onCreateCommand(
     final QCommandContextType context)
   {

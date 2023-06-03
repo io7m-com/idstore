@@ -74,6 +74,11 @@ public record IdAdmin(
 
   public IdAdmin withRedactedPassword()
   {
+    final var redacted =
+      IdPasswordAlgorithmRedacted.create()
+        .createHashed("", new byte[0])
+        .withExpirationDate(this.password.expires());
+
     return new IdAdmin(
       this.id,
       this.idName,
@@ -81,8 +86,7 @@ public record IdAdmin(
       this.emails,
       this.timeCreated,
       this.timeUpdated,
-      IdPasswordAlgorithmRedacted.create()
-        .createHashed("", new byte[0]),
+      redacted,
       this.permissions
     );
   }

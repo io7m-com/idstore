@@ -19,6 +19,7 @@
 [package com.io7m.idstore.protocol.admin.cb]
 
 [import com.io7m.cedarbridge cb]
+[import com.io7m.cedarbridge.time ct]
 
 [documentation IdA1Password "Information for a hashed password."]
 [record IdA1Password
@@ -28,6 +29,8 @@
   [field hash cb:String]
   [documentation salt "The password salt."]
   [field salt cb:String]
+  [documentation expires "The password expiration date."]
+  [field expires [cb:Option ct:OffsetDateTime]]
 ]
 
 [documentation IdA1TimestampUTC "A UTC timestamp value."]
@@ -323,6 +326,16 @@
   [field timeUpdated IdA1TimestampUTC]
 ]
 
+[documentation IdA1PasswordExpirationSet "The possible behaviours for setting password expirations."]
+[variant IdA1PasswordExpirationSet
+  [documentation Never "Never expire, regardless of the server setting."]
+  [case Never]
+  [documentation Refresh "Refresh the password to the server setting."]
+  [case Refresh]
+  [documentation Specific "Expire at the given time, regardless of the server setting."]
+  [case Specific [field time ct:OffsetDateTime]]
+]
+
 ;
 ; Admin commands.
 ;
@@ -448,6 +461,14 @@
   [field realName [cb:Option cb:String]]
   [documentation password "The admin's new password"]
   [field password [cb:Option IdA1Password]]
+]
+
+[documentation IdA1CommandAdminUpdatePasswordExpiration "A request to update the admin's password expiration."]
+[record IdA1CommandAdminUpdatePasswordExpiration
+  [documentation userId "The admin."]
+  [field userId cb:UUID]
+  [documentation set "The set behaviour."]
+  [field set IdA1PasswordExpirationSet]
 ]
 
 [documentation IdA1CommandAuditSearchBegin "Start searching/listing audit records."]
@@ -582,6 +603,14 @@
   [field realName [cb:Option cb:String]]
   [documentation password "The user's new password"]
   [field password [cb:Option IdA1Password]]
+]
+
+[documentation IdA1CommandUserUpdatePasswordExpiration "A request to update the user's password expiration."]
+[record IdA1CommandUserUpdatePasswordExpiration
+  [documentation userId "The user."]
+  [field userId cb:UUID]
+  [documentation set "The set behaviour."]
+  [field set IdA1PasswordExpirationSet]
 ]
 
 ;
@@ -891,6 +920,7 @@
       IdA1CommandAdminSearchPrevious
       IdA1CommandAdminSelf
       IdA1CommandAdminUpdateCredentials
+      IdA1CommandAdminUpdatePasswordExpiration
       IdA1CommandAuditSearchBegin
       IdA1CommandAuditSearchNext
       IdA1CommandAuditSearchPrevious
@@ -912,6 +942,7 @@
       IdA1CommandUserSearchNext
       IdA1CommandUserSearchPrevious
       IdA1CommandUserUpdateCredentials
+      IdA1CommandUserUpdatePasswordExpiration
       IdA1ResponseAdminBanCreate
       IdA1ResponseAdminBanDelete
       IdA1ResponseAdminBanGet

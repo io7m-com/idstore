@@ -31,6 +31,7 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -105,7 +106,11 @@ public final class IdACmdUserCreateTest
     final var users =
       Mockito.mock(IdDatabaseUsersQueriesType.class);
 
-    Mockito.doThrow(new IdDatabaseException("", USER_DUPLICATE, Map.of(), empty()))
+    Mockito.doThrow(new IdDatabaseException(
+        "",
+        USER_DUPLICATE,
+        Map.of(),
+        empty()))
       .when(users)
       .userCreate(
         any(),
@@ -174,7 +179,9 @@ public final class IdACmdUserCreateTest
     final var userId =
       randomUUID();
     final var password =
-      this.password();
+      this.password()
+        .withExpirationDate(OffsetDateTime.parse("1970-01-01T00:30:02Z"));
+
     final var expectedUser =
       new IdUser(
         userId,

@@ -70,6 +70,7 @@ create table admins (
   password_algo    varchar(1000000)         not null,
   password_hash    varchar(1000000)         not null,
   password_salt    varchar(1000000)         not null,
+  password_expires timestamp with time zone,
   permissions      varchar(1000000)         not null,
   deleting         boolean                  not null,
   initial          boolean                  not null,
@@ -126,6 +127,7 @@ create table users (
   password_algo    varchar(1000000)         not null,
   password_hash    varchar(1000000)         not null,
   password_salt    varchar(1000000)         not null,
+  password_expires timestamp with time zone,
   deleting         boolean                  not null,
 
   foreign key (id) references user_ids (id)

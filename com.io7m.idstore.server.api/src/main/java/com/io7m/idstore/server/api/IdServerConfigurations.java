@@ -101,6 +101,7 @@ public final class IdServerConfigurations
       file.brandingConfiguration(),
       file.historyConfiguration(),
       file.rateLimit(),
+      file.passwordExpiration(),
       file.openTelemetry()
     );
   }

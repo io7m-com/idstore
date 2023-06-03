@@ -52,6 +52,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
 import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdatePasswordExpiration;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
@@ -73,7 +74,12 @@ import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserUpdateCredentials;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdatePasswordExpiration;
 import com.io7m.idstore.protocol.admin.IdAMessageType;
+import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetNever;
+import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetRefresh;
+import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetSpecific;
+import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetType;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanGet;
@@ -113,6 +119,7 @@ import net.jqwik.api.Arbitrary;
 import net.jqwik.api.Combinators;
 import net.jqwik.api.providers.TypeUsage;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
@@ -166,6 +173,7 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       commandAdminSearchPrevious(),
       commandAdminSelf(),
       commandAdminUpdate(),
+      commandAdminUpdatePasswordExpiration(),
       commandAuditSearchBegin(),
       commandAuditSearchNext(),
       commandAuditSearchPrevious(),
@@ -187,6 +195,7 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       commandUserSearchNext(),
       commandUserSearchPrevious(),
       commandUserUpdate(),
+      commandUserUpdatePasswordExpiration(),
       responseAdminBanCreate(),
       responseAdminBanDelete(),
       responseAdminBanGet(),
@@ -221,6 +230,55 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       responseUserSearchPrevious(),
       responseUserUpdate()
     );
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdAPasswordExpirationSetType> passwordExpirationSet()
+  {
+    final var a_id =
+      Arbitraries.defaultFor(UUID.class);
+    final var a_i =
+      Arbitraries.integers()
+        .between(0, 2);
+
+    return Combinators.combine(a_id, a_i)
+      .as((uuid, integer) -> {
+        return switch (integer.intValue()) {
+          case 0 -> new IdAPasswordExpirationSetNever();
+          case 1 -> new IdAPasswordExpirationSetRefresh();
+          case 2 -> new IdAPasswordExpirationSetSpecific(OffsetDateTime.now());
+          default -> throw new IllegalStateException();
+        };
+      });
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdACommandUserUpdatePasswordExpiration> commandUserUpdatePasswordExpiration()
+  {
+    final var a_id =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(a_id, passwordExpirationSet())
+      .as(IdACommandUserUpdatePasswordExpiration::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdACommandAdminUpdatePasswordExpiration> commandAdminUpdatePasswordExpiration()
+  {
+    final var a_id =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(a_id, passwordExpirationSet())
+      .as(IdACommandAdminUpdatePasswordExpiration::new);
   }
 
   /**

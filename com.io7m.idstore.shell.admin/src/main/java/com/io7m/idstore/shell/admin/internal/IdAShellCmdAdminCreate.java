@@ -128,12 +128,6 @@ public final class IdAShellCmdAdminCreate
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandAdminCreate onCreateCommand(
     final QCommandContextType context)
     throws Exception

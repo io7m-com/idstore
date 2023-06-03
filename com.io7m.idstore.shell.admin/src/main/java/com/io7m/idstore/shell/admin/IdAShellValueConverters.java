@@ -18,7 +18,9 @@
 package com.io7m.idstore.shell.admin;
 
 import com.io7m.idstore.model.IdEmail;
+import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetType;
 import com.io7m.idstore.shell.admin.internal.IdAEmailConverter;
+import com.io7m.idstore.shell.admin.internal.IdAPasswordExpirationSetConverter;
 import com.io7m.quarrel.core.QValueConverterDirectory;
 import com.io7m.quarrel.core.QValueConverterDirectoryType;
 
@@ -30,7 +32,9 @@ public final class IdAShellValueConverters
 {
   private static final QValueConverterDirectoryType CONVERTERS =
     QValueConverterDirectory.core()
-      .with(IdEmail.class, new IdAEmailConverter());
+      .with(IdEmail.class, new IdAEmailConverter())
+      .with(IdAPasswordExpirationSetType.class,
+            new IdAPasswordExpirationSetConverter());
 
   private IdAShellValueConverters()
   {

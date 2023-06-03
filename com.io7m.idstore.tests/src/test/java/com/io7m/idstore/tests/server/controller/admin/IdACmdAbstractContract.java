@@ -27,14 +27,19 @@ import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.server.api.IdServerConfiguration;
+import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.admin.IdACommandContext;
 import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.idstore.tests.IdFakeClock;
+import com.io7m.idstore.tests.IdTestDirectories;
 import com.io7m.repetoir.core.RPServiceDirectory;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import org.junit.jupiter.api.AfterEach;
@@ -42,6 +47,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
 
+import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.UUID;
@@ -54,6 +60,10 @@ public abstract class IdACmdAbstractContract
   private IdServerClock serverClock;
   private IdServerStrings strings;
   private OffsetDateTime timeStart;
+  private Path directory;
+  private Path configFile;
+  private IdServerConfiguration configuration;
+  private IdServerConfigurationService configurationService;
 
   protected final Times once()
   {
@@ -68,7 +78,9 @@ public abstract class IdACmdAbstractContract
   protected final IdPassword password()
   {
     try {
-      return IdPasswordAlgorithmPBKDF2HmacSHA256.create().createHashed("x");
+      return IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+        .createHashed("x")
+        .withExpirationDate(OffsetDateTime.parse("1970-01-01T00:30:02Z"));
     } catch (final IdPasswordException e) {
       throw new IllegalStateException(e);
     }
@@ -113,6 +125,9 @@ public abstract class IdACmdAbstractContract
   protected final void commandSetup()
     throws Exception
   {
+    this.directory =
+      IdTestDirectories.createTempDirectory();
+
     this.services =
       new RPServiceDirectory();
     this.transaction =
@@ -127,8 +142,32 @@ public abstract class IdACmdAbstractContract
     this.strings =
       new IdServerStrings(Locale.ROOT);
 
-    this.services.register(IdServerClock.class, this.serverClock);
-    this.services.register(IdServerStrings.class, this.strings);
+    this.configFile =
+      IdTestDirectories.resourceOf(
+        IdACmdAbstractContract.class,
+        this.directory,
+        "server-config-0.xml"
+      );
+
+    this.configuration =
+      IdServerConfigurations.ofFile(
+        Locale.ROOT,
+        this.clock,
+        new IdServerConfigurationFiles().parse(this.configFile)
+      );
+
+    this.configurationService =
+      new IdServerConfigurationService(this.configuration);
+
+    this.services.register(
+      IdServerConfigurationService.class,
+      this.configurationService);
+    this.services.register(
+      IdServerClock.class,
+      this.serverClock);
+    this.services.register(
+      IdServerStrings.class,
+      this.strings);
     this.services.register(
       IdServerTelemetryServiceType.class,
       IdServerTelemetryNoOp.noop());
@@ -138,6 +177,7 @@ public abstract class IdACmdAbstractContract
   protected final void commandTearDown()
     throws Exception
   {
+    IdTestDirectories.deleteDirectory(this.directory);
     this.services.close();
   }
 

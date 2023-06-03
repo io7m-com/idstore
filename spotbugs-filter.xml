@@ -431,6 +431,16 @@
     <Method name="executeCommand"/>
     <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
   </Match>
+  <Match>
+    <Class name="com.io7m.idstore.server.controller.admin.IdACmdAdminUpdatePasswordExpiration"/>
+    <Method name="handlePasswordExpirationSet"/>
+    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+  </Match>
+  <Match>
+    <Class name="com.io7m.idstore.server.controller.admin.IdACmdUserUpdatePasswordExpiration"/>
+    <Method name="handlePasswordExpirationSet"/>
+    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+  </Match>
 
   <!--                              -->
   <!-- com.io7m.idstore.server.http -->

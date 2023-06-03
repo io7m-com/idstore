@@ -66,12 +66,6 @@ public final class IdAShellCmdAdminSearchByEmailNext
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandAdminSearchByEmailNext onCreateCommand(
     final QCommandContextType context)
   {

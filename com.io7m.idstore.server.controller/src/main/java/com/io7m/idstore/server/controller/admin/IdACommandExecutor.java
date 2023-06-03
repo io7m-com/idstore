@@ -36,6 +36,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
 import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
+import com.io7m.idstore.protocol.admin.IdACommandAdminUpdatePasswordExpiration;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
@@ -58,6 +59,7 @@ import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandUserUpdateCredentials;
+import com.io7m.idstore.protocol.admin.IdACommandUserUpdatePasswordExpiration;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutorType;
@@ -109,133 +111,139 @@ public final class IdACommandExecutor
     final IdACommandType<? extends IdAResponseType> command)
     throws IdCommandExecutionFailure
   {
-    if (command instanceof IdACommandAdminSelf c) {
+    if (command instanceof final IdACommandAdminSelf c) {
       return new IdACmdAdminSelf().execute(context, c);
     }
-    if (command instanceof IdACommandLogin c) {
+    if (command instanceof final IdACommandLogin c) {
       return new IdACmdAdminLogin().execute(context, c);
     }
 
-    if (command instanceof IdACommandUserSearchBegin c) {
+    if (command instanceof final IdACommandUserSearchBegin c) {
       return new IdACmdUserSearchBegin().execute(context, c);
     }
-    if (command instanceof IdACommandUserSearchPrevious c) {
+    if (command instanceof final IdACommandUserSearchPrevious c) {
       return new IdACmdUserSearchPrevious().execute(context, c);
     }
-    if (command instanceof IdACommandUserSearchNext c) {
+    if (command instanceof final IdACommandUserSearchNext c) {
       return new IdACmdUserSearchNext().execute(context, c);
     }
-    if (command instanceof IdACommandUserSearchByEmailBegin c) {
+    if (command instanceof final IdACommandUserSearchByEmailBegin c) {
       return new IdACmdUserSearchByEmailBegin().execute(context, c);
     }
-    if (command instanceof IdACommandUserSearchByEmailPrevious c) {
+    if (command instanceof final IdACommandUserSearchByEmailPrevious c) {
       return new IdACmdUserSearchByEmailPrevious().execute(context, c);
     }
-    if (command instanceof IdACommandUserSearchByEmailNext c) {
+    if (command instanceof final IdACommandUserSearchByEmailNext c) {
       return new IdACmdUserSearchByEmailNext().execute(context, c);
     }
 
-    if (command instanceof IdACommandUserGet c) {
+    if (command instanceof final IdACommandUserGet c) {
       return new IdACmdUserGet().execute(context, c);
     }
-    if (command instanceof IdACommandUserGetByEmail c) {
+    if (command instanceof final IdACommandUserGetByEmail c) {
       return new IdACmdUserGetByEmail().execute(context, c);
     }
-    if (command instanceof IdACommandUserCreate c) {
+    if (command instanceof final IdACommandUserCreate c) {
       return new IdACmdUserCreate().execute(context, c);
     }
-    if (command instanceof IdACommandUserUpdateCredentials c) {
+    if (command instanceof final IdACommandUserUpdateCredentials c) {
       return new IdACmdUserUpdateCredentials().execute(context, c);
     }
-    if (command instanceof IdACommandUserDelete c) {
+    if (command instanceof final IdACommandUserUpdatePasswordExpiration c) {
+      return new IdACmdUserUpdatePasswordExpiration().execute(context, c);
+    }
+    if (command instanceof final IdACommandUserDelete c) {
       return new IdACmdUserDelete().execute(context, c);
     }
-    if (command instanceof IdACommandUserEmailAdd c) {
+    if (command instanceof final IdACommandUserEmailAdd c) {
       return new IdACmdUserEmailAdd().execute(context, c);
     }
-    if (command instanceof IdACommandUserEmailRemove c) {
+    if (command instanceof final IdACommandUserEmailRemove c) {
       return new IdACmdUserEmailRemove().execute(context, c);
     }
 
-    if (command instanceof IdACommandAuditSearchBegin c) {
+    if (command instanceof final IdACommandAuditSearchBegin c) {
       return new IdACmdAuditSearchBegin().execute(context, c);
     }
-    if (command instanceof IdACommandAuditSearchPrevious c) {
+    if (command instanceof final IdACommandAuditSearchPrevious c) {
       return new IdACmdAuditSearchPrevious().execute(context, c);
     }
-    if (command instanceof IdACommandAuditSearchNext c) {
+    if (command instanceof final IdACommandAuditSearchNext c) {
       return new IdACmdAuditSearchNext().execute(context, c);
     }
 
-    if (command instanceof IdACommandAdminGet c) {
+    if (command instanceof final IdACommandAdminGet c) {
       return new IdACmdAdminGet().execute(context, c);
     }
-    if (command instanceof IdACommandAdminGetByEmail c) {
+    if (command instanceof final IdACommandAdminGetByEmail c) {
       return new IdACmdAdminGetByEmail().execute(context, c);
     }
-    if (command instanceof IdACommandAdminCreate c) {
+    if (command instanceof final IdACommandAdminCreate c) {
       return new IdACmdAdminCreate().execute(context, c);
     }
-    if (command instanceof IdACommandAdminUpdateCredentials c) {
+    if (command instanceof final IdACommandAdminUpdateCredentials c) {
       return new IdACmdAdminUpdateCredentials().execute(context, c);
     }
-    if (command instanceof IdACommandAdminDelete c) {
+    if (command instanceof final IdACommandAdminUpdatePasswordExpiration c) {
+      return new IdACmdAdminUpdatePasswordExpiration().execute(context, c);
+    }
+    if (command instanceof final IdACommandAdminDelete c) {
       return new IdACmdAdminDelete().execute(context, c);
     }
 
-    if (command instanceof IdACommandAdminSearchBegin c) {
+    if (command instanceof final IdACommandAdminSearchBegin c) {
       return new IdACmdAdminSearchBegin().execute(context, c);
     }
-    if (command instanceof IdACommandAdminSearchPrevious c) {
+    if (command instanceof final IdACommandAdminSearchPrevious c) {
       return new IdACmdAdminSearchPrevious().execute(context, c);
     }
-    if (command instanceof IdACommandAdminSearchNext c) {
+    if (command instanceof final IdACommandAdminSearchNext c) {
       return new IdACmdAdminSearchNext().execute(context, c);
     }
-    if (command instanceof IdACommandAdminSearchByEmailBegin c) {
+    if (command instanceof final IdACommandAdminSearchByEmailBegin c) {
       return new IdACmdAdminSearchByEmailBegin().execute(context, c);
     }
-    if (command instanceof IdACommandAdminSearchByEmailPrevious c) {
+    if (command instanceof final IdACommandAdminSearchByEmailPrevious c) {
       return new IdACmdAdminSearchByEmailPrevious().execute(context, c);
     }
-    if (command instanceof IdACommandAdminSearchByEmailNext c) {
+    if (command instanceof final IdACommandAdminSearchByEmailNext c) {
       return new IdACmdAdminSearchByEmailNext().execute(context, c);
     }
 
-    if (command instanceof IdACommandAdminEmailAdd c) {
+    if (command instanceof final IdACommandAdminEmailAdd c) {
       return new IdACmdAdminEmailAdd().execute(context, c);
     }
-    if (command instanceof IdACommandAdminEmailRemove c) {
+    if (command instanceof final IdACommandAdminEmailRemove c) {
       return new IdACmdAdminEmailRemove().execute(context, c);
     }
-    if (command instanceof IdACommandAdminPermissionRevoke c) {
+    if (command instanceof final IdACommandAdminPermissionRevoke c) {
       return new IdACmdAdminPermissionRevoke().execute(context, c);
     }
-    if (command instanceof IdACommandAdminPermissionGrant c) {
+    if (command instanceof final IdACommandAdminPermissionGrant c) {
       return new IdACmdAdminPermissionGrant().execute(context, c);
     }
 
-    if (command instanceof IdACommandAdminBanCreate c) {
+    if (command instanceof final IdACommandAdminBanCreate c) {
       return new IdACmdAdminBanCreate().execute(context, c);
     }
-    if (command instanceof IdACommandAdminBanDelete c) {
+    if (command instanceof final IdACommandAdminBanDelete c) {
       return new IdACmdAdminBanDelete().execute(context, c);
     }
-    if (command instanceof IdACommandAdminBanGet c) {
+    if (command instanceof final IdACommandAdminBanGet c) {
       return new IdACmdAdminBanGet().execute(context, c);
     }
 
-    if (command instanceof IdACommandUserBanCreate c) {
+    if (command instanceof final IdACommandUserBanCreate c) {
       return new IdACmdUserBanCreate().execute(context, c);
     }
-    if (command instanceof IdACommandUserBanDelete c) {
+    if (command instanceof final IdACommandUserBanDelete c) {
       return new IdACmdUserBanDelete().execute(context, c);
     }
-    if (command instanceof IdACommandUserBanGet c) {
+    if (command instanceof final IdACommandUserBanGet c) {
       return new IdACmdUserBanGet().execute(context, c);
     }
 
-    if (command instanceof IdACommandUserLoginHistory c) {
+    if (command instanceof final IdACommandUserLoginHistory c) {
       return new IdACmdUserLoginHistory().execute(context, c);
     }
 

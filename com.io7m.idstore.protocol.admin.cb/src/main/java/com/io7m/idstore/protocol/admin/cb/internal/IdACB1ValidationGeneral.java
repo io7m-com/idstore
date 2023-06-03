@@ -26,6 +26,7 @@ import com.io7m.cedarbridge.runtime.api.CBSerializableType;
 import com.io7m.cedarbridge.runtime.api.CBSome;
 import com.io7m.cedarbridge.runtime.api.CBString;
 import com.io7m.cedarbridge.runtime.api.CBUUID;
+import com.io7m.cedarbridge.runtime.time.CBOffsetDateTime;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.model.IdEmail;
@@ -121,7 +122,8 @@ public final class IdACB1ValidationGeneral
     return new IdA1Password(
       new CBString(password.algorithm().identifier()),
       new CBString(password.hash()),
-      new CBString(password.salt())
+      new CBString(password.salt()),
+      fromOptional(password.expires().map(CBOffsetDateTime::new))
     );
   }
 
@@ -187,7 +189,8 @@ public final class IdACB1ValidationGeneral
     return new IdPassword(
       IdPasswordAlgorithms.parse(fieldPassword.fieldAlgorithm().value()),
       fieldPassword.fieldHash().value(),
-      fieldPassword.fieldSalt().value()
+      fieldPassword.fieldSalt().value(),
+      fieldPassword.fieldExpires().asOptional().map(CBOffsetDateTime::value)
     );
   }
 

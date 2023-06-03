@@ -100,12 +100,6 @@ public final class IdAShellCmdUserGet
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   protected IdACommandUserGet onCreateCommand(
     final QCommandContextType context)
   {

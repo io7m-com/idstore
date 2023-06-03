@@ -88,12 +88,6 @@ public final class IdMCmdServer implements QCommandType
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   public QCommandStatus onExecute(
     final QCommandContextType context)
     throws Exception

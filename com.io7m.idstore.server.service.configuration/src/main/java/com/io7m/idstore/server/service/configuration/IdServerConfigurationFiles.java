@@ -39,6 +39,7 @@ import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdLogs;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdMetrics;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdOTLPProtocol;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdTraces;
+import com.io7m.idstore.server.api.IdServerPasswordExpirationConfiguration;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerSessionConfiguration;
 import com.io7m.idstore.server.service.configuration.jaxb.Branding;
@@ -55,6 +56,7 @@ import com.io7m.idstore.server.service.configuration.jaxb.Mail;
 import com.io7m.idstore.server.service.configuration.jaxb.MailAuthentication;
 import com.io7m.idstore.server.service.configuration.jaxb.OpenTelemetry;
 import com.io7m.idstore.server.service.configuration.jaxb.OpenTelemetryProtocol;
+import com.io7m.idstore.server.service.configuration.jaxb.PasswordExpiration;
 import com.io7m.idstore.server.service.configuration.jaxb.RateLimiting;
 import com.io7m.idstore.server.service.configuration.jaxb.SMTPSType;
 import com.io7m.idstore.server.service.configuration.jaxb.SMTPTLSType;
@@ -153,7 +155,26 @@ public final class IdServerConfigurationFiles
       processHistory(input.getHistory()),
       processSessions(input.getSessions()),
       processRateLimit(input.getRateLimiting()),
+      processPasswordExpiration(input.getPasswordExpiration()),
       processOpenTelemetry(input.getOpenTelemetry())
+    );
+  }
+
+  private static IdServerPasswordExpirationConfiguration processPasswordExpiration(
+    final PasswordExpiration passwordExpiration)
+  {
+    if (passwordExpiration == null) {
+      return new IdServerPasswordExpirationConfiguration(
+        Optional.empty(),
+        Optional.empty()
+      );
+    }
+
+    return new IdServerPasswordExpirationConfiguration(
+      Optional.ofNullable(passwordExpiration.getUserPasswordValidityDuration())
+        .map(IdServerConfigurationFiles::processDuration),
+      Optional.ofNullable(passwordExpiration.getAdminPasswordValidityDuration())
+        .map(IdServerConfigurationFiles::processDuration)
     );
   }
 

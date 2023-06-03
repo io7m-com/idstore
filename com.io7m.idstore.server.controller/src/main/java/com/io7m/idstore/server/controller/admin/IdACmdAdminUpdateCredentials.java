@@ -25,6 +25,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminUpdate;
+import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.jaffirm.core.Invariants;
 
 import java.util.Objects;
@@ -55,6 +57,17 @@ public final class IdACmdAdminUpdateCredentials
     final IdACommandAdminUpdateCredentials command)
     throws IdException
   {
+    final var services =
+      context.services();
+    final var expiration =
+      services.requireService(IdServerConfigurationService.class)
+        .configuration()
+        .passwordExpiration();
+    final var clock =
+      services.requireService(IdServerClock.class);
+    final var strings =
+      services.requireService(IdServerStrings.class);
+
     final var transaction =
       context.transaction();
     final var admin =
@@ -81,15 +94,16 @@ public final class IdACmdAdminUpdateCredentials
       adminId
     );
 
-    final var strings =
-      context.services().requireService(IdServerStrings.class);
+    final var password =
+      command.password()
+        .map(p -> expiration.expireAdminPasswordIfNecessary(clock.clock(), p));
 
     try {
       admins.adminUpdate(
         newAdmin,
         command.idName(),
         command.realName(),
-        command.password(),
+        password,
         Optional.empty()
       );
     } catch (final IdDatabaseException e) {

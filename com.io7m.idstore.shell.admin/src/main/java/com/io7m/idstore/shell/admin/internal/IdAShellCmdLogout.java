@@ -81,12 +81,6 @@ public final class IdAShellCmdLogout implements IdAShellCmdType
   }
 
   @Override
-  public QParametersPositionalType onListPositionalParameters()
-  {
-    return new QParametersPositionalNone();
-  }
-
-  @Override
   public QCommandStatus onExecute(
     final QCommandContextType context)
     throws Exception

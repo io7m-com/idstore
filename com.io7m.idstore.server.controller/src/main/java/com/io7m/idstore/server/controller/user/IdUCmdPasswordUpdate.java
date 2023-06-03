@@ -23,6 +23,8 @@ import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
 import com.io7m.idstore.server.security.IdSecUserActionPasswordUpdate;
+import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -51,6 +53,15 @@ public final class IdUCmdPasswordUpdate
     final IdUCommandPasswordUpdate command)
     throws IdException
   {
+    final var services =
+      context.services();
+    final var expiration =
+      services.requireService(IdServerConfigurationService.class)
+        .configuration()
+        .passwordExpiration();
+    final var clock =
+      services.requireService(IdServerClock.class);
+
     final var user = context.user();
     context.securityCheck(new IdSecUserActionPasswordUpdate(user));
 
@@ -69,14 +80,24 @@ public final class IdUCmdPasswordUpdate
       transaction.queries(IdDatabaseUsersQueriesType.class);
 
     transaction.userIdSet(user.id());
+
+    /*
+     * Create a new hashed password based on the provided text, and then
+     * set an expiration date on it if expiration is enabled.
+     */
+
+    final var newPassword =
+      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+        .createHashed(command.password());
+
+    final var newPasswordExpiring =
+      expiration.expireUserPasswordIfNecessary(clock.clock(), newPassword);
+
     users.userUpdate(
       user.id(),
       Optional.empty(),
       Optional.empty(),
-      Optional.of(
-        IdPasswordAlgorithmPBKDF2HmacSHA256.create()
-          .createHashed(command.password())
-      )
+      Optional.of(newPasswordExpiring)
     );
 
     return new IdUResponseUserUpdate(

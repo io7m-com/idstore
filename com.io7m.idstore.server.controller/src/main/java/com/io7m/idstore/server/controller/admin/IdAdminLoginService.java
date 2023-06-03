@@ -214,7 +214,8 @@ public final class IdAdminLoginService implements RPServiceType
     throws IdPasswordException, IdCommandExecutionFailure
   {
     final var ok =
-      user.password().check(password);
+      user.password()
+        .check(this.clock.clock(), password);
 
     if (!ok) {
       this.events.emit(
