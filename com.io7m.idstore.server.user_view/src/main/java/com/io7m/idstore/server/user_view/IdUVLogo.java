@@ -24,6 +24,8 @@ import com.io7m.idstore.server.http.IdHTTPServletResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
+import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+
 /**
  * A logo servlet.
  */
@@ -48,7 +50,9 @@ public final class IdUVLogo extends IdHTTPServletFunctional
     final var branding =
       services.requireService(IdServerBrandingServiceType.class);
 
-    return (request, information) -> execute(branding);
+    return withInstrumentation(services, (request, information) -> {
+      return execute(branding);
+    });
   }
 
   private static IdHTTPServletResponseType execute(

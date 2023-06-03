@@ -46,6 +46,7 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -83,21 +84,23 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    return withAuthentication(
-      services,
-      (request, information, session, user) -> {
-        return execute(
-          services,
-          database,
-          strings,
-          branding,
-          template,
-          session,
-          user,
-          request,
-          information
-        );
-      });
+    return withInstrumentation(services, (request, information) -> {
+      return withAuthentication(
+        services,
+        (req0, info0, session, user) -> {
+          return execute(
+            services,
+            database,
+            strings,
+            branding,
+            template,
+            session,
+            user,
+            req0,
+            info0
+          );
+        }).execute(request, information);
+    });
   }
 
   private static IdHTTPServletResponseType execute(

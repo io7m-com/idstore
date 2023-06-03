@@ -51,6 +51,7 @@ import java.util.Optional;
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
+import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 
 /**
  * The page that displays the login form, or executes the login if a username
@@ -93,7 +94,7 @@ public final class IdUVLogin extends IdHTTPServletFunctional
         .configuration()
         .rateLimit();
 
-    return (request, information) -> {
+    return withInstrumentation(services, (request, information) -> {
       return execute(
         database,
         branding,
@@ -105,7 +106,7 @@ public final class IdUVLogin extends IdHTTPServletFunctional
         request,
         information
       );
-    };
+    });
   }
 
   private static IdHTTPServletResponseType execute(

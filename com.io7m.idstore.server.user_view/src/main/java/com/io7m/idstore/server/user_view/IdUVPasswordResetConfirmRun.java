@@ -40,6 +40,7 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.Optional;
 
+import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -76,7 +77,7 @@ public final class IdUVPasswordResetConfirmRun
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    return (request, information) -> {
+    return withInstrumentation(services, (request, information) -> {
       return execute(
         userPasswordResets,
         strings,
@@ -85,7 +86,7 @@ public final class IdUVPasswordResetConfirmRun
         request,
         information
       );
-    };
+    });
   }
 
   private static IdHTTPServletResponseType execute(

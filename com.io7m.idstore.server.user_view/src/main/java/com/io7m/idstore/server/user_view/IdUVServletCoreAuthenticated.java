@@ -63,7 +63,6 @@ public final class IdUVServletCoreAuthenticated
   private final IdFMTemplateType<IdFMMessageData> template;
   private final IdServerBrandingServiceType branding;
   private final IdFMTemplateType<IdFMLoginData> loginTemplate;
-
   private IdUVServletCoreAuthenticated(
     final RPServiceDirectoryType services,
     final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> inCore)
