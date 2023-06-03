@@ -25,8 +25,6 @@ import com.io7m.quarrel.core.QCommandStatus;
 import com.io7m.quarrel.core.QCommandType;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
-import com.io7m.quarrel.core.QParametersPositionalNone;
-import com.io7m.quarrel.core.QParametersPositionalType;
 import com.io7m.quarrel.core.QStringType;
 import com.io7m.quarrel.ext.logback.QLogback;
 import org.slf4j.bridge.SLF4JBridgeHandler;

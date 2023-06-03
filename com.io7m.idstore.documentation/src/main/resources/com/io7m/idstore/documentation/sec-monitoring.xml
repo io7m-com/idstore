@@ -2,8 +2,7 @@
 
 <Section id="6351efb7-81d4-4e9a-be05-e913873b81dd"
          title="Security"
-         xmlns="urn:com.io7m.structural:8:0"
-         xmlns:xi="http://www.w3.org/2001/XInclude">
+         xmlns="urn:com.io7m.structural:8:0">
 
   <Subsection title="Overview">
     <Paragraph>

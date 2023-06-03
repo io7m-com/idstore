@@ -16,19 +16,14 @@
 
 package com.io7m.idstore.tests.server.controller.admin;
 
-import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
-import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminPermissionSet;
-import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
-import com.io7m.idstore.model.IdPasswordAlgorithmRedacted;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.protocol.admin.IdACommandUserUpdatePasswordExpiration;
 import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetNever;
 import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetRefresh;
 import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetSpecific;
-import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
 import com.io7m.idstore.server.controller.admin.IdACmdUserUpdatePasswordExpiration;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
@@ -42,17 +37,14 @@ import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_DENIED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
-import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_CREDENTIALS;
 import static com.io7m.idstore.model.IdAdminPermission.USER_WRITE_CREDENTIALS;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;

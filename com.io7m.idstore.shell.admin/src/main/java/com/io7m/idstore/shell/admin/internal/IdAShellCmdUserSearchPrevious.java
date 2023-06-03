@@ -22,8 +22,6 @@ import com.io7m.idstore.protocol.admin.IdAResponseUserSearchPrevious;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamedType;
-import com.io7m.quarrel.core.QParametersPositionalNone;
-import com.io7m.quarrel.core.QParametersPositionalType;
 import com.io7m.quarrel.core.QStringType.QConstant;
 
 import java.util.List;
