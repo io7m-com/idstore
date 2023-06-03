@@ -788,6 +788,10 @@
     <Class name="com.io7m.idstore.shell.admin.internal.IdAShellCmdHelp"/>
     <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
   </Match>
+  <Match>
+    <Class name="com.io7m.idstore.shell.admin.internal.IdAPasswordExpirationSetConverter"/>
+    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+  </Match>
 
   <!--                              -->
   <!-- com.io7m.idstore.user_client -->

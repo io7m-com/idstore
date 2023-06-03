@@ -22,7 +22,6 @@ import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetType;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
-import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
@@ -86,7 +85,6 @@ public final class IdAShellCmdAdminUpdatePasswordExpiration
   @Override
   protected IdACommandAdminUpdatePasswordExpiration onCreateCommand(
     final QCommandContextType context)
-    throws QException
   {
     return new IdACommandAdminUpdatePasswordExpiration(
       context.parameterValue(USER_ID),
@@ -98,7 +96,6 @@ public final class IdAShellCmdAdminUpdatePasswordExpiration
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminUpdate response)
-    throws QException
   {
     final var output =
       context.output();
