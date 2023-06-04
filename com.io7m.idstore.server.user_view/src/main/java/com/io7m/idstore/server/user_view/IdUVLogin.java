@@ -18,6 +18,7 @@ package com.io7m.idstore.server.user_view;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
+import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUserLoggedIn;
@@ -29,6 +30,8 @@ import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
 import com.io7m.idstore.server.http.IdHTTPServletResponseRedirect;
 import com.io7m.idstore.server.http.IdHTTPServletResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.idstore.server.service.templating.IdFMLoginData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
@@ -41,12 +44,14 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Optional;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
+import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 
 /**
  * The page that displays the login form, or executes the login if a username
@@ -82,18 +87,26 @@ public final class IdUVLogin extends IdHTTPServletFunctional
     final var template =
       services.requireService(IdFMTemplateServiceType.class)
         .pageLoginTemplate();
+    final var telemetry =
+      services.requireService(IdServerTelemetryServiceType.class);
+    final var rateLimit =
+      services.requireService(IdServerConfigurationService.class)
+        .configuration()
+        .rateLimit();
 
-    return (request, information) -> {
+    return withInstrumentation(services, (request, information) -> {
       return execute(
         database,
         branding,
         logins,
         strings,
         template,
+        telemetry,
+        rateLimit,
         request,
         information
       );
-    };
+    });
   }
 
   private static IdHTTPServletResponseType execute(
@@ -102,6 +115,8 @@ public final class IdUVLogin extends IdHTTPServletFunctional
     final IdUserLoginService logins,
     final IdServerStrings strings,
     final IdFMTemplateType<IdFMLoginData> template,
+    final IdServerTelemetryServiceType telemetry,
+    final IdServerRateLimitConfiguration rateLimit,
     final HttpServletRequest request,
     final IdHTTPServletRequestInformation information)
   {
@@ -115,6 +130,8 @@ public final class IdUVLogin extends IdHTTPServletFunctional
     if (username == null || password == null) {
       return showLoginForm(branding, template, session, 200);
     }
+
+    applyFixedDelay(telemetry, rateLimit.userLoginDelay());
 
     try (var connection = database.openConnection(IDSTORE)) {
       try (var transaction = connection.openTransaction()) {
@@ -147,6 +164,26 @@ public final class IdUVLogin extends IdHTTPServletFunctional
     } catch (final IdDatabaseException e) {
       session.setAttribute("ErrorMessage", e.getMessage());
       return showLoginForm(branding, template, session, 401);
+    }
+  }
+
+  private static void applyFixedDelay(
+    final IdServerTelemetryServiceType telemetry,
+    final Duration duration)
+  {
+    try {
+      final var childSpan =
+        telemetry.tracer()
+          .spanBuilder("FixedDelay")
+          .startSpan();
+
+      try (var ignored = childSpan.makeCurrent()) {
+        Thread.sleep(duration.toMillis());
+      } finally {
+        childSpan.end();
+      }
+    } catch (final InterruptedException e) {
+      Thread.currentThread().interrupt();
     }
   }
 

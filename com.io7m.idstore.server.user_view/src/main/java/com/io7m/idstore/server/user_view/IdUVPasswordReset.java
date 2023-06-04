@@ -33,6 +33,8 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
+import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+
 /**
  * The page that displays a password reset form.
  */
@@ -60,7 +62,9 @@ public final class IdUVPasswordReset extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pagePasswordResetTemplate();
 
-    return (request, information) -> execute(branding, template);
+    return withInstrumentation(services, (request, information) -> {
+      return execute(branding, template);
+    });
   }
 
   private static IdHTTPServletResponseType execute(

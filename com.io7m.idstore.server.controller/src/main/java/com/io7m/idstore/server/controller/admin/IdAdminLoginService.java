@@ -25,7 +25,6 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
-import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.events.IdEventAdminLoggedIn;
 import com.io7m.idstore.server.service.events.IdEventAdminLoginAuthenticationFailed;
 import com.io7m.idstore.server.service.events.IdEventAdminLoginRateLimitExceeded;
@@ -54,7 +53,6 @@ public final class IdAdminLoginService implements RPServiceType
   private final IdServerClock clock;
   private final IdServerStrings strings;
   private final IdSessionAdminService sessions;
-  private final IdServerConfigurationService configurations;
   private final IdEventServiceType events;
   private final IdRateLimitAdminLoginServiceType rateLimit;
 
@@ -64,7 +62,6 @@ public final class IdAdminLoginService implements RPServiceType
    * @param inClock          The clock
    * @param inStrings        The string resources
    * @param inSessions       A session service
-   * @param inConfigurations A configuration service
    * @param inRateLimit      The rate limit service
    * @param inEvents         The event service
    */
@@ -73,7 +70,6 @@ public final class IdAdminLoginService implements RPServiceType
     final IdServerClock inClock,
     final IdServerStrings inStrings,
     final IdSessionAdminService inSessions,
-    final IdServerConfigurationService inConfigurations,
     final IdRateLimitAdminLoginServiceType inRateLimit,
     final IdEventServiceType inEvents)
   {
@@ -83,8 +79,6 @@ public final class IdAdminLoginService implements RPServiceType
       Objects.requireNonNull(inStrings, "strings");
     this.sessions =
       Objects.requireNonNull(inSessions, "inSessions");
-    this.configurations =
-      Objects.requireNonNull(inConfigurations, "inConfigurations");
     this.events =
       Objects.requireNonNull(inEvents, "inEvents");
     this.rateLimit =
@@ -132,7 +126,6 @@ public final class IdAdminLoginService implements RPServiceType
         admins.adminGetForNameRequire(new IdName(username));
 
       this.checkBan(requestId, admins, user);
-      this.applyFixedDelay();
       this.checkPassword(requestId, remoteHost, password, user);
 
       admins.adminLogin(user.id(), metadata);
@@ -163,24 +156,6 @@ public final class IdAdminLoginService implements RPServiceType
         requestId,
         500
       );
-    }
-  }
-
-  /**
-   * Apply a fixed delay for all login requests.
-   */
-
-  private void applyFixedDelay()
-  {
-    try {
-      Thread.sleep(
-        this.configurations.configuration()
-          .rateLimit()
-          .userLoginDelay()
-          .toMillis()
-      );
-    } catch (final InterruptedException e) {
-      Thread.currentThread().interrupt();
     }
   }
 

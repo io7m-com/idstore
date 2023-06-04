@@ -167,7 +167,6 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
         this.serverClock,
         this.strings,
         this.sessions,
-        this.configurationService,
         this.rateLimit,
         this.events
       );
@@ -478,7 +477,6 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
       this.serverClock,
       this.strings,
       this.sessions,
-      this.configurationService,
       this.rateLimit,
       this.events
     );
@@ -491,7 +489,6 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
       this.serverClock,
       this.strings,
       this.sessions,
-      this.configurationService,
       this.rateLimit,
       this.events
     );

@@ -132,7 +132,6 @@ public final class IdUserLoginService implements RPServiceType
         users.userGetForNameRequire(new IdName(username));
 
       this.checkBan(requestId, users, user);
-      this.applyFixedDelay();
       this.checkPassword(requestId, remoteHost, password, user);
 
       users.userLogin(
@@ -170,24 +169,6 @@ public final class IdUserLoginService implements RPServiceType
         requestId,
         500
       );
-    }
-  }
-
-  /**
-   * Apply a fixed delay for all login requests.
-   */
-
-  private void applyFixedDelay()
-  {
-    try {
-      Thread.sleep(
-        this.configurations.configuration()
-          .rateLimit()
-          .userLoginDelay()
-          .toMillis()
-      );
-    } catch (final InterruptedException e) {
-      Thread.currentThread().interrupt();
     }
   }
 

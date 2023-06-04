@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 
+import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -63,15 +64,12 @@ public final class IdUVEmailAdd extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageEmailAddTemplate();
 
-    return withAuthentication(
-      services,
-      (request, information, session, user) -> {
-        return execute(
-          branding,
-          template,
-          information
-        );
-      });
+    return withInstrumentation(services, (request, information) -> {
+      return withAuthentication(
+        services,
+        (r0, info1, session, user) -> execute(branding, template, info1))
+        .execute(request, information);
+    });
   }
 
   private static IdHTTPServletResponseType execute(

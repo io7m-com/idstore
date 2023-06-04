@@ -33,6 +33,7 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
+import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 
 /**
@@ -62,11 +63,13 @@ public final class IdUVPasswordUpdate extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pagePasswordUpdateTemplate();
 
-    return withAuthentication(
-      services,
-      (request, information, session, user) -> {
-        return execute(branding, template, information);
-      });
+    return withInstrumentation(services, (request, information) -> {
+      return withAuthentication(
+        services,
+        (req0, info0, session, user) -> {
+          return execute(branding, template, info0);
+        }).execute(request, information);
+    });
   }
 
   private static IdHTTPServletResponseType execute(

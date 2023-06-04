@@ -45,6 +45,7 @@ import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 
 /**
  * The endpoint that allows for completing email verification challenges.
@@ -80,7 +81,7 @@ public final class IdUVEmailVerificationDeny
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    return (request, information) -> {
+    return withInstrumentation(services, (request, information) -> {
       return execute(
         services,
         strings,
@@ -90,7 +91,7 @@ public final class IdUVEmailVerificationDeny
         request,
         information
       );
-    };
+    });
   }
 
   private static IdHTTPServletResponseType execute(

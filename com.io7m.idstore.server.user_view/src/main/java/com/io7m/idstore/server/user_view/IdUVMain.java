@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -79,20 +80,22 @@ public final class IdUVMain extends IdHTTPServletFunctional
     final var msgTemplate =
       templates.pageMessage();
 
-    return withAuthentication(
-      services,
-      (request, information, session, user) -> {
-        return execute(
-          database,
-          branding,
-          userTemplate,
-          msgTemplate,
-          session,
-          user,
-          request,
-          information
-        );
-      });
+    return withInstrumentation(services, (request, information) -> {
+      return withAuthentication(
+        services,
+        (r0, info0, session, user) -> {
+          return execute(
+            database,
+            branding,
+            userTemplate,
+            msgTemplate,
+            session,
+            user,
+            r0,
+            info0
+          );
+        }).execute(request, information);
+    });
   }
 
   private static IdHTTPServletResponseType execute(
