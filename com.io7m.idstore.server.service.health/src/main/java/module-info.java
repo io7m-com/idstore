@@ -24,6 +24,7 @@ module com.io7m.idstore.server.service.health
   requires static org.osgi.annotation.versioning;
 
   requires com.io7m.idstore.database.api;
+  requires com.io7m.idstore.server.service.telemetry.api;
 
   exports com.io7m.idstore.server.service.health;
 }
