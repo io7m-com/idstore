@@ -52,6 +52,7 @@ import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 
 /**
  * The page that displays the login form, or executes the login if a username
@@ -150,6 +151,7 @@ public final class IdUVLogin extends IdHTTPServletFunctional
             metadata
           );
         } catch (final IdCommandExecutionFailure e) {
+          setSpanErrorCode(e.errorCode());
           session.setAttribute(
             "ErrorMessage",
             strings.format("errorInvalidUsernamePassword")
@@ -162,6 +164,7 @@ public final class IdUVLogin extends IdHTTPServletFunctional
         return new IdHTTPServletResponseRedirect("/");
       }
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       session.setAttribute("ErrorMessage", e.getMessage());
       return showLoginForm(branding, template, session, 401);
     }

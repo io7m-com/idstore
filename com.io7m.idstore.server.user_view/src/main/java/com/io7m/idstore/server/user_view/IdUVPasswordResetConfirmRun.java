@@ -41,6 +41,7 @@ import java.io.UncheckedIOException;
 import java.util.Optional;
 
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -131,6 +132,7 @@ public final class IdUVPasswordResetConfirmRun
         Optional.ofNullable(tokenParameter.get())
       );
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       return IdUVErrorPage.showError(
         strings,
         branding,

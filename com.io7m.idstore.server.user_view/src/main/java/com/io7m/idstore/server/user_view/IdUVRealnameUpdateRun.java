@@ -43,6 +43,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 
 /**
@@ -152,6 +153,7 @@ public final class IdUVRealnameUpdateRun extends IdHTTPServletFunctional
         return new IdHTTPServletResponseRedirect(DESTINATION_ON_SUCCESS);
       }
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       session.messageCurrentSet(
         new IdSessionMessage(
           information.requestId(),
@@ -163,6 +165,7 @@ public final class IdUVRealnameUpdateRun extends IdHTTPServletFunctional
         )
       );
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       session.messageCurrentSet(
         new IdSessionMessage(
           information.requestId(),

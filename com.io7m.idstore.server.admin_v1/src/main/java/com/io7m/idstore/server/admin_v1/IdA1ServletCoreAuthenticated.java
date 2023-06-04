@@ -45,6 +45,7 @@ import java.util.UUID;
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_SERVER;
 import static com.io7m.idstore.server.admin_v1.IdA1Errors.errorResponseOf;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 
 /**
  * A core that executes the given core under authentication.
@@ -119,6 +120,7 @@ public final class IdA1ServletCoreAuthenticated
     try {
       adminOpt = this.adminGet(adminSession.adminId());
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       return errorResponseOf(this.messages, information, BLAME_SERVER, e);
     }
 

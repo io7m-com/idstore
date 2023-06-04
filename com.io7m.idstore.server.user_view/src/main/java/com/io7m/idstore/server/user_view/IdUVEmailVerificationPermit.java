@@ -46,6 +46,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 
 /**
  * The endpoint that allows for completing email verification challenges.
@@ -133,6 +134,7 @@ public final class IdUVEmailVerificationPermit
         tokenParameter.get()
       );
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       return IdUVErrorPage.showError(
         strings,
         branding,
@@ -143,6 +145,7 @@ public final class IdUVEmailVerificationPermit
         DESTINATION_ON_FAILURE
       );
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       return IdUVErrorPage.showError(
         strings,
         branding,

@@ -30,6 +30,7 @@ import java.util.Objects;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 
 /**
  * A servlet core that executes the given core with a database transaction.
@@ -84,6 +85,7 @@ public final class IdU1ServletCoreTransactional
           transaction);
       }
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       return IdU1Errors.errorResponseOf(
         this.messages,
         information,
