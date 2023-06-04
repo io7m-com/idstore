@@ -32,6 +32,7 @@ import com.io7m.quarrel.core.QErrorFormatting;
 import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QLocalization;
 import com.io7m.quarrel.core.QLocalizationType;
+import com.io7m.seltzer.api.SStructuredErrorType;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.MaskingCallback;
@@ -237,7 +238,7 @@ public final class IdAShell implements IdAShellType
         arguments
       );
     } catch (final QException ex) {
-      this.formatQException(ex);
+      this.formatException(ex);
       throw new ShellCommandFailed(ex);
     }
 
@@ -246,8 +247,8 @@ public final class IdAShell implements IdAShellType
     } catch (final InterruptedException e) {
       Thread.currentThread().interrupt();
     } catch (final Exception e) {
-      if (e instanceof final QException q) {
-        this.formatQException(q);
+      if (e instanceof final SStructuredErrorType<?> q) {
+        this.formatException(q);
       }
 
       e.printStackTrace(this.writer);
@@ -257,9 +258,11 @@ public final class IdAShell implements IdAShellType
     }
   }
 
-  private void formatQException(
-    final QException ex)
+  private void formatException(
+    final SStructuredErrorType<?> ex)
   {
+    this.writer.printf("Error: ");
+
     QErrorFormatting.format(
       this.localizer, ex, s -> {
         this.writer.append(s);
@@ -267,15 +270,18 @@ public final class IdAShell implements IdAShellType
         this.writer.flush();
       }
     );
-    ex.extraErrors().forEach(e -> {
-      QErrorFormatting.format(
-        this.localizer, e, s -> {
-          this.writer.append(s);
-          this.writer.println();
-          this.writer.flush();
-        }
-      );
-    });
+
+    if (ex instanceof final QException q) {
+      q.extraErrors().forEach(e -> {
+        QErrorFormatting.format(
+          this.localizer, e, s -> {
+            this.writer.append(s);
+            this.writer.println();
+            this.writer.flush();
+          }
+        );
+      });
+    }
   }
 
   @Override
