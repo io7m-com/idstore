@@ -91,8 +91,7 @@ public final class IdHTTPServletCoreInstrumented
         .startSpan();
 
     try (var ignored = span.makeCurrent()) {
-      final var response =
-        this.core.execute(request, information);
+      final var response = this.core.execute(request, information);
       span.setAttribute(HTTP_STATUS_CODE, response.statusCode());
       response.contentLengthOptional().ifPresent(size -> {
         span.setAttribute(HTTP_RESPONSE_CONTENT_LENGTH, Long.valueOf(size));

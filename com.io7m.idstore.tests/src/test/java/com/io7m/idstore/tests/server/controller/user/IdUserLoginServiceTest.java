@@ -152,7 +152,10 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     this.strings =
       new IdServerStrings(Locale.ROOT);
     this.sessions =
-      new IdSessionUserService(OpenTelemetry.noop(), Duration.ofDays(1L));
+      new IdSessionUserService(
+        OpenTelemetry.noop().getMeter("com.io7m.idstore"),
+        Duration.ofDays(1L)
+      );
     this.rateLimit =
       mock(IdRateLimitUserLoginServiceType.class);
     this.events =

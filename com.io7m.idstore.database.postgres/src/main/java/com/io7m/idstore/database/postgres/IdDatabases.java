@@ -32,7 +32,8 @@ import com.io7m.trasco.vanilla.TrExecutors;
 import com.io7m.trasco.vanilla.TrSchemaRevisionSetParsers;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.metrics.Meter;
+import io.opentelemetry.api.trace.Tracer;
 import org.postgresql.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,12 +160,14 @@ public final class IdDatabases implements IdDatabaseFactoryType
   @Override
   public IdDatabaseType open(
     final IdDatabaseConfiguration configuration,
-    final OpenTelemetry openTelemetry,
+    final Tracer tracer,
+    final Meter meter,
     final Consumer<String> startupMessages)
     throws IdDatabaseException
   {
     Objects.requireNonNull(configuration, "configuration");
-    Objects.requireNonNull(openTelemetry, "openTelemetry");
+    Objects.requireNonNull(tracer, "tracer");
+    Objects.requireNonNull(meter, "meter");
     Objects.requireNonNull(startupMessages, "startupMessages");
 
     try {
@@ -211,7 +214,8 @@ public final class IdDatabases implements IdDatabaseFactoryType
       }
 
       return new IdDatabase(
-        openTelemetry,
+        tracer,
+        meter,
         configuration.clock(),
         dataSource
       );
@@ -266,7 +270,7 @@ public final class IdDatabases implements IdDatabaseFactoryType
     final Consumer<String> startupMessages,
     final TrEventType event)
   {
-    if (event instanceof TrEventExecutingSQL sql) {
+    if (event instanceof final TrEventExecutingSQL sql) {
       publishEvent(
         startupMessages,
         String.format("Executing SQL: %s", sql.statement())
@@ -274,7 +278,7 @@ public final class IdDatabases implements IdDatabaseFactoryType
       return;
     }
 
-    if (event instanceof TrEventUpgrading upgrading) {
+    if (event instanceof final TrEventUpgrading upgrading) {
       publishEvent(
         startupMessages,
         String.format(

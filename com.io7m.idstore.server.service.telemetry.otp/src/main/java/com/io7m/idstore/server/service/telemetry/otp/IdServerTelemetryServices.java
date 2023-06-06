@@ -122,9 +122,14 @@ public final class IdServerTelemetryServices
         IdVersion.MAIN_VERSION
       );
 
+    final var meter =
+      openTelemetry.getMeter(
+        "com.io7m.idstore"
+      );
+
     return new IdServerTelemetryService(
-      openTelemetry,
-      tracer
+      tracer,
+      meter
     );
   }
 

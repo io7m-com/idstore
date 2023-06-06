@@ -172,7 +172,8 @@ public final class IdDatabasesTest
       assertThrows(IdDatabaseException.class, () -> {
         this.databases.open(
           this.databaseConfiguration,
-          OpenTelemetry.noop(),
+          OpenTelemetry.noop().getTracer("com.io7m.idstore"),
+          OpenTelemetry.noop().getMeter("com.io7m.idstore"),
           s -> {
           }
         );
@@ -220,7 +221,8 @@ public final class IdDatabasesTest
       assertThrows(IdDatabaseException.class, () -> {
         this.databases.open(
           this.databaseConfiguration,
-          OpenTelemetry.noop(),
+          OpenTelemetry.noop().getTracer("com.io7m.idstore"),
+          OpenTelemetry.noop().getMeter("com.io7m.idstore"),
           s -> {
           }
         );
@@ -256,7 +258,8 @@ public final class IdDatabasesTest
       assertThrows(IdDatabaseException.class, () -> {
         this.databases.open(
           this.databaseConfiguration,
-          OpenTelemetry.noop(),
+          OpenTelemetry.noop().getTracer("com.io7m.idstore"),
+          OpenTelemetry.noop().getMeter("com.io7m.idstore"),
           s -> {
           }
         );
@@ -305,7 +308,8 @@ public final class IdDatabasesTest
       assertThrows(IdDatabaseException.class, () -> {
         this.databases.open(
           this.databaseConfigurationWithoutUpgrades,
-          OpenTelemetry.noop(),
+          OpenTelemetry.noop().getTracer("com.io7m.idstore"),
+          OpenTelemetry.noop().getMeter("com.io7m.idstore"),
           s -> {
           }
         );

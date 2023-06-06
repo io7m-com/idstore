@@ -41,6 +41,9 @@ public final class IdSessionAdminServiceTest
   protected IdSessionAdminService createWithExpiration(
     final Duration expiration)
   {
-    return new IdSessionAdminService(OpenTelemetry.noop(), expiration);
+    return new IdSessionAdminService(
+      OpenTelemetry.noop().getMeter("com.io7m.idstore"),
+      expiration
+    );
   }
 }

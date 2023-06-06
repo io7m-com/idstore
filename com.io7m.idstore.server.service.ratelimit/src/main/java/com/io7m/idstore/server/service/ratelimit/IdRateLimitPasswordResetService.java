@@ -54,7 +54,7 @@ public final class IdRateLimitPasswordResetService
     return new IdRateLimitPasswordResetService(
       IdRateLimiter.create(
         telemetry,
-        "IdRateLimitPasswordReset",
+        "password_reset",
         expiration,
         timeUnit)
     );

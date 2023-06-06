@@ -72,8 +72,9 @@ import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.repetoir.core.RPServiceDirectory;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,7 +154,11 @@ public final class IdServer implements IdServerType
 
         try {
           this.database =
-            this.resources.add(this.createDatabase(this.telemetry.openTelemetry()));
+            this.resources.add(
+              this.createDatabase(
+                this.telemetry.tracer(),
+                this.telemetry.meter())
+            );
           final var services =
             this.resources.add(this.createServiceDirectory(this.database));
 
@@ -225,14 +230,14 @@ public final class IdServer implements IdServerType
 
     final var sessionAdminService =
       new IdSessionAdminService(
-        this.telemetry.openTelemetry(),
+        this.telemetry.meter(),
         this.configuration.sessions().adminSessionExpiration()
       );
     services.register(IdSessionAdminService.class, sessionAdminService);
 
     final var sessionUserService =
       new IdSessionUserService(
-        this.telemetry.openTelemetry(),
+        this.telemetry.meter(),
         this.configuration.sessions().userSessionExpiration()
       );
     services.register(IdSessionUserService.class, sessionUserService);
@@ -377,13 +382,15 @@ public final class IdServer implements IdServerType
   }
 
   private IdDatabaseType createDatabase(
-    final OpenTelemetry openTelemetry)
+    final Tracer tracer,
+    final Meter meter)
     throws IdDatabaseException
   {
     return this.configuration.databases()
       .open(
         this.configuration.databaseConfiguration(),
-        openTelemetry,
+        tracer,
+        meter,
         event -> {
 
         });
@@ -470,7 +477,8 @@ public final class IdServer implements IdServerType
             this.configuration.databases()
               .open(
                 setupConfiguration,
-                this.telemetry.openTelemetry(),
+                this.telemetry.tracer(),
+                this.telemetry.meter(),
                 event -> {
                 }));
 

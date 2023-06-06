@@ -42,6 +42,9 @@ public final class IdSessionUserServiceTest
   protected IdSessionUserService createWithExpiration(
     final Duration expiration)
   {
-    return new IdSessionUserService(OpenTelemetry.noop(), expiration);
+    return new IdSessionUserService(
+      OpenTelemetry.noop().getMeter("com.io7m.idstore"),
+      expiration
+    );
   }
 }

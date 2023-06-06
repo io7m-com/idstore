@@ -54,7 +54,7 @@ public final class IdRateLimitUserLoginService
     return new IdRateLimitUserLoginService(
       IdRateLimiter.create(
         telemetry,
-        "IdRateLimitUserLoginService",
+        "user_login",
         expiration,
         timeUnit)
     );

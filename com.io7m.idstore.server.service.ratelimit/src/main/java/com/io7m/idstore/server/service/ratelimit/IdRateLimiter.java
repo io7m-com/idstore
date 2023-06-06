@@ -20,6 +20,8 @@ package com.io7m.idstore.server.service.ratelimit;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.LongUpDownCounter;
 
 import java.util.Objects;
@@ -32,16 +34,20 @@ import java.util.concurrent.TimeUnit;
 public final class IdRateLimiter
 {
   private final Cache<Operation, Operation> cache;
-  private final LongUpDownCounter sizeCounter;
+  private final LongUpDownCounter sizeGauge;
+  private final LongCounter tripCounter;
 
   private IdRateLimiter(
     final Cache<Operation, Operation> inCache,
-    final LongUpDownCounter inMeter)
+    final LongUpDownCounter inSizeCounter,
+    final LongCounter inTripCounter)
   {
     this.cache =
       Objects.requireNonNull(inCache, "cache");
-    this.sizeCounter =
-      Objects.requireNonNull(inMeter, "inMeter");
+    this.sizeGauge =
+      Objects.requireNonNull(inSizeCounter, "sizeCounter");
+    this.tripCounter =
+      Objects.requireNonNull(inTripCounter, "tripCounter");
   }
 
   /**
@@ -61,22 +67,28 @@ public final class IdRateLimiter
     final long expiration,
     final TimeUnit timeUnit)
   {
-    final var meters =
-      telemetry.openTelemetry()
-        .meterBuilder(name)
+    final var sizeGauge =
+      telemetry.meter()
+        .upDownCounterBuilder("idstore_ratelimit_%s_size".formatted(name))
+        .setDescription("The size of the rate limit cache for '%s' operations.".formatted(
+          name))
         .build();
 
-    final var guage =
-      meters.upDownCounterBuilder("size")
+    final var tripCounter =
+      telemetry.meter()
+        .counterBuilder("idstore_ratelimit_%s_triggers".formatted(name))
+        .setDescription(
+          "The number of times the rate limit has been triggered for '%s' operations.".formatted(
+            name))
         .build();
 
     final Cache<Operation, Operation> cache =
       Caffeine.newBuilder()
         .expireAfterWrite(expiration, timeUnit)
-        .evictionListener((key, value, cause) -> guage.add(-1L))
+        .evictionListener((key, value, cause) -> sizeGauge.add(-1L))
         .build();
 
-    return new IdRateLimiter(cache, guage);
+    return new IdRateLimiter(cache, sizeGauge, tripCounter);
   }
 
   /**
@@ -92,17 +104,25 @@ public final class IdRateLimiter
     final String user,
     final String operation)
   {
+    final var attributes =
+      Attributes.builder()
+        .put("host", host)
+        .put("user", user)
+        .put("operation", operation)
+        .build();
+
     final var op =
       new Operation(host, user, operation);
     final var existing =
       this.cache.getIfPresent(op);
 
     if (existing != null) {
+      this.tripCounter.add(1L, attributes);
       return false;
     }
 
     this.cache.put(op, op);
-    this.sizeCounter.add(1L);
+    this.sizeGauge.add(1L, attributes);
     return true;
   }
 

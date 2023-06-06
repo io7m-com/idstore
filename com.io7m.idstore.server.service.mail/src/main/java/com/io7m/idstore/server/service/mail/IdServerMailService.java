@@ -22,6 +22,8 @@ import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTPS;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP_TLS;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import jakarta.mail.Message;
@@ -48,6 +50,8 @@ public final class IdServerMailService implements IdServerMailServiceType
   private final IdServerTelemetryServiceType telemetry;
   private final Session session;
   private final ExecutorService executor;
+  private final LongCounter mailSent;
+  private final LongCounter mailFailed;
 
   private IdServerMailService(
     final IdServerMailConfiguration inConfiguration,
@@ -63,6 +67,16 @@ public final class IdServerMailService implements IdServerMailServiceType
       Objects.requireNonNull(inSession, "session");
     this.executor =
       Objects.requireNonNull(inExecutor, "executor");
+
+    final var meter = inTelemetry.meter();
+    this.mailSent =
+      meter.counterBuilder("idstore_mail_sent")
+        .setDescription("Number of mails sent.")
+        .build();
+    this.mailFailed =
+      meter.counterBuilder("idstore_mail_failed")
+        .setDescription("Number of mails that failed to send.")
+        .build();
   }
 
   /**
@@ -100,7 +114,9 @@ public final class IdServerMailService implements IdServerMailServiceType
     if (transport instanceof IdServerMailTransportSMTP) {
       p.setProperty("mail.transport.protocol", "smtp");
       p.setProperty("mail.smtp.host", transport.host());
-      p.setProperty("mail.smtp.port", Integer.toUnsignedString(transport.port()));
+      p.setProperty(
+        "mail.smtp.port",
+        Integer.toUnsignedString(transport.port()));
       p.setProperty("mail.smtp.starttls.enable", "true");
       p.setProperty("mail.smtp.starttls.required", "false");
       authOpt.ifPresent(auth -> {
@@ -110,7 +126,9 @@ public final class IdServerMailService implements IdServerMailServiceType
     } else if (transport instanceof IdServerMailTransportSMTP_TLS) {
       p.setProperty("mail.transport.protocol", "smtp");
       p.setProperty("mail.smtp.host", transport.host());
-      p.setProperty("mail.smtp.port", Integer.toUnsignedString(transport.port()));
+      p.setProperty(
+        "mail.smtp.port",
+        Integer.toUnsignedString(transport.port()));
       p.setProperty("mail.smtp.starttls.enable", "true");
       p.setProperty("mail.smtp.starttls.required", "true");
       authOpt.ifPresent(auth -> {
@@ -121,7 +139,9 @@ public final class IdServerMailService implements IdServerMailServiceType
       p.setProperty("mail.transport.protocol", "smtps");
       p.setProperty("mail.smtps.quitwait", "false");
       p.setProperty("mail.smtps.host", transport.host());
-      p.setProperty("mail.smtps.port", Integer.toUnsignedString(transport.port()));
+      p.setProperty(
+        "mail.smtps.port",
+        Integer.toUnsignedString(transport.port()));
       authOpt.ifPresent(auth -> {
         p.setProperty("mail.smtps.username", auth.userName());
         p.setProperty("mail.smtps.password", auth.password());
@@ -173,6 +193,11 @@ public final class IdServerMailService implements IdServerMailServiceType
           .setParent(Context.current().with(parentSpan))
           .startSpan();
 
+      final var metricAttributes =
+        Attributes.builder()
+          .put("smtp.to", to.value())
+          .build();
+
       try {
         final Message message =
           new MimeMessage(this.session);
@@ -192,8 +217,10 @@ public final class IdServerMailService implements IdServerMailServiceType
         message.setContent(text, "text/plain");
         Transport.send(message);
 
+        this.mailSent.add(1L, metricAttributes);
         future.complete(null);
       } catch (final Exception e) {
+        this.mailFailed.add(1L, metricAttributes);
         span.recordException(e);
         future.completeExceptionally(e);
       } finally {

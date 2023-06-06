@@ -20,10 +20,9 @@ import com.io7m.idstore.database.api.IdDatabaseConnectionType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseRole;
 import com.io7m.idstore.database.api.IdDatabaseType;
-import com.io7m.idstore.model.IdVersion;
 import com.zaxxer.hikari.HikariDataSource;
-import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.metrics.LongCounter;
+import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import org.jooq.conf.RenderNameCase;
@@ -57,23 +56,22 @@ public final class IdDatabase implements IdDatabaseType
   /**
    * The default postgres server database implementation.
    *
-   * @param telemetry    A telemetry interface
+   * @param inTracer    A telemetry tracer interface
+   * @param meter A telemetry meter interface
    * @param inClock      The clock
    * @param inDataSource A pooled data source
    */
 
   public IdDatabase(
-    final OpenTelemetry telemetry,
+    final Tracer inTracer,
+    final Meter meter,
     final Clock inClock,
     final HikariDataSource inDataSource)
   {
-    Objects.requireNonNull(telemetry, "inOpenTelemetry");
-
     this.tracer =
-      telemetry.getTracer(
-        "com.io7m.idstore.database.postgres",
-        IdVersion.MAIN_VERSION
-      );
+      Objects.requireNonNull(inTracer, "tracer");
+    Objects.requireNonNull(meter, "meter");
+
     this.clock =
       Objects.requireNonNull(inClock, "clock");
     this.dataSource =
@@ -81,19 +79,17 @@ public final class IdDatabase implements IdDatabaseType
     this.settings =
       new Settings().withRenderNameCase(RenderNameCase.LOWER);
 
-    final var meters =
-      telemetry.meterBuilder(
-          "com.io7m.idstore.database.postgres")
-        .build();
-
     this.transactions =
-      meters.counterBuilder("IdDatabase.transactions")
+      meter.counterBuilder("idstore_db_transactions")
+        .setDescription("The number of completed transactions.")
         .build();
     this.transactionCommits =
-      meters.counterBuilder("IdDatabase.commits")
+      meter.counterBuilder("idstore_db_commits")
+        .setDescription("The number of database transaction commits.")
         .build();
     this.transactionRollbacks =
-      meters.counterBuilder("IdDatabase.commits")
+      meter.counterBuilder("idstore_db_rollbacks")
+        .setDescription("The number of database transaction rollbacks.")
         .build();
   }
 

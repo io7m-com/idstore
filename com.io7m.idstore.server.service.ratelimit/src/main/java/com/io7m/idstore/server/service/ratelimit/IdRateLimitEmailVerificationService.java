@@ -56,7 +56,7 @@ public final class IdRateLimitEmailVerificationService
     return new IdRateLimitEmailVerificationService(
       IdRateLimiter.create(
         telemetry,
-        "IdRateLimitEmailVerification",
+        "email_verification",
         expiration,
         timeUnit)
     );

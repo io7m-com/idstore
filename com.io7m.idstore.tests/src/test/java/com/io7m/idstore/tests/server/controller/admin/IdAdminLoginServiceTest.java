@@ -154,7 +154,10 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     this.strings =
       new IdServerStrings(Locale.ROOT);
     this.sessions =
-      new IdSessionAdminService(OpenTelemetry.noop(), Duration.ofDays(1L));
+      new IdSessionAdminService(
+        OpenTelemetry.noop().getMeter("com.io7m.idstore"),
+        Duration.ofDays(1L)
+      );
     this.events =
       mock(IdEventServiceType.class);
     this.rateLimit =
@@ -388,7 +391,9 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     verifyNoMoreInteractions(this.admins);
 
     verify(this.events, once())
-      .emit(new IdEventAdminLoginAuthenticationFailed("www.example.com", admin.id()));
+      .emit(new IdEventAdminLoginAuthenticationFailed(
+        "www.example.com",
+        admin.id()));
     verifyNoMoreInteractions(this.events);
   }
 

@@ -18,7 +18,7 @@
 package com.io7m.idstore.server.service.telemetry.otp.internal;
 
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
-import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.Tracer;
 
 import java.util.Objects;
@@ -30,24 +30,24 @@ import java.util.Objects;
 public final class IdServerTelemetryService
   implements IdServerTelemetryServiceType
 {
-  private final OpenTelemetry openTelemetry;
   private final Tracer tracer;
+  private final Meter meter;
 
   /**
    * An OpenTelemetry service.
    *
-   * @param inOpenTelemetry The OT instance
-   * @param inTracer        The tracer instance
+   * @param inTracer The tracer instance
+   * @param inMeter  The meter instance
    */
 
   public IdServerTelemetryService(
-    final OpenTelemetry inOpenTelemetry,
-    final Tracer inTracer)
+    final Tracer inTracer,
+    final Meter inMeter)
   {
-    this.openTelemetry =
-      Objects.requireNonNull(inOpenTelemetry, "openTelemetry");
     this.tracer =
       Objects.requireNonNull(inTracer, "tracer");
+    this.meter =
+      Objects.requireNonNull(inMeter, "meter");
   }
 
   @Override
@@ -70,8 +70,8 @@ public final class IdServerTelemetryService
   }
 
   @Override
-  public OpenTelemetry openTelemetry()
+  public Meter meter()
   {
-    return this.openTelemetry;
+    return this.meter;
   }
 }

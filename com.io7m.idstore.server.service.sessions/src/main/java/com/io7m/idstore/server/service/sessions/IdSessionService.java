@@ -19,10 +19,11 @@ package com.io7m.idstore.server.service.sessions;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.repetoir.core.RPServiceType;
-import io.opentelemetry.api.OpenTelemetry;
-import io.opentelemetry.api.metrics.ObservableLongMeasurement;
+import io.opentelemetry.api.metrics.LongUpDownCounter;
+import io.opentelemetry.api.metrics.Meter;
 import org.slf4j.Logger;
 
 import java.time.Duration;
@@ -30,7 +31,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
+
+import static java.lang.Long.toUnsignedString;
 
 /**
  * A service to create and manage sessions.
@@ -41,7 +45,7 @@ import java.util.function.BiFunction;
 public abstract class IdSessionService<S extends IdSessionType>
   implements RPServiceType
 {
-  private final ObservableLongMeasurement sessionsGauge;
+  private final LongUpDownCounter sessionsGauge;
   private final Cache<IdSessionSecretIdentifier, S> sessions;
   private final ConcurrentMap<IdSessionSecretIdentifier, S> sessionsMap;
   private final BiFunction<UUID, IdSessionSecretIdentifier, S> sessionCreator;
@@ -49,14 +53,14 @@ public abstract class IdSessionService<S extends IdSessionType>
   /**
    * A service to create and manage sessions.
    *
-   * @param inTelemetry      The telemetry service
+   * @param inMeter          The telemetry meter service
    * @param inExpiration     The session expiration time
    * @param type             The session type
    * @param inSessionCreator A session creator function
    */
 
   protected IdSessionService(
-    final OpenTelemetry inTelemetry,
+    final Meter inMeter,
     final Duration inExpiration,
     final String type,
     final BiFunction<UUID, IdSessionSecretIdentifier, S> inSessionCreator)
@@ -67,22 +71,34 @@ public abstract class IdSessionService<S extends IdSessionType>
     this.sessions =
       Caffeine.newBuilder()
         .expireAfterAccess(inExpiration)
+        .scheduler(createScheduler(type))
         .<IdSessionSecretIdentifier, S>evictionListener(
-          (key, val, removalCause) -> this.onSessionRemoved(removalCause))
+          (key, session, removalCause) -> this.onSessionRemoved(removalCause))
         .build();
 
     this.sessionsMap =
       this.sessions.asMap();
 
-    final var meter =
-      inTelemetry.meterBuilder(IdSessionService.class.getCanonicalName())
-        .build();
-
     this.sessionsGauge =
-      meter.gaugeBuilder("idstore.active%sSessions".formatted(type))
+      inMeter.upDownCounterBuilder("idstore_%s_sessions_active".formatted(type))
         .setDescription("Active %s sessions.".formatted(type))
-        .ofLongs()
-        .buildObserver();
+        .build();
+  }
+
+  private static Scheduler createScheduler(
+    final String type)
+  {
+    return Scheduler.forScheduledExecutorService(
+      Executors.newSingleThreadScheduledExecutor(r -> {
+        final var thread = new Thread(r);
+        thread.setDaemon(true);
+        thread.setName(
+          "com.io7m.idstore.server.service.sessions.IdSessionService[%s][%d]".formatted(
+            type,
+            thread.getId()));
+        return thread;
+      })
+    );
   }
 
   protected abstract Logger logger();
@@ -91,12 +107,15 @@ public abstract class IdSessionService<S extends IdSessionType>
     final RemovalCause removalCause)
   {
     final var sizeNow = this.sessions.estimatedSize();
-    this.logger().debug(
-      "delete session ({}) ({} now active)",
-      removalCause,
-      Long.toUnsignedString(sizeNow)
-    );
-    this.sessionsGauge.record(sizeNow);
+    final var logger = this.logger();
+    if (logger.isDebugEnabled()) {
+      logger.debug(
+        "delete session ({}) ({} now active)",
+        removalCause,
+        toUnsignedString(sizeNow)
+      );
+    }
+    this.sessionsGauge.add(-1L);
   }
 
   /**
@@ -138,7 +157,14 @@ public abstract class IdSessionService<S extends IdSessionType>
 
     final var session = this.sessionCreator.apply(userId, id);
     this.sessions.put(id, session);
-    this.sessionsGauge.record(this.sessions.estimatedSize());
+    this.sessionsGauge.add(1L);
+
+    final var sizeNow = this.sessions.estimatedSize();
+    final var logger = this.logger();
+    if (logger.isDebugEnabled()) {
+      logger.debug("create session ({} now active)", toUnsignedString(sizeNow));
+    }
+
     return session;
   }
 
@@ -152,8 +178,6 @@ public abstract class IdSessionService<S extends IdSessionType>
     final IdSessionSecretIdentifier id)
   {
     Objects.requireNonNull(id, "id");
-
     this.sessions.invalidate(id);
-    this.sessionsGauge.record(this.sessions.estimatedSize());
   }
 }
