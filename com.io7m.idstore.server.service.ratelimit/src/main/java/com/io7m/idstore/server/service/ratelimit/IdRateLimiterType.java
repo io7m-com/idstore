@@ -17,17 +17,19 @@
 
 package com.io7m.idstore.server.service.ratelimit;
 
+import com.io7m.repetoir.core.RPServiceType;
+
+import java.time.Duration;
+
 /**
- * A rate limiting service for user logins.
+ * A rate limiting service.
  */
 
-public interface IdRateLimitUserLoginServiceType extends IdRateLimiterType
+public interface IdRateLimiterType extends RPServiceType
 {
   /**
-   * @param host The host performing the action
-   *
-   * @return {@code true} if the given operation is allowed by rate limiting
+   * @return The suggested wait time if a rate limit is exceeded
    */
 
-  boolean isAllowedByRateLimit(String host);
+  Duration waitTime();
 }

@@ -18,13 +18,17 @@ package com.io7m.idstore.server.controller.user;
 
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.model.IdPassword;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
+import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
+import com.io7m.idstore.server.api.IdServerPasswordExpirationConfiguration;
 import com.io7m.idstore.server.security.IdSecUserActionPasswordUpdate;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -55,6 +59,8 @@ public final class IdUCmdPasswordUpdate
   {
     final var services =
       context.services();
+    final var telemetry =
+      services.requireService(IdServerTelemetryServiceType.class);
     final var expiration =
       services.requireService(IdServerConfigurationService.class)
         .configuration()
@@ -81,28 +87,50 @@ public final class IdUCmdPasswordUpdate
 
     transaction.userIdSet(user.id());
 
-    /*
-     * Create a new hashed password based on the provided text, and then
-     * set an expiration date on it if expiration is enabled.
-     */
-
     final var newPassword =
-      IdPasswordAlgorithmPBKDF2HmacSHA256.create()
-        .createHashed(command.password());
-
-    final var newPasswordExpiring =
-      expiration.expireUserPasswordIfNecessary(clock.clock(), newPassword);
+      hashPassword(clock, telemetry, command, expiration);
 
     users.userUpdate(
       user.id(),
       Optional.empty(),
       Optional.empty(),
-      Optional.of(newPasswordExpiring)
+      Optional.of(newPassword)
     );
 
     return new IdUResponseUserUpdate(
       context.requestId(),
       users.userGetRequire(user.id())
     );
+  }
+
+  /**
+   * Create a new hashed password based on the provided text, and then
+   * set an expiration date on it if expiration is enabled.
+   */
+
+  private static IdPassword hashPassword(
+    final IdServerClock clock,
+    final IdServerTelemetryServiceType telemetry,
+    final IdUCommandPasswordUpdate command,
+    final IdServerPasswordExpirationConfiguration expiration)
+    throws IdPasswordException
+  {
+    final var span =
+      telemetry.tracer()
+        .spanBuilder("HashPassword")
+        .startSpan();
+
+    try (var ignored = span.makeCurrent()) {
+      final var newPassword =
+        IdPasswordAlgorithmPBKDF2HmacSHA256.create()
+          .createHashed(command.password());
+
+      return expiration.expireUserPasswordIfNecessary(
+        clock.clock(),
+        newPassword
+      );
+    } finally {
+      span.end();
+    }
   }
 }

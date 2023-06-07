@@ -24,6 +24,7 @@ import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.LongUpDownCounter;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -31,16 +32,18 @@ import java.util.concurrent.TimeUnit;
  * A trivial rate limiter.
  */
 
-public final class IdRateLimiter
+public final class IdRateLimiter implements IdRateLimiterType
 {
   private final Cache<Operation, Operation> cache;
   private final LongUpDownCounter sizeGauge;
   private final LongCounter tripCounter;
+  private final Duration waitTime;
 
   private IdRateLimiter(
     final Cache<Operation, Operation> inCache,
     final LongUpDownCounter inSizeCounter,
-    final LongCounter inTripCounter)
+    final LongCounter inTripCounter,
+    final Duration inWaitTime)
   {
     this.cache =
       Objects.requireNonNull(inCache, "cache");
@@ -48,6 +51,8 @@ public final class IdRateLimiter
       Objects.requireNonNull(inSizeCounter, "sizeCounter");
     this.tripCounter =
       Objects.requireNonNull(inTripCounter, "tripCounter");
+    this.waitTime =
+      Objects.requireNonNull(inWaitTime, "inWaitTime");
   }
 
   /**
@@ -88,7 +93,12 @@ public final class IdRateLimiter
         .evictionListener((key, value, cause) -> sizeGauge.add(-1L))
         .build();
 
-    return new IdRateLimiter(cache, sizeGauge, tripCounter);
+    return new IdRateLimiter(
+      cache,
+      sizeGauge,
+      tripCounter,
+      Duration.of(expiration, timeUnit.toChronoUnit())
+    );
   }
 
   /**
@@ -131,6 +141,18 @@ public final class IdRateLimiter
   {
     return "[IdRateLimiter %s]"
       .formatted(Integer.toUnsignedString(this.hashCode(), 16));
+  }
+
+  @Override
+  public Duration waitTime()
+  {
+    return this.waitTime;
+  }
+
+  @Override
+  public String description()
+  {
+    return "A basic rate limiter.";
   }
 
   private record Operation(

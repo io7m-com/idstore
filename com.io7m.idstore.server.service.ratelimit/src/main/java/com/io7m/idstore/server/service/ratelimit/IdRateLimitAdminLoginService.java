@@ -18,6 +18,7 @@ package com.io7m.idstore.server.service.ratelimit;
 
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -78,5 +79,11 @@ public final class IdRateLimitAdminLoginService
   {
     return "[IdRateLimitAdminLoginService 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode(), 16));
+  }
+
+  @Override
+  public Duration waitTime()
+  {
+    return this.limiter.waitTime();
   }
 }

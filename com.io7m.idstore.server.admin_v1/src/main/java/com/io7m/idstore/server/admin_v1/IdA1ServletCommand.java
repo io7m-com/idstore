@@ -21,6 +21,7 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.protocol.admin.IdACommandType;
+import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
@@ -37,10 +38,12 @@ import com.io7m.idstore.server.http.IdHTTPServletResponseType;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
+import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
@@ -81,6 +84,8 @@ public final class IdA1ServletCommand extends IdHTTPServletFunctional
       services.requireService(IdACB1Messages.class);
     final var strings =
       services.requireService(IdServerStrings.class);
+    final var telemetry =
+      services.requireService(IdServerTelemetryServiceType.class);
 
     return (request, information) -> {
       return withInstrumentation(
@@ -97,6 +102,7 @@ public final class IdA1ServletCommand extends IdHTTPServletFunctional
                     req2,
                     info2,
                     messages,
+                    telemetry,
                     limits,
                     strings,
                     session,
@@ -114,6 +120,7 @@ public final class IdA1ServletCommand extends IdHTTPServletFunctional
     final HttpServletRequest request,
     final IdHTTPServletRequestInformation information,
     final IdACB1Messages messages,
+    final IdServerTelemetryServiceType telemetry,
     final IdRequestLimits limits,
     final IdServerStrings strings,
     final IdSessionAdmin session,
@@ -122,15 +129,16 @@ public final class IdA1ServletCommand extends IdHTTPServletFunctional
   {
     try (var input =
            limits.boundedMaximumInput(request, 1048576)) {
-      final var data =
-        input.readAllBytes();
+
       final var message =
-        messages.parse(data);
+        parseMessage(telemetry, messages, input);
+
       if (message instanceof final IdACommandType<?> command) {
         return executeCommand(
           services,
           information,
           messages,
+          telemetry,
           session,
           user,
           command,
@@ -165,6 +173,7 @@ public final class IdA1ServletCommand extends IdHTTPServletFunctional
     final RPServiceDirectoryType services,
     final IdHTTPServletRequestInformation information,
     final IdACB1Messages messages,
+    final IdServerTelemetryServiceType telemetry,
     final IdSessionAdmin session,
     final IdAdmin user,
     final IdACommandType<?> command,
@@ -205,11 +214,82 @@ public final class IdA1ServletCommand extends IdHTTPServletFunctional
       );
     }
 
-    transaction.commit();
+    commit(telemetry, transaction);
     return new IdHTTPServletResponseFixedSize(
       200,
       IdACB1Messages.contentType(),
       messages.serialize(result)
     );
+  }
+
+  private static IdAMessageType parseMessage(
+    final IdServerTelemetryServiceType telemetry,
+    final IdACB1Messages messages,
+    final InputStream input)
+    throws IOException, IdProtocolException
+  {
+    final var parseSpan =
+      telemetry.tracer()
+        .spanBuilder("ParseMessage")
+        .startSpan();
+
+    try (var ignored = parseSpan.makeCurrent()) {
+      final var data = parseMessageReadData(telemetry, input);
+      return parseMessageDeserialize(telemetry, messages, data);
+    } finally {
+      parseSpan.end();
+    }
+  }
+
+  private static IdAMessageType parseMessageDeserialize(
+    final IdServerTelemetryServiceType telemetry,
+    final IdACB1Messages messages,
+    final byte[] data)
+    throws IdProtocolException
+  {
+    final var readSpan =
+      telemetry.tracer()
+        .spanBuilder("Deserialize")
+        .startSpan();
+
+    try (var ignored = readSpan.makeCurrent()) {
+      return messages.parse(data);
+    } finally {
+      readSpan.end();
+    }
+  }
+
+  private static byte[] parseMessageReadData(
+    final IdServerTelemetryServiceType telemetry,
+    final InputStream input)
+    throws IOException
+  {
+    final var readSpan =
+      telemetry.tracer()
+        .spanBuilder("Read")
+        .startSpan();
+
+    try (var ignored = readSpan.makeCurrent()) {
+      return input.readAllBytes();
+    } finally {
+      readSpan.end();
+    }
+  }
+
+  private static void commit(
+    final IdServerTelemetryServiceType telemetry,
+    final IdDatabaseTransactionType transaction)
+    throws IdDatabaseException
+  {
+    final var commitSpan =
+      telemetry.tracer()
+        .spanBuilder("Commit")
+        .startSpan();
+
+    try (var ignored = commitSpan.makeCurrent()) {
+      transaction.commit();
+    } finally {
+      commitSpan.end();
+    }
   }
 }

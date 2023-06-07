@@ -20,6 +20,7 @@ import com.io7m.idstore.database.api.IdDatabaseConnectionType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseRole;
 import com.io7m.idstore.database.api.IdDatabaseType;
+import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.zaxxer.hikari.HikariDataSource;
 import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.Meter;
@@ -49,6 +50,7 @@ public final class IdDatabase implements IdDatabaseType
   private final HikariDataSource dataSource;
   private final Settings settings;
   private final Tracer tracer;
+  private final CloseableCollectionType<IdDatabaseException> resources;
   private final LongCounter transactions;
   private final LongCounter transactionCommits;
   private final LongCounter transactionRollbacks;
@@ -56,20 +58,24 @@ public final class IdDatabase implements IdDatabaseType
   /**
    * The default postgres server database implementation.
    *
-   * @param inTracer    A telemetry tracer interface
-   * @param meter A telemetry meter interface
+   * @param inTracer     A telemetry tracer interface
+   * @param meter        A telemetry meter interface
    * @param inClock      The clock
    * @param inDataSource A pooled data source
+   * @param inResources  The resources to be closed
    */
 
   public IdDatabase(
     final Tracer inTracer,
     final Meter meter,
     final Clock inClock,
-    final HikariDataSource inDataSource)
+    final HikariDataSource inDataSource,
+    final CloseableCollectionType<IdDatabaseException> inResources)
   {
     this.tracer =
       Objects.requireNonNull(inTracer, "tracer");
+    this.resources =
+      Objects.requireNonNull(inResources, "resources");
     Objects.requireNonNull(meter, "meter");
 
     this.clock =
@@ -110,8 +116,9 @@ public final class IdDatabase implements IdDatabaseType
 
   @Override
   public void close()
+    throws IdDatabaseException
   {
-    this.dataSource.close();
+    this.resources.close();
   }
 
   /**

@@ -75,6 +75,24 @@ public final class IdHTTPServletCoreInstrumented
     final var tracer =
       this.telemetry.tracer();
 
+    final var meterReq =
+      this.telemetry.meter()
+        .counterBuilder("idstore_http_requests")
+        .setDescription("The number of HTTP requests.")
+        .build();
+
+    final var meterOK =
+      this.telemetry.meter()
+        .counterBuilder("idstore_http_requests_ok")
+        .setDescription("The number of HTTP requests that resulted in success.")
+        .build();
+
+    final var meterFailed =
+      this.telemetry.meter()
+        .counterBuilder("idstore_http_requests_failed")
+        .setDescription("The number of HTTP requests that resulted in failure.")
+        .build();
+
     final var span =
       tracer.spanBuilder(request.getServletPath())
         .setStartTimestamp(Instant.now())
@@ -90,8 +108,16 @@ public final class IdHTTPServletCoreInstrumented
         .setAttribute("http.request_id", information.requestId().toString())
         .startSpan();
 
+    meterReq.add(1L);
+
     try (var ignored = span.makeCurrent()) {
       final var response = this.core.execute(request, information);
+      if (response.statusCode() == 200) {
+        meterOK.add(1L);
+      } else {
+        meterFailed.add(1L);
+      }
+
       span.setAttribute(HTTP_STATUS_CODE, response.statusCode());
       response.contentLengthOptional().ifPresent(size -> {
         span.setAttribute(HTTP_RESPONSE_CONTENT_LENGTH, Long.valueOf(size));

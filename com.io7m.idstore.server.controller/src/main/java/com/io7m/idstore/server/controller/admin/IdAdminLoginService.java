@@ -173,7 +173,9 @@ public final class IdAdminLoginService implements RPServiceType
       throw new IdCommandExecutionFailure(
         this.strings.format("loginRateLimited"),
         RATE_LIMIT_EXCEEDED,
-        Map.of(),
+        Map.of(
+          "Wait Duration", this.rateLimit.waitTime().toString()
+        ),
         Optional.empty(),
         requestId,
         400

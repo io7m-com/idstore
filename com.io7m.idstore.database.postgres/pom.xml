@@ -52,6 +52,10 @@
       <artifactId>com.io7m.jdeferthrow.core</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.io7m.jmulticlose</groupId>
+      <artifactId>com.io7m.jmulticlose.core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.io7m.trasco</groupId>
       <artifactId>com.io7m.trasco.api</artifactId>
     </dependency>

@@ -796,6 +796,39 @@
     <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
   </Match>
 
+  <!--                             -->
+  <!-- com.io7m.idstore.trafficgen -->
+  <!--                             -->
+
+  <!-- Record types. -->
+  <Match>
+    <Class name="com.io7m.idstore.trafficgen.IdTrafficGeneratorConfiguration"/>
+    <Or>
+      <Bug pattern="EI_EXPOSE_REP"/>
+      <Bug pattern="EI_EXPOSE_REP2"/>
+      <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+    </Or>
+  </Match>
+
+  <!-- A deliberate delay for rate limiting purposes. -->
+  <Match>
+    <Class name="com.io7m.idstore.trafficgen.internal.IdTrafficGenerator"/>
+    <Bug pattern="MDM_THREAD_YIELD"/>
+  </Match>
+
+  <!-- Constructor method. -->
+  <Match>
+    <Class name="com.io7m.idstore.trafficgen.IdTrafficGenerators"/>
+    <Bug pattern="HES_LOCAL_EXECUTOR_SERVICE"/>
+  </Match>
+
+  <!-- JDK requires strong random support. -->
+  <Match>
+    <Class name="com.io7m.idstore.trafficgen.IdTrafficGenerators"/>
+    <Method name="create"/>
+    <Bug pattern="EXS_EXCEPTION_SOFTENING_HAS_CHECKED"/>
+  </Match>
+
   <!--                              -->
   <!-- com.io7m.idstore.user_client -->
   <!--                              -->
