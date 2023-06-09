@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.SERVICE_NAME;
 import static io.opentelemetry.semconv.resource.attributes.ResourceAttributes.SERVICE_VERSION;
@@ -160,6 +161,7 @@ public final class IdServerTelemetryServices
 
     final var periodicMetricReader =
       PeriodicMetricReader.builder(metricExporter)
+        .setInterval(1L, TimeUnit.SECONDS)
         .build();
 
     return SdkMeterProvider.builder()

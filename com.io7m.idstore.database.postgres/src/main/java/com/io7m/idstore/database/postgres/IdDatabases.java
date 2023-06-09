@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.database.postgres;
 
-import com.io7m.anethum.common.ParseException;
+import com.io7m.anethum.api.ParsingException;
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseFactoryType;
@@ -247,7 +247,7 @@ public final class IdDatabases implements IdDatabaseFactoryType
         Map.of(),
         Optional.empty()
       );
-    } catch (final ParseException e) {
+    } catch (final ParsingException e) {
       throw new IdDatabaseException(
         requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
         e,

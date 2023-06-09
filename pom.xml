@@ -66,7 +66,7 @@
   </modules>
 
   <properties>
-    <com.io7m.anethum.version>0.0.2</com.io7m.anethum.version>
+    <com.io7m.anethum.version>1.0.0-beta0001</com.io7m.anethum.version>
     <com.io7m.cedarbridge.version>1.2.0</com.io7m.cedarbridge.version>
     <com.io7m.cxbutton.version>0.0.5</com.io7m.cxbutton.version>
     <com.io7m.hibiscus.version>0.0.8</com.io7m.hibiscus.version>
@@ -77,7 +77,7 @@
     <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
     <com.io7m.quarrel.version>1.0.0</com.io7m.quarrel.version>
     <com.io7m.quixote.version>0.0.2</com.io7m.quixote.version>
-    <com.io7m.seltzer.version>0.0.1</com.io7m.seltzer.version>
+    <com.io7m.seltzer.version>1.0.0-beta0001</com.io7m.seltzer.version>
     <com.io7m.trasco.version>0.0.6</com.io7m.trasco.version>
     <com.io7m.verdant.version>0.0.1</com.io7m.verdant.version>
     <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
@@ -317,11 +317,6 @@
         <groupId>org.jooq</groupId>
         <artifactId>jooq-postgres-extensions</artifactId>
         <version>${jooq.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.io7m.anethum</groupId>
-        <artifactId>com.io7m.anethum.common</artifactId>
-        <version>${com.io7m.anethum.version}</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.anethum</groupId>
