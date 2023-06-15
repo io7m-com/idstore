@@ -33,8 +33,10 @@ module com.io7m.idstore.server.admin_v1
   requires com.io7m.idstore.server.service.clock;
   requires com.io7m.idstore.server.service.configuration;
   requires com.io7m.idstore.server.service.health;
+  requires com.io7m.idstore.server.service.metrics;
   requires com.io7m.idstore.server.service.reqlimit;
   requires com.io7m.idstore.server.service.sessions;
+  requires com.io7m.idstore.server.service.telemetry.api;
   requires com.io7m.idstore.server.service.verdant;
 
   requires com.io7m.verdant.core;
@@ -43,7 +45,6 @@ module com.io7m.idstore.server.admin_v1
   requires org.eclipse.jetty.server;
   requires org.eclipse.jetty.servlet;
   requires org.slf4j;
-  requires com.io7m.idstore.server.service.telemetry.api;
 
   exports com.io7m.idstore.server.admin_v1;
 }

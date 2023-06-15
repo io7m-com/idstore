@@ -20,10 +20,10 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
+import com.io7m.idstore.model.IdUserDomain;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.repetoir.core.RPServiceType;
-import io.opentelemetry.api.metrics.LongUpDownCounter;
-import io.opentelemetry.api.metrics.Meter;
 import org.slf4j.Logger;
 
 import java.time.Duration;
@@ -45,48 +45,48 @@ import static java.lang.Long.toUnsignedString;
 public abstract class IdSessionService<S extends IdSessionType>
   implements RPServiceType
 {
-  private final LongUpDownCounter sessionsGauge;
   private final Cache<IdSessionSecretIdentifier, S> sessions;
   private final ConcurrentMap<IdSessionSecretIdentifier, S> sessionsMap;
   private final BiFunction<UUID, IdSessionSecretIdentifier, S> sessionCreator;
+  private final IdMetricsServiceType metrics;
+  private final IdUserDomain type;
 
   /**
    * A service to create and manage sessions.
    *
-   * @param inMeter          The telemetry meter service
+   * @param inMetrics        The metrics service
    * @param inExpiration     The session expiration time
-   * @param type             The session type
+   * @param inType           The session type
    * @param inSessionCreator A session creator function
    */
 
   protected IdSessionService(
-    final Meter inMeter,
+    final IdMetricsServiceType inMetrics,
     final Duration inExpiration,
-    final String type,
+    final IdUserDomain inType,
     final BiFunction<UUID, IdSessionSecretIdentifier, S> inSessionCreator)
   {
     this.sessionCreator =
       Objects.requireNonNull(inSessionCreator, "sessionCreator");
+    this.metrics =
+      Objects.requireNonNull(inMetrics, "inMetrics");
+    this.type =
+      Objects.requireNonNull(inType, "type");
 
     this.sessions =
       Caffeine.newBuilder()
         .expireAfterAccess(inExpiration)
-        .scheduler(createScheduler(type))
+        .scheduler(createScheduler(inType))
         .<IdSessionSecretIdentifier, S>evictionListener(
           (key, session, removalCause) -> this.onSessionRemoved(removalCause))
         .build();
 
     this.sessionsMap =
       this.sessions.asMap();
-
-    this.sessionsGauge =
-      inMeter.upDownCounterBuilder("idstore_%s_sessions_active".formatted(type))
-        .setDescription("Active %s sessions.".formatted(type))
-        .build();
   }
 
   private static Scheduler createScheduler(
-    final String type)
+    final IdUserDomain type)
   {
     return Scheduler.forScheduledExecutorService(
       Executors.newSingleThreadScheduledExecutor(r -> {
@@ -115,7 +115,7 @@ public abstract class IdSessionService<S extends IdSessionType>
         toUnsignedString(sizeNow)
       );
     }
-    this.sessionsGauge.add(-1L);
+    this.metrics.onLoginClosed(this.type, sizeNow);
   }
 
   /**
@@ -157,9 +157,10 @@ public abstract class IdSessionService<S extends IdSessionType>
 
     final var session = this.sessionCreator.apply(userId, id);
     this.sessions.put(id, session);
-    this.sessionsGauge.add(1L);
 
     final var sizeNow = this.sessions.estimatedSize();
+    this.metrics.onLogin(this.type, sizeNow);
+
     final var logger = this.logger();
     if (logger.isDebugEnabled()) {
       logger.debug("create session ({} now active)", toUnsignedString(sizeNow));

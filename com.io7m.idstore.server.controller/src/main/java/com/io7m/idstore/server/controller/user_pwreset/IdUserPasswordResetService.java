@@ -61,6 +61,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_M
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
 import static io.opentelemetry.api.trace.SpanKind.CLIENT;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_CLIENT_IP;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_USER_AGENT;
@@ -195,7 +196,7 @@ public final class IdUserPasswordResetService
         userName
       ).run();
     } catch (final Exception e) {
-      span.recordException(e);
+      recordSpanException(e);
       throw e;
     } finally {
       span.end();
@@ -238,7 +239,7 @@ public final class IdUserPasswordResetService
         token
       ).run();
     } catch (final Exception e) {
-      span.recordException(e);
+      recordSpanException(e);
       throw e;
     } finally {
       span.end();
@@ -281,7 +282,7 @@ public final class IdUserPasswordResetService
         tokenOpt
       ).run();
     } catch (final Exception e) {
-      span.recordException(e);
+      recordSpanException(e);
       throw e;
     } finally {
       span.end();

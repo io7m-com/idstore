@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.user_v1;
 
+import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.model.IdVersion;
 import com.io7m.idstore.server.http.IdHTTPServletFunctional;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
@@ -53,6 +54,7 @@ public final class IdU1ServletVersion
     return (request, information) -> {
       return withInstrumentation(
         services,
+        IdUserDomain.USER,
         (req0, info0) -> {
           return execute();
         }

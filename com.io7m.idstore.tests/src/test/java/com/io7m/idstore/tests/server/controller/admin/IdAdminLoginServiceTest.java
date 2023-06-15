@@ -41,13 +41,15 @@ import com.io7m.idstore.server.service.events.IdEventAdminLoggedIn;
 import com.io7m.idstore.server.service.events.IdEventAdminLoginAuthenticationFailed;
 import com.io7m.idstore.server.service.events.IdEventAdminLoginRateLimitExceeded;
 import com.io7m.idstore.server.service.events.IdEventServiceType;
+import com.io7m.idstore.server.service.metrics.IdMetricsService;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
+import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.tests.IdFakeClock;
 import com.io7m.idstore.tests.IdTestDirectories;
 import com.io7m.idstore.tests.server.api.IdServerConfigurationsTest;
 import com.io7m.idstore.tests.server.service.IdServiceContract;
-import io.opentelemetry.api.OpenTelemetry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -91,6 +93,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
   private IdRateLimitAdminLoginServiceType rateLimit;
   private Path directory;
   private IdServerConfigurationService configurationService;
+  private IdMetricsServiceType metrics;
 
   private static Times once()
   {
@@ -155,15 +158,17 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
       new IdServerStrings(Locale.ROOT);
     this.sessions =
       new IdSessionAdminService(
-        OpenTelemetry.noop().getMeter("com.io7m.idstore"),
+        new IdMetricsService(IdServerTelemetryNoOp.noop()),
         Duration.ofDays(1L)
       );
     this.events =
       mock(IdEventServiceType.class);
+    this.metrics =
+      mock(IdMetricsServiceType.class);
     this.rateLimit =
       mock(IdRateLimitAdminLoginServiceType.class);
     this.configurationService =
-      new IdServerConfigurationService(configuration);
+      new IdServerConfigurationService(this.metrics, configuration);
 
     this.login =
       new IdAdminLoginService(

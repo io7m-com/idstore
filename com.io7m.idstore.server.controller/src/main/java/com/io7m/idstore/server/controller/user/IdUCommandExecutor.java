@@ -32,6 +32,8 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
+
 /**
  * A command executor for public commands.
  */
@@ -66,7 +68,7 @@ public final class IdUCommandExecutor
     try (var ignored = span.makeCurrent()) {
       return executeCommand(context, command);
     } catch (final Throwable e) {
-      span.recordException(e);
+      recordSpanException(e);
       throw e;
     } finally {
       span.end();

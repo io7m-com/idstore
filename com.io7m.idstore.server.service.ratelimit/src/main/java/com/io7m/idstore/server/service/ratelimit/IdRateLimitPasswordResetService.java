@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.server.service.ratelimit;
 
-import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -40,7 +40,7 @@ public final class IdRateLimitPasswordResetService
   /**
    * Create a rate limit service.
    *
-   * @param telemetry  The telemetry service
+   * @param metrics    The metrics service
    * @param expiration The expiration for tokens
    * @param timeUnit   The time unit for expirations
    *
@@ -48,16 +48,17 @@ public final class IdRateLimitPasswordResetService
    */
 
   public static IdRateLimitPasswordResetServiceType create(
-    final IdServerTelemetryServiceType telemetry,
+    final IdMetricsServiceType metrics,
     final long expiration,
     final TimeUnit timeUnit)
   {
     return new IdRateLimitPasswordResetService(
       IdRateLimiter.create(
-        telemetry,
+        metrics,
         "password_reset",
         expiration,
-        timeUnit)
+        timeUnit
+      )
     );
   }
 

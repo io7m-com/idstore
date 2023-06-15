@@ -49,6 +49,8 @@ import com.io7m.idstore.server.service.health.IdServerHealth;
 import com.io7m.idstore.server.service.mail.IdServerMailService;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.maintenance.IdMaintenanceService;
+import com.io7m.idstore.server.service.metrics.IdMetricsService;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationService;
@@ -89,6 +91,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
@@ -152,54 +155,8 @@ public final class IdServer implements IdServerType
             .setSpanKind(SpanKind.INTERNAL)
             .startSpan();
 
-        try {
-          this.database =
-            this.resources.add(
-              this.createDatabase(
-                this.telemetry.tracer(),
-                this.telemetry.meter())
-            );
-          final var services =
-            this.resources.add(this.createServiceDirectory(this.database));
-
-          final Server userView = IdUVServer.createUserViewServer(services);
-          this.resources.add(userView::stop);
-
-          final Server userAPI = IdU1Server.createUserAPIServer(services);
-          this.resources.add(userAPI::stop);
-
-          final Server adminAPI = IdA1Server.createAdminAPIServer(services);
-          this.resources.add(adminAPI::stop);
-        } catch (final IdDatabaseException e) {
-          startupSpan.recordException(e);
-
-          try {
-            this.close();
-          } catch (final IdServerException ex) {
-            e.addSuppressed(ex);
-          }
-          throw new IdServerException(
-            e.getMessage(),
-            e,
-            new IdErrorCode("database"),
-            Map.of(),
-            Optional.empty()
-          );
-        } catch (final Exception e) {
-          startupSpan.recordException(e);
-
-          try {
-            this.close();
-          } catch (final IdServerException ex) {
-            e.addSuppressed(ex);
-          }
-          throw new IdServerException(
-            e.getMessage(),
-            e,
-            new IdErrorCode("startup"),
-            Map.of(),
-            Optional.empty()
-          );
+        try (var ignored = startupSpan.makeCurrent()) {
+          this.startInSpan();
         } finally {
           startupSpan.end();
         }
@@ -207,6 +164,60 @@ public final class IdServer implements IdServerType
     } catch (final Throwable e) {
       this.close();
       throw e;
+    }
+  }
+
+  private void startInSpan()
+    throws IdServerException
+  {
+    try {
+      this.database =
+        this.resources.add(
+          this.createDatabase(
+            this.telemetry.tracer(),
+            this.telemetry.meter())
+        );
+      final var services =
+        this.resources.add(this.createServiceDirectory(this.database));
+
+      final Server userView = IdUVServer.createUserViewServer(services);
+      this.resources.add(userView::stop);
+
+      final Server userAPI = IdU1Server.createUserAPIServer(services);
+      this.resources.add(userAPI::stop);
+
+      final Server adminAPI = IdA1Server.createAdminAPIServer(services);
+      this.resources.add(adminAPI::stop);
+    } catch (final IdDatabaseException e) {
+      recordSpanException(e);
+
+      try {
+        this.close();
+      } catch (final IdServerException ex) {
+        e.addSuppressed(ex);
+      }
+      throw new IdServerException(
+        e.getMessage(),
+        e,
+        new IdErrorCode("database"),
+        Map.of(),
+        Optional.empty()
+      );
+    } catch (final Exception e) {
+      recordSpanException(e);
+
+      try {
+        this.close();
+      } catch (final IdServerException ex) {
+        e.addSuppressed(ex);
+      }
+      throw new IdServerException(
+        e.getMessage(),
+        e,
+        new IdErrorCode("startup"),
+        Map.of(),
+        Optional.empty()
+      );
     }
   }
 
@@ -218,31 +229,39 @@ public final class IdServer implements IdServerType
     services.register(IdServerTelemetryServiceType.class, this.telemetry);
     services.register(IdDatabaseType.class, newDatabase);
 
+    final var metrics = new IdMetricsService(this.telemetry);
+    services.register(IdMetricsServiceType.class, metrics);
+
+    final var eventService = IdEventService.create(this.telemetry, metrics);
+    services.register(IdEventServiceType.class, eventService);
+
     final var strings = new IdServerStrings(this.configuration.locale());
     services.register(IdServerStrings.class, strings);
 
     final var mailService =
       IdServerMailService.create(
         this.telemetry,
+        eventService,
         this.configuration.mailConfiguration()
       );
     services.register(IdServerMailServiceType.class, mailService);
 
     final var sessionAdminService =
       new IdSessionAdminService(
-        this.telemetry.meter(),
+        metrics,
         this.configuration.sessions().adminSessionExpiration()
       );
     services.register(IdSessionAdminService.class, sessionAdminService);
 
     final var sessionUserService =
       new IdSessionUserService(
-        this.telemetry.meter(),
+        metrics,
         this.configuration.sessions().userSessionExpiration()
       );
     services.register(IdSessionUserService.class, sessionUserService);
 
-    final var config = new IdServerConfigurationService(this.configuration);
+    final var config =
+      new IdServerConfigurationService(metrics, this.configuration);
     services.register(IdServerConfigurationService.class, config);
 
     final var clock = new IdServerClock(this.configuration.clock());
@@ -250,7 +269,7 @@ public final class IdServer implements IdServerType
 
     final var userLoginRateLimitService =
       IdRateLimitUserLoginService.create(
-        this.telemetry,
+        metrics,
         this.configuration.rateLimit()
           .userLoginRateLimit()
           .toSeconds(),
@@ -264,7 +283,7 @@ public final class IdServer implements IdServerType
 
     final var adminLoginRateLimitService =
       IdRateLimitAdminLoginService.create(
-        this.telemetry,
+        metrics,
         this.configuration.rateLimit()
           .userLoginRateLimit()
           .toSeconds(),
@@ -275,9 +294,6 @@ public final class IdServer implements IdServerType
       IdRateLimitAdminLoginServiceType.class,
       adminLoginRateLimitService
     );
-
-    final var eventService = IdEventService.create(services);
-    services.register(IdEventServiceType.class, eventService);
 
     services.register(
       IdUserLoginService.class,
@@ -320,7 +336,7 @@ public final class IdServer implements IdServerType
 
     final var userPasswordRateLimitService =
       IdRateLimitPasswordResetService.create(
-        this.telemetry,
+        metrics,
         this.configuration.rateLimit()
           .passwordResetRateLimit()
           .toSeconds(),
@@ -334,7 +350,7 @@ public final class IdServer implements IdServerType
 
     final var emailVerificationRateLimitService =
       IdRateLimitEmailVerificationService.create(
-        this.telemetry,
+        metrics,
         this.configuration.rateLimit()
           .emailVerificationRateLimit()
           .toSeconds(),

@@ -31,6 +31,7 @@ import org.jooq.conf.Settings;
 
 import java.sql.SQLException;
 import java.time.Clock;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -54,6 +55,7 @@ public final class IdDatabase implements IdDatabaseType
   private final LongCounter transactions;
   private final LongCounter transactionCommits;
   private final LongCounter transactionRollbacks;
+  private volatile long connectionTimeNow;
 
   /**
    * The default postgres server database implementation.
@@ -97,6 +99,36 @@ public final class IdDatabase implements IdDatabaseType
       meter.counterBuilder("idstore_db_rollbacks")
         .setDescription("The number of database transaction rollbacks.")
         .build();
+    this.resources.add(
+      meter.gaugeBuilder("idstore_db_connection_time")
+        .setDescription("The amount of time a database connection is held.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(this.connectionTimeNow);
+        })
+    );
+
+    this.resources.add(
+      meter.gaugeBuilder("idstore_db_connections_active")
+        .setDescription("The number of connections that are currently active.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(
+            (long) this.dataSource.getHikariPoolMXBean().getActiveConnections()
+          );
+        })
+    );
+
+    this.resources.add(
+      meter.gaugeBuilder("idstore_db_connections_total")
+        .setDescription("The total number of available connections.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(
+            (long) this.dataSource.getHikariPoolMXBean().getTotalConnections()
+          );
+        })
+    );
   }
 
   LongCounter counterTransactions()
@@ -143,9 +175,12 @@ public final class IdDatabase implements IdDatabaseType
         .startSpan();
 
     try {
+      span.addEvent("RequestConnection");
       final var conn = this.dataSource.getConnection();
+      span.addEvent("ObtainedConnection");
+      final var timeNow = OffsetDateTime.now();
       conn.setAutoCommit(false);
-      return new IdDatabaseConnection(this, conn, role, span);
+      return new IdDatabaseConnection(this, conn, timeNow, role, span);
     } catch (final SQLException e) {
       span.recordException(e);
       span.end();
@@ -189,5 +224,11 @@ public final class IdDatabase implements IdDatabaseType
   {
     return "[IdDatabase 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode(), 16));
+  }
+
+  void setConnectionTimeNow(
+    final long nanos)
+  {
+    this.connectionTimeNow = nanos;
   }
 }

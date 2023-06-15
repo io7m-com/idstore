@@ -34,6 +34,7 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 
@@ -64,7 +65,7 @@ public final class IdUVRealnameUpdate extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageRealnameUpdateTemplate();
 
-    return withInstrumentation(services, (request, information) -> {
+    return withInstrumentation(services, USER, (request, information) -> {
       return withAuthentication(
         services,
         (req0, info0, session, user) -> {

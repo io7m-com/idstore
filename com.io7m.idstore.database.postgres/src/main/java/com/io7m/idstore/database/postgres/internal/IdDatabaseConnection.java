@@ -25,6 +25,8 @@ import io.opentelemetry.context.Context;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,6 +36,7 @@ import static java.util.Objects.requireNonNullElse;
 record IdDatabaseConnection(
   IdDatabase database,
   Connection connection,
+  OffsetDateTime timeStart,
   IdDatabaseRole role,
   Span connectionSpan)
   implements IdDatabaseConnectionType
@@ -77,6 +80,11 @@ record IdDatabaseConnection(
     throws IdDatabaseException
   {
     try {
+      final var timeNow = OffsetDateTime.now();
+      this.database.setConnectionTimeNow(
+        Duration.between(this.timeStart, timeNow).toNanos()
+      );
+
       if (!this.connection.isClosed()) {
         this.connection.close();
       }

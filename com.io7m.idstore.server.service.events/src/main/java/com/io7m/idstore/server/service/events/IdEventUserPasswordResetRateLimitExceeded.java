@@ -26,9 +26,10 @@ import java.util.Objects;
  * @param target     The target username or email, depending on which was specified
  */
 
-public record IdEventUserPasswordResetRateLimitExceeded(String remoteHost,
-                                                        String target) implements
-  IdEventType
+public record IdEventUserPasswordResetRateLimitExceeded(
+  String remoteHost,
+  String target)
+  implements IdEventType
 {
   /**
    * A password reset rate limit was exceeded.
@@ -41,6 +42,12 @@ public record IdEventUserPasswordResetRateLimitExceeded(String remoteHost,
   {
     Objects.requireNonNull(remoteHost, "remoteHost");
     Objects.requireNonNull(target, "target");
+  }
+
+  @Override
+  public IdEventSeverity severity()
+  {
+    return IdEventSeverity.WARNING;
   }
 
   @Override

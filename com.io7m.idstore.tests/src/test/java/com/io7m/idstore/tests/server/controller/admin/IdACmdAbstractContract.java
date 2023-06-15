@@ -34,6 +34,7 @@ import com.io7m.idstore.server.controller.admin.IdACommandContext;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
@@ -52,6 +53,8 @@ import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.UUID;
 
+import static org.mockito.Mockito.mock;
+
 public abstract class IdACmdAbstractContract
 {
   private RPServiceDirectory services;
@@ -64,6 +67,7 @@ public abstract class IdACmdAbstractContract
   private Path configFile;
   private IdServerConfiguration configuration;
   private IdServerConfigurationService configurationService;
+  private IdMetricsServiceType metrics;
 
   protected final Times once()
   {
@@ -156,8 +160,10 @@ public abstract class IdACmdAbstractContract
         new IdServerConfigurationFiles().parse(this.configFile)
       );
 
+    this.metrics =
+      mock(IdMetricsServiceType.class);
     this.configurationService =
-      new IdServerConfigurationService(this.configuration);
+      new IdServerConfigurationService(this.metrics, this.configuration);
 
     this.services.register(
       IdServerConfigurationService.class,

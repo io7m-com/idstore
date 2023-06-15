@@ -21,9 +21,10 @@ import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTPS;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP_TLS;
+import com.io7m.idstore.server.service.events.IdEventMailFailed;
+import com.io7m.idstore.server.service.events.IdEventMailSent;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
-import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
 import jakarta.mail.Message;
@@ -31,7 +32,11 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -40,22 +45,27 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
+
 /**
  * A mail service.
  */
 
 public final class IdServerMailService implements IdServerMailServiceType
 {
+  private static final Logger LOG =
+    LoggerFactory.getLogger(IdServerMailService.class);
+
   private final IdServerMailConfiguration configuration;
   private final IdServerTelemetryServiceType telemetry;
   private final Session session;
   private final ExecutorService executor;
-  private final LongCounter mailSent;
-  private final LongCounter mailFailed;
+  private final IdEventServiceType events;
 
   private IdServerMailService(
     final IdServerMailConfiguration inConfiguration,
     final IdServerTelemetryServiceType inTelemetry,
+    final IdEventServiceType inEvents,
     final Session inSession,
     final ExecutorService inExecutor)
   {
@@ -63,26 +73,19 @@ public final class IdServerMailService implements IdServerMailServiceType
       Objects.requireNonNull(inConfiguration, "configuration");
     this.telemetry =
       Objects.requireNonNull(inTelemetry, "telemetry");
+    this.events =
+      Objects.requireNonNull(inEvents, "inEvents");
     this.session =
       Objects.requireNonNull(inSession, "session");
     this.executor =
       Objects.requireNonNull(inExecutor, "executor");
-
-    final var meter = inTelemetry.meter();
-    this.mailSent =
-      meter.counterBuilder("idstore_mail_sent")
-        .setDescription("Number of mails sent.")
-        .build();
-    this.mailFailed =
-      meter.counterBuilder("idstore_mail_failed")
-        .setDescription("Number of mails that failed to send.")
-        .build();
   }
 
   /**
    * Create a new mail service.
    *
    * @param telemetry     The telemetry service
+   * @param events        The events service
    * @param configuration The mail configuration
    *
    * @return The service
@@ -90,6 +93,7 @@ public final class IdServerMailService implements IdServerMailServiceType
 
   public static IdServerMailServiceType create(
     final IdServerTelemetryServiceType telemetry,
+    final IdEventServiceType events,
     final IdServerMailConfiguration configuration)
   {
     Objects.requireNonNull(telemetry, "telemetry");
@@ -154,6 +158,7 @@ public final class IdServerMailService implements IdServerMailServiceType
     return new IdServerMailService(
       configuration,
       telemetry,
+      events,
       session,
       executor
     );
@@ -193,10 +198,7 @@ public final class IdServerMailService implements IdServerMailServiceType
           .setParent(Context.current().with(parentSpan))
           .startSpan();
 
-      final var metricAttributes =
-        Attributes.builder()
-          .put("smtp.to", to.value())
-          .build();
+      final var timeThen = OffsetDateTime.now();
 
       try {
         final Message message =
@@ -217,11 +219,16 @@ public final class IdServerMailService implements IdServerMailServiceType
         message.setContent(text, "text/plain");
         Transport.send(message);
 
-        this.mailSent.add(1L, metricAttributes);
+        final var timeNow = OffsetDateTime.now();
+        this.events.emit(
+          new IdEventMailSent(to, Duration.between(timeThen, timeNow)));
         future.complete(null);
       } catch (final Exception e) {
-        this.mailFailed.add(1L, metricAttributes);
-        span.recordException(e);
+        LOG.debug("send failed: ", e);
+        final var timeNow = OffsetDateTime.now();
+        this.events.emit(
+          new IdEventMailFailed(to, Duration.between(timeThen, timeNow)));
+        recordSpanException(e);
         future.completeExceptionally(e);
       } finally {
         span.end();

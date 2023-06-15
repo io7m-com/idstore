@@ -43,6 +43,12 @@ public record IdEventAdminLoggedIn(
   }
 
   @Override
+  public IdEventSeverity severity()
+  {
+    return IdEventSeverity.INFO;
+  }
+
+  @Override
   public String name()
   {
     return "security.admin.login.succeeded";

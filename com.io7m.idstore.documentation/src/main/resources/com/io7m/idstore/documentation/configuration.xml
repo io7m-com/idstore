@@ -319,7 +319,7 @@
         Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
         seconds) effectively disables this kind of rate limiting.
       </Paragraph>
-      <Paragraph>
+      <Paragraph id="f50cff95-6a7e-4ae9-a190-b02004c60c52">
         The optional <Term type="expression">UserLoginDelay</Term> attribute specifies a fixed delay that is applied
         to all user login requests to reduce the practicality of online password brute forcing. The attribute must be
         specified as an
@@ -336,7 +336,7 @@
         Setting this attribute to <Term type="expression">PT0S</Term> (a duration of <Term type="constant">0</Term>
         seconds) effectively disables this kind of rate limiting.
       </Paragraph>
-      <Paragraph>
+      <Paragraph id="fd2f71be-33b2-43b2-8357-7453194c071b">
         The optional <Term type="expression">AdminLoginDelay</Term> attribute specifies a fixed delay that is applied
         to all admin login requests to reduce the practicality of online password brute forcing. The attribute must be
         specified as an

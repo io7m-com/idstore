@@ -25,6 +25,7 @@ import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 
 /**
@@ -51,7 +52,7 @@ public final class IdUVLogout extends IdHTTPServletFunctional
     final var userSessions =
       services.requireService(IdSessionUserService.class);
 
-    return withInstrumentation(services, (request, information) -> {
+    return withInstrumentation(services, USER, (request, information) -> {
       return execute(userSessions, request);
     });
   }

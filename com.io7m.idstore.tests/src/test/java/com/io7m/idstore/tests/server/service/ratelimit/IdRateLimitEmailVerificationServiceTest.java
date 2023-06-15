@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.tests.server.service.ratelimit;
 
+import com.io7m.idstore.server.service.metrics.IdMetricsService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
@@ -34,11 +35,13 @@ public final class IdRateLimitEmailVerificationServiceTest
   extends IdServiceContract<IdRateLimitEmailVerificationServiceType>
 {
   private IdServerTelemetryServiceType telemetry;
+  private IdMetricsService metrics;
 
   @BeforeEach
   public void setup()
   {
     this.telemetry = IdServerTelemetryNoOp.noop();
+    this.metrics = new IdMetricsService(this.telemetry);
   }
 
   @Test
@@ -47,7 +50,7 @@ public final class IdRateLimitEmailVerificationServiceTest
   {
     final var service =
       IdRateLimitEmailVerificationService.create(
-        this.telemetry,
+        this.metrics,
         100L,
         MILLISECONDS
       );
@@ -64,7 +67,7 @@ public final class IdRateLimitEmailVerificationServiceTest
   protected IdRateLimitEmailVerificationServiceType createInstanceA()
   {
     return IdRateLimitEmailVerificationService.create(
-      this.telemetry,
+      this.metrics,
       100L,
       MILLISECONDS
     );
@@ -74,7 +77,7 @@ public final class IdRateLimitEmailVerificationServiceTest
   protected IdRateLimitEmailVerificationServiceType createInstanceB()
   {
     return IdRateLimitEmailVerificationService.create(
-      this.telemetry,
+      this.metrics,
       200L,
       MILLISECONDS
     );

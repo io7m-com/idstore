@@ -17,9 +17,12 @@
 package com.io7m.idstore.server.service.telemetry.api;
 
 import com.io7m.idstore.error_codes.IdErrorCode;
+import com.io7m.idstore.error_codes.IdException;
 import com.io7m.repetoir.core.RPServiceType;
+import io.opentelemetry.api.logs.Logger;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 
 /**
@@ -41,6 +44,12 @@ public interface IdServerTelemetryServiceType extends RPServiceType
   Meter meter();
 
   /**
+   * @return The main logger
+   */
+
+  Logger logger();
+
+  /**
    * Set the error code for the current span.
    *
    * @param errorCode The error code
@@ -49,6 +58,25 @@ public interface IdServerTelemetryServiceType extends RPServiceType
   static void setSpanErrorCode(
     final IdErrorCode errorCode)
   {
-    Span.current().setAttribute("idstore.errorCode", errorCode.id());
+    final var span = Span.current();
+    span.setAttribute("idstore.errorCode", errorCode.id());
+    span.setStatus(StatusCode.ERROR);
+  }
+
+  /**
+   * Set the error code for the current span.
+   *
+   * @param e The error code
+   */
+
+  static void recordSpanException(
+    final Throwable e)
+  {
+    final var span = Span.current();
+    if (e instanceof final IdException ex) {
+      setSpanErrorCode(ex.errorCode());
+    }
+    span.recordException(e);
+    span.setStatus(StatusCode.ERROR);
   }
 }

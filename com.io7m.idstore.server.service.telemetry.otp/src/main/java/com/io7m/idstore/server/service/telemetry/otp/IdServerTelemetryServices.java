@@ -27,11 +27,15 @@ import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.exporter.otlp.http.logs.OtlpHttpLogRecordExporter;
 import io.opentelemetry.exporter.otlp.http.metrics.OtlpHttpMetricExporter;
 import io.opentelemetry.exporter.otlp.http.trace.OtlpHttpSpanExporter;
+import io.opentelemetry.exporter.otlp.logs.OtlpGrpcLogRecordExporter;
 import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.logs.SdkLoggerProvider;
+import io.opentelemetry.sdk.logs.export.BatchLogRecordProcessor;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import io.opentelemetry.sdk.resources.Resource;
@@ -83,10 +87,12 @@ public final class IdServerTelemetryServices
       telemetryConfiguration.metrics();
     final var tracesOpt =
       telemetryConfiguration.traces();
+    final var logsOpt =
+      telemetryConfiguration.logs();
 
-    if (metricsOpt.isEmpty() && tracesOpt.isEmpty()) {
+    if (metricsOpt.isEmpty() && tracesOpt.isEmpty() && logsOpt.isEmpty()) {
       LOG.warn(
-        "Neither metrics nor trace configurations were provided; no telemetry will be sent!");
+        "No metrics, log, or trace configurations were provided; no telemetry will be sent!");
       return IdServerTelemetryNoOp.noop();
     }
 
@@ -110,6 +116,10 @@ public final class IdServerTelemetryServices
       builder.setTracerProvider(createTracerProvider(resource, traces));
     });
 
+    logsOpt.ifPresent(logs -> {
+      builder.setLoggerProvider(createLoggerProvider(resource, logs));
+    });
+
     final var contextPropagators =
       ContextPropagators.create(W3CTraceContextPropagator.getInstance());
 
@@ -128,10 +138,47 @@ public final class IdServerTelemetryServices
         "com.io7m.idstore"
       );
 
-    return new IdServerTelemetryService(
-      tracer,
-      meter
+    final var logger =
+      openTelemetry.getLogsBridge()
+        .loggerBuilder("com.io7m.idstore")
+        .build();
+
+    return new IdServerTelemetryService(tracer, meter, logger);
+  }
+
+  private static SdkLoggerProvider createLoggerProvider(
+    final Resource resource,
+    final IdServerOpenTelemetryConfiguration.IdLogs logs)
+  {
+    final var endpoint = logs.endpoint().toString();
+    LOG.info(
+      "log data will be sent to {} using {}",
+      endpoint,
+      logs.protocol()
     );
+
+    final var logExporter =
+      switch (logs.protocol()) {
+        case HTTP -> {
+          yield OtlpHttpLogRecordExporter.builder()
+            .setEndpoint(endpoint)
+            .build();
+        }
+        case GRPC -> {
+          yield OtlpGrpcLogRecordExporter.builder()
+            .setEndpoint(endpoint)
+            .build();
+        }
+      };
+
+    final var processor =
+      BatchLogRecordProcessor.builder(logExporter)
+        .build();
+
+    return SdkLoggerProvider.builder()
+      .addLogRecordProcessor(processor)
+      .setResource(resource)
+      .build();
   }
 
   private static SdkMeterProvider createMeterProvider(

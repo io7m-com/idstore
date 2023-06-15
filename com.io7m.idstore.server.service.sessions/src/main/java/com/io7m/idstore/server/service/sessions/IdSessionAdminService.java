@@ -16,11 +16,13 @@
 
 package com.io7m.idstore.server.service.sessions;
 
-import io.opentelemetry.api.metrics.Meter;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+
+import static com.io7m.idstore.model.IdUserDomain.ADMIN;
 
 /**
  * A service to create and manage admin sessions.
@@ -34,18 +36,18 @@ public final class IdSessionAdminService extends IdSessionService<IdSessionAdmin
   /**
    * A service to create and manage sessions.
    *
-   * @param inMeter The meter service
+   * @param inMetrics The metrics service
    * @param inExpiration The expiration time for sessions
    */
 
   public IdSessionAdminService(
-    final Meter inMeter,
+    final IdMetricsServiceType inMetrics,
     final Duration inExpiration)
   {
     super(
-      inMeter,
+      inMetrics,
       inExpiration,
-      "admin",
+      ADMIN,
       IdSessionAdmin::new
     );
   }

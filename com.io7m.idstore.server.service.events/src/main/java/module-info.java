@@ -23,8 +23,10 @@ module com.io7m.idstore.server.service.events
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires transitive com.io7m.repetoir.core;
   requires com.io7m.idstore.server.service.telemetry.api;
+  requires com.io7m.idstore.server.service.metrics;
+
+  requires transitive com.io7m.repetoir.core;
   requires org.slf4j;
 
   exports com.io7m.idstore.server.service.events;

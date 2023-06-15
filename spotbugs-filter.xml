@@ -61,6 +61,11 @@
     <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
   </Match>
 
+  <!-- We don't use nullable annotations because we don't use null. -->
+  <Match>
+    <Bug pattern="AI_ANNOTATION_ISSUES_NEEDS_NULLABLE"/>
+  </Match>
+
   <!--                               -->
   <!-- com.io7m.idstore.admin_client -->
   <!--                               -->
@@ -557,7 +562,7 @@
   <!-- Pattern matching... -->
   <Match>
     <Class name="com.io7m.idstore.server.service.events.IdEventService"/>
-    <Method name="emit"/>
+    <Method name="logToMetrics"/>
     <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
   </Match>
 

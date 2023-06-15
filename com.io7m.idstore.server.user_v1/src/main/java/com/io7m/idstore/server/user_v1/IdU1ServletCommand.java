@@ -20,6 +20,7 @@ package com.io7m.idstore.server.user_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUMessageType;
@@ -90,6 +91,7 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
     return (request, information) -> {
       return withInstrumentation(
         services,
+        IdUserDomain.USER,
         (req0, info0) -> {
           return withAuthentication(
             services,
