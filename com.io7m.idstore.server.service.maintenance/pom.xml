@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-beta0009</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.service.maintenance</artifactId>
