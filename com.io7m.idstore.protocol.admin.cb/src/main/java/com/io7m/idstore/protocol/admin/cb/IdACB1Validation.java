@@ -25,8 +25,10 @@ import com.io7m.cedarbridge.runtime.convenience.CBMaps;
 import com.io7m.cedarbridge.runtime.time.CBOffsetDateTime;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdAuditSearchParameters;
+import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordException;
+import com.io7m.idstore.model.IdShortHumanToken;
 import com.io7m.idstore.protocol.admin.IdACommandAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdACommandAdminBanDelete;
 import com.io7m.idstore.protocol.admin.IdACommandAdminBanGet;
@@ -51,6 +53,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
+import com.io7m.idstore.protocol.admin.IdACommandMailTest;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
@@ -95,6 +98,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
+import com.io7m.idstore.protocol.admin.IdAResponseMailTest;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
@@ -119,6 +123,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.io7m.cedarbridge.runtime.api.CBCore.string;
 import static com.io7m.cedarbridge.runtime.api.CBOptionType.fromOptional;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireAdmin;
@@ -350,6 +355,8 @@ public final class IdACB1Validation
       return toWireResponseUserUpdate(c);
     } else if (response instanceof final IdAResponseUserLoginHistory c) {
       return toWireResponseUserLoginHistory(c);
+    } else if (response instanceof final IdAResponseMailTest c) {
+      return toWireResponseMailTest(c);
     }
 
     throw new IdProtocolException(
@@ -357,6 +364,15 @@ public final class IdACB1Validation
       PROTOCOL_ERROR,
       Map.of(),
       Optional.empty()
+    );
+  }
+
+  private static IdA1ResponseMailTest toWireResponseMailTest(
+    final IdAResponseMailTest c)
+  {
+    return new IdA1ResponseMailTest(
+      new CBUUID(c.requestId()),
+      string(c.token().value())
     );
   }
 
@@ -525,6 +541,13 @@ public final class IdACB1Validation
       return toWireCommandUserLoginHistory(c);
     } else if (command instanceof final IdACommandUserUpdatePasswordExpiration c) {
       return toWireCommandUserUpdatePasswordExpiration(c);
+
+      /*
+       * Other commands.
+       */
+
+    } else if (command instanceof final IdACommandMailTest c) {
+      return toWireCommandMailTest(c);
     }
 
     throw new IdProtocolException(
@@ -532,6 +555,15 @@ public final class IdACB1Validation
       PROTOCOL_ERROR,
       Map.of(),
       Optional.empty()
+    );
+  }
+
+  private static ProtocolIdAv1Type toWireCommandMailTest(
+    final IdACommandMailTest c)
+  {
+    return new IdA1CommandMailTest(
+      string(c.address().value()),
+      string(c.token().value())
     );
   }
 
@@ -884,6 +916,15 @@ public final class IdACB1Validation
         return fromWireResponseUserUpdate(c);
       } else if (message instanceof final IdA1ResponseUserLoginHistory c) {
         return fromWireResponseUserLoginHistory(c);
+
+        /*
+         * Other commands/responses.
+         */
+
+      } else if (message instanceof final IdA1ResponseMailTest c) {
+        return fromWireResponseMailTest(c);
+      } else if (message instanceof final IdA1CommandMailTest c) {
+        return fromWireCommandMailTest(c);
       }
 
     } catch (final Exception e) {
@@ -903,6 +944,24 @@ public final class IdACB1Validation
       PROTOCOL_ERROR,
       Map.of(),
       Optional.empty()
+    );
+  }
+
+  private static IdACommandMailTest fromWireCommandMailTest(
+    final IdA1CommandMailTest c)
+  {
+    return new IdACommandMailTest(
+      new IdEmail(c.fieldAddress().value()),
+      new IdShortHumanToken(c.fieldToken().value())
+    );
+  }
+
+  private static IdAResponseMailTest fromWireResponseMailTest(
+    final IdA1ResponseMailTest c)
+  {
+    return new IdAResponseMailTest(
+      c.fieldRequestId().value(),
+      new IdShortHumanToken(c.fieldToken().value())
     );
   }
 

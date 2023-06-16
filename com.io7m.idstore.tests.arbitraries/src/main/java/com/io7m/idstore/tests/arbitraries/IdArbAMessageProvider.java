@@ -29,6 +29,7 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdLogin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
+import com.io7m.idstore.model.IdShortHumanToken;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
@@ -57,6 +58,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
+import com.io7m.idstore.protocol.admin.IdACommandMailTest;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanGet;
@@ -100,6 +102,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
+import com.io7m.idstore.protocol.admin.IdAResponseMailTest;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanGet;
@@ -178,6 +181,7 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       commandAuditSearchNext(),
       commandAuditSearchPrevious(),
       commandLogin(),
+      commandMailTest(),
       commandUserBanCreate(),
       commandUserBanDelete(),
       commandUserBanGet(),
@@ -215,6 +219,7 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       responseAuditSearchPrevious(),
       responseError(),
       responseLogin(),
+      responseMailTest(),
       responseUserBanCreate(),
       responseUserBanDelete(),
       responseUserBanGet(),
@@ -644,6 +649,35 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
   public static Arbitrary<IdACommandAuditSearchPrevious> commandAuditSearchPrevious()
   {
     return Arbitraries.of(new IdACommandAuditSearchPrevious());
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdACommandMailTest> commandMailTest()
+  {
+    final var e =
+      Arbitraries.defaultFor(IdEmail.class);
+    final var t =
+      Arbitraries.defaultFor(IdShortHumanToken.class);
+
+    return Combinators.combine(e, t).as(IdACommandMailTest::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdAResponseMailTest> responseMailTest()
+  {
+    final var e =
+      Arbitraries.defaultFor(UUID.class);
+    final var t =
+      Arbitraries.defaultFor(IdShortHumanToken.class);
+
+    return Combinators.combine(e, t)
+      .as(IdAResponseMailTest::new);
   }
 
   /**

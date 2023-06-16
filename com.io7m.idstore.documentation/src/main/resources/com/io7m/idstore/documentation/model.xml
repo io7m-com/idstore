@@ -170,6 +170,10 @@
           <Cell>USER_READ</Cell>
           <Cell>The bearer of this permission is permitted to read existing user accounts.</Cell>
         </Row>
+        <Row>
+          <Cell>MAIL_TEST</Cell>
+          <Cell>The bearer of this permission is permitted to send test emails.</Cell>
+        </Row>
       </Table>
     </FormalItem>
   </Subsection>

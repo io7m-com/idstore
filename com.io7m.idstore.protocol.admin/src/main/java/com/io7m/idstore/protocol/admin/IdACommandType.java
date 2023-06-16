@@ -51,6 +51,7 @@ public sealed interface IdACommandType<R extends IdAResponseType>
   IdACommandAuditSearchNext,
   IdACommandAuditSearchPrevious,
   IdACommandLogin,
+  IdACommandMailTest,
   IdACommandUserBanCreate,
   IdACommandUserBanDelete,
   IdACommandUserBanGet,

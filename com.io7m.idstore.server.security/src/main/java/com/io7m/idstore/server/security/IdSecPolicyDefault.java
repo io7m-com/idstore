@@ -30,6 +30,7 @@ import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_EMAIL_SELF;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS_SELF;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
+import static com.io7m.idstore.model.IdAdminPermission.MAIL_TEST;
 import static com.io7m.idstore.model.IdAdminPermission.USER_BAN;
 import static com.io7m.idstore.model.IdAdminPermission.USER_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_DELETE;
@@ -63,28 +64,28 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   private static IdSecPolicyResultType checkUserAction(
     final IdSecUserActionType action)
   {
-    if (action instanceof IdSecUserActionEmailAddBegin e) {
+    if (action instanceof final IdSecUserActionEmailAddBegin e) {
       return checkUserActionEmailAddBegin(e);
     }
-    if (action instanceof IdSecUserActionEmailAddPermit e) {
+    if (action instanceof final IdSecUserActionEmailAddPermit e) {
       return checkUserActionEmailAddPermit(e);
     }
-    if (action instanceof IdSecUserActionEmailAddDeny e) {
+    if (action instanceof final IdSecUserActionEmailAddDeny e) {
       return checkUserActionEmailAddDeny(e);
     }
-    if (action instanceof IdSecUserActionEmailRemoveBegin e) {
+    if (action instanceof final IdSecUserActionEmailRemoveBegin e) {
       return checkUserActionEmailRemoveBegin(e);
     }
-    if (action instanceof IdSecUserActionEmailRemovePermit e) {
+    if (action instanceof final IdSecUserActionEmailRemovePermit e) {
       return checkUserActionEmailRemovePermit(e);
     }
-    if (action instanceof IdSecUserActionEmailRemoveDeny e) {
+    if (action instanceof final IdSecUserActionEmailRemoveDeny e) {
       return checkUserActionEmailRemoveDeny(e);
     }
-    if (action instanceof IdSecUserActionRealnameUpdate e) {
+    if (action instanceof final IdSecUserActionRealnameUpdate e) {
       return checkUserActionRealnameUpdate(e);
     }
-    if (action instanceof IdSecUserActionPasswordUpdate e) {
+    if (action instanceof final IdSecUserActionPasswordUpdate e) {
       return checkUserActionPasswordUpdate(e);
     }
 
@@ -154,73 +155,88 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   private static IdSecPolicyResultType checkAdminAction(
     final IdSecAdminActionType action)
   {
-    if (action instanceof IdSecAdminActionAdminBanGet e) {
+    if (action instanceof final IdSecAdminActionAdminBanGet e) {
       return checkAdminActionAdminBanGet(e);
     }
-    if (action instanceof IdSecAdminActionAdminBanCreate e) {
+    if (action instanceof final IdSecAdminActionAdminBanCreate e) {
       return checkAdminActionAdminBanCreate(e);
     }
-    if (action instanceof IdSecAdminActionAdminBanDelete e) {
+    if (action instanceof final IdSecAdminActionAdminBanDelete e) {
       return checkAdminActionAdminBanDelete(e);
     }
 
-    if (action instanceof IdSecAdminActionUserBanGet e) {
+    if (action instanceof final IdSecAdminActionUserBanGet e) {
       return checkAdminActionUserBanGet(e);
     }
-    if (action instanceof IdSecAdminActionUserBanCreate e) {
+    if (action instanceof final IdSecAdminActionUserBanCreate e) {
       return checkAdminActionUserBanCreate(e);
     }
-    if (action instanceof IdSecAdminActionUserBanDelete e) {
+    if (action instanceof final IdSecAdminActionUserBanDelete e) {
       return checkAdminActionUserBanDelete(e);
     }
 
-    if (action instanceof IdSecAdminActionUserRead e) {
+    if (action instanceof final IdSecAdminActionUserRead e) {
       return checkAdminActionUserRead(e);
     }
-    if (action instanceof IdSecAdminActionUserCreate e) {
+    if (action instanceof final IdSecAdminActionUserCreate e) {
       return checkAdminActionUserCreate(e);
     }
-    if (action instanceof IdSecAdminActionUserUpdateEmail e) {
+    if (action instanceof final IdSecAdminActionUserUpdateEmail e) {
       return checkAdminActionUserUpdateEmail(e);
     }
-    if (action instanceof IdSecAdminActionUserUpdateCredentials e) {
+    if (action instanceof final IdSecAdminActionUserUpdateCredentials e) {
       return checkAdminActionUserUpdateCredentials(e);
     }
-    if (action instanceof IdSecAdminActionUserDelete e) {
+    if (action instanceof final IdSecAdminActionUserDelete e) {
       return checkAdminActionUserDelete(e);
     }
 
-    if (action instanceof IdSecAdminActionAdminRead e) {
+    if (action instanceof final IdSecAdminActionAdminRead e) {
       return checkAdminActionAdminRead(e);
     }
-    if (action instanceof IdSecAdminActionAdminCreate e) {
+    if (action instanceof final IdSecAdminActionAdminCreate e) {
       return checkAdminActionAdminCreate(e);
     }
-    if (action instanceof IdSecAdminActionAdminUpdate e) {
+    if (action instanceof final IdSecAdminActionAdminUpdate e) {
       return checkAdminActionAdminUpdate(e);
     }
-    if (action instanceof IdSecAdminActionAdminDelete e) {
+    if (action instanceof final IdSecAdminActionAdminDelete e) {
       return checkAdminActionAdminDelete(e);
     }
 
-    if (action instanceof IdSecAdminActionAdminEmailAdd e) {
+    if (action instanceof final IdSecAdminActionAdminEmailAdd e) {
       return checkAdminActionAdminEmailAdd(e);
     }
-    if (action instanceof IdSecAdminActionAdminEmailRemove e) {
+    if (action instanceof final IdSecAdminActionAdminEmailRemove e) {
       return checkAdminActionAdminEmailRemove(e);
     }
-    if (action instanceof IdSecAdminActionAdminPermissionGrant e) {
+    if (action instanceof final IdSecAdminActionAdminPermissionGrant e) {
       return checkAdminActionAdminPermissionGrant(e);
     }
-    if (action instanceof IdSecAdminActionAdminPermissionRevoke e) {
+    if (action instanceof final IdSecAdminActionAdminPermissionRevoke e) {
       return checkAdminActionAdminPermissionRevoke(e);
     }
 
-    if (action instanceof IdSecAdminActionAuditRead e) {
+    if (action instanceof final IdSecAdminActionAuditRead e) {
       return checkAdminActionAuditRead(e);
     }
 
+    if (action instanceof final IdSecAdminActionMailTest e) {
+      return checkMailTest(e);
+    }
+
     return new IdSecPolicyResultDenied("Operation not permitted.");
+  }
+
+  private static IdSecPolicyResultType checkMailTest(
+    final IdSecAdminActionMailTest e)
+  {
+    if (!e.admin().permissions().implies(MAIL_TEST)) {
+      return new IdSecPolicyResultDenied(
+        "Testing mail requires the %s permission.".formatted(MAIL_TEST)
+      );
+    }
+    return new IdSecPolicyResultPermitted();
   }
 
   private static IdSecPolicyResultType checkAdminActionAdminBanDelete(
@@ -566,10 +582,10 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
   {
     Objects.requireNonNull(action, "action");
 
-    if (action instanceof IdSecAdminActionType admin) {
+    if (action instanceof final IdSecAdminActionType admin) {
       return checkAdminAction(admin);
     }
-    if (action instanceof IdSecUserActionType user) {
+    if (action instanceof final IdSecUserActionType user) {
       return checkUserAction(user);
     }
     return new IdSecPolicyResultDenied("Operation not permitted.");

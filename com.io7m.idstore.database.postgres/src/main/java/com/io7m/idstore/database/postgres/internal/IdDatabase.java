@@ -107,28 +107,6 @@ public final class IdDatabase implements IdDatabaseType
           measurement.record(this.connectionTimeNow);
         })
     );
-
-    this.resources.add(
-      meter.gaugeBuilder("idstore_db_connections_active")
-        .setDescription("The number of connections that are currently active.")
-        .ofLongs()
-        .buildWithCallback(measurement -> {
-          measurement.record(
-            (long) this.dataSource.getHikariPoolMXBean().getActiveConnections()
-          );
-        })
-    );
-
-    this.resources.add(
-      meter.gaugeBuilder("idstore_db_connections_total")
-        .setDescription("The total number of available connections.")
-        .ofLongs()
-        .buildWithCallback(measurement -> {
-          measurement.record(
-            (long) this.dataSource.getHikariPoolMXBean().getTotalConnections()
-          );
-        })
-    );
   }
 
   LongCounter counterTransactions()

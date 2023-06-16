@@ -90,4 +90,10 @@ public interface IdFMTemplateServiceType extends RPServiceType
    */
 
   IdFMTemplateType<IdFMPasswordResetConfirmData> pagePasswordResetConfirmTemplate();
+
+  /**
+   * @return The test email template
+   */
+
+  IdFMTemplateType<IdFMEmailTestData> emailTestTemplate();
 }

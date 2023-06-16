@@ -117,6 +117,8 @@
   [case UserRead]
   [documentation UserBan "A permission that allows for banning users."]
   [case UserBan]
+  [documentation MailTest "A permission that allows for sending test mail."]
+  [case MailTest]
 ]
 
 [documentation IdA1AdminColumn "A column to use for sorting admins."]
@@ -483,6 +485,14 @@
 [documentation IdA1CommandAuditSearchPrevious "Get the previous page of audit search results."]
 [record IdA1CommandAuditSearchPrevious]
 
+[documentation IdA1CommandMailTest "Send a test email to a given address."]
+[record IdA1CommandMailTest
+  [documentation address "The target email address."]
+  [field address cb:String]
+  [documentation token "The email token."]
+  [field token cb:String]
+]
+
 [documentation IdA1CommandLogin "A request to log in."]
 [record IdA1CommandLogin
   [documentation userName "The username."]
@@ -757,6 +767,14 @@
   [field page [IdA1Page IdA1AuditEvent]]
 ]
 
+[documentation IdA1ResponseMailTest "A response to IdA1CommandMailTest."]
+[record IdA1ResponseMailTest
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId cb:UUID]
+  [documentation token "The unique token that was placed into the test email."]
+  [field token cb:String]
+]
+
 ;
 ; User responses.
 ;
@@ -925,6 +943,7 @@
       IdA1CommandAuditSearchNext
       IdA1CommandAuditSearchPrevious
       IdA1CommandLogin
+      IdA1CommandMailTest
       IdA1CommandUserBanCreate
       IdA1CommandUserBanDelete
       IdA1CommandUserBanGet
@@ -962,6 +981,7 @@
       IdA1ResponseAuditSearchPrevious
       IdA1ResponseError
       IdA1ResponseLogin
+      IdA1ResponseMailTest
       IdA1ResponseUserBanCreate
       IdA1ResponseUserBanDelete
       IdA1ResponseUserBanGet

@@ -78,6 +78,7 @@ import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWriteEmail;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWriteEmailSelf;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWritePermissions;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.AdminWritePermissionsSelf;
+import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.MailTest;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.UserWriteCredentials;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminPermission.UserWriteEmail;
 import com.io7m.idstore.protocol.admin.cb.IdA1AdminSearchByEmailParameters;
@@ -553,6 +554,7 @@ public final class IdACB1ValidationAdmin
       case USER_READ -> new UserRead();
       case USER_WRITE_CREDENTIALS -> new UserWriteCredentials();
       case USER_WRITE_EMAIL -> new UserWriteEmail();
+      case MAIL_TEST -> new MailTest();
     };
   }
 
@@ -955,6 +957,8 @@ public final class IdACB1ValidationAdmin
       return IdAdminPermission.USER_WRITE_EMAIL;
     } else if (p instanceof AuditRead) {
       return IdAdminPermission.AUDIT_READ;
+    } else if (p instanceof MailTest) {
+      return IdAdminPermission.MAIL_TEST;
     } else {
       throw new IllegalArgumentException(
         "Unrecognized permission: %s".formatted(p)

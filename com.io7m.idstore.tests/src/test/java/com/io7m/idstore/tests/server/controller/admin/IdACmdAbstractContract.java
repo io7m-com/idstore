@@ -31,21 +31,23 @@ import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.admin.IdACommandContext;
+import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
+import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.tests.IdFakeClock;
 import com.io7m.idstore.tests.IdTestDirectories;
 import com.io7m.repetoir.core.RPServiceDirectory;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
 
 import java.nio.file.Path;
@@ -68,6 +70,9 @@ public abstract class IdACmdAbstractContract
   private IdServerConfiguration configuration;
   private IdServerConfigurationService configurationService;
   private IdMetricsServiceType metrics;
+  private IdFMTemplateServiceType templates;
+  private IdServerMailServiceType mail;
+  private IdServerBrandingServiceType branding;
 
   protected final Times once()
   {
@@ -135,7 +140,7 @@ public abstract class IdACmdAbstractContract
     this.services =
       new RPServiceDirectory();
     this.transaction =
-      Mockito.mock(IdDatabaseTransactionType.class);
+      mock(IdDatabaseTransactionType.class);
 
     this.clock =
       new IdFakeClock();
@@ -160,23 +165,45 @@ public abstract class IdACmdAbstractContract
         new IdServerConfigurationFiles().parse(this.configFile)
       );
 
+    this.branding =
+      mock(IdServerBrandingServiceType.class);
     this.metrics =
       mock(IdMetricsServiceType.class);
+    this.templates =
+      mock(IdFMTemplateServiceType.class);
+    this.mail =
+      mock(IdServerMailServiceType.class);
     this.configurationService =
       new IdServerConfigurationService(this.metrics, this.configuration);
 
     this.services.register(
+      IdServerBrandingServiceType.class,
+      this.branding
+    );
+    this.services.register(
+      IdServerMailServiceType.class,
+      this.mail
+    );
+    this.services.register(
+      IdFMTemplateServiceType.class,
+      this.templates
+    );
+    this.services.register(
       IdServerConfigurationService.class,
-      this.configurationService);
+      this.configurationService
+    );
     this.services.register(
       IdServerClock.class,
-      this.serverClock);
+      this.serverClock
+    );
     this.services.register(
       IdServerStrings.class,
-      this.strings);
+      this.strings
+    );
     this.services.register(
       IdServerTelemetryServiceType.class,
-      IdServerTelemetryNoOp.noop());
+      IdServerTelemetryNoOp.noop()
+    );
   }
 
   @AfterEach
@@ -219,5 +246,20 @@ public abstract class IdACmdAbstractContract
       "NCSA Mosaic",
       admin
     );
+  }
+
+  protected final IdServerBrandingServiceType branding()
+  {
+    return this.branding;
+  }
+
+  protected final IdFMTemplateServiceType templates()
+  {
+    return this.templates;
+  }
+
+  protected final IdServerMailServiceType mail()
+  {
+    return this.mail;
   }
 }

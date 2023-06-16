@@ -36,6 +36,7 @@ import com.io7m.idstore.server.security.IdSecAdminActionAdminPermissionRevoke;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminRead;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminUpdate;
 import com.io7m.idstore.server.security.IdSecAdminActionAuditRead;
+import com.io7m.idstore.server.security.IdSecAdminActionMailTest;
 import com.io7m.idstore.server.security.IdSecAdminActionUserCreate;
 import com.io7m.idstore.server.security.IdSecAdminActionUserDelete;
 import com.io7m.idstore.server.security.IdSecAdminActionUserRead;
@@ -62,6 +63,7 @@ import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_EMAIL_SELF;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS_SELF;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
+import static com.io7m.idstore.model.IdAdminPermission.MAIL_TEST;
 import static com.io7m.idstore.model.IdAdminPermission.USER_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_DELETE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_READ;
@@ -1420,6 +1422,62 @@ public final class IdSecurityPolicyTest
     failsWith(
       action,
       "The ADMIN_READ permission cannot be revoked by an admin that does not have it.");
+  }
+
+  /**
+   * Admins require permissions to send mail.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testMailTestFails()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionMailTest(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of()
+        )
+      );
+
+    failsWith(
+      action,
+      "Testing mail requires the MAIL_TEST permission.");
+  }
+
+  /**
+   * Admins require permissions to send mail.
+   *
+   * @throws IdSecurityException On errors
+   */
+
+  @Test
+  public void testMailTestSucceeds()
+    throws IdSecurityException
+  {
+    final var action =
+      new IdSecAdminActionMailTest(
+        new IdAdmin(
+          UUID.randomUUID(),
+          new IdName("admin-0"),
+          new IdRealName("Someone R. Incognito"),
+          IdNonEmptyList.single(new IdEmail("someone@example.com")),
+          now(),
+          now(),
+          BAD_PASSWORD,
+          IdAdminPermissionSet.of(MAIL_TEST)
+        )
+      );
+
+    succeeds(action);
   }
 
   private static void succeeds(

@@ -45,6 +45,7 @@ public sealed interface IdAResponseType
   IdAResponseAuditSearchPrevious,
   IdAResponseError,
   IdAResponseLogin,
+  IdAResponseMailTest,
   IdAResponseUserBanCreate,
   IdAResponseUserBanDelete,
   IdAResponseUserBanGet,
