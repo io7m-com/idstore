@@ -23,7 +23,7 @@ module com.io7m.idstore.server.service.sessions
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires com.io7m.idstore.server.service.metrics;
+  requires com.io7m.idstore.server.service.telemetry.api;
   requires com.io7m.idstore.database.api;
 
   requires com.github.benmanes.caffeine;

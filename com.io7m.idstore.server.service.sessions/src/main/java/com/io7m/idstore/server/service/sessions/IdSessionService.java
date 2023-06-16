@@ -21,7 +21,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import com.io7m.idstore.model.IdUserDomain;
-import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.jaffirm.core.Preconditions;
 import com.io7m.repetoir.core.RPServiceType;
 import org.slf4j.Logger;

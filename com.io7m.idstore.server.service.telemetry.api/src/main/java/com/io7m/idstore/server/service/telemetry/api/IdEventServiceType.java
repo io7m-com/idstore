@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.service.events;
+package com.io7m.idstore.server.service.telemetry.api;
 
 import com.io7m.repetoir.core.RPServiceType;
 

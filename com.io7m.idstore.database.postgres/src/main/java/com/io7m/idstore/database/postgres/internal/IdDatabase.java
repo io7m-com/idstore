@@ -87,24 +87,74 @@ public final class IdDatabase implements IdDatabaseType
     this.settings =
       new Settings().withRenderNameCase(RenderNameCase.LOWER);
 
+    final var dataSourceBean =
+      this.dataSource.getHikariPoolMXBean();
+
     this.transactions =
       meter.counterBuilder("idstore_db_transactions")
         .setDescription("The number of completed transactions.")
         .build();
+
     this.transactionCommits =
       meter.counterBuilder("idstore_db_commits")
         .setDescription("The number of database transaction commits.")
         .build();
+
     this.transactionRollbacks =
       meter.counterBuilder("idstore_db_rollbacks")
         .setDescription("The number of database transaction rollbacks.")
         .build();
+    
     this.resources.add(
       meter.gaugeBuilder("idstore_db_connection_time")
         .setDescription("The amount of time a database connection is held.")
         .ofLongs()
         .buildWithCallback(measurement -> {
           measurement.record(this.connectionTimeNow);
+        })
+    );
+
+    this.resources.add(
+      meter.gaugeBuilder("idstore_db_connections_active")
+        .setDescription("Number of active database connections.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(
+            Integer.toUnsignedLong(dataSourceBean.getActiveConnections())
+          );
+        })
+    );
+
+    this.resources.add(
+      meter.gaugeBuilder("idstore_db_connections_idle")
+        .setDescription("Number of idle database connections.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(
+            Integer.toUnsignedLong(dataSourceBean.getIdleConnections())
+          );
+        })
+    );
+
+    this.resources.add(
+      meter.gaugeBuilder("idstore_db_connections_total")
+        .setDescription("Total number of database connections.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(
+            Integer.toUnsignedLong(dataSourceBean.getTotalConnections())
+          );
+        })
+    );
+
+    this.resources.add(
+      meter.gaugeBuilder("idstore_db_threads_waiting")
+        .setDescription("Number of threads waiting for connections.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(
+            Integer.toUnsignedLong(dataSourceBean.getThreadsAwaitingConnection())
+          );
         })
     );
   }

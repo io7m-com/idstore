@@ -15,53 +15,49 @@
  */
 
 
-package com.io7m.idstore.server.service.events;
+package com.io7m.idstore.server.service.telemetry.api;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
- * A user provided incorrect credentials when trying to log in.
+ * A user logged in.
  *
- * @param remoteHost The remote remoteHost
- * @param userId     The user
+ * @param userId The user
  */
 
-public record IdEventUserLoginAuthenticationFailed(
-  String remoteHost,
+public record IdEventUserLoggedIn(
   UUID userId)
   implements IdEventUserType
 {
   /**
-   * A user provided incorrect credentials when trying to log in.
+   * A user logged in.
    *
-   * @param remoteHost The remote remoteHost
-   * @param userId     The user
+   * @param userId The user
    */
 
-  public IdEventUserLoginAuthenticationFailed
+  public IdEventUserLoggedIn
   {
-    Objects.requireNonNull(remoteHost, "remoteHost");
     Objects.requireNonNull(userId, "userId");
   }
 
   @Override
   public IdEventSeverity severity()
   {
-    return IdEventSeverity.WARNING;
+    return IdEventSeverity.INFO;
   }
 
   @Override
   public String name()
   {
-    return "security.user.login.authentication_failed";
+    return "security.user.login.succeeded";
   }
 
   @Override
   public String message()
   {
-    return "%s %s %s".formatted(this.name(), this.userId, this.remoteHost);
+    return "%s %s".formatted(this.name(), this.userId);
   }
 
   @Override
@@ -70,8 +66,7 @@ public record IdEventUserLoginAuthenticationFailed(
     return Map.ofEntries(
       Map.entry("event.domain", this.domain()),
       Map.entry("event.name", this.name()),
-      Map.entry("idstore.user", this.userId.toString()),
-      Map.entry("idstore.remote_host", this.remoteHost())
+      Map.entry("idstore.user", this.userId.toString())
     );
   }
 }

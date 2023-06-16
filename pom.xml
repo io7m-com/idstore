@@ -44,11 +44,9 @@
     <module>com.io7m.idstore.server.service.branding</module>
     <module>com.io7m.idstore.server.service.clock</module>
     <module>com.io7m.idstore.server.service.configuration</module>
-    <module>com.io7m.idstore.server.service.events</module>
     <module>com.io7m.idstore.server.service.health</module>
     <module>com.io7m.idstore.server.service.mail</module>
     <module>com.io7m.idstore.server.service.maintenance</module>
-    <module>com.io7m.idstore.server.service.metrics</module>
     <module>com.io7m.idstore.server.service.ratelimit</module>
     <module>com.io7m.idstore.server.service.reqlimit</module>
     <module>com.io7m.idstore.server.service.sessions</module>

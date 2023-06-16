@@ -14,10 +14,8 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.service.events;
+package com.io7m.idstore.server.service.telemetry.api;
 
-import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
-import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.logs.Severity;
 import io.opentelemetry.api.trace.Span;

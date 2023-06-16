@@ -79,4 +79,10 @@ public interface IdServerTelemetryServiceType extends RPServiceType
     span.recordException(e);
     span.setStatus(StatusCode.ERROR);
   }
+
+  /**
+   * @return {@code true} if this telemetry service is a no-op service
+   */
+
+  boolean isNoOp();
 }

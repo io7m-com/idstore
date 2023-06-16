@@ -14,13 +14,22 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
+package com.io7m.idstore.server.service.telemetry.api;
+
+import java.util.UUID;
+
 /**
- * Identity server (Server metrics service)
+ * Events involving authenticated administrators.
  */
 
-@Export
-@Version("1.0.0")
-package com.io7m.idstore.server.service.metrics;
+public sealed interface IdEventAdminType
+  extends IdEventType
+  permits IdEventAdminLoggedIn, IdEventAdminLoginAuthenticationFailed
+{
+  /**
+   * @return The authenticated administrator
+   */
 
-import org.osgi.annotation.bundle.Export;
-import org.osgi.annotation.versioning.Version;
+  UUID adminId();
+}

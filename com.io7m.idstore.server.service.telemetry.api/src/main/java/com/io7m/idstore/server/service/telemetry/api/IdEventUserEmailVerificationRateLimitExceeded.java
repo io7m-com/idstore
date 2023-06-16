@@ -14,34 +14,38 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.service.events;
+
+package com.io7m.idstore.server.service.telemetry.api;
+
+import com.io7m.idstore.model.IdEmail;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
- * A password reset rate limit was exceeded.
+ * A user exceeded the rate limit for email verifications.
  *
- * @param remoteHost The host exceeding the limit
- * @param target     The target username or email, depending on which was specified
+ * @param userId The user
+ * @param email  The email
  */
 
-public record IdEventUserPasswordResetRateLimitExceeded(
-  String remoteHost,
-  String target)
-  implements IdEventType
+public record IdEventUserEmailVerificationRateLimitExceeded(
+  UUID userId,
+  IdEmail email)
+  implements IdEventUserType
 {
   /**
-   * A password reset rate limit was exceeded.
+   * A user exceeded the rate limit for email verifications.
    *
-   * @param remoteHost The remoteHost exceeding the limit
-   * @param target     The target username or email, depending on which was specified
+   * @param userId The user
+   * @param email  The email
    */
 
-  public IdEventUserPasswordResetRateLimitExceeded
+  public IdEventUserEmailVerificationRateLimitExceeded
   {
-    Objects.requireNonNull(remoteHost, "remoteHost");
-    Objects.requireNonNull(target, "target");
+    Objects.requireNonNull(userId, "userId");
+    Objects.requireNonNull(email, "email");
   }
 
   @Override
@@ -53,13 +57,13 @@ public record IdEventUserPasswordResetRateLimitExceeded(
   @Override
   public String name()
   {
-    return "security.user.password_reset.rate_limit_exceeded";
+    return "security.user.email.rate_limit_exceeded";
   }
 
   @Override
   public String message()
   {
-    return "%s %s %s".formatted(this.name(), this.remoteHost, this.target);
+    return "%s %s %s".formatted(this.name(), this.userId, this.email);
   }
 
   @Override
@@ -68,8 +72,8 @@ public record IdEventUserPasswordResetRateLimitExceeded(
     return Map.ofEntries(
       Map.entry("event.domain", this.domain()),
       Map.entry("event.name", this.name()),
-      Map.entry("idstore.target", this.target),
-      Map.entry("idstore.remote_host", this.remoteHost())
+      Map.entry("idstore.user", this.userId.toString()),
+      Map.entry("idstore.email", this.email.value())
     );
   }
 }

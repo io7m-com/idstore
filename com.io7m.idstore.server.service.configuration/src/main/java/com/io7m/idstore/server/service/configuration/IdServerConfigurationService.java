@@ -17,7 +17,7 @@
 package com.io7m.idstore.server.service.configuration;
 
 import com.io7m.idstore.server.api.IdServerConfiguration;
-import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Objects;

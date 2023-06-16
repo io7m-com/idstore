@@ -23,7 +23,7 @@ import com.io7m.idstore.server.http.IdPlainErrorHandler;
 import com.io7m.idstore.server.http.IdServletHolders;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
-import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration.ConnectionFactory;

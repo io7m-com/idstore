@@ -14,38 +14,34 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
-package com.io7m.idstore.server.service.events;
-
-import com.io7m.idstore.model.IdEmail;
+package com.io7m.idstore.server.service.telemetry.api;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
- * A user exceeded the rate limit for email verifications.
+ * A password reset rate limit was exceeded.
  *
- * @param userId The user
- * @param email  The email
+ * @param remoteHost The host exceeding the limit
+ * @param target     The target username or email, depending on which was specified
  */
 
-public record IdEventUserEmailVerificationRateLimitExceeded(
-  UUID userId,
-  IdEmail email)
-  implements IdEventUserType
+public record IdEventUserPasswordResetRateLimitExceeded(
+  String remoteHost,
+  String target)
+  implements IdEventType
 {
   /**
-   * A user exceeded the rate limit for email verifications.
+   * A password reset rate limit was exceeded.
    *
-   * @param userId The user
-   * @param email  The email
+   * @param remoteHost The remoteHost exceeding the limit
+   * @param target     The target username or email, depending on which was specified
    */
 
-  public IdEventUserEmailVerificationRateLimitExceeded
+  public IdEventUserPasswordResetRateLimitExceeded
   {
-    Objects.requireNonNull(userId, "userId");
-    Objects.requireNonNull(email, "email");
+    Objects.requireNonNull(remoteHost, "remoteHost");
+    Objects.requireNonNull(target, "target");
   }
 
   @Override
@@ -57,13 +53,13 @@ public record IdEventUserEmailVerificationRateLimitExceeded(
   @Override
   public String name()
   {
-    return "security.user.email.rate_limit_exceeded";
+    return "security.user.password_reset.rate_limit_exceeded";
   }
 
   @Override
   public String message()
   {
-    return "%s %s %s".formatted(this.name(), this.userId, this.email);
+    return "%s %s %s".formatted(this.name(), this.remoteHost, this.target);
   }
 
   @Override
@@ -72,8 +68,8 @@ public record IdEventUserEmailVerificationRateLimitExceeded(
     return Map.ofEntries(
       Map.entry("event.domain", this.domain()),
       Map.entry("event.name", this.name()),
-      Map.entry("idstore.user", this.userId.toString()),
-      Map.entry("idstore.email", this.email.value())
+      Map.entry("idstore.target", this.target),
+      Map.entry("idstore.remote_host", this.remoteHost())
     );
   }
 }

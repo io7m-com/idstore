@@ -14,53 +14,51 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.service.events;
 
+package com.io7m.idstore.server.service.telemetry.api;
+
+import com.io7m.idstore.model.IdEmail;
+
+import java.time.Duration;
 import java.util.Map;
 
 /**
- * The base type of events.
+ * Mail failed to send.
+ *
+ * @param to       The target address
+ * @param time The time it took
  */
 
-public sealed interface IdEventType
-  permits IdEventAdminLoginRateLimitExceeded,
-  IdEventAdminType,
-  IdEventMailFailed,
-  IdEventMailSent,
-  IdEventUserLoginRateLimitExceeded,
-  IdEventUserPasswordResetRateLimitExceeded,
-  IdEventUserType
+public record IdEventMailFailed(
+  IdEmail to,
+  Duration time)
+  implements IdEventType
 {
-  /**
-   * @return The event domain
-   */
-
-  default String domain()
+  @Override
+  public String name()
   {
-    return "server";
+    return "mail.failed";
   }
 
-  /**
-   * @return The event severity
-   */
+  @Override
+  public IdEventSeverity severity()
+  {
+    return IdEventSeverity.ERROR;
+  }
 
-  IdEventSeverity severity();
+  @Override
+  public String message()
+  {
+    return "%s %s".formatted(this.name(), this.to());
+  }
 
-  /**
-   * @return The event name
-   */
-
-  String name();
-
-  /**
-   * @return The formatted event message
-   */
-
-  String message();
-
-  /**
-   * @return The complete event attributes
-   */
-
-  Map<String, String> asAttributes();
+  @Override
+  public Map<String, String> asAttributes()
+  {
+    return Map.ofEntries(
+      Map.entry("event.domain", this.domain()),
+      Map.entry("event.name", this.name()),
+      Map.entry("idstore.email", this.to.value())
+    );
+  }
 }

@@ -19,7 +19,7 @@ package com.io7m.idstore.server.http;
 
 import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.server.service.clock.IdServerClock;
-import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

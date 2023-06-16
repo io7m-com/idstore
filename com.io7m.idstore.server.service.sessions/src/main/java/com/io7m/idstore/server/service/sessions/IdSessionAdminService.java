@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.server.service.sessions;
 
-import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -23,7 +23,6 @@ import com.io7m.idstore.database.api.IdDatabaseFactoryType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.postgres.internal.IdDatabase;
 import com.io7m.jmulticlose.core.CloseableCollection;
-import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.trasco.api.TrEventExecutingSQL;
 import com.io7m.trasco.api.TrEventType;
 import com.io7m.trasco.api.TrEventUpgrading;
@@ -195,8 +194,8 @@ public final class IdDatabases implements IdDatabaseFactoryType
       config.setPassword(configuration.password());
       config.setAutoCommit(false);
 
-      final var dataSource = resources.add(new HikariDataSource(config));
-      createMetricsMeters(meter, resources, dataSource);
+      final var dataSource =
+        resources.add(new HikariDataSource(config));
 
       final var parsers = new TrSchemaRevisionSetParsers();
       final TrSchemaRevisionSet revisions;
@@ -264,59 +263,6 @@ public final class IdDatabases implements IdDatabaseFactoryType
         Optional.empty()
       );
     }
-  }
-
-  private static void createMetricsMeters(
-    final Meter meter,
-    final CloseableCollectionType<IdDatabaseException> resources,
-    final HikariDataSource dataSource)
-  {
-    final var dataSourceBean =
-      dataSource.getHikariPoolMXBean();
-
-    resources.add(
-      meter.gaugeBuilder("idstore_db_connections_active")
-        .setDescription("Number of active database connections.")
-        .ofLongs()
-        .buildWithCallback(measurement -> {
-          measurement.record(
-            Integer.toUnsignedLong(dataSourceBean.getActiveConnections())
-          );
-        })
-    );
-
-    resources.add(
-      meter.gaugeBuilder("idstore_db_connections_idle")
-        .setDescription("Number of idle database connections.")
-        .ofLongs()
-        .buildWithCallback(measurement -> {
-          measurement.record(
-            Integer.toUnsignedLong(dataSourceBean.getIdleConnections())
-          );
-        })
-    );
-
-    resources.add(
-      meter.gaugeBuilder("idstore_db_connections_total")
-        .setDescription("Total number of database connections.")
-        .ofLongs()
-        .buildWithCallback(measurement -> {
-          measurement.record(
-            Integer.toUnsignedLong(dataSourceBean.getTotalConnections())
-          );
-        })
-    );
-
-    resources.add(
-      meter.gaugeBuilder("idstore_db_threads_waiting")
-        .setDescription("Number of threads waiting for connections.")
-        .ofLongs()
-        .buildWithCallback(measurement -> {
-          measurement.record(
-            Integer.toUnsignedLong(dataSourceBean.getThreadsAwaitingConnection())
-          );
-        })
-    );
   }
 
   private static void publishEvent(

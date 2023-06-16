@@ -15,11 +15,10 @@
  */
 
 
-package com.io7m.idstore.server.service.metrics;
+package com.io7m.idstore.server.service.telemetry.api;
 
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdUserDomain;
-import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.jmulticlose.core.ClosingResourceFailedException;
@@ -56,6 +55,7 @@ public final class IdMetricsService implements IdMetricsServiceType
   private final ConcurrentHashMap<IdUserDomain, Long> loginCountsNow;
   private final EnumMap<IdUserDomain, ConcurrentLinkedQueue<TimeSample>> mailTimeNow;
   private final EnumMap<IdUserDomain, ConcurrentLinkedQueue<TimeSample>> httpTimeNow;
+  private final boolean isNoOp;
   private volatile long loginPauseTimeUser;
   private volatile long loginPauseTimeAdmin;
 
@@ -80,6 +80,8 @@ public final class IdMetricsService implements IdMetricsServiceType
   {
     Objects.requireNonNull(telemetry, "telemetry");
 
+    this.isNoOp =
+      telemetry.isNoOp();
     this.resources =
       CloseableCollection.create();
 
@@ -266,6 +268,10 @@ public final class IdMetricsService implements IdMetricsServiceType
   public void onHttpRequested(
     final IdUserDomain type)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     this.httpCount.add(1L, typeAttributesFor(type));
   }
 
@@ -273,6 +279,10 @@ public final class IdMetricsService implements IdMetricsServiceType
   public void onHttp5xx(
     final IdUserDomain type)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     this.http5xx.add(1L, typeAttributesFor(type));
   }
 
@@ -280,6 +290,10 @@ public final class IdMetricsService implements IdMetricsServiceType
   public void onHttp2xx(
     final IdUserDomain type)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     this.http2xx.add(1L, typeAttributesFor(type));
   }
 
@@ -287,6 +301,10 @@ public final class IdMetricsService implements IdMetricsServiceType
   public void onHttp4xx(
     final IdUserDomain type)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     this.http4xx.add(1L, typeAttributesFor(type));
   }
 
@@ -295,6 +313,9 @@ public final class IdMetricsService implements IdMetricsServiceType
     final IdUserDomain type,
     final long size)
   {
+    if (this.isNoOp) {
+      return;
+    }
     if (size == -1L) {
       return;
     }
@@ -306,6 +327,9 @@ public final class IdMetricsService implements IdMetricsServiceType
     final IdUserDomain type,
     final long size)
   {
+    if (this.isNoOp) {
+      return;
+    }
     if (size == -1L) {
       return;
     }
@@ -317,6 +341,10 @@ public final class IdMetricsService implements IdMetricsServiceType
     final IdEmail address,
     final Duration time)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     this.mailOK.add(
       1L,
       Attributes.of(stringKey("to"), address.value())
@@ -331,6 +359,10 @@ public final class IdMetricsService implements IdMetricsServiceType
     final IdEmail address,
     final Duration time)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     this.mailFail.add(
       1L,
       Attributes.of(stringKey("to"), address.value())
@@ -347,6 +379,10 @@ public final class IdMetricsService implements IdMetricsServiceType
     final String user,
     final String operation)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     final var attributes =
       Attributes.builder()
         .put("name", name)
@@ -363,6 +399,10 @@ public final class IdMetricsService implements IdMetricsServiceType
     final IdUserDomain type,
     final Duration time)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     this.httpTimeNow.get(type)
       .add(new TimeSample(type, time.toNanos()));
   }
@@ -372,6 +412,10 @@ public final class IdMetricsService implements IdMetricsServiceType
     final IdUserDomain type,
     final long countNow)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     this.loginCountsNow.put(type, Long.valueOf(countNow));
   }
 
@@ -380,6 +424,10 @@ public final class IdMetricsService implements IdMetricsServiceType
     final IdUserDomain type,
     final long countNow)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     this.loginCountsNow.put(type, Long.valueOf(countNow));
   }
 
@@ -388,6 +436,10 @@ public final class IdMetricsService implements IdMetricsServiceType
     final IdUserDomain type,
     final Duration duration)
   {
+    if (this.isNoOp) {
+      return;
+    }
+
     switch (type) {
       case USER -> {
         this.loginPauseTimeUser = duration.toNanos();

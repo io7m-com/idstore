@@ -16,9 +16,9 @@
 
 package com.io7m.idstore.tests.server.service.ratelimit;
 
-import com.io7m.idstore.server.service.metrics.IdMetricsService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdMetricsService;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.idstore.tests.server.service.IdServiceContract;

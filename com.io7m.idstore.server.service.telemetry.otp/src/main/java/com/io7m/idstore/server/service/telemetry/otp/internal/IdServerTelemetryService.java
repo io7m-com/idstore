@@ -96,6 +96,12 @@ public final class IdServerTelemetryService
   }
 
   @Override
+  public boolean isNoOp()
+  {
+    return false;
+  }
+
+  @Override
   public void close()
   {
     this.up.close();

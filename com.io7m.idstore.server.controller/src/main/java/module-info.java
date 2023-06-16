@@ -32,7 +32,6 @@ module com.io7m.idstore.server.controller
   requires com.io7m.idstore.server.service.branding;
   requires com.io7m.idstore.server.service.clock;
   requires com.io7m.idstore.server.service.configuration;
-  requires com.io7m.idstore.server.service.events;
   requires com.io7m.idstore.server.service.mail;
   requires com.io7m.idstore.server.service.ratelimit;
   requires com.io7m.idstore.server.service.sessions;

@@ -15,52 +15,41 @@
  */
 
 
-package com.io7m.idstore.server.service.events;
+package com.io7m.idstore.server.service.telemetry.api;
 
+import com.io7m.idstore.model.IdEmail;
+
+import java.time.Duration;
 import java.util.Map;
-import java.util.Objects;
 
 /**
- * A login rate limit was exceeded for a user.
+ * Mail was sent successfully.
  *
- * @param remoteHost The remoteHost exceeding the limit
- * @param username   The username
+ * @param to   The target address
+ * @param time The time it took to send
  */
 
-public record IdEventUserLoginRateLimitExceeded(
-  String remoteHost,
-  String username)
+public record IdEventMailSent(
+  IdEmail to,
+  Duration time)
   implements IdEventType
 {
-  /**
-   * A login rate limit was exceeded for a user.
-   *
-   * @param remoteHost The remoteHost exceeding the limit
-   * @param username   The username
-   */
-
-  public IdEventUserLoginRateLimitExceeded
+  @Override
+  public String name()
   {
-    Objects.requireNonNull(remoteHost, "remoteHost");
-    Objects.requireNonNull(username, "username");
+    return "mail.sent";
   }
 
   @Override
   public IdEventSeverity severity()
   {
-    return IdEventSeverity.WARNING;
-  }
-
-  @Override
-  public String name()
-  {
-    return "security.user.login.rate_limit_exceeded";
+    return IdEventSeverity.INFO;
   }
 
   @Override
   public String message()
   {
-    return "%s %s %s".formatted(this.name(), this.remoteHost, this.username);
+    return "%s %s".formatted(this.name(), this.to());
   }
 
   @Override
@@ -69,8 +58,7 @@ public record IdEventUserLoginRateLimitExceeded(
     return Map.ofEntries(
       Map.entry("event.domain", this.domain()),
       Map.entry("event.name", this.name()),
-      Map.entry("idstore.username", this.username),
-      Map.entry("idstore.remote_host", this.remoteHost())
+      Map.entry("idstore.email", this.to.value())
     );
   }
 }

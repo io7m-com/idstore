@@ -15,35 +15,35 @@
  */
 
 
-package com.io7m.idstore.server.service.events;
+package com.io7m.idstore.server.service.telemetry.api;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
- * An admin provided incorrect credentials when trying to log in.
+ * A user provided incorrect credentials when trying to log in.
  *
  * @param remoteHost The remote remoteHost
- * @param adminId    The admin
+ * @param userId     The user
  */
 
-public record IdEventAdminLoginAuthenticationFailed(
+public record IdEventUserLoginAuthenticationFailed(
   String remoteHost,
-  UUID adminId)
-  implements IdEventAdminType
+  UUID userId)
+  implements IdEventUserType
 {
   /**
-   * An admin provided incorrect credentials when trying to log in.
+   * A user provided incorrect credentials when trying to log in.
    *
    * @param remoteHost The remote remoteHost
-   * @param adminId    The admin
+   * @param userId     The user
    */
 
-  public IdEventAdminLoginAuthenticationFailed
+  public IdEventUserLoginAuthenticationFailed
   {
     Objects.requireNonNull(remoteHost, "remoteHost");
-    Objects.requireNonNull(adminId, "adminId");
+    Objects.requireNonNull(userId, "userId");
   }
 
   @Override
@@ -55,13 +55,13 @@ public record IdEventAdminLoginAuthenticationFailed(
   @Override
   public String name()
   {
-    return "security.admin.login.authentication_failed";
+    return "security.user.login.authentication_failed";
   }
 
   @Override
   public String message()
   {
-    return "%s %s %s".formatted(this.name(), this.adminId, this.remoteHost);
+    return "%s %s %s".formatted(this.name(), this.userId, this.remoteHost);
   }
 
   @Override
@@ -70,8 +70,8 @@ public record IdEventAdminLoginAuthenticationFailed(
     return Map.ofEntries(
       Map.entry("event.domain", this.domain()),
       Map.entry("event.name", this.name()),
-      Map.entry("idstore.remote_host", this.remoteHost()),
-      Map.entry("idstore.admin", this.adminId().toString())
+      Map.entry("idstore.user", this.userId.toString()),
+      Map.entry("idstore.remote_host", this.remoteHost())
     );
   }
 }
