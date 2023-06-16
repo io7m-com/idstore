@@ -13,7 +13,7 @@
 
   <groupId>com.io7m.idstore</groupId>
   <artifactId>com.io7m.idstore</artifactId>
-  <version>1.0.0-beta0009</version>
+  <version>1.0.0-SNAPSHOT</version>
 
   <packaging>pom</packaging>
   <name>com.io7m.idstore</name>
@@ -81,7 +81,7 @@
     <com.io7m.trasco.version>1.0.0-beta0001</com.io7m.trasco.version>
     <com.io7m.verdant.version>1.0.0</com.io7m.verdant.version>
     <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
-    <io7m.api.previousVersion>1.0.0-beta0009</io7m.api.previousVersion>
+    <io7m.api.previousVersion>1.0.0-SNAPSHOT</io7m.api.previousVersion>
     <jetty.version>11.0.15</jetty.version>
     <jooq.version>3.18.4</jooq.version>
     <logback.version>1.4.8</logback.version>
