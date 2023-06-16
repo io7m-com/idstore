@@ -20,6 +20,7 @@ import com.io7m.anethum.api.ParsingException;
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseFactoryType;
+import com.io7m.idstore.database.api.IdDatabaseTelemetry;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.postgres.internal.IdDatabase;
 import com.io7m.jmulticlose.core.CloseableCollection;
@@ -33,8 +34,6 @@ import com.io7m.trasco.vanilla.TrExecutors;
 import com.io7m.trasco.vanilla.TrSchemaRevisionSetParsers;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import io.opentelemetry.api.metrics.Meter;
-import io.opentelemetry.api.trace.Tracer;
 import org.postgresql.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,14 +159,12 @@ public final class IdDatabases implements IdDatabaseFactoryType
   @Override
   public IdDatabaseType open(
     final IdDatabaseConfiguration configuration,
-    final Tracer tracer,
-    final Meter meter,
+    final IdDatabaseTelemetry telemetry,
     final Consumer<String> startupMessages)
     throws IdDatabaseException
   {
     Objects.requireNonNull(configuration, "configuration");
-    Objects.requireNonNull(tracer, "tracer");
-    Objects.requireNonNull(meter, "meter");
+    Objects.requireNonNull(telemetry, "telemetry");
     Objects.requireNonNull(startupMessages, "startupMessages");
 
     final var resources = CloseableCollection.create(() -> {
@@ -224,8 +221,7 @@ public final class IdDatabases implements IdDatabaseFactoryType
       }
 
       return new IdDatabase(
-        tracer,
-        meter,
+        telemetry,
         configuration.clock(),
         dataSource,
         resources

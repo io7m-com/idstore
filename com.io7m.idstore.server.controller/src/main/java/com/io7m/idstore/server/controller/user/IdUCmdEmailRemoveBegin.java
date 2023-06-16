@@ -34,10 +34,10 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.security.IdSecUserActionEmailRemoveBegin;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
-import com.io7m.idstore.server.service.telemetry.api.IdEventServiceType;
-import com.io7m.idstore.server.service.telemetry.api.IdEventUserEmailVerificationRateLimitExceeded;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdEventServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdEventUserEmailVerificationRateLimitExceeded;
 import com.io7m.idstore.server.service.templating.IdFMEmailVerificationData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import io.opentelemetry.api.trace.Span;

@@ -19,8 +19,10 @@ package com.io7m.idstore.tests.database;
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseCreate;
 import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.database.api.IdDatabaseTelemetry;
 import com.io7m.idstore.database.api.IdDatabaseUpgrade;
 import com.io7m.idstore.database.postgres.IdDatabases;
+import com.io7m.idstore.model.IdVersion;
 import io.opentelemetry.api.OpenTelemetry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -168,12 +170,20 @@ public final class IdDatabasesTest
       }
     }
 
+    final var telemetry =
+      new IdDatabaseTelemetry(
+        true,
+        OpenTelemetry.noop()
+          .getMeter("com.io7m.idstore"),
+        OpenTelemetry.noop()
+          .getTracer("com.io7m.idstore", IdVersion.MAIN_VERSION)
+      );
+
     final var ex =
       assertThrows(IdDatabaseException.class, () -> {
         this.databases.open(
           this.databaseConfiguration,
-          OpenTelemetry.noop().getTracer("com.io7m.idstore"),
-          OpenTelemetry.noop().getMeter("com.io7m.idstore"),
+          telemetry,
           s -> {
           }
         );
@@ -217,12 +227,20 @@ public final class IdDatabasesTest
       }
     }
 
+    final var telemetry =
+      new IdDatabaseTelemetry(
+        true,
+        OpenTelemetry.noop()
+          .getMeter("com.io7m.idstore"),
+        OpenTelemetry.noop()
+          .getTracer("com.io7m.idstore", IdVersion.MAIN_VERSION)
+      );
+
     final var ex =
       assertThrows(IdDatabaseException.class, () -> {
         this.databases.open(
           this.databaseConfiguration,
-          OpenTelemetry.noop().getTracer("com.io7m.idstore"),
-          OpenTelemetry.noop().getMeter("com.io7m.idstore"),
+          telemetry,
           s -> {
           }
         );
@@ -254,12 +272,20 @@ public final class IdDatabasesTest
       }
     }
 
+    final var telemetry =
+      new IdDatabaseTelemetry(
+        true,
+        OpenTelemetry.noop()
+          .getMeter("com.io7m.idstore"),
+        OpenTelemetry.noop()
+          .getTracer("com.io7m.idstore", IdVersion.MAIN_VERSION)
+      );
+
     final var ex =
       assertThrows(IdDatabaseException.class, () -> {
         this.databases.open(
           this.databaseConfiguration,
-          OpenTelemetry.noop().getTracer("com.io7m.idstore"),
-          OpenTelemetry.noop().getMeter("com.io7m.idstore"),
+          telemetry,
           s -> {
           }
         );
@@ -304,12 +330,20 @@ public final class IdDatabasesTest
       }
     }
 
+    final var telemetry =
+      new IdDatabaseTelemetry(
+        true,
+        OpenTelemetry.noop()
+          .getMeter("com.io7m.idstore"),
+        OpenTelemetry.noop()
+          .getTracer("com.io7m.idstore", IdVersion.MAIN_VERSION)
+      );
+
     final var ex =
       assertThrows(IdDatabaseException.class, () -> {
         this.databases.open(
           this.databaseConfigurationWithoutUpgrades,
-          OpenTelemetry.noop().getTracer("com.io7m.idstore"),
-          OpenTelemetry.noop().getMeter("com.io7m.idstore"),
+          telemetry,
           s -> {
           }
         );

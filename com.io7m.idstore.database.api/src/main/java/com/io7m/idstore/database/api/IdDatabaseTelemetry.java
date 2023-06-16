@@ -17,35 +17,35 @@
 
 package com.io7m.idstore.database.api;
 
-import java.util.function.Consumer;
+import io.opentelemetry.api.metrics.Meter;
+import io.opentelemetry.api.trace.Tracer;
+
+import java.util.Objects;
 
 /**
- * The type of server database factories.
+ * Interfaces used for database telemetry.
+ *
+ * @param isNoOp {@code true} if telemetry is in no-op mode
+ * @param meter  The meter
+ * @param tracer The tracer
  */
 
-public interface IdDatabaseFactoryType
+public record IdDatabaseTelemetry(
+  boolean isNoOp,
+  Meter meter,
+  Tracer tracer)
 {
   /**
-   * @return The database kind (such as "POSTGRESQL")
+   * Interfaces used for database telemetry.
+   *
+   * @param isNoOp {@code true} if telemetry is in no-op mode
+   * @param meter  The meter
+   * @param tracer The tracer
    */
 
-  String kind();
-
-  /**
-   * Open a database.
-   *
-   * @param configuration   The database configuration
-   * @param telemetry       The telemetry
-   * @param startupMessages A function that will receive startup messages
-   *
-   * @return A database
-   *
-   * @throws IdDatabaseException On errors
-   */
-
-  IdDatabaseType open(
-    IdDatabaseConfiguration configuration,
-    IdDatabaseTelemetry telemetry,
-    Consumer<String> startupMessages)
-    throws IdDatabaseException;
+  public IdDatabaseTelemetry
+  {
+    Objects.requireNonNull(meter, "meter");
+    Objects.requireNonNull(tracer, "tracer");
+  }
 }
