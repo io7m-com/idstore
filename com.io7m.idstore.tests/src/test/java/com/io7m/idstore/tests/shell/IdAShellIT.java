@@ -906,6 +906,33 @@ public final class IdAShellIT
   }
 
 
+  @Test
+  public void testShellMailTest(
+    final IdServerType server)
+    throws Exception
+  {
+    configureAdmin(server);
+    this.startShell();
+
+    final var w = this.terminal.sendInputToTerminalWriter();
+    w.printf("login %s admin 1234%n", server.adminAPI());
+    w.println("self");
+    w.println(
+      "mail-test --email someone@example.com --token 123456"
+    );
+    w.flush();
+    w.close();
+
+    this.waitForShell();
+    assertEquals(0, this.exitCode);
+
+    final var output = this.terminal.terminalProducedOutput();
+    assertTrue(output.toString().contains(
+      "Mail sent successfully.\n" +
+      "Token: 123456"));
+  }
+
+
   private void startShell()
   {
     this.executor.execute(() -> {

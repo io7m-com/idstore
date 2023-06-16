@@ -21,6 +21,9 @@ import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTPS;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP_TLS;
+import com.io7m.idstore.server.service.events.IdEventMailFailed;
+import com.io7m.idstore.server.service.events.IdEventMailSent;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
@@ -29,7 +32,11 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -38,20 +45,27 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
+
 /**
  * A mail service.
  */
 
 public final class IdServerMailService implements IdServerMailServiceType
 {
+  private static final Logger LOG =
+    LoggerFactory.getLogger(IdServerMailService.class);
+
   private final IdServerMailConfiguration configuration;
   private final IdServerTelemetryServiceType telemetry;
   private final Session session;
   private final ExecutorService executor;
+  private final IdEventServiceType events;
 
   private IdServerMailService(
     final IdServerMailConfiguration inConfiguration,
     final IdServerTelemetryServiceType inTelemetry,
+    final IdEventServiceType inEvents,
     final Session inSession,
     final ExecutorService inExecutor)
   {
@@ -59,6 +73,8 @@ public final class IdServerMailService implements IdServerMailServiceType
       Objects.requireNonNull(inConfiguration, "configuration");
     this.telemetry =
       Objects.requireNonNull(inTelemetry, "telemetry");
+    this.events =
+      Objects.requireNonNull(inEvents, "inEvents");
     this.session =
       Objects.requireNonNull(inSession, "session");
     this.executor =
@@ -69,6 +85,7 @@ public final class IdServerMailService implements IdServerMailServiceType
    * Create a new mail service.
    *
    * @param telemetry     The telemetry service
+   * @param events        The events service
    * @param configuration The mail configuration
    *
    * @return The service
@@ -76,6 +93,7 @@ public final class IdServerMailService implements IdServerMailServiceType
 
   public static IdServerMailServiceType create(
     final IdServerTelemetryServiceType telemetry,
+    final IdEventServiceType events,
     final IdServerMailConfiguration configuration)
   {
     Objects.requireNonNull(telemetry, "telemetry");
@@ -100,7 +118,9 @@ public final class IdServerMailService implements IdServerMailServiceType
     if (transport instanceof IdServerMailTransportSMTP) {
       p.setProperty("mail.transport.protocol", "smtp");
       p.setProperty("mail.smtp.host", transport.host());
-      p.setProperty("mail.smtp.port", Integer.toUnsignedString(transport.port()));
+      p.setProperty(
+        "mail.smtp.port",
+        Integer.toUnsignedString(transport.port()));
       p.setProperty("mail.smtp.starttls.enable", "true");
       p.setProperty("mail.smtp.starttls.required", "false");
       authOpt.ifPresent(auth -> {
@@ -110,7 +130,9 @@ public final class IdServerMailService implements IdServerMailServiceType
     } else if (transport instanceof IdServerMailTransportSMTP_TLS) {
       p.setProperty("mail.transport.protocol", "smtp");
       p.setProperty("mail.smtp.host", transport.host());
-      p.setProperty("mail.smtp.port", Integer.toUnsignedString(transport.port()));
+      p.setProperty(
+        "mail.smtp.port",
+        Integer.toUnsignedString(transport.port()));
       p.setProperty("mail.smtp.starttls.enable", "true");
       p.setProperty("mail.smtp.starttls.required", "true");
       authOpt.ifPresent(auth -> {
@@ -121,7 +143,9 @@ public final class IdServerMailService implements IdServerMailServiceType
       p.setProperty("mail.transport.protocol", "smtps");
       p.setProperty("mail.smtps.quitwait", "false");
       p.setProperty("mail.smtps.host", transport.host());
-      p.setProperty("mail.smtps.port", Integer.toUnsignedString(transport.port()));
+      p.setProperty(
+        "mail.smtps.port",
+        Integer.toUnsignedString(transport.port()));
       authOpt.ifPresent(auth -> {
         p.setProperty("mail.smtps.username", auth.userName());
         p.setProperty("mail.smtps.password", auth.password());
@@ -134,6 +158,7 @@ public final class IdServerMailService implements IdServerMailServiceType
     return new IdServerMailService(
       configuration,
       telemetry,
+      events,
       session,
       executor
     );
@@ -173,6 +198,8 @@ public final class IdServerMailService implements IdServerMailServiceType
           .setParent(Context.current().with(parentSpan))
           .startSpan();
 
+      final var timeThen = OffsetDateTime.now();
+
       try {
         final Message message =
           new MimeMessage(this.session);
@@ -192,9 +219,16 @@ public final class IdServerMailService implements IdServerMailServiceType
         message.setContent(text, "text/plain");
         Transport.send(message);
 
+        final var timeNow = OffsetDateTime.now();
+        this.events.emit(
+          new IdEventMailSent(to, Duration.between(timeThen, timeNow)));
         future.complete(null);
       } catch (final Exception e) {
-        span.recordException(e);
+        LOG.debug("send failed: ", e);
+        final var timeNow = OffsetDateTime.now();
+        this.events.emit(
+          new IdEventMailFailed(to, Duration.between(timeThen, timeNow)));
+        recordSpanException(e);
         future.completeExceptionally(e);
       } finally {
         span.end();

@@ -25,6 +25,8 @@ import java.util.Map;
 public sealed interface IdEventType
   permits IdEventAdminLoginRateLimitExceeded,
   IdEventAdminType,
+  IdEventMailFailed,
+  IdEventMailSent,
   IdEventUserLoginRateLimitExceeded,
   IdEventUserPasswordResetRateLimitExceeded,
   IdEventUserType
@@ -37,6 +39,12 @@ public sealed interface IdEventType
   {
     return "server";
   }
+
+  /**
+   * @return The event severity
+   */
+
+  IdEventSeverity severity();
 
   /**
    * @return The event name

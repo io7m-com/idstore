@@ -41,6 +41,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
+import com.io7m.idstore.protocol.admin.IdACommandMailTest;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
@@ -64,6 +65,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
+
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
 
 /**
  * A command executor for public commands.
@@ -99,7 +102,7 @@ public final class IdACommandExecutor
     try (var ignored = span.makeCurrent()) {
       return executeCommand(context, command);
     } catch (final Throwable e) {
-      span.recordException(e);
+      recordSpanException(e);
       throw e;
     } finally {
       span.end();
@@ -245,6 +248,10 @@ public final class IdACommandExecutor
 
     if (command instanceof final IdACommandUserLoginHistory c) {
       return new IdACmdUserLoginHistory().execute(context, c);
+    }
+
+    if (command instanceof final IdACommandMailTest c) {
+      return new IdACmdMailTest().execute(context, c);
     }
 
     throw new IllegalStateException();

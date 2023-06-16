@@ -40,7 +40,9 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.Optional;
 
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -80,7 +82,7 @@ public final class IdUVPasswordResetConfirm
       services.requireService(IdFMTemplateServiceType.class)
         .pagePasswordResetConfirmTemplate();
 
-    return withInstrumentation(services, (request, information) -> {
+    return withInstrumentation(services, USER, (request, information) -> {
       return execute(
         userPasswordResets,
         strings,
@@ -116,6 +118,7 @@ public final class IdUVPasswordResetConfirm
 
       return showPasswordForm(branding, formTemplate, token);
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       return IdUVErrorPage.showError(
         strings,
         branding,

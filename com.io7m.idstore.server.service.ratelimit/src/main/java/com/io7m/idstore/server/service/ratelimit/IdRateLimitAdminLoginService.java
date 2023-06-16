@@ -16,8 +16,9 @@
 
 package com.io7m.idstore.server.service.ratelimit;
 
-import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +40,7 @@ public final class IdRateLimitAdminLoginService
   /**
    * Create a rate limit service.
    *
-   * @param telemetry  The telemetry service
+   * @param metrics    The metrics service
    * @param expiration The expiration for tokens
    * @param timeUnit   The time unit for expirations
    *
@@ -47,16 +48,17 @@ public final class IdRateLimitAdminLoginService
    */
 
   public static IdRateLimitAdminLoginServiceType create(
-    final IdServerTelemetryServiceType telemetry,
+    final IdMetricsServiceType metrics,
     final long expiration,
     final TimeUnit timeUnit)
   {
     return new IdRateLimitAdminLoginService(
       IdRateLimiter.create(
-        telemetry,
-        "IdRateLimitAdminLoginService",
+        metrics,
+        "admin_login",
         expiration,
-        timeUnit)
+        timeUnit
+      )
     );
   }
 
@@ -78,5 +80,11 @@ public final class IdRateLimitAdminLoginService
   {
     return "[IdRateLimitAdminLoginService 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode(), 16));
+  }
+
+  @Override
+  public Duration waitTime()
+  {
+    return this.limiter.waitTime();
   }
 }

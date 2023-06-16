@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0007</version>
+    <version>1.0.0-beta0008</version>
   </parent>
 
   <artifactId>com.io7m.idstore.oci</artifactId>
@@ -126,6 +126,24 @@
                     <argument>-t</argument>
                     <argument>quay.io/io7mcom/idstore:${project.version}</argument>
                     <argument>${project.build.directory}/oci</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+
+              <!-- Run the image as a basic sanity check. -->
+              <execution>
+                <id>oci-image-run-check</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <executable>podman</executable>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>--rm</argument>
+                    <argument>quay.io/io7mcom/idstore:${project.version}</argument>
+                    <argument>help</argument>
                   </arguments>
                 </configuration>
               </execution>

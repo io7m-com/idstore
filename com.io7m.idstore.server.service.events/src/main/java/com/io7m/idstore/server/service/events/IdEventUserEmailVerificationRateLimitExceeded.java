@@ -49,6 +49,12 @@ public record IdEventUserEmailVerificationRateLimitExceeded(
   }
 
   @Override
+  public IdEventSeverity severity()
+  {
+    return IdEventSeverity.WARNING;
+  }
+
+  @Override
   public String name()
   {
     return "security.user.email.rate_limit_exceeded";

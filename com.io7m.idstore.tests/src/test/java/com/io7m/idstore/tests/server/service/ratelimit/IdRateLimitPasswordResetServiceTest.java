@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.tests.server.service.ratelimit;
 
+import com.io7m.idstore.server.service.metrics.IdMetricsService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
@@ -32,11 +33,13 @@ public final class IdRateLimitPasswordResetServiceTest
   extends IdServiceContract<IdRateLimitPasswordResetServiceType>
 {
   private IdServerTelemetryServiceType telemetry;
+  private IdMetricsService metrics;
 
   @BeforeEach
   public void setup()
   {
     this.telemetry = IdServerTelemetryNoOp.noop();
+    this.metrics = new IdMetricsService(this.telemetry);
   }
 
   @Test
@@ -45,7 +48,7 @@ public final class IdRateLimitPasswordResetServiceTest
   {
     final var service =
       IdRateLimitPasswordResetService.create(
-        this.telemetry,
+        this.metrics,
         100L,
         MILLISECONDS
       );
@@ -61,7 +64,7 @@ public final class IdRateLimitPasswordResetServiceTest
   protected IdRateLimitPasswordResetServiceType createInstanceA()
   {
     return IdRateLimitPasswordResetService.create(
-      this.telemetry,
+      this.metrics,
       100L,
       MILLISECONDS
     );
@@ -71,7 +74,7 @@ public final class IdRateLimitPasswordResetServiceTest
   protected IdRateLimitPasswordResetServiceType createInstanceB()
   {
     return IdRateLimitPasswordResetService.create(
-      this.telemetry,
+      this.metrics,
       200L,
       MILLISECONDS
     );

@@ -20,8 +20,12 @@ package com.io7m.idstore.tests.server.service.mail;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
+import com.io7m.idstore.server.service.events.IdEventService;
+import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.mail.IdServerMailService;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
+import com.io7m.idstore.server.service.metrics.IdMetricsService;
+import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.tests.server.service.IdServiceContract;
 import io.opentelemetry.api.trace.Span;
 import jakarta.mail.MessagingException;
@@ -51,10 +55,20 @@ public final class IdServerMailServiceTest
   private SMTPServer smtp;
   private IdServerMailConfiguration configuration;
   private IdServerMailServiceType mailService;
+  private IdServerTelemetryNoOp telemetry;
+  private IdMetricsService metrics;
+  private IdEventServiceType events;
 
   @BeforeEach
   public void setup()
   {
+    this.telemetry =
+      noop();
+    this.metrics =
+      new IdMetricsService(this.telemetry);
+    this.events =
+      IdEventService.create(this.telemetry, this.metrics);
+
     this.emailsReceived = new ConcurrentLinkedQueue<>();
     this.smtp =
       SMTPServer.port(32025)
@@ -83,7 +97,7 @@ public final class IdServerMailServiceTest
       );
 
     this.mailService =
-      IdServerMailService.create(noop(), this.configuration);
+      IdServerMailService.create(noop(), this.events, this.configuration);
   }
 
   @AfterEach
@@ -128,12 +142,12 @@ public final class IdServerMailServiceTest
   @Override
   protected IdServerMailServiceType createInstanceA()
   {
-    return IdServerMailService.create(noop(), this.configuration);
+    return IdServerMailService.create(noop(), this.events, this.configuration);
   }
 
   @Override
   protected IdServerMailServiceType createInstanceB()
   {
-    return IdServerMailService.create(noop(), this.configuration);
+    return IdServerMailService.create(noop(), this.events, this.configuration);
   }
 }

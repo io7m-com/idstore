@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Section xmlns="urn:com.io7m.structural:8:0"
+         id="23281173-5a7d-4b0e-95d0-768fa81a44e2"
+         title="Monitoring">
+
+  <Subsection title="Overview">
+    <Paragraph>
+      The <Term type="package">idstore</Term> package is extensively instrumented with
+      <LinkExternal target="https://opentelemetry.io">OpenTelemetry</LinkExternal>
+      in order to allow for the server to be continually monitored. The package publishes
+      <Link target="52a79cba-d824-41e2-b9b2-07f3edf6c8b4">metrics</Link>,
+      logs, and traces, all of which can be independently enabled or disabled. Most installations will only want to
+      enable metrics or logs in production; traces are more useful when trying to diagnose performance
+      problems, or for doing actual development on the <Term type="package">idstore</Term> package.
+    </Paragraph>
+  </Subsection>
+
+  <Subsection title="Metrics" id="52a79cba-d824-41e2-b9b2-07f3edf6c8b4">
+    <Subsection title="Names">
+      <Paragraph>
+        The package publishes the following metrics that can be used for monitoring:
+      </Paragraph>
+      <FormalItem title="Metrics">
+        <Table type="genericTable">
+          <Columns>
+            <Column>Name</Column>
+            <Column>Description</Column>
+          </Columns>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_up</Term>
+            </Cell>
+            <Cell>
+              A gauge that displays a constant <Term type="constant">1</Term> value while the server is up.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_http_time</Term>
+            </Cell>
+            <Cell>
+              A gauge that logs the time each HTTP request has taken in nanoseconds.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_http_requests</Term>
+            </Cell>
+            <Cell>
+              A counter that is incremented every time an HTTP request is handled.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_http_requests_size</Term>
+            </Cell>
+            <Cell>
+              A counter that is incremented with the size of every HTTP request.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_http_responses_size</Term>
+            </Cell>
+            <Cell>
+              A counter that is incremented with the size of every produced HTTP response.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_http_responses_2xx</Term>
+            </Cell>
+            <Cell>
+              A counter that is incremented with every HTTP response that produces a 2xx status code.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_http_responses_4xx</Term>
+            </Cell>
+            <Cell>
+              A counter that is incremented with every HTTP response that produces a 4xx status code. A 4xx
+              status code should be understood to mean "blame the client".
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_http_responses_5xx</Term>
+            </Cell>
+            <Cell>
+              A counter that is incremented with every HTTP response that produces a 5xx status code. A 5xx
+              status code should be understood to mean "blame the server".
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_mail_ok</Term>
+            </Cell>
+            <Cell>
+              A counter that is incremented every time mail is sent successfully.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_mail_failed</Term>
+            </Cell>
+            <Cell>
+              A counter that is incremented every time mail fails to send correctly.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_mail_time</Term>
+            </Cell>
+            <Cell>
+              A gauge that logs the time each mail operation has taken in nanoseconds.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_ratelimit_triggers</Term>
+            </Cell>
+            <Cell>
+              A counter that is incremented every time a rate limit is violated.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_ratelimit_login_delay</Term>
+            </Cell>
+            <Cell>
+              A gauge that produces a constant value taken directly from the configured
+              <Link target="f50cff95-6a7e-4ae9-a190-b02004c60c52">user</Link>
+              and
+              <Link target="fd2f71be-33b2-43b2-8357-7453194c071b">admin</Link>
+              login delays. This metric is useful because login delays add significantly
+              to HTTP response times, and this metric can be used to subtract those delays
+              from the logged response times.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
+              <Term type="expression">idstore_sessions</Term>
+            </Cell>
+            <Cell>
+              A gauge that displays the number of currently active user or admin sessions.
+            </Cell>
+          </Row>
+        </Table>
+      </FormalItem>
+      <Paragraph>
+        Most metrics are labelled with various attributes that allow for distinguishing between
+        requests that occurred as part of the user service, or part of the admin service. Metrics
+        involving the mail system typically include the destination address as an attribute.
+      </Paragraph>
+      <Paragraph>
+        The package <Term type="term">may</Term> produce other metrics, however these are undocumented and
+        should not be relied upon.
+      </Paragraph>
+    </Subsection>
+  </Subsection>
+
+  <Subsection title="Grafana Dashboard" id="117e08a3-e1f3-4e22-b387-84ccc744bc61">
+    <Paragraph>
+      The <Term type="package">idstore</Term> package provides a basic
+      <LinkExternal target="https://grafana.com">Grafana</LinkExternal> dashboard. The dashboard
+      can be imported from
+      <LinkExternal
+        target="https://raw.githubusercontent.com/io7m/idstore/develop/com.io7m.idstore.grafana/src/main/resources/com/io7m/idstore/grafana/dashboard.json">
+        https://raw.githubusercontent.com/io7m/idstore/develop/com.io7m.idstore.grafana/src/main/resources/com/io7m/idstore/grafana/dashboard.json
+      </LinkExternal>.
+    </Paragraph>
+    <FormalItem title="Dashboard">
+      <Image source="dashboard.png" width="640" height="324">Dashboard</Image>
+    </FormalItem>
+  </Subsection>
+
+</Section>

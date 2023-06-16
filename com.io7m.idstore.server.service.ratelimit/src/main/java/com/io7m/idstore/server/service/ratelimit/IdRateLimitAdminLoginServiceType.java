@@ -17,13 +17,11 @@
 
 package com.io7m.idstore.server.service.ratelimit;
 
-import com.io7m.repetoir.core.RPServiceType;
-
 /**
  * A rate limiting service for admin logins.
  */
 
-public interface IdRateLimitAdminLoginServiceType extends RPServiceType
+public interface IdRateLimitAdminLoginServiceType extends IdRateLimiterType
 {
   /**
    * @param host The host performing the action

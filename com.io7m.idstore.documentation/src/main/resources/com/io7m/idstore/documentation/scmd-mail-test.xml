@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Section id="157840ab-7cc0-434a-a6a5-ee2fdbfd2848" title="mail-test" xmlns="urn:com.io7m.structural:8:0">
+  <Subsection title="Name">
+    <Paragraph>
+      <Term type="command">mail-test</Term>
+       - Send a test email.
+    </Paragraph>
+  </Subsection>
+  <Subsection title="Description">
+    <Paragraph>
+      The 
+      <Term type="command">mail-test</Term>
+       command checks to see if the mail system is working by sending a test email.
+    </Paragraph>
+    <Paragraph>
+      For obvious reasons, the command can only check that the <Term type="package">idstore</Term>
+      server is capable of sending mail through its configured mail service - it cannot automatically
+      verify that the target will actually receive the sent mail.
+    </Paragraph>
+    <FormalItem title="Parameters">
+      <Table type="parameterTable">
+        <Columns>
+          <Column>Parameter</Column>
+          <Column>Type</Column>
+          <Column>Cardinality</Column>
+          <Column>Default</Column>
+          <Column>Description</Column>
+        </Columns>
+        <Row>
+          <Cell>
+            <Term type="parameter">--email</Term>
+          </Cell>
+          <Cell>
+            <Term type="type">com.io7m.idstore.model.IdEmail</Term>
+          </Cell>
+          <Cell>
+            <Term type="expression">[1]</Term>
+          </Cell>
+          <Cell>
+            <Term type="constant"/>
+          </Cell>
+          <Cell>The target email address.</Cell>
+        </Row>
+        <Row>
+          <Cell>
+            <Term type="parameter">--token</Term>
+          </Cell>
+          <Cell>
+            <Term type="type">com.io7m.idstore.model.IdShortHumanToken</Term>
+          </Cell>
+          <Cell>
+            <Term type="expression">[0, 1]</Term>
+          </Cell>
+          <Cell>
+            <Term type="constant"/>
+          </Cell>
+          <Cell>The short token to include in the email. If a value is not provided, one is randomly generated.</Cell>
+        </Row>
+      </Table>
+    </FormalItem>
+  </Subsection>
+  <Subsection title="Example">
+    <FormalItem title="Example">
+      <Verbatim><![CDATA[[idstore]# mail-test --email user@example.com
+Mail sent successfully.
+Token: 220384
+]]></Verbatim>
+    </FormalItem>
+  </Subsection>
+</Section>
+

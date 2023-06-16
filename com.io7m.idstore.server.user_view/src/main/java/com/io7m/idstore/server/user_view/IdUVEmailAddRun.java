@@ -42,7 +42,9 @@ import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 
 /**
@@ -79,7 +81,7 @@ public final class IdUVEmailAddRun extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    return withInstrumentation(services, (request, information) -> {
+    return withInstrumentation(services, USER, (request, information) -> {
       return withAuthentication(
         services,
         (r0, info1, session, user) -> {
@@ -164,6 +166,7 @@ public final class IdUVEmailAddRun extends IdHTTPServletFunctional
         );
       }
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       session.messageCurrentSet(
         new IdSessionMessage(
           information.requestId(),
@@ -175,6 +178,7 @@ public final class IdUVEmailAddRun extends IdHTTPServletFunctional
         )
       );
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       session.messageCurrentSet(
         new IdSessionMessage(
           information.requestId(),

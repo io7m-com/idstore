@@ -16,9 +16,10 @@
 
 package com.io7m.idstore.tests.server.service.sessions;
 
+import com.io7m.idstore.server.service.metrics.IdMetricsService;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
-import io.opentelemetry.api.OpenTelemetry;
+import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 
 import java.time.Duration;
 
@@ -41,6 +42,9 @@ public final class IdSessionAdminServiceTest
   protected IdSessionAdminService createWithExpiration(
     final Duration expiration)
   {
-    return new IdSessionAdminService(OpenTelemetry.noop(), expiration);
+    return new IdSessionAdminService(
+      new IdMetricsService(IdServerTelemetryNoOp.noop()),
+      expiration
+    );
   }
 }

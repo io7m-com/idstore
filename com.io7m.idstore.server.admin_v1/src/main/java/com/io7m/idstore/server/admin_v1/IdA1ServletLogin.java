@@ -20,6 +20,7 @@ package com.io7m.idstore.server.admin_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
@@ -95,6 +96,7 @@ public final class IdA1ServletLogin extends IdHTTPServletFunctional
     return (request, information) -> {
       return withInstrumentation(
         services,
+        IdUserDomain.ADMIN,
         (req0, info0) -> {
           return withFixedDelay(
             services,

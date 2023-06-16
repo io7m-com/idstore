@@ -17,15 +17,13 @@
 
 package com.io7m.idstore.server.service.ratelimit;
 
-import com.io7m.repetoir.core.RPServiceType;
-
 import java.util.UUID;
 
 /**
  * A rate limiting service for email verifications.
  */
 
-public interface IdRateLimitEmailVerificationServiceType extends RPServiceType
+public interface IdRateLimitEmailVerificationServiceType extends IdRateLimiterType
 {
   /**
    * @param user The user ID

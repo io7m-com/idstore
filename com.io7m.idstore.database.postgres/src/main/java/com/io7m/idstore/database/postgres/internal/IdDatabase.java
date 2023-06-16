@@ -20,10 +20,10 @@ import com.io7m.idstore.database.api.IdDatabaseConnectionType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseRole;
 import com.io7m.idstore.database.api.IdDatabaseType;
-import com.io7m.idstore.model.IdVersion;
+import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.zaxxer.hikari.HikariDataSource;
-import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.metrics.LongCounter;
+import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import org.jooq.conf.RenderNameCase;
@@ -31,6 +31,7 @@ import org.jooq.conf.Settings;
 
 import java.sql.SQLException;
 import java.time.Clock;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,30 +51,35 @@ public final class IdDatabase implements IdDatabaseType
   private final HikariDataSource dataSource;
   private final Settings settings;
   private final Tracer tracer;
+  private final CloseableCollectionType<IdDatabaseException> resources;
   private final LongCounter transactions;
   private final LongCounter transactionCommits;
   private final LongCounter transactionRollbacks;
+  private volatile long connectionTimeNow;
 
   /**
    * The default postgres server database implementation.
    *
-   * @param telemetry    A telemetry interface
+   * @param inTracer     A telemetry tracer interface
+   * @param meter        A telemetry meter interface
    * @param inClock      The clock
    * @param inDataSource A pooled data source
+   * @param inResources  The resources to be closed
    */
 
   public IdDatabase(
-    final OpenTelemetry telemetry,
+    final Tracer inTracer,
+    final Meter meter,
     final Clock inClock,
-    final HikariDataSource inDataSource)
+    final HikariDataSource inDataSource,
+    final CloseableCollectionType<IdDatabaseException> inResources)
   {
-    Objects.requireNonNull(telemetry, "inOpenTelemetry");
-
     this.tracer =
-      telemetry.getTracer(
-        "com.io7m.idstore.database.postgres",
-        IdVersion.MAIN_VERSION
-      );
+      Objects.requireNonNull(inTracer, "tracer");
+    this.resources =
+      Objects.requireNonNull(inResources, "resources");
+    Objects.requireNonNull(meter, "meter");
+
     this.clock =
       Objects.requireNonNull(inClock, "clock");
     this.dataSource =
@@ -81,20 +87,26 @@ public final class IdDatabase implements IdDatabaseType
     this.settings =
       new Settings().withRenderNameCase(RenderNameCase.LOWER);
 
-    final var meters =
-      telemetry.meterBuilder(
-          "com.io7m.idstore.database.postgres")
-        .build();
-
     this.transactions =
-      meters.counterBuilder("IdDatabase.transactions")
+      meter.counterBuilder("idstore_db_transactions")
+        .setDescription("The number of completed transactions.")
         .build();
     this.transactionCommits =
-      meters.counterBuilder("IdDatabase.commits")
+      meter.counterBuilder("idstore_db_commits")
+        .setDescription("The number of database transaction commits.")
         .build();
     this.transactionRollbacks =
-      meters.counterBuilder("IdDatabase.commits")
+      meter.counterBuilder("idstore_db_rollbacks")
+        .setDescription("The number of database transaction rollbacks.")
         .build();
+    this.resources.add(
+      meter.gaugeBuilder("idstore_db_connection_time")
+        .setDescription("The amount of time a database connection is held.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(this.connectionTimeNow);
+        })
+    );
   }
 
   LongCounter counterTransactions()
@@ -114,8 +126,9 @@ public final class IdDatabase implements IdDatabaseType
 
   @Override
   public void close()
+    throws IdDatabaseException
   {
-    this.dataSource.close();
+    this.resources.close();
   }
 
   /**
@@ -140,9 +153,12 @@ public final class IdDatabase implements IdDatabaseType
         .startSpan();
 
     try {
+      span.addEvent("RequestConnection");
       final var conn = this.dataSource.getConnection();
+      span.addEvent("ObtainedConnection");
+      final var timeNow = OffsetDateTime.now();
       conn.setAutoCommit(false);
-      return new IdDatabaseConnection(this, conn, role, span);
+      return new IdDatabaseConnection(this, conn, timeNow, role, span);
     } catch (final SQLException e) {
       span.recordException(e);
       span.end();
@@ -186,5 +202,11 @@ public final class IdDatabase implements IdDatabaseType
   {
     return "[IdDatabase 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode(), 16));
+  }
+
+  void setConnectionTimeNow(
+    final long nanos)
+  {
+    this.connectionTimeNow = nanos;
   }
 }

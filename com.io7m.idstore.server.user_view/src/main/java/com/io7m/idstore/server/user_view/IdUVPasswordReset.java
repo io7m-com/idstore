@@ -33,6 +33,7 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 
 /**
@@ -62,7 +63,7 @@ public final class IdUVPasswordReset extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pagePasswordResetTemplate();
 
-    return withInstrumentation(services, (request, information) -> {
+    return withInstrumentation(services, USER, (request, information) -> {
       return execute(branding, template);
     });
   }

@@ -17,9 +17,13 @@
 package com.io7m.idstore.server.service.configuration;
 
 import com.io7m.idstore.server.api.IdServerConfiguration;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Objects;
+
+import static com.io7m.idstore.model.IdUserDomain.ADMIN;
+import static com.io7m.idstore.model.IdUserDomain.USER;
 
 /**
  * A service that exposes configuration information.
@@ -32,14 +36,21 @@ public final class IdServerConfigurationService implements RPServiceType
   /**
    * A service that exposes configuration information.
    *
+   * @param inMetrics       The metrics service
    * @param inConfiguration The configuration
    */
 
   public IdServerConfigurationService(
+    final IdMetricsServiceType inMetrics,
     final IdServerConfiguration inConfiguration)
   {
     this.configuration =
       Objects.requireNonNull(inConfiguration, "configuration");
+
+    inMetrics.onLoginPauseTime(
+      USER, inConfiguration.rateLimit().userLoginDelay());
+    inMetrics.onLoginPauseTime(
+      ADMIN, inConfiguration.rateLimit().adminLoginDelay());
   }
 
   @Override

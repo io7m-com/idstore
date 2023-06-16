@@ -34,6 +34,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
 
 /**
  * A service that performs nightly database maintenance.
@@ -153,7 +154,7 @@ public final class IdMaintenanceService
       }
     } catch (final Exception e) {
       LOG.error("maintenance task failed: ", e);
-      span.recordException(e);
+      recordSpanException(e);
     } finally {
       span.end();
     }

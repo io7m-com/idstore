@@ -20,6 +20,7 @@ package com.io7m.idstore.server.user_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
 import com.io7m.idstore.protocol.user.IdUResponseLogin;
@@ -52,6 +53,7 @@ import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreFixedDelay.withFixedDelay;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreTransactional.withTransaction;
 
 /**
@@ -95,6 +97,7 @@ public final class IdU1ServletLogin extends IdHTTPServletFunctional
     return (request, information) -> {
       return withInstrumentation(
         services,
+        IdUserDomain.USER,
         (req0, info0) -> {
           return withFixedDelay(
             services,
@@ -133,6 +136,7 @@ public final class IdU1ServletLogin extends IdHTTPServletFunctional
     } catch (final IOException e) {
       throw new UncheckedIOException(e);
     } catch (final IdException e) {
+      setSpanErrorCode(e.errorCode());
       return IdU1Errors.errorResponseOf(messages, information, BLAME_CLIENT, e);
     }
 
@@ -151,12 +155,14 @@ public final class IdU1ServletLogin extends IdHTTPServletFunctional
         meta
       );
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       return IdU1Errors.errorResponseOf(messages, information, e);
     }
 
     try {
       transaction.commit();
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       return IdU1Errors.errorResponseOf(messages, information, BLAME_SERVER, e);
     }
 

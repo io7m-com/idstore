@@ -17,8 +17,9 @@
 
 package com.io7m.idstore.server.service.ratelimit;
 
-import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +42,7 @@ public final class IdRateLimitEmailVerificationService
   /**
    * A rate limiting service for email verifications.
    *
-   * @param telemetry  The telemetry service
+   * @param metrics    The metrics service
    * @param expiration The expiration for tokens
    * @param timeUnit   The time unit for expirations
    *
@@ -49,16 +50,17 @@ public final class IdRateLimitEmailVerificationService
    */
 
   public static IdRateLimitEmailVerificationServiceType create(
-    final IdServerTelemetryServiceType telemetry,
+    final IdMetricsServiceType metrics,
     final long expiration,
     final TimeUnit timeUnit)
   {
     return new IdRateLimitEmailVerificationService(
       IdRateLimiter.create(
-        telemetry,
-        "IdRateLimitEmailVerification",
+        metrics,
+        "email_verification",
         expiration,
-        timeUnit)
+        timeUnit
+      )
     );
   }
 
@@ -84,5 +86,11 @@ public final class IdRateLimitEmailVerificationService
   {
     return "[IdRateLimitEmailVerificationService 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode(), 16));
+  }
+
+  @Override
+  public Duration waitTime()
+  {
+    return this.limiter.waitTime();
   }
 }

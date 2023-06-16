@@ -65,8 +65,8 @@ public final class IdMain implements Runnable
         Optional.of(URI.create("https://www.io7m.com/software/idstore/"))
       );
 
-    final var builder =
-      QApplication.builder(metadata);
+    final var builder = QApplication.builder(metadata);
+    builder.allowAtSyntax(true);
     builder.addCommand(new IdMCmdInitialize());
     builder.addCommand(new IdMCmdServer());
     builder.addCommand(new IdMCmdShell());

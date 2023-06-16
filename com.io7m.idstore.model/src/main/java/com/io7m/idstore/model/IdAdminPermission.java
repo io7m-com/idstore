@@ -231,6 +231,18 @@ public enum IdAdminPermission
     {
       return Set.of();
     }
+  },
+
+  /**
+   * A permission that allows testing the mail system.
+   */
+
+  MAIL_TEST {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
   };
 
   private static final Set<IdAdminPermission> ADMIN_WRITE_EMAIL_IMPLIES_SELF =

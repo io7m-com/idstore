@@ -11,7 +11,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0007</version>
+    <version>1.0.0-beta0008</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.admin_v1</artifactId>
@@ -49,6 +49,16 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.server.service.sessions</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.server.service.clock</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.server.service.metrics</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -120,6 +130,15 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-context</artifactId>
     </dependency>
 
     <dependency>

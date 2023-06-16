@@ -46,6 +46,12 @@ public record IdEventAdminLoginRateLimitExceeded(
   }
 
   @Override
+  public IdEventSeverity severity()
+  {
+    return IdEventSeverity.WARNING;
+  }
+
+  @Override
   public String name()
   {
     return "security.admin.login.rate_limit_exceeded";

@@ -36,6 +36,7 @@ public sealed interface IdSecAdminActionType
   IdSecAdminActionAdminRead,
   IdSecAdminActionAdminUpdate,
   IdSecAdminActionAuditRead,
+  IdSecAdminActionMailTest,
   IdSecAdminActionUserBanCreate,
   IdSecAdminActionUserBanDelete,
   IdSecAdminActionUserBanGet,

@@ -19,9 +19,9 @@ package com.io7m.idstore.server.service.ratelimit;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
-import io.opentelemetry.api.metrics.LongUpDownCounter;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -29,25 +29,33 @@ import java.util.concurrent.TimeUnit;
  * A trivial rate limiter.
  */
 
-public final class IdRateLimiter
+public final class IdRateLimiter implements IdRateLimiterType
 {
+  private final IdMetricsServiceType metrics;
   private final Cache<Operation, Operation> cache;
-  private final LongUpDownCounter sizeCounter;
+  private final String name;
+  private final Duration waitTime;
 
   private IdRateLimiter(
+    final IdMetricsServiceType inMetrics,
     final Cache<Operation, Operation> inCache,
-    final LongUpDownCounter inMeter)
+    final String inName,
+    final Duration inWaitTime)
   {
+    this.metrics =
+      Objects.requireNonNull(inMetrics, "metrics");
     this.cache =
       Objects.requireNonNull(inCache, "cache");
-    this.sizeCounter =
-      Objects.requireNonNull(inMeter, "inMeter");
+    this.name =
+      Objects.requireNonNull(inName, "name");
+    this.waitTime =
+      Objects.requireNonNull(inWaitTime, "inWaitTime");
   }
 
   /**
    * Create a rate limiter.
    *
-   * @param telemetry  The telemetry service
+   * @param metrics    The metrics service
    * @param name       The rate name
    * @param expiration The expiration for tokens
    * @param timeUnit   The time unit for expirations
@@ -56,27 +64,22 @@ public final class IdRateLimiter
    */
 
   public static IdRateLimiter create(
-    final IdServerTelemetryServiceType telemetry,
+    final IdMetricsServiceType metrics,
     final String name,
     final long expiration,
     final TimeUnit timeUnit)
   {
-    final var meters =
-      telemetry.openTelemetry()
-        .meterBuilder(name)
-        .build();
-
-    final var guage =
-      meters.upDownCounterBuilder("size")
-        .build();
-
     final Cache<Operation, Operation> cache =
       Caffeine.newBuilder()
         .expireAfterWrite(expiration, timeUnit)
-        .evictionListener((key, value, cause) -> guage.add(-1L))
         .build();
 
-    return new IdRateLimiter(cache, guage);
+    return new IdRateLimiter(
+      metrics,
+      cache,
+      name,
+      Duration.of(expiration, timeUnit.toChronoUnit())
+    );
   }
 
   /**
@@ -98,11 +101,16 @@ public final class IdRateLimiter
       this.cache.getIfPresent(op);
 
     if (existing != null) {
+      this.metrics.onRateLimitTriggered(
+        this.name,
+        host,
+        user,
+        operation
+      );
       return false;
     }
 
     this.cache.put(op, op);
-    this.sizeCounter.add(1L);
     return true;
   }
 
@@ -111,6 +119,18 @@ public final class IdRateLimiter
   {
     return "[IdRateLimiter %s]"
       .formatted(Integer.toUnsignedString(this.hashCode(), 16));
+  }
+
+  @Override
+  public Duration waitTime()
+  {
+    return this.waitTime;
+  }
+
+  @Override
+  public String description()
+  {
+    return "A basic rate limiter.";
   }
 
   private record Operation(

@@ -46,7 +46,9 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -84,7 +86,7 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    return withInstrumentation(services, (request, information) -> {
+    return withInstrumentation(services, USER, (request, information) -> {
       return withAuthentication(
         services,
         (req0, info0, session, user) -> {
@@ -162,6 +164,7 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
         return showConfirmed(strings, branding, template, information);
       }
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       session.messageCurrentSet(
         new IdSessionMessage(
           information.requestId(),
@@ -173,6 +176,7 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
         )
       );
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       session.messageCurrentSet(
         new IdSessionMessage(
           information.requestId(),

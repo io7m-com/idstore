@@ -16,12 +16,14 @@
 
 package com.io7m.idstore.database.postgres;
 
-import com.io7m.anethum.common.ParseException;
+import com.io7m.anethum.api.ParsingException;
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseFactoryType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.postgres.internal.IdDatabase;
+import com.io7m.jmulticlose.core.CloseableCollection;
+import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.trasco.api.TrEventExecutingSQL;
 import com.io7m.trasco.api.TrEventType;
 import com.io7m.trasco.api.TrEventUpgrading;
@@ -32,7 +34,8 @@ import com.io7m.trasco.vanilla.TrExecutors;
 import com.io7m.trasco.vanilla.TrSchemaRevisionSetParsers;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.metrics.Meter;
+import io.opentelemetry.api.trace.Tracer;
 import org.postgresql.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +73,6 @@ public final class IdDatabases implements IdDatabaseFactoryType
 
   /**
    * The default postgres server database implementation.
-   *
    */
 
   public IdDatabases()
@@ -159,13 +161,24 @@ public final class IdDatabases implements IdDatabaseFactoryType
   @Override
   public IdDatabaseType open(
     final IdDatabaseConfiguration configuration,
-    final OpenTelemetry openTelemetry,
+    final Tracer tracer,
+    final Meter meter,
     final Consumer<String> startupMessages)
     throws IdDatabaseException
   {
     Objects.requireNonNull(configuration, "configuration");
-    Objects.requireNonNull(openTelemetry, "openTelemetry");
+    Objects.requireNonNull(tracer, "tracer");
+    Objects.requireNonNull(meter, "meter");
     Objects.requireNonNull(startupMessages, "startupMessages");
+
+    final var resources = CloseableCollection.create(() -> {
+      return new IdDatabaseException(
+        "Closing a resource failed.",
+        SQL_ERROR,
+        Map.of(),
+        Optional.empty()
+      );
+    });
 
     try {
       final var url = new StringBuilder(128);
@@ -182,9 +195,10 @@ public final class IdDatabases implements IdDatabaseFactoryType
       config.setPassword(configuration.password());
       config.setAutoCommit(false);
 
-      final var dataSource = new HikariDataSource(config);
-      final var parsers = new TrSchemaRevisionSetParsers();
+      final var dataSource = resources.add(new HikariDataSource(config));
+      createMetricsMeters(meter, resources, dataSource);
 
+      final var parsers = new TrSchemaRevisionSetParsers();
       final TrSchemaRevisionSet revisions;
       try (var stream = IdDatabases.class.getResourceAsStream(
         "/com/io7m/idstore/database/postgres/internal/database.xml")) {
@@ -211,9 +225,11 @@ public final class IdDatabases implements IdDatabaseFactoryType
       }
 
       return new IdDatabase(
-        openTelemetry,
+        tracer,
+        meter,
         configuration.clock(),
-        dataSource
+        dataSource,
+        resources
       );
     } catch (final IOException e) {
       throw new IdDatabaseException(
@@ -231,7 +247,7 @@ public final class IdDatabases implements IdDatabaseFactoryType
         Map.of(),
         Optional.empty()
       );
-    } catch (final ParseException e) {
+    } catch (final ParsingException e) {
       throw new IdDatabaseException(
         requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
         e,
@@ -250,6 +266,59 @@ public final class IdDatabases implements IdDatabaseFactoryType
     }
   }
 
+  private static void createMetricsMeters(
+    final Meter meter,
+    final CloseableCollectionType<IdDatabaseException> resources,
+    final HikariDataSource dataSource)
+  {
+    final var dataSourceBean =
+      dataSource.getHikariPoolMXBean();
+
+    resources.add(
+      meter.gaugeBuilder("idstore_db_connections_active")
+        .setDescription("Number of active database connections.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(
+            Integer.toUnsignedLong(dataSourceBean.getActiveConnections())
+          );
+        })
+    );
+
+    resources.add(
+      meter.gaugeBuilder("idstore_db_connections_idle")
+        .setDescription("Number of idle database connections.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(
+            Integer.toUnsignedLong(dataSourceBean.getIdleConnections())
+          );
+        })
+    );
+
+    resources.add(
+      meter.gaugeBuilder("idstore_db_connections_total")
+        .setDescription("Total number of database connections.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(
+            Integer.toUnsignedLong(dataSourceBean.getTotalConnections())
+          );
+        })
+    );
+
+    resources.add(
+      meter.gaugeBuilder("idstore_db_threads_waiting")
+        .setDescription("Number of threads waiting for connections.")
+        .ofLongs()
+        .buildWithCallback(measurement -> {
+          measurement.record(
+            Integer.toUnsignedLong(dataSourceBean.getThreadsAwaitingConnection())
+          );
+        })
+    );
+  }
+
   private static void publishEvent(
     final Consumer<String> startupMessages,
     final String message)
@@ -266,7 +335,7 @@ public final class IdDatabases implements IdDatabaseFactoryType
     final Consumer<String> startupMessages,
     final TrEventType event)
   {
-    if (event instanceof TrEventExecutingSQL sql) {
+    if (event instanceof final TrEventExecutingSQL sql) {
       publishEvent(
         startupMessages,
         String.format("Executing SQL: %s", sql.statement())
@@ -274,7 +343,7 @@ public final class IdDatabases implements IdDatabaseFactoryType
       return;
     }
 
-    if (event instanceof TrEventUpgrading upgrading) {
+    if (event instanceof final TrEventUpgrading upgrading) {
       publishEvent(
         startupMessages,
         String.format(

@@ -23,6 +23,7 @@
   <xi:include href="install.xml"/>
   <xi:include href="configuration.xml"/>
   <xi:include href="model.xml"/>
+  <xi:include href="monitoring.xml"/>
   <xi:include href="cmdline.xml"/>
   <xi:include href="shell-admin.xml"/>
   <xi:include href="api.xml"/>

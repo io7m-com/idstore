@@ -41,6 +41,7 @@ import com.io7m.idstore.shell.admin.internal.IdAShellCmdAuditSearchPrevious;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdHelp;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdLogin;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdLogout;
+import com.io7m.idstore.shell.admin.internal.IdAShellCmdMailTest;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdSelf;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdSet;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserBanCreate;
@@ -141,6 +142,7 @@ public final class IdAShells implements IdAShellFactoryType
         new IdAShellCmdHelp(),
         new IdAShellCmdLogin(client),
         new IdAShellCmdLogout(client),
+        new IdAShellCmdMailTest(client),
         new IdAShellCmdSelf(client),
         new IdAShellCmdSet(options),
         new IdAShellCmdUserBanCreate(client),

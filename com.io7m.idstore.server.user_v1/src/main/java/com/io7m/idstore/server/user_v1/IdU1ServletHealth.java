@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.server.user_v1;
 
+import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.server.http.IdHTTPServletFunctional;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
 import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
@@ -56,6 +57,7 @@ public final class IdU1ServletHealth
     return (request, information) -> {
       return withInstrumentation(
         services,
+        IdUserDomain.USER,
         (req0, info0) -> execute(health)
       ).execute(request, information);
     };

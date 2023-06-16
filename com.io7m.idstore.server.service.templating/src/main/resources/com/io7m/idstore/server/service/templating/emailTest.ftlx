@@ -1,0 +1,10 @@
+[#ftl output_format="plainText"]
+
+Hello! This is an automated message from the ${productTitle} identity server.
+
+Your test token is:
+
+  ${token}
+
+Please note: This is an automated message, and it is not possible to reply to
+this email.

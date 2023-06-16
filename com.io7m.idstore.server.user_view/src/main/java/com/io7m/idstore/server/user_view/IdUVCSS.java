@@ -30,6 +30,7 @@ import java.io.UncheckedIOException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -72,7 +73,7 @@ public final class IdUVCSS extends IdHTTPServletFunctional
       throw new UncheckedIOException(e);
     }
 
-    return withInstrumentation(services, (request, information) -> {
+    return withInstrumentation(services, USER, (request, information) -> {
       return execute(request, branding, resetCssData);
     });
   }

@@ -44,6 +44,7 @@ import java.util.UUID;
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_v1.IdU1Errors.errorResponseOf;
 
 /**
@@ -119,6 +120,7 @@ public final class IdU1ServletCoreAuthenticated
     try {
       userOpt = this.userGet(userSession.userId());
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       return errorResponseOf(this.messages, information, BLAME_SERVER, e);
     }
 

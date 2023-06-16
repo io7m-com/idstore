@@ -9,7 +9,7 @@
   <parent>
     <groupId>com.io7m.idstore</groupId>
     <artifactId>com.io7m.idstore</artifactId>
-    <version>1.0.0-beta0007</version>
+    <version>1.0.0-beta0008</version>
   </parent>
   <artifactId>com.io7m.idstore.tests</artifactId>
 
@@ -142,6 +142,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.server.service.reqlimit</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.server.service.events</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

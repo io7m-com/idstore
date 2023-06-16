@@ -36,6 +36,7 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.Objects;
 
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -67,7 +68,7 @@ public final class IdUVMessage extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    return withInstrumentation(services, (request, information) -> {
+    return withInstrumentation(services, USER, (request, information) -> {
       return withAuthentication(
         services,
         (r0, info0, session, user) -> {

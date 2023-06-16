@@ -16,9 +16,13 @@
 
 package com.io7m.idstore.server.user_v1;
 
+import com.io7m.idstore.model.IdUserDomain;
+import com.io7m.idstore.server.http.IdHTTPRequestTimeFilter;
 import com.io7m.idstore.server.http.IdPlainErrorHandler;
 import com.io7m.idstore.server.http.IdServletHolders;
+import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -28,11 +32,15 @@ import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.DefaultSessionIdManager;
 import org.eclipse.jetty.server.session.NullSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.EnumSet;
+
+import static jakarta.servlet.DispatcherType.REQUEST;
 
 /**
  * A user API v1 server.
@@ -100,6 +108,21 @@ public final class IdU1Server
 
     final var servlets =
       createServletHolders(services);
+
+    /*
+     * Add a handler that tracks request/response time.
+     */
+
+    final var filterHolder =
+      new FilterHolder(
+        new IdHTTPRequestTimeFilter(
+          services.requireService(IdMetricsServiceType.class),
+          IdUserDomain.USER,
+          services.requireService(IdServerClock.class)
+        )
+      );
+
+    servlets.addFilter(filterHolder, "*", EnumSet.of(REQUEST));
 
     /*
      * Set up a session handler that allows for Servlets to have sessions

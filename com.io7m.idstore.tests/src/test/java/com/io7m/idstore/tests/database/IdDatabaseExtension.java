@@ -36,6 +36,7 @@ import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
+import com.io7m.idstore.model.IdVersion;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.jmulticlose.core.ClosingResourceFailedException;
@@ -174,7 +175,8 @@ public final class IdDatabaseExtension
     this.database =
       this.perTestResources.add(DATABASES.open(
         this.databaseConfiguration,
-        OpenTelemetry.noop(),
+        OpenTelemetry.noop().getTracer("com.io7m.idstore", IdVersion.MAIN_VERSION),
+        OpenTelemetry.noop().getMeter("com.io7m.idstore"),
         message -> {
 
         }

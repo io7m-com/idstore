@@ -47,6 +47,12 @@ public record IdEventAdminLoginAuthenticationFailed(
   }
 
   @Override
+  public IdEventSeverity severity()
+  {
+    return IdEventSeverity.WARNING;
+  }
+
+  @Override
   public String name()
   {
     return "security.admin.login.authentication_failed";

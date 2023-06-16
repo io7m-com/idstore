@@ -36,6 +36,7 @@ module com.io7m.idstore.server.service.telemetry.otp
   requires io.opentelemetry.sdk.trace;
   requires io.opentelemetry.sdk;
   requires io.opentelemetry.semconv;
+  requires io.opentelemetry.sdk.logs;
 
   provides IdServerTelemetryServiceFactoryType
     with IdServerTelemetryServices;

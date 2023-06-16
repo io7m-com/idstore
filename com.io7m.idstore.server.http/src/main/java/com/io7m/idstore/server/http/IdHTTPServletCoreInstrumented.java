@@ -17,6 +17,8 @@
 
 package com.io7m.idstore.server.http;
 
+import com.io7m.idstore.model.IdUserDomain;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.trace.SpanKind;
@@ -25,6 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.Objects;
 
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_CLIENT_IP;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_METHOD;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH;
@@ -40,21 +43,30 @@ import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_
 public final class IdHTTPServletCoreInstrumented
   implements IdHTTPServletFunctionalCoreType
 {
+  private final IdUserDomain domain;
   private final IdHTTPServletFunctionalCoreType core;
   private final IdServerTelemetryServiceType telemetry;
+  private final IdMetricsServiceType metrics;
 
   private IdHTTPServletCoreInstrumented(
     final RPServiceDirectoryType inServices,
+    final IdUserDomain inDomain,
     final IdHTTPServletFunctionalCoreType inCore)
   {
     this.telemetry =
       inServices.requireService(IdServerTelemetryServiceType.class);
+    this.metrics =
+      inServices.requireService(IdMetricsServiceType.class);
+    this.domain =
+      Objects.requireNonNull(inDomain, "inDomain");
+
     this.core =
       Objects.requireNonNull(inCore, "core");
   }
 
   /**
    * @param inServices The services
+   * @param inDomain The user domain
    * @param inCore     The core
    *
    * @return A servlet core that executes the given core with instrumentation
@@ -62,9 +74,10 @@ public final class IdHTTPServletCoreInstrumented
 
   public static IdHTTPServletFunctionalCoreType withInstrumentation(
     final RPServiceDirectoryType inServices,
+    final IdUserDomain inDomain,
     final IdHTTPServletFunctionalCoreType inCore)
   {
-    return new IdHTTPServletCoreInstrumented(inServices, inCore);
+    return new IdHTTPServletCoreInstrumented(inServices, inDomain, inCore);
   }
 
   @Override
@@ -90,16 +103,31 @@ public final class IdHTTPServletCoreInstrumented
         .setAttribute("http.request_id", information.requestId().toString())
         .startSpan();
 
+    this.metrics.onHttpRequested(this.domain);
+    this.metrics.onHttpRequestSize(this.domain, request.getContentLengthLong());
+
     try (var ignored = span.makeCurrent()) {
-      final var response =
-        this.core.execute(request, information);
+      final var response = this.core.execute(request, information);
+
+      final var code = response.statusCode();
+      if (code >= 400) {
+        if (code >= 500) {
+          this.metrics.onHttp5xx(this.domain);
+        } else {
+          this.metrics.onHttp4xx(this.domain);
+        }
+      } else {
+        this.metrics.onHttp2xx(this.domain);
+      }
+
       span.setAttribute(HTTP_STATUS_CODE, response.statusCode());
       response.contentLengthOptional().ifPresent(size -> {
         span.setAttribute(HTTP_RESPONSE_CONTENT_LENGTH, Long.valueOf(size));
+        this.metrics.onHttpResponseSize(this.domain, size);
       });
       return response;
     } catch (final Throwable e) {
-      span.recordException(e);
+      recordSpanException(e);
       throw e;
     } finally {
       span.end();

@@ -34,6 +34,7 @@ import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
@@ -46,7 +47,6 @@ import com.io7m.idstore.tests.server.api.IdServerConfigurationsTest;
 import com.io7m.repetoir.core.RPServiceDirectory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mockito;
 import org.mockito.internal.verification.Times;
 
 import java.nio.file.Path;
@@ -55,6 +55,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+
+import static org.mockito.Mockito.mock;
 
 public abstract class IdUCmdAbstractContract
 {
@@ -71,6 +73,7 @@ public abstract class IdUCmdAbstractContract
   private IdServerBrandingServiceType branding;
   private IdRateLimitEmailVerificationServiceType rateLimit;
   private IdEventServiceType eventService;
+  private IdMetricsServiceType metrics;
 
   protected final Times once()
   {
@@ -143,7 +146,7 @@ public abstract class IdUCmdAbstractContract
     this.services =
       new RPServiceDirectory();
     this.transaction =
-      Mockito.mock(IdDatabaseTransactionType.class);
+      mock(IdDatabaseTransactionType.class);
 
     this.clock =
       new IdFakeClock();
@@ -154,17 +157,19 @@ public abstract class IdUCmdAbstractContract
     this.strings =
       new IdServerStrings(Locale.ROOT);
     this.templates =
-      Mockito.mock(IdFMTemplateServiceType.class);
+      mock(IdFMTemplateServiceType.class);
+    this.metrics =
+      mock(IdMetricsServiceType.class);
     this.configurations =
-      new IdServerConfigurationService(configuration);
+      new IdServerConfigurationService(this.metrics, configuration);
     this.mail =
-      Mockito.mock(IdServerMailServiceType.class);
+      mock(IdServerMailServiceType.class);
     this.branding =
-      Mockito.mock(IdServerBrandingServiceType.class);
+      mock(IdServerBrandingServiceType.class);
     this.rateLimit =
-      Mockito.mock(IdRateLimitEmailVerificationServiceType.class);
+      mock(IdRateLimitEmailVerificationServiceType.class);
     this.eventService =
-      Mockito.mock(IdEventServiceType.class);
+      mock(IdEventServiceType.class);
 
     this.services.register(
       IdServerClock.class,

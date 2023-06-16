@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0007</version>
+    <version>1.0.0-beta0008</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.service.configuration</artifactId>
@@ -21,7 +21,17 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.server.api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.server.service.metrics</artifactId>
       <version>${project.version}</version>
     </dependency>
 

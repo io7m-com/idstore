@@ -19,6 +19,7 @@ package com.io7m.idstore.server.service.health;
 
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
+import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import com.io7m.repetoir.core.RPServiceType;
 
@@ -37,12 +38,16 @@ public final class IdServerHealth implements RPServiceType, AutoCloseable
 {
   private final IdDatabaseType database;
   private final ScheduledExecutorService executor;
+  private final IdServerTelemetryServiceType telemetry;
   private volatile String status;
 
   private IdServerHealth(
+    final IdServerTelemetryServiceType inTelemetry,
     final IdDatabaseType inDatabase,
     final ScheduledExecutorService inExecutor)
   {
+    this.telemetry =
+      Objects.requireNonNull(inTelemetry, "inTelemetry");
     this.database =
       Objects.requireNonNull(inDatabase, "database");
     this.executor =
@@ -65,10 +70,19 @@ public final class IdServerHealth implements RPServiceType, AutoCloseable
 
   private void updateHealthStatus()
   {
-    try (var ignored = this.database.openConnection(IDSTORE_READ_ONLY)) {
-      this.status = statusOKText();
-    } catch (final IdDatabaseException e) {
-      this.status = "UNHEALTHY DATABASE (%s)".formatted(e.getMessage());
+    final var span =
+      this.telemetry.tracer()
+        .spanBuilder("IdServerHealth")
+        .startSpan();
+
+    try (var ignored1 = span.makeCurrent()) {
+      try (var ignored2 = this.database.openConnection(IDSTORE_READ_ONLY)) {
+        this.status = statusOKText();
+      } catch (final IdDatabaseException e) {
+        this.status = "UNHEALTHY DATABASE (%s)".formatted(e.getMessage());
+      }
+    } finally {
+      span.end();
     }
   }
 
@@ -85,6 +99,8 @@ public final class IdServerHealth implements RPServiceType, AutoCloseable
   {
     final var database =
       services.requireService(IdDatabaseType.class);
+    final var telemetry =
+      services.requireService(IdServerTelemetryServiceType.class);
 
     final var executor =
       Executors.newSingleThreadScheduledExecutor(r -> {
@@ -97,7 +113,7 @@ public final class IdServerHealth implements RPServiceType, AutoCloseable
         return thread;
       });
 
-    return new IdServerHealth(database, executor);
+    return new IdServerHealth(telemetry, database, executor);
   }
 
   /**

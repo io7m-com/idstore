@@ -16,9 +16,10 @@
 
 package com.io7m.idstore.server.service.events;
 
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
-import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.logs.Severity;
 import io.opentelemetry.api.trace.Span;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,26 +37,35 @@ public final class IdEventService implements IdEventServiceType
   private static final Logger LOG =
     LoggerFactory.getLogger(IdEventService.class);
 
+  private final io.opentelemetry.api.logs.Logger logger;
+  private final IdMetricsServiceType metrics;
+
   private IdEventService(
-    final IdServerTelemetryServiceType inTelemetry)
+    final IdServerTelemetryServiceType inTelemetry,
+    final IdMetricsServiceType inMetrics)
   {
     Objects.requireNonNull(inTelemetry, "inTelemetry");
+
+    this.metrics =
+      Objects.requireNonNull(inMetrics, "inMetrics");
+    this.logger =
+      inTelemetry.logger();
   }
 
   /**
    * Create a new event service.
    *
-   * @param services The service directory
+   * @param telemetry The telemetry service
+   * @param metrics   The metrics service
    *
    * @return The event service
    */
 
   public static IdEventServiceType create(
-    final RPServiceDirectoryType services)
+    final IdServerTelemetryServiceType telemetry,
+    final IdMetricsServiceType metrics)
   {
-    return new IdEventService(
-      services.requireService(IdServerTelemetryServiceType.class)
-    );
+    return new IdEventService(telemetry, metrics);
   }
 
   @Override
@@ -64,19 +74,53 @@ public final class IdEventService implements IdEventServiceType
   {
     Objects.requireNonNull(event, "event");
 
-    var builder =
-      LOG.makeLoggingEventBuilder(Level.INFO)
-        .setMessage(event.message());
+    this.logToTelemetry(event);
+    this.logToMetrics(event);
+  }
 
-    final var eventAttributes = Attributes.builder();
+  private void logToMetrics(
+    final IdEventType event)
+  {
+    if (event instanceof final IdEventMailSent s) {
+      this.metrics.onMailSent(s.to(), s.time());
+    }
+    if (event instanceof final IdEventMailFailed f) {
+      this.metrics.onMailFailed(f.to(), f.time());
+    }
+  }
+
+  private void logToTelemetry(
+    final IdEventType event)
+  {
+    var builder =
+      LOG.makeLoggingEventBuilder(
+        switch (event.severity()) {
+          case INFO -> Level.INFO;
+          case ERROR -> Level.ERROR;
+          case WARNING -> Level.WARN;
+        }).setMessage(event.message());
+
+    final var eventAttributeBuilder = Attributes.builder();
     for (final var entry : event.asAttributes().entrySet()) {
-      eventAttributes.put(entry.getKey(), entry.getValue());
+      eventAttributeBuilder.put(entry.getKey(), entry.getValue());
       builder = builder.addKeyValue(entry.getKey(), entry.getValue());
     }
-
-    Span.current()
-      .addEvent(event.name(), eventAttributes.build(), Instant.now());
     builder.log();
+
+    final var attributes =
+      eventAttributeBuilder.build();
+    Span.current()
+      .addEvent(event.name(), attributes, Instant.now());
+
+    this.logger.logRecordBuilder()
+      .setAllAttributes(attributes)
+      .setBody(event.message())
+      .setSeverity(
+        switch (event.severity()) {
+          case ERROR -> Severity.ERROR;
+          case INFO -> Severity.INFO;
+          case WARNING -> Severity.WARN;
+        }).emit();
   }
 
   @Override

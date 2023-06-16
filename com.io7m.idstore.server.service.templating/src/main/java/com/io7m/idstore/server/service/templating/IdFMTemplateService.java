@@ -169,6 +169,14 @@ public final class IdFMTemplateService implements IdFMTemplateServiceType
     );
   }
 
+  @Override
+  public IdFMTemplateType<IdFMEmailTestData> emailTestTemplate()
+  {
+    return new IdGenericTemplate<>(
+      this.findTemplate("emailTest")
+    );
+  }
+
   private static final class IdGenericTemplate<T extends IdFMDataModelType>
     implements IdFMTemplateType<T>
   {

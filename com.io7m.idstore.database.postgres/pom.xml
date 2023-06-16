@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0007</version>
+    <version>1.0.0-beta0008</version>
   </parent>
 
   <artifactId>com.io7m.idstore.database.postgres</artifactId>
@@ -52,6 +52,10 @@
       <artifactId>com.io7m.jdeferthrow.core</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.io7m.jmulticlose</groupId>
+      <artifactId>com.io7m.jmulticlose.core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.io7m.trasco</groupId>
       <artifactId>com.io7m.trasco.api</artifactId>
     </dependency>
@@ -64,16 +68,16 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.io7m.anethum</groupId>
-      <artifactId>com.io7m.anethum.common</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.io7m.jaffirm</groupId>
       <artifactId>com.io7m.jaffirm.core</artifactId>
     </dependency>
     <dependency>
       <groupId>com.io7m.jqpage</groupId>
       <artifactId>com.io7m.jqpage.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.anethum</groupId>
+      <artifactId>com.io7m.anethum.api</artifactId>
     </dependency>
 
     <dependency>

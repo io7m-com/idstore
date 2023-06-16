@@ -18,7 +18,9 @@
 package com.io7m.idstore.server.service.telemetry.otp.internal;
 
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
-import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.logs.Logger;
+import io.opentelemetry.api.metrics.Meter;
+import io.opentelemetry.api.metrics.ObservableLongGauge;
 import io.opentelemetry.api.trace.Tracer;
 
 import java.util.Objects;
@@ -28,26 +30,38 @@ import java.util.Objects;
  */
 
 public final class IdServerTelemetryService
-  implements IdServerTelemetryServiceType
+  implements AutoCloseable, IdServerTelemetryServiceType
 {
-  private final OpenTelemetry openTelemetry;
   private final Tracer tracer;
+  private final Meter meter;
+  private final Logger logger;
+  private final ObservableLongGauge up;
 
   /**
    * An OpenTelemetry service.
    *
-   * @param inOpenTelemetry The OT instance
-   * @param inTracer        The tracer instance
+   * @param inTracer The tracer instance
+   * @param inMeter  The meter instance
+   * @param inLogger The logger instance
    */
 
   public IdServerTelemetryService(
-    final OpenTelemetry inOpenTelemetry,
-    final Tracer inTracer)
+    final Tracer inTracer,
+    final Meter inMeter,
+    final Logger inLogger)
   {
-    this.openTelemetry =
-      Objects.requireNonNull(inOpenTelemetry, "openTelemetry");
     this.tracer =
       Objects.requireNonNull(inTracer, "tracer");
+    this.meter =
+      Objects.requireNonNull(inMeter, "meter");
+    this.logger =
+      Objects.requireNonNull(inLogger, "logger");
+
+    this.up =
+      this.meter.gaugeBuilder("idstore_up")
+        .setDescription("The idstore server is up.")
+        .ofLongs()
+        .buildWithCallback(m -> m.record(1L));
   }
 
   @Override
@@ -70,8 +84,20 @@ public final class IdServerTelemetryService
   }
 
   @Override
-  public OpenTelemetry openTelemetry()
+  public Meter meter()
   {
-    return this.openTelemetry;
+    return this.meter;
+  }
+
+  @Override
+  public Logger logger()
+  {
+    return this.logger;
+  }
+
+  @Override
+  public void close()
+  {
+    this.up.close();
   }
 }

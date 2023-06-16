@@ -45,7 +45,9 @@ import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 
 /**
  * The endpoint that allows for completing email verification challenges.
@@ -81,7 +83,7 @@ public final class IdUVEmailVerificationDeny
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    return withInstrumentation(services, (request, information) -> {
+    return withInstrumentation(services, USER, (request, information) -> {
       return execute(
         services,
         strings,
@@ -133,6 +135,7 @@ public final class IdUVEmailVerificationDeny
         tokenParameter.get()
       );
     } catch (final IdDatabaseException e) {
+      setSpanErrorCode(e.errorCode());
       return IdUVErrorPage.showError(
         strings,
         branding,
@@ -143,6 +146,7 @@ public final class IdUVEmailVerificationDeny
         DESTINATION_ON_FAILURE
       );
     } catch (final IdCommandExecutionFailure e) {
+      setSpanErrorCode(e.errorCode());
       return IdUVErrorPage.showError(
         strings,
         branding,

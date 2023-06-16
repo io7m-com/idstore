@@ -40,13 +40,15 @@ import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.events.IdEventUserLoggedIn;
 import com.io7m.idstore.server.service.events.IdEventUserLoginAuthenticationFailed;
 import com.io7m.idstore.server.service.events.IdEventUserLoginRateLimitExceeded;
+import com.io7m.idstore.server.service.metrics.IdMetricsService;
+import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitUserLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
+import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.tests.IdFakeClock;
 import com.io7m.idstore.tests.IdTestDirectories;
 import com.io7m.idstore.tests.server.api.IdServerConfigurationsTest;
 import com.io7m.idstore.tests.server.service.IdServiceContract;
-import io.opentelemetry.api.OpenTelemetry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -91,6 +93,7 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
   private Path directory;
   private IdRateLimitUserLoginServiceType rateLimit;
   private IdEventServiceType events;
+  private IdMetricsServiceType metrics;
 
   private static Times once()
   {
@@ -152,7 +155,10 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     this.strings =
       new IdServerStrings(Locale.ROOT);
     this.sessions =
-      new IdSessionUserService(OpenTelemetry.noop(), Duration.ofDays(1L));
+      new IdSessionUserService(
+        new IdMetricsService(IdServerTelemetryNoOp.noop()),
+        Duration.ofDays(1L)
+      );
     this.rateLimit =
       mock(IdRateLimitUserLoginServiceType.class);
     this.events =
@@ -161,8 +167,10 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
     when(this.rateLimit.isAllowedByRateLimit(any()))
       .thenReturn(Boolean.TRUE);
 
+    this.metrics =
+      mock(IdMetricsServiceType.class);
     this.configurationService =
-      new IdServerConfigurationService(configuration);
+      new IdServerConfigurationService(this.metrics, configuration);
     this.login =
       new IdUserLoginService(
         this.serverClock,
