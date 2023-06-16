@@ -14,22 +14,21 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.server.service.telemetry.api;
 
-package com.io7m.idstore.server.service.events;
-
-import java.util.UUID;
+import com.io7m.repetoir.core.RPServiceType;
 
 /**
- * Events involving authenticated administrators.
+ * The event service.
  */
 
-public sealed interface IdEventAdminType
-  extends IdEventType
-  permits IdEventAdminLoggedIn, IdEventAdminLoginAuthenticationFailed
+public interface IdEventServiceType extends RPServiceType
 {
   /**
-   * @return The authenticated administrator
+   * Emit an event.
+   *
+   * @param event The event
    */
 
-  UUID adminId();
+  void emit(IdEventType event);
 }

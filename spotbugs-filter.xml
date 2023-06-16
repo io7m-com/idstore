@@ -570,7 +570,7 @@
 
   <!-- Pattern matching... -->
   <Match>
-    <Class name="com.io7m.idstore.server.service.events.IdEventService"/>
+    <Class name="com.io7m.idstore.server.service.telemetry.api.IdEventService"/>
     <Method name="logToMetrics"/>
     <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
   </Match>
@@ -578,14 +578,14 @@
   <!-- Record types. -->
   <Match>
     <Or>
-      <Class name="com.io7m.idstore.server.service.events.IdEventAdminLoggedIn"/>
-      <Class name="com.io7m.idstore.server.service.events.IdEventAdminLoginAuthenticationFailed"/>
-      <Class name="com.io7m.idstore.server.service.events.IdEventAdminLoginRateLimitExceeded"/>
-      <Class name="com.io7m.idstore.server.service.events.IdEventUserEmailVerificationRateLimitExceeded"/>
-      <Class name="com.io7m.idstore.server.service.events.IdEventUserLoggedIn"/>
-      <Class name="com.io7m.idstore.server.service.events.IdEventUserLoginAuthenticationFailed"/>
-      <Class name="com.io7m.idstore.server.service.events.IdEventUserLoginRateLimitExceeded"/>
-      <Class name="com.io7m.idstore.server.service.events.IdEventUserPasswordResetRateLimitExceeded"/>
+      <Class name="com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoggedIn"/>
+      <Class name="com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoginAuthenticationFailed"/>
+      <Class name="com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoginRateLimitExceeded"/>
+      <Class name="com.io7m.idstore.server.service.telemetry.api.IdEventUserEmailVerificationRateLimitExceeded"/>
+      <Class name="com.io7m.idstore.server.service.telemetry.api.IdEventUserLoggedIn"/>
+      <Class name="com.io7m.idstore.server.service.telemetry.api.IdEventUserLoginAuthenticationFailed"/>
+      <Class name="com.io7m.idstore.server.service.telemetry.api.IdEventUserLoginRateLimitExceeded"/>
+      <Class name="com.io7m.idstore.server.service.telemetry.api.IdEventUserPasswordResetRateLimitExceeded"/>
     </Or>
     <Or>
       <Bug pattern="EI_EXPOSE_REP"/>

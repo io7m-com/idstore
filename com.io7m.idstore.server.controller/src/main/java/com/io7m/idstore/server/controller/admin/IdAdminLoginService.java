@@ -25,12 +25,12 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
-import com.io7m.idstore.server.service.events.IdEventAdminLoggedIn;
-import com.io7m.idstore.server.service.events.IdEventAdminLoginAuthenticationFailed;
-import com.io7m.idstore.server.service.events.IdEventAdminLoginRateLimitExceeded;
-import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
+import com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoggedIn;
+import com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoginAuthenticationFailed;
+import com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoginRateLimitExceeded;
+import com.io7m.idstore.server.service.telemetry.api.IdEventServiceType;
 import com.io7m.repetoir.core.RPServiceType;
 import com.io7m.seltzer.api.SStructuredErrorType;
 

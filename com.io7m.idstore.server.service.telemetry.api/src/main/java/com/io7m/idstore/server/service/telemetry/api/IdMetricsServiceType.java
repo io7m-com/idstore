@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.service.metrics;
+package com.io7m.idstore.server.service.telemetry.api;
 
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdUserDomain;

@@ -14,20 +14,53 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.server.service.telemetry.api;
+
+import java.util.Map;
+
 /**
- * Identity server (Events service)
+ * The base type of events.
  */
 
-module com.io7m.idstore.server.service.events
+public sealed interface IdEventType
+  permits IdEventAdminLoginRateLimitExceeded,
+  IdEventAdminType,
+  IdEventMailFailed,
+  IdEventMailSent,
+  IdEventUserLoginRateLimitExceeded,
+  IdEventUserPasswordResetRateLimitExceeded,
+  IdEventUserType
 {
-  requires static org.osgi.annotation.bundle;
-  requires static org.osgi.annotation.versioning;
+  /**
+   * @return The event domain
+   */
 
-  requires com.io7m.idstore.server.service.telemetry.api;
-  requires com.io7m.idstore.server.service.metrics;
+  default String domain()
+  {
+    return "server";
+  }
 
-  requires transitive com.io7m.repetoir.core;
-  requires org.slf4j;
+  /**
+   * @return The event severity
+   */
 
-  exports com.io7m.idstore.server.service.events;
+  IdEventSeverity severity();
+
+  /**
+   * @return The event name
+   */
+
+  String name();
+
+  /**
+   * @return The formatted event message
+   */
+
+  String message();
+
+  /**
+   * @return The complete event attributes
+   */
+
+  Map<String, String> asAttributes();
 }

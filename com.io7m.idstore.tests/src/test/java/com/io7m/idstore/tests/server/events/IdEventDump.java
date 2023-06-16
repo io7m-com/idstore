@@ -18,15 +18,15 @@
 package com.io7m.idstore.tests.server.events;
 
 import com.io7m.idstore.model.IdEmail;
-import com.io7m.idstore.server.service.events.IdEventAdminLoggedIn;
-import com.io7m.idstore.server.service.events.IdEventAdminLoginAuthenticationFailed;
-import com.io7m.idstore.server.service.events.IdEventAdminLoginRateLimitExceeded;
-import com.io7m.idstore.server.service.events.IdEventType;
-import com.io7m.idstore.server.service.events.IdEventUserEmailVerificationRateLimitExceeded;
-import com.io7m.idstore.server.service.events.IdEventUserLoggedIn;
-import com.io7m.idstore.server.service.events.IdEventUserLoginAuthenticationFailed;
-import com.io7m.idstore.server.service.events.IdEventUserLoginRateLimitExceeded;
-import com.io7m.idstore.server.service.events.IdEventUserPasswordResetRateLimitExceeded;
+import com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoggedIn;
+import com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoginAuthenticationFailed;
+import com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoginRateLimitExceeded;
+import com.io7m.idstore.server.service.telemetry.api.IdEventType;
+import com.io7m.idstore.server.service.telemetry.api.IdEventUserEmailVerificationRateLimitExceeded;
+import com.io7m.idstore.server.service.telemetry.api.IdEventUserLoggedIn;
+import com.io7m.idstore.server.service.telemetry.api.IdEventUserLoginAuthenticationFailed;
+import com.io7m.idstore.server.service.telemetry.api.IdEventUserLoginRateLimitExceeded;
+import com.io7m.idstore.server.service.telemetry.api.IdEventUserPasswordResetRateLimitExceeded;
 
 import java.util.List;
 import java.util.TreeMap;

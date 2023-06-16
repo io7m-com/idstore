@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0008</version>
+    <version>1.0.0-beta0009</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.service.configuration</artifactId>
@@ -31,7 +31,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>com.io7m.idstore.server.service.metrics</artifactId>
+      <artifactId>com.io7m.idstore.server.service.telemetry.api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

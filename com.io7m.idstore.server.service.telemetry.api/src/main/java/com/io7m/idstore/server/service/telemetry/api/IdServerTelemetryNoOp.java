@@ -33,11 +33,13 @@ public final class IdServerTelemetryNoOp
   private final Tracer tracer;
   private final Meter meter;
   private final Logger logger;
+  private final boolean isNoOp;
 
   private IdServerTelemetryNoOp(
     final Tracer inTracer,
     final Meter inMeter,
-    final Logger inLogger)
+    final Logger inLogger,
+    final boolean noOp)
   {
     this.tracer =
       Objects.requireNonNull(inTracer, "tracer");
@@ -45,6 +47,7 @@ public final class IdServerTelemetryNoOp
       Objects.requireNonNull(inMeter, "inMeter");
     this.logger =
       Objects.requireNonNull(inLogger, "inLogger");
+    this.isNoOp = noOp;
   }
 
   /**
@@ -57,7 +60,8 @@ public final class IdServerTelemetryNoOp
     return new IdServerTelemetryNoOp(
       noop.getTracer("noop"),
       noop.getMeter("noop"),
-      noop.getLogsBridge().get("noop")
+      noop.getLogsBridge().get("noop"),
+      true
     );
   }
 
@@ -81,6 +85,12 @@ public final class IdServerTelemetryNoOp
   public Logger logger()
   {
     return this.logger;
+  }
+
+  @Override
+  public boolean isNoOp()
+  {
+    return this.isNoOp;
   }
 
   @Override

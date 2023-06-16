@@ -22,6 +22,7 @@ import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseCreate;
 import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.database.api.IdDatabaseTelemetry;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUpgrade;
@@ -171,12 +172,20 @@ public final class IdDatabaseExtension
         Clock.systemUTC()
       );
 
+    final var telemetry =
+      new IdDatabaseTelemetry(
+        true,
+        OpenTelemetry.noop()
+          .getMeter("com.io7m.idstore"),
+        OpenTelemetry.noop()
+          .getTracer("com.io7m.idstore", IdVersion.MAIN_VERSION)
+      );
+
     this.perTestResources = CloseableCollection.create();
     this.database =
       this.perTestResources.add(DATABASES.open(
         this.databaseConfiguration,
-        OpenTelemetry.noop().getTracer("com.io7m.idstore", IdVersion.MAIN_VERSION),
-        OpenTelemetry.noop().getMeter("com.io7m.idstore"),
+        telemetry,
         message -> {
 
         }

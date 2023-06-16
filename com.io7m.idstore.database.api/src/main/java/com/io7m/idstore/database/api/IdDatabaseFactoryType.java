@@ -17,9 +17,6 @@
 
 package com.io7m.idstore.database.api;
 
-import io.opentelemetry.api.metrics.Meter;
-import io.opentelemetry.api.trace.Tracer;
-
 import java.util.function.Consumer;
 
 /**
@@ -38,8 +35,7 @@ public interface IdDatabaseFactoryType
    * Open a database.
    *
    * @param configuration   The database configuration
-   * @param tracer          The telemetry tracer instance
-   * @param meter           The telemetry meter instance
+   * @param telemetry       The telemetry
    * @param startupMessages A function that will receive startup messages
    *
    * @return A database
@@ -49,8 +45,7 @@ public interface IdDatabaseFactoryType
 
   IdDatabaseType open(
     IdDatabaseConfiguration configuration,
-    Tracer tracer,
-    Meter meter,
+    IdDatabaseTelemetry telemetry,
     Consumer<String> startupMessages)
     throws IdDatabaseException;
 }

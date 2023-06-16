@@ -20,6 +20,7 @@ import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseCreate;
 import com.io7m.idstore.database.api.IdDatabaseException;
+import com.io7m.idstore.database.api.IdDatabaseTelemetry;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUpgrade;
 import com.io7m.idstore.error_codes.IdErrorCode;
@@ -43,14 +44,10 @@ import com.io7m.idstore.server.service.branding.IdServerBrandingService;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
-import com.io7m.idstore.server.service.events.IdEventService;
-import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.health.IdServerHealth;
 import com.io7m.idstore.server.service.mail.IdServerMailService;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.maintenance.IdMaintenanceService;
-import com.io7m.idstore.server.service.metrics.IdMetricsService;
-import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitEmailVerificationService;
@@ -62,6 +59,10 @@ import com.io7m.idstore.server.service.ratelimit.IdRateLimitUserLoginServiceType
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
+import com.io7m.idstore.server.service.telemetry.api.IdEventService;
+import com.io7m.idstore.server.service.telemetry.api.IdEventServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdMetricsService;
+import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceFactoryType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
@@ -74,9 +75,7 @@ import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.repetoir.core.RPServiceDirectory;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.SpanKind;
-import io.opentelemetry.api.trace.Tracer;
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,12 +170,15 @@ public final class IdServer implements IdServerType
     throws IdServerException
   {
     try {
-      this.database =
-        this.resources.add(
-          this.createDatabase(
-            this.telemetry.tracer(),
-            this.telemetry.meter())
+      final var dbTelemetry =
+        new IdDatabaseTelemetry(
+          this.telemetry.isNoOp(),
+          this.telemetry.meter(),
+          this.telemetry.tracer()
         );
+
+      this.database =
+        this.resources.add(this.createDatabase(dbTelemetry));
       final var services =
         this.resources.add(this.createServiceDirectory(this.database));
 
@@ -398,15 +400,13 @@ public final class IdServer implements IdServerType
   }
 
   private IdDatabaseType createDatabase(
-    final Tracer tracer,
-    final Meter meter)
+    final IdDatabaseTelemetry dbTelemetry)
     throws IdDatabaseException
   {
     return this.configuration.databases()
       .open(
         this.configuration.databaseConfiguration(),
-        tracer,
-        meter,
+        dbTelemetry,
         event -> {
 
         });
@@ -493,9 +493,13 @@ public final class IdServer implements IdServerType
             this.configuration.databases()
               .open(
                 setupConfiguration,
-                this.telemetry.tracer(),
-                this.telemetry.meter(),
+                new IdDatabaseTelemetry(
+                  this.telemetry.isNoOp(),
+                  this.telemetry.meter(),
+                  this.telemetry.tracer()
+                ),
                 event -> {
+
                 }));
 
         final var password =

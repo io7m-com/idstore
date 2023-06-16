@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.server.service.ratelimit;
 
-import com.io7m.idstore.server.service.metrics.IdMetricsServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 
 import java.time.Duration;
 import java.util.Objects;

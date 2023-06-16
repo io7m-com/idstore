@@ -40,9 +40,9 @@ import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetServic
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
-import com.io7m.idstore.server.service.events.IdEventServiceType;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitPasswordResetServiceType;
+import com.io7m.idstore.server.service.telemetry.api.IdEventServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.idstore.server.service.templating.IdFMEmailPasswordResetData;

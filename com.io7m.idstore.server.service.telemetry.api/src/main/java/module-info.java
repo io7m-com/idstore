@@ -23,6 +23,9 @@ module com.io7m.idstore.server.service.telemetry.api
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
+  requires com.io7m.jmulticlose.core;
+  requires org.slf4j;
+
   requires transitive com.io7m.repetoir.core;
   requires transitive io.opentelemetry.api;
   requires transitive com.io7m.idstore.server.api;

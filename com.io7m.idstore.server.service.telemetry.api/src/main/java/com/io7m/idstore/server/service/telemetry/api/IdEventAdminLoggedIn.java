@@ -15,29 +15,31 @@
  */
 
 
-package com.io7m.idstore.server.service.events;
+package com.io7m.idstore.server.service.telemetry.api;
 
-import com.io7m.idstore.model.IdEmail;
-
-import java.time.Duration;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
- * Mail was sent successfully.
+ * An administrator logged in.
  *
- * @param to   The target address
- * @param time The time it took to send
+ * @param adminId The administrator
  */
 
-public record IdEventMailSent(
-  IdEmail to,
-  Duration time)
-  implements IdEventType
+public record IdEventAdminLoggedIn(
+  UUID adminId)
+  implements IdEventAdminType
 {
-  @Override
-  public String name()
+  /**
+   * An administrator logged in.
+   *
+   * @param adminId The administrator
+   */
+
+  public IdEventAdminLoggedIn
   {
-    return "mail.sent";
+    Objects.requireNonNull(adminId, "adminId");
   }
 
   @Override
@@ -47,9 +49,15 @@ public record IdEventMailSent(
   }
 
   @Override
+  public String name()
+  {
+    return "security.admin.login.succeeded";
+  }
+
+  @Override
   public String message()
   {
-    return "%s %s".formatted(this.name(), this.to());
+    return "%s %s".formatted(this.name(), this.adminId);
   }
 
   @Override
@@ -58,7 +66,7 @@ public record IdEventMailSent(
     return Map.ofEntries(
       Map.entry("event.domain", this.domain()),
       Map.entry("event.name", this.name()),
-      Map.entry("idstore.email", this.to.value())
+      Map.entry("idstore.admin", this.adminId.toString())
     );
   }
 }

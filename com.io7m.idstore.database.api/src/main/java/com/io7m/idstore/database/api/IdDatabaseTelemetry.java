@@ -14,21 +14,38 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.server.service.events;
 
-import com.io7m.repetoir.core.RPServiceType;
+package com.io7m.idstore.database.api;
+
+import io.opentelemetry.api.metrics.Meter;
+import io.opentelemetry.api.trace.Tracer;
+
+import java.util.Objects;
 
 /**
- * The event service.
+ * Interfaces used for database telemetry.
+ *
+ * @param isNoOp {@code true} if telemetry is in no-op mode
+ * @param meter  The meter
+ * @param tracer The tracer
  */
 
-public interface IdEventServiceType extends RPServiceType
+public record IdDatabaseTelemetry(
+  boolean isNoOp,
+  Meter meter,
+  Tracer tracer)
 {
   /**
-   * Emit an event.
+   * Interfaces used for database telemetry.
    *
-   * @param event The event
+   * @param isNoOp {@code true} if telemetry is in no-op mode
+   * @param meter  The meter
+   * @param tracer The tracer
    */
 
-  void emit(IdEventType event);
+  public IdDatabaseTelemetry
+  {
+    Objects.requireNonNull(meter, "meter");
+    Objects.requireNonNull(tracer, "tracer");
+  }
 }

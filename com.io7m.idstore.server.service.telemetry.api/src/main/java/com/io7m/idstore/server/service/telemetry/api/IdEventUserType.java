@@ -15,7 +15,7 @@
  */
 
 
-package com.io7m.idstore.server.service.events;
+package com.io7m.idstore.server.service.telemetry.api;
 
 import java.util.UUID;
 

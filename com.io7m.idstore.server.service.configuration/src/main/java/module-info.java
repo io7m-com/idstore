@@ -24,7 +24,7 @@ module com.io7m.idstore.server.service.configuration
   requires static org.osgi.annotation.bundle;
 
   requires transitive com.io7m.idstore.server.api;
-  requires com.io7m.idstore.server.service.metrics;
+  requires com.io7m.idstore.server.service.telemetry.api;
 
   requires jakarta.xml.bind;
   requires com.io7m.cxbutton.core;

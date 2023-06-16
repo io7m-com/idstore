@@ -15,49 +15,53 @@
  */
 
 
-package com.io7m.idstore.server.service.events;
+package com.io7m.idstore.server.service.telemetry.api;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
- * An administrator logged in.
+ * An admin provided incorrect credentials when trying to log in.
  *
- * @param adminId The administrator
+ * @param remoteHost The remote remoteHost
+ * @param adminId    The admin
  */
 
-public record IdEventAdminLoggedIn(
+public record IdEventAdminLoginAuthenticationFailed(
+  String remoteHost,
   UUID adminId)
   implements IdEventAdminType
 {
   /**
-   * An administrator logged in.
+   * An admin provided incorrect credentials when trying to log in.
    *
-   * @param adminId The administrator
+   * @param remoteHost The remote remoteHost
+   * @param adminId    The admin
    */
 
-  public IdEventAdminLoggedIn
+  public IdEventAdminLoginAuthenticationFailed
   {
+    Objects.requireNonNull(remoteHost, "remoteHost");
     Objects.requireNonNull(adminId, "adminId");
   }
 
   @Override
   public IdEventSeverity severity()
   {
-    return IdEventSeverity.INFO;
+    return IdEventSeverity.WARNING;
   }
 
   @Override
   public String name()
   {
-    return "security.admin.login.succeeded";
+    return "security.admin.login.authentication_failed";
   }
 
   @Override
   public String message()
   {
-    return "%s %s".formatted(this.name(), this.adminId);
+    return "%s %s %s".formatted(this.name(), this.adminId, this.remoteHost);
   }
 
   @Override
@@ -66,7 +70,8 @@ public record IdEventAdminLoggedIn(
     return Map.ofEntries(
       Map.entry("event.domain", this.domain()),
       Map.entry("event.name", this.name()),
-      Map.entry("idstore.admin", this.adminId.toString())
+      Map.entry("idstore.remote_host", this.remoteHost()),
+      Map.entry("idstore.admin", this.adminId().toString())
     );
   }
 }
