@@ -557,6 +557,54 @@
     </complexType>
   </element>
 
+  <element name="DatabaseOwner">
+    <complexType>
+      <attribute name="User"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The username that will be used to connect to the database for installation and upgrades.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Password"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The password that will be used to connect to the database for installation and upgrades.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="DatabaseUser">
+    <complexType>
+      <attribute name="User"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The username that will be used to connect to the database for normal usage.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Password"
+                 use="required"
+                 type="string">
+        <annotation>
+          <documentation>
+            The password that will be used to connect to the database for normal usage.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
   <element name="Database">
     <annotation>
       <documentation>
@@ -565,6 +613,41 @@
     </annotation>
 
     <complexType>
+      <attribute name="OwnerRoleName" use="required" type="string">
+        <annotation>
+          <documentation>
+            The name of the role that owns the database. This is used for the initial database setup, and for
+            upgrades.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="OwnerRolePassword" use="required" type="string">
+        <annotation>
+          <documentation>
+            The password of the role that owns the database.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="WorkerRolePassword" use="required" type="string">
+        <annotation>
+          <documentation>
+            The password of the role used for normal database operation. This is an unprivileged role that
+            does not have the ability to perform DDL or other database-changing operations.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="ReaderRolePassword" use="optional" type="string">
+        <annotation>
+          <documentation>
+            The password of the role used for read-only database operation. If this attribute is not specified,
+            the read-only role is not allowed to log in.
+          </documentation>
+        </annotation>
+      </attribute>
+
       <attribute name="Kind"
                  use="required"
                  type="string">
@@ -581,26 +664,6 @@
         <annotation>
           <documentation>
             The name of the database.
-          </documentation>
-        </annotation>
-      </attribute>
-
-      <attribute name="User"
-                 use="required"
-                 type="string">
-        <annotation>
-          <documentation>
-            The username that will be used to connect to the database.
-          </documentation>
-        </annotation>
-      </attribute>
-
-      <attribute name="Password"
-                 use="required"
-                 type="string">
-        <annotation>
-          <documentation>
-            The password that will be used to connect to the database.
           </documentation>
         </annotation>
       </attribute>

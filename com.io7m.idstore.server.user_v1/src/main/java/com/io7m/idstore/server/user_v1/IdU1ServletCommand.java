@@ -20,7 +20,6 @@ package com.io7m.idstore.server.user_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUMessageType;
@@ -50,12 +49,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_v1.IdU1Errors.errorResponseOf;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreAuthenticated.withAuthentication;
+import static com.io7m.idstore.server.user_v1.IdU1ServletCoreMaintenanceAware.withMaintenanceAwareness;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreTransactional.withTransaction;
 
 /**
@@ -88,33 +89,28 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
     final var telemetry =
       services.requireService(IdServerTelemetryServiceType.class);
 
-    return (request, information) -> {
-      return withInstrumentation(
-        services,
-        IdUserDomain.USER,
-        (req0, info0) -> {
-          return withAuthentication(
+    final var authenticated =
+      withAuthentication(services, (req1, info1, session, user) -> {
+        return withTransaction(services, (req2, info2, transaction) -> {
+          return execute(
             services,
-            (req1, info1, session, user) -> {
-              return withTransaction(
-                services,
-                (req2, info2, transaction) -> {
-                  return execute(
-                    services,
-                    req2,
-                    info2,
-                    messages,
-                    telemetry,
-                    limits,
-                    strings,
-                    session,
-                    user,
-                    transaction
-                  );
-                }).execute(req1, info1);
-            }).execute(req0, info0);
-        }).execute(request, information);
-    };
+            req2,
+            info2,
+            messages,
+            telemetry,
+            limits,
+            strings,
+            session,
+            user,
+            transaction
+          );
+        }).execute(req1, info1);
+      });
+
+    final var maintenanceAware =
+      withMaintenanceAwareness(services, authenticated);
+
+    return withInstrumentation(services, USER, maintenanceAware);
   }
 
   private static IdHTTPServletResponseType execute(

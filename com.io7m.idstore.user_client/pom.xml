@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0009</version>
+    <version>1.0.0-beta0010</version>
   </parent>
 
   <artifactId>com.io7m.idstore.user_client</artifactId>
@@ -48,6 +48,15 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.protocol.api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentelemetry</groupId>
+      <artifactId>opentelemetry-context</artifactId>
     </dependency>
 
     <dependency>

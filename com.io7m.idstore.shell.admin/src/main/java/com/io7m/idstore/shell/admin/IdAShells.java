@@ -28,6 +28,7 @@ import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminEmailAdd;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminEmailRemove;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminGet;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminGetByEmail;
+import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminMaintenanceModeSet;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchBegin;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchByEmailBegin;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchByEmailNext;
@@ -129,6 +130,7 @@ public final class IdAShells implements IdAShellFactoryType
         new IdAShellCmdAdminEmailRemove(client),
         new IdAShellCmdAdminGet(client),
         new IdAShellCmdAdminGetByEmail(client),
+        new IdAShellCmdAdminMaintenanceModeSet(client),
         new IdAShellCmdAdminSearchBegin(client),
         new IdAShellCmdAdminSearchByEmailBegin(client),
         new IdAShellCmdAdminSearchByEmailNext(client),

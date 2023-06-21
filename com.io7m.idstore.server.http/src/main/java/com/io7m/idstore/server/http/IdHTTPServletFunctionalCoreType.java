@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * returns a response.
  */
 
+@FunctionalInterface
 public interface IdHTTPServletFunctionalCoreType
 {
   /**

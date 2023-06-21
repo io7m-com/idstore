@@ -35,6 +35,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Clock;
+import java.util.Optional;
 
 import static com.io7m.idstore.tests.database.IdDatabaseExtension.POSTGRES_VERSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -93,6 +94,8 @@ public final class IdDatabasesTest
       new IdDatabaseConfiguration(
         "postgres",
         "12345678",
+        "12345678",
+        Optional.of("12345678"),
         CONTAINER.getHost(),
         CONTAINER.getFirstMappedPort().intValue(),
         "idstore",
@@ -105,6 +108,8 @@ public final class IdDatabasesTest
       new IdDatabaseConfiguration(
         "postgres",
         "12345678",
+        "12345678",
+        Optional.of("12345678"),
         CONTAINER.getHost(),
         CONTAINER.getFirstMappedPort().intValue(),
         "idstore",
@@ -123,8 +128,8 @@ public final class IdDatabasesTest
 
     this.dataSource = new PGConnectionPoolDataSource();
     this.dataSource.setUrl(url.toString());
-    this.dataSource.setUser(this.databaseConfiguration.user());
-    this.dataSource.setPassword(this.databaseConfiguration.password());
+    this.dataSource.setUser(this.databaseConfiguration.ownerRoleName());
+    this.dataSource.setPassword(this.databaseConfiguration.ownerRolePassword());
     this.dataSource.setDefaultAutoCommit(false);
 
     this.databases = new IdDatabases();

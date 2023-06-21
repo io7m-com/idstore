@@ -35,8 +35,9 @@
 
   <Database Name="idstore"
             Kind="POSTGRESQL"
-            User="test"
-            Password="test"
+            OwnerRoleName="idstore_install"
+            OwnerRolePassword="mydatabasewill"
+            WorkerRolePassword="probablybecompromised"
             Address="db.example.com"
             Port="5432"
             Create="true"
@@ -268,6 +269,24 @@
       <Paragraph>
         The <Term type="expression">Database</Term> section of the configuration file configures the database.
       </Paragraph>
+      <Paragraph>
+        The <Term type="expression">OwnerRoleName</Term> attribute specifies the name of the role that
+        <Link target="e6639080-328c-4695-a2a0-e155d0c39e0b">owns the database</Link>. Conventionally, this should be
+        <Term type="constant">idstore_install</Term>, but can be set independently by the database administrator.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="expression">OwnerRolePassword</Term> attribute specifies the password of the owner role.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="expression">WorkerRolePassword</Term> attribute specifies the password of the
+        <Link target="5a4ee9ec-898c-4395-b158-17f7d998b6e1">worker</Link> role used for normal database
+        operation.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="expression">ReaderRolePassword</Term> attribute specifies the password of the
+        <Link target="45afd370-ac5d-44fa-a4f6-b636a3c6a349">reader</Link> role used for read-only database
+        access. If this attribute is not specified, logging in using this role will be prevented.
+      </Paragraph>
     </Subsection>
     <Subsection title="Example">
       <Paragraph>
@@ -276,9 +295,10 @@
       <FormalItem title="Example">
         <Verbatim><![CDATA[
 <Database Kind="POSTGRESQL"
-          Name="postgres"
-          User="postgres"
-          Password="12345678"
+          OwnerRoleName="idstore_install"
+          OwnerRolePassword="mydatabasewill"
+          WorkerRolePassword="probablybecompromised"
+          ReaderRolePassword="lookbutdonottouch"
           Address="localhost"
           Port="54322"
           Create="true"

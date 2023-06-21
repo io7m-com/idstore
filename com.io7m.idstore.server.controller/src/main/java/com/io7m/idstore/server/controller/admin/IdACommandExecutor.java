@@ -42,6 +42,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.protocol.admin.IdACommandMailTest;
+import com.io7m.idstore.protocol.admin.IdACommandMaintenanceModeSet;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
@@ -252,6 +253,9 @@ public final class IdACommandExecutor
 
     if (command instanceof final IdACommandMailTest c) {
       return new IdACmdMailTest().execute(context, c);
+    }
+    if (command instanceof final IdACommandMaintenanceModeSet c) {
+      return new IdACmdMaintenanceModeSet().execute(context, c);
     }
 
     throw new IllegalStateException();

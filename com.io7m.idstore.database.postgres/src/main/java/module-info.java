@@ -36,6 +36,7 @@ module com.io7m.idstore.database.postgres
   requires com.io7m.trasco.api;
   requires com.io7m.trasco.vanilla;
   requires com.zaxxer.hikari;
+  requires org.apache.commons.text;
   requires org.jooq;
   requires org.postgresql.jdbc;
   requires org.slf4j;

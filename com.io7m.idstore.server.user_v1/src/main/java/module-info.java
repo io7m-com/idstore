@@ -33,6 +33,7 @@ module com.io7m.idstore.server.user_v1
   requires com.io7m.idstore.server.service.clock;
   requires com.io7m.idstore.server.service.configuration;
   requires com.io7m.idstore.server.service.health;
+  requires com.io7m.idstore.server.service.maintenance;
   requires com.io7m.idstore.server.service.reqlimit;
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.telemetry.api;

@@ -27,6 +27,7 @@ module com.io7m.idstore.server.http
   requires com.io7m.idstore.server.service.clock;
 
   requires io.opentelemetry.api;
+  requires io.opentelemetry.context;
   requires io.opentelemetry.semconv;
   requires jetty.servlet.api;
   requires org.eclipse.jetty.http;

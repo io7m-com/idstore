@@ -34,6 +34,7 @@ module com.io7m.idstore.server.user_view
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.telemetry.api;
   requires com.io7m.idstore.server.service.templating;
+  requires com.io7m.idstore.server.service.maintenance;
 
   requires io.opentelemetry.api;
   requires org.eclipse.jetty.http;

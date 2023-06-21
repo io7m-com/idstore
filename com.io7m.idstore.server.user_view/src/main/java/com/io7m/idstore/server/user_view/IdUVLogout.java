@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
 
 /**
  * The page that logs out.
@@ -52,9 +53,11 @@ public final class IdUVLogout extends IdHTTPServletFunctional
     final var userSessions =
       services.requireService(IdSessionUserService.class);
 
-    return withInstrumentation(services, USER, (request, information) -> {
-      return execute(userSessions, request);
-    });
+    final IdHTTPServletFunctionalCoreType main =
+      (request, information) -> execute(userSessions, request);
+
+    final var maintenanceAware = withMaintenanceAwareness(services, main);
+    return withInstrumentation(services, USER, maintenanceAware);
   }
 
   private static IdHTTPServletResponseType execute(

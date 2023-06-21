@@ -36,6 +36,7 @@ import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
+import com.io7m.idstore.server.service.maintenance.IdClosedForMaintenanceService;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
@@ -73,6 +74,7 @@ public abstract class IdACmdAbstractContract
   private IdFMTemplateServiceType templates;
   private IdServerMailServiceType mail;
   private IdServerBrandingServiceType branding;
+  private IdClosedForMaintenanceService maintenance;
 
   protected final Times once()
   {
@@ -165,6 +167,8 @@ public abstract class IdACmdAbstractContract
         new IdServerConfigurationFiles().parse(this.configFile)
       );
 
+    this.maintenance =
+      mock(IdClosedForMaintenanceService.class);
     this.branding =
       mock(IdServerBrandingServiceType.class);
     this.metrics =
@@ -176,6 +180,10 @@ public abstract class IdACmdAbstractContract
     this.configurationService =
       new IdServerConfigurationService(this.metrics, this.configuration);
 
+    this.services.register(
+      IdClosedForMaintenanceService.class,
+      this.maintenance
+    );
     this.services.register(
       IdServerBrandingServiceType.class,
       this.branding
@@ -222,6 +230,11 @@ public abstract class IdACmdAbstractContract
   protected final IdDatabaseTransactionType transaction()
   {
     return this.transaction;
+  }
+
+  protected final IdClosedForMaintenanceService maintenance()
+  {
+    return this.maintenance;
   }
 
   protected final IdACommandContext createContextAndSession(

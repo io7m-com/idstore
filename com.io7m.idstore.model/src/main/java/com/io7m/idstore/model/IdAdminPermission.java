@@ -243,6 +243,18 @@ public enum IdAdminPermission
     {
       return Set.of();
     }
+  },
+
+  /**
+   * A permission that allows setting the server into maintenance mode.
+   */
+
+  MAINTENANCE_MODE {
+    @Override
+    public Set<IdAdminPermission> implies()
+    {
+      return Set.of();
+    }
   };
 
   private static final Set<IdAdminPermission> ADMIN_WRITE_EMAIL_IMPLIES_SELF =

@@ -47,6 +47,7 @@ import com.io7m.idstore.server.service.configuration.IdServerConfigurationServic
 import com.io7m.idstore.server.service.health.IdServerHealth;
 import com.io7m.idstore.server.service.mail.IdServerMailService;
 import com.io7m.idstore.server.service.mail.IdServerMailServiceType;
+import com.io7m.idstore.server.service.maintenance.IdClosedForMaintenanceService;
 import com.io7m.idstore.server.service.maintenance.IdMaintenanceService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginServiceType;
@@ -233,6 +234,11 @@ public final class IdServer implements IdServerType
 
     final var metrics = new IdMetricsService(this.telemetry);
     services.register(IdMetricsServiceType.class, metrics);
+
+    services.register(
+      IdClosedForMaintenanceService.class,
+      new IdClosedForMaintenanceService(metrics)
+    );
 
     final var eventService = IdEventService.create(this.telemetry, metrics);
     services.register(IdEventServiceType.class, eventService);
@@ -478,8 +484,10 @@ public final class IdServer implements IdServerType
 
         final var setupConfiguration =
           new IdDatabaseConfiguration(
-            baseConfiguration.user(),
-            baseConfiguration.password(),
+            baseConfiguration.ownerRoleName(),
+            baseConfiguration.ownerRolePassword(),
+            baseConfiguration.workerRolePassword(),
+            baseConfiguration.readerRolePassword(),
             baseConfiguration.address(),
             baseConfiguration.port(),
             baseConfiguration.databaseName(),

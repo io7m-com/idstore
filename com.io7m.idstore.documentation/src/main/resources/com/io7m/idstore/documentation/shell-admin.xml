@@ -88,6 +88,7 @@
     <xi:include href="scmd-login.xml"/>
     <xi:include href="scmd-logout.xml"/>
     <xi:include href="scmd-mail-test.xml"/>
+    <xi:include href="scmd-maintenance-mode.xml"/>
     <xi:include href="scmd-self.xml"/>
     <xi:include href="scmd-set.xml"/>
     <xi:include href="scmd-user-ban-create.xml"/>

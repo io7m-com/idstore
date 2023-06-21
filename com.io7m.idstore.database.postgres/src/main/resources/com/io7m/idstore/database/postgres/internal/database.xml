@@ -4,7 +4,7 @@
   <Schema versionCurrent="0">
     <Comment>
       The idstore role is a least-privilege role that can perform only those operations required to run the system and
-      no others.
+      no others. The role is initially set to "nologin" as a password will be assigned later and logins enabled.
     </Comment>
 
     <Statement><![CDATA[
@@ -301,13 +301,14 @@ create table user_password_resets (
   <Schema versionCurrent="2">
     <Comment>
       The idstore_read_only role is a read-only role that can read all data but cannot change anything.
+      The role is initially set to "nologin" as a password may be assigned later and logins enabled.
     </Comment>
 
     <Statement><![CDATA[
 drop role if exists idstore_read_only;
 ]]></Statement>
     <Statement><![CDATA[
-create role idstore_read_only with nosuperuser nocreatedb nocreaterole noinherit;
+create role idstore_read_only with nosuperuser nocreatedb nocreaterole noinherit nologin;
 ]]></Statement>
 
     <Statement>grant select on admins to idstore_read_only</Statement>

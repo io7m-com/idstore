@@ -292,8 +292,10 @@ public final class IdServerConfigurationFiles
   {
     return new IdServerDatabaseConfiguration(
       processDatabaseKind(database.getKind()),
-      database.getUser(),
-      database.getPassword(),
+      database.getOwnerRoleName(),
+      database.getOwnerRolePassword(),
+      database.getWorkerRolePassword(),
+      Optional.ofNullable(database.getReaderRolePassword()),
       database.getAddress(),
       Math.toIntExact(database.getPort()),
       database.getName(),

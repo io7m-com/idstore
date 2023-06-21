@@ -26,6 +26,7 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.controller.user.IdUCmdPasswordUpdate;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
 import com.io7m.idstore.server.http.IdHTTPServletFunctional;
+import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
 import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
 import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
@@ -50,6 +51,7 @@ import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
+import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -86,23 +88,27 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    return withInstrumentation(services, USER, (request, information) -> {
-      return withAuthentication(
-        services,
-        (req0, info0, session, user) -> {
-          return execute(
-            services,
-            database,
-            strings,
-            branding,
-            template,
-            session,
-            user,
-            req0,
-            info0
-          );
-        }).execute(request, information);
-    });
+    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
+      (request, information, session, user) -> {
+        return execute(
+          services,
+          database,
+          strings,
+          branding,
+          template,
+          session,
+          user,
+          request,
+          information
+        );
+      };
+
+    final var authenticated =
+      withAuthentication(services, main);
+    final var maintenanceAware =
+      withMaintenanceAwareness(services, authenticated);
+
+    return withInstrumentation(services, USER, maintenanceAware);
   }
 
   private static IdHTTPServletResponseType execute(

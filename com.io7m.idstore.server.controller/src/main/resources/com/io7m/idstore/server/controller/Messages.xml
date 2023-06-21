@@ -21,6 +21,10 @@
   <entry key="userIdNameDuplicate">Duplicate user ID name: "{0}"</entry>
   <entry key="loginRateLimited">Logins are rate-limited. Please try again shortly!</entry>
 
+  <entry key="maintenanceModeSetOn">Server is in maintenance mode with message "{0}"</entry>
+  <entry key="maintenanceModeSetOff">Server is now actively serving requests.</entry>
+  <entry key="maintenanceModeTitle">Maintenance mode.</entry>
+
   <entry key="emailVerificationRateLimited">Email verifications are rate-limited. Please try again shortly!</entry>
   <entry key="emailVerificationSuccessTitle">Verified</entry>
   <entry key="emailVerificationSuccess">Email verified successfully.</entry>

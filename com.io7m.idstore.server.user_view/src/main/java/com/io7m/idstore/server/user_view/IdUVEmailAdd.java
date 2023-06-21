@@ -17,12 +17,15 @@
 
 package com.io7m.idstore.server.user_view;
 
+import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.server.http.IdHTTPServletFunctional;
+import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
 import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
 import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
 import com.io7m.idstore.server.http.IdHTTPServletResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
+import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.templating.IdFMEmailAddData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
@@ -36,6 +39,7 @@ import java.io.UncheckedIOException;
 import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
+import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -65,12 +69,14 @@ public final class IdUVEmailAdd extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageEmailAddTemplate();
 
-    return withInstrumentation(services, USER, (request, information) -> {
-      return withAuthentication(
-        services,
-        (r0, info1, session, user) -> execute(branding, template, info1))
-        .execute(request, information);
-    });
+    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
+      (request, info, session, user) -> execute(branding, template, info);
+    final var authenticated =
+      withAuthentication(services, main);
+    final var maintenanceAware =
+      withMaintenanceAwareness(services, authenticated);
+
+    return withInstrumentation(services, USER, maintenanceAware);
   }
 
   private static IdHTTPServletResponseType execute(

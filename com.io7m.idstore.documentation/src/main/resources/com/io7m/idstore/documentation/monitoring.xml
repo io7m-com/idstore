@@ -37,6 +37,16 @@
           </Row>
           <Row>
             <Cell>
+              <Term type="expression">idstore_closed_for_maintenance</Term>
+            </Cell>
+            <Cell>
+              A gauge that displays a <Term type="constant">1</Term> value while the server is
+              in <Link target="8f3aa434-a254-49b4-9ea4-68c8f6ecfdd9">maintenance mode</Link> and
+              <Term type="constant">0</Term> otherwise.
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>
               <Term type="expression">idstore_http_time</Term>
             </Cell>
             <Cell>

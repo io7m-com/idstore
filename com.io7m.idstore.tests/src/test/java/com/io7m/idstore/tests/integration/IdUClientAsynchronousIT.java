@@ -44,6 +44,7 @@ import com.io7m.quixote.core.QWebServers;
 import com.io7m.verdant.core.VProtocolSupported;
 import com.io7m.verdant.core.VProtocols;
 import com.io7m.verdant.core.cb.VProtocolMessages;
+import io.opentelemetry.api.OpenTelemetry;
 import net.jqwik.api.Arbitraries;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,7 +114,9 @@ public final class IdUClientAsynchronousIT extends IdWithServerContract
       new IdUClients();
     this.client =
       this.clients.openAsynchronousClient(
-        new IdUClientConfiguration(Locale.ROOT)
+        new IdUClientConfiguration(
+          OpenTelemetry.noop(),
+          Locale.ROOT)
       );
 
     this.messages =

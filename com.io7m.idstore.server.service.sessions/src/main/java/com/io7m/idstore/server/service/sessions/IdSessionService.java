@@ -106,16 +106,21 @@ public abstract class IdSessionService<S extends IdSessionType>
   private void onSessionRemoved(
     final RemovalCause removalCause)
   {
-    final var sizeNow = this.sessions.estimatedSize();
+    final var sizeNow =
+      this.sessions.estimatedSize();
+    final var sizeMinus =
+      Math.max(0L, sizeNow - 1L);
+
     final var logger = this.logger();
     if (logger.isDebugEnabled()) {
       logger.debug(
         "delete session ({}) ({} now active)",
         removalCause,
-        toUnsignedString(sizeNow)
+        toUnsignedString(sizeMinus)
       );
     }
-    this.metrics.onLoginClosed(this.type, sizeNow);
+
+    this.metrics.onLoginClosed(this.type, sizeMinus);
   }
 
   /**

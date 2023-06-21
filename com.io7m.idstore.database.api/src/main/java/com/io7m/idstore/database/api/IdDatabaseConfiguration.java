@@ -18,23 +18,28 @@ package com.io7m.idstore.database.api;
 
 import java.time.Clock;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * The server database configuration.
  *
- * @param user          The username with which to connect
- * @param password      The password with which to connect
- * @param port          The database TCP/IP port
- * @param upgrade       The upgrade specification
- * @param create        The creation specification
- * @param address       The database address
- * @param databaseName  The database name
- * @param clock         A clock for time retrievals
+ * @param ownerRoleName      The name of the role that owns the database; used for database setup and migrations
+ * @param ownerRolePassword  The password of the role that owns the database
+ * @param workerRolePassword The password of the worker role used for normal database operation
+ * @param readerRolePassword The password of the role used for read-only database access
+ * @param port               The database TCP/IP port
+ * @param upgrade            The upgrade specification
+ * @param create             The creation specification
+ * @param address            The database address
+ * @param databaseName       The database name
+ * @param clock              A clock for time retrievals
  */
 
 public record IdDatabaseConfiguration(
-  String user,
-  String password,
+  String ownerRoleName,
+  String ownerRolePassword,
+  String workerRolePassword,
+  Optional<String> readerRolePassword,
   String address,
   int port,
   String databaseName,
@@ -45,20 +50,24 @@ public record IdDatabaseConfiguration(
   /**
    * The server database configuration.
    *
-   * @param user          The username with which to connect
-   * @param password      The password with which to connect
-   * @param port          The database TCP/IP port
-   * @param upgrade       The upgrade specification
-   * @param create        The creation specification
-   * @param address       The database address
-   * @param databaseName  The database name
-   * @param clock         A clock for time retrievals
+   * @param ownerRoleName      The name of the role that owns the database; used for database setup and migrations
+   * @param ownerRolePassword  The password of the role that owns the database
+   * @param workerRolePassword The password of the worker role used for normal database operation
+   * @param readerRolePassword The password of the role used for read-only database access
+   * @param port               The database TCP/IP port
+   * @param upgrade            The upgrade specification
+   * @param create             The creation specification
+   * @param address            The database address
+   * @param databaseName       The database name
+   * @param clock              A clock for time retrievals
    */
 
   public IdDatabaseConfiguration
   {
-    Objects.requireNonNull(user, "user");
-    Objects.requireNonNull(password, "password");
+    Objects.requireNonNull(ownerRoleName, "ownerRoleName");
+    Objects.requireNonNull(ownerRolePassword, "ownerRolePassword");
+    Objects.requireNonNull(workerRolePassword, "workerRolePassword");
+    Objects.requireNonNull(readerRolePassword, "readerRolePassword");
     Objects.requireNonNull(address, "address");
     Objects.requireNonNull(databaseName, "databaseName");
     Objects.requireNonNull(create, "create");

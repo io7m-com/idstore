@@ -51,9 +51,10 @@ public final class IdUVLogo extends IdHTTPServletFunctional
     final var branding =
       services.requireService(IdServerBrandingServiceType.class);
 
-    return withInstrumentation(services, USER, (request, information) -> {
-      return execute(branding);
-    });
+    final IdHTTPServletFunctionalCoreType main =
+      (request, information) -> execute(branding);
+
+    return withInstrumentation(services, USER, main);
   }
 
   private static IdHTTPServletResponseType execute(

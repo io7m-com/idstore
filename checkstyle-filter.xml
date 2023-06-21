@@ -187,5 +187,7 @@
   <!-- The test message generator refers to a lot of command types. -->
   <suppress files="IdArbAMessageProvider\.java"
             checks="ClassDataAbstractionCoupling"/>
+  <suppress files="IdArbAMessageProvider\.java"
+            checks="FileLength"/>
 
 </suppressions>

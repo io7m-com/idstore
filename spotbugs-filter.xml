@@ -63,7 +63,10 @@
 
   <!-- We don't use nullable annotations because we don't use null. -->
   <Match>
-    <Bug pattern="AI_ANNOTATION_ISSUES_NEEDS_NULLABLE"/>
+    <Or>
+      <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
+      <Bug pattern="AI_ANNOTATION_ISSUES_NEEDS_NULLABLE"/>
+    </Or>
   </Match>
 
   <!--                               -->
@@ -157,6 +160,24 @@
     <Class name="com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions"/>
     <Method name="handleDatabaseException"/>
     <Bug pattern="CC_CYCLOMATIC_COMPLEXITY"/>
+  </Match>
+
+  <!-- This is, depressingly, the only way to use ALTER ROLE. -->
+  <Match>
+    <Class name="com.io7m.idstore.database.postgres.IdDatabases"/>
+    <Method name="updateWorkerRolePassword"/>
+    <Or>
+      <Bug pattern="SQL_INJECTION_JDBC"/>
+      <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
+    </Or>
+  </Match>
+  <Match>
+    <Class name="com.io7m.idstore.database.postgres.IdDatabases"/>
+    <Method name="updateReadOnlyRolePassword"/>
+    <Or>
+      <Bug pattern="SQL_INJECTION_JDBC"/>
+      <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
+    </Or>
   </Match>
 
   <!--                              -->
@@ -564,6 +585,13 @@
     <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
   </Match>
 
+  <!-- Translating generated classes to records. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles"/>
+    <Method name="processDatabase"/>
+    <Bug pattern="CE_CLASS_ENVY"/>
+  </Match>
+
   <!--                                        -->
   <!-- com.io7m.idstore.server.service.events -->
   <!--                                        -->
@@ -759,14 +787,20 @@
 
   <!-- toString() isn't needed here. -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated"/>
+    <Or>
+      <Class name="com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated"/>
+      <Class name="com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware"/>
+    </Or>
     <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
   </Match>
 
   <!-- Lots of IOException -> UncheckedIOException, and Exception -> IllegalStateException -->
   <Match>
     <Package name="com.io7m.idstore.server.user_view"/>
-    <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
+    <Or>
+      <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
+      <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CHECKED"/>
+    </Or>
   </Match>
 
   <!-- Specifically there to instantiate lots of other classes. -->

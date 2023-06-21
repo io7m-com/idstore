@@ -36,6 +36,7 @@ import com.io7m.idstore.user_client.api.IdUClientCredentials;
 import com.io7m.idstore.user_client.api.IdUClientEventType;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.junreachable.UnreachableCodeException;
+import io.opentelemetry.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,10 +135,27 @@ public final class IdUHandler1 extends IdUHandlerAbstract
       final var sendBytes =
         this.messages.serialize(message);
 
-      final var request =
+      final HttpRequest.Builder builder =
         HttpRequest.newBuilder(uri)
-          .header("User-Agent", userAgent())
-          .POST(HttpRequest.BodyPublishers.ofByteArray(sendBytes))
+          .header("User-Agent", userAgent());
+
+      /*
+       * Inject any required trace propagation headers.
+       */
+
+      this.configuration()
+        .openTelemetry()
+        .getPropagators()
+        .getTextMapPropagator()
+        .inject(Context.current(), builder, (b, name, value) -> {
+          if (LOG.isTraceEnabled()) {
+            LOG.trace("injecting header {} -> {}", name, value);
+          }
+          builder.header(name, value);
+        });
+
+      final var request =
+        builder.POST(HttpRequest.BodyPublishers.ofByteArray(sendBytes))
           .build();
 
       final var response =

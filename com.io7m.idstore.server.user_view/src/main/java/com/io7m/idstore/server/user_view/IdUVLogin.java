@@ -54,6 +54,7 @@ import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
 import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
+import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
 
 /**
  * The page that displays the login form, or executes the login if a username
@@ -96,19 +97,23 @@ public final class IdUVLogin extends IdHTTPServletFunctional
         .configuration()
         .rateLimit();
 
-    return withInstrumentation(services, USER, (request, information) -> {
-      return execute(
-        database,
-        branding,
-        logins,
-        strings,
-        template,
-        telemetry,
-        rateLimit,
-        request,
-        information
-      );
-    });
+    final IdHTTPServletFunctionalCoreType main =
+      (request, information) -> {
+        return execute(
+          database,
+          branding,
+          logins,
+          strings,
+          template,
+          telemetry,
+          rateLimit,
+          request,
+          information
+        );
+      };
+
+    final var maintenanceAware = withMaintenanceAwareness(services, main);
+    return withInstrumentation(services, USER, maintenanceAware);
   }
 
   private static IdHTTPServletResponseType execute(
