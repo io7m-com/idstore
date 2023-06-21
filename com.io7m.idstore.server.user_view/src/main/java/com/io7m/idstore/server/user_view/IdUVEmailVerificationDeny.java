@@ -48,6 +48,7 @@ import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
+import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
 
 /**
  * The endpoint that allows for completing email verification challenges.
@@ -83,17 +84,23 @@ public final class IdUVEmailVerificationDeny
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    return withInstrumentation(services, USER, (request, information) -> {
-      return execute(
-        services,
-        strings,
-        database,
-        branding,
-        errorTemplate,
-        request,
-        information
-      );
-    });
+    final IdHTTPServletFunctionalCoreType main =
+      (request, information) -> {
+        return execute(
+          services,
+          strings,
+          database,
+          branding,
+          errorTemplate,
+          request,
+          information
+        );
+      };
+
+    final var maintenanceAware =
+      withMaintenanceAwareness(services, main);
+
+    return withInstrumentation(services, USER, maintenanceAware);
   }
 
   private static IdHTTPServletResponseType execute(

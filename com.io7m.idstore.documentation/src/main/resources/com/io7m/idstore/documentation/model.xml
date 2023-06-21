@@ -305,4 +305,24 @@
     </Subsection>
   </Subsection>
 
+  <Subsection title="Maintenance Mode" id="8f3aa434-a254-49b4-9ea4-68c8f6ecfdd9">
+    <Paragraph>
+      When performing essential maintenance such as a database upgrade, the server can be placed
+      into <Term type="term">maintenance</Term> mode. In this mode, all requests made to the
+      <Link target="01d8e9c6-54c0-4501-8f45-e6988e0cb673">user API</Link> or
+      <Link target="dae57724-5cd8-46b3-8650-1c3becce481e">user view</Link> will return a
+      <Term type="constant">503</Term> HTTP status code and a configurable message.
+    </Paragraph>
+    <FormalItem title="Maintenance Mode">
+      <Image source="maintenance.png"
+             width="640"
+             height="451">Maintenance mode.
+      </Image>
+    </FormalItem>
+    <Paragraph>
+      Maintenance mode is not a persistent setting; if the server is restarted, it will start up
+      in the normal non-maintenance mode.
+    </Paragraph>
+  </Subsection>
+
 </Section>

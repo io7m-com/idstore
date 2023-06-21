@@ -28,6 +28,7 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.controller.user.IdUCmdEmailRemoveBegin;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
 import com.io7m.idstore.server.http.IdHTTPServletFunctional;
+import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
 import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
 import com.io7m.idstore.server.http.IdHTTPServletResponseType;
@@ -46,6 +47,7 @@ import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
+import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
 
 /**
  * The page that executes the email removal.
@@ -81,23 +83,27 @@ public final class IdUVEmailRemoveRun extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    return withInstrumentation(services, USER, (request, information) -> {
-      return withAuthentication(
-        services,
-        (r0, info1, session, user) -> {
-          return execute(
-            services,
-            strings,
-            database,
-            branding,
-            template,
-            session,
-            user,
-            request,
-            information
-          );
-        }).execute(request, information);
-    });
+    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
+      (request, information, session, user) -> {
+        return execute(
+          services,
+          strings,
+          database,
+          branding,
+          template,
+          session,
+          user,
+          request,
+          information
+        );
+      };
+
+    final var authenticated =
+      withAuthentication(services, main);
+    final var maintenanceAware =
+      withMaintenanceAwareness(services, authenticated);
+
+    return withInstrumentation(services, USER, maintenanceAware);
   }
 
   private static IdHTTPServletResponseType execute(

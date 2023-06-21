@@ -59,6 +59,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.protocol.admin.IdACommandMailTest;
+import com.io7m.idstore.protocol.admin.IdACommandMaintenanceModeSet;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanGet;
@@ -103,6 +104,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseMailTest;
+import com.io7m.idstore.protocol.admin.IdAResponseMaintenanceModeSet;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanGet;
@@ -182,6 +184,7 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       commandAuditSearchPrevious(),
       commandLogin(),
       commandMailTest(),
+      commandMaintenanceModeSet(),
       commandUserBanCreate(),
       commandUserBanDelete(),
       commandUserBanGet(),
@@ -220,6 +223,7 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       responseError(),
       responseLogin(),
       responseMailTest(),
+      responseMaintenanceModeSet(),
       responseUserBanCreate(),
       responseUserBanDelete(),
       responseUserBanGet(),
@@ -235,6 +239,32 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       responseUserSearchPrevious(),
       responseUserUpdate()
     );
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdAResponseMaintenanceModeSet> responseMaintenanceModeSet()
+  {
+    final var a_id =
+      Arbitraries.defaultFor(UUID.class);
+    final var a_s =
+      Arbitraries.strings();
+
+    return Combinators.combine(a_id, a_s)
+      .as(IdAResponseMaintenanceModeSet::new);
+  }
+
+  /**
+   * @return A message arbitrary
+   */
+
+  public static Arbitrary<IdACommandMaintenanceModeSet> commandMaintenanceModeSet()
+  {
+    return Arbitraries.strings()
+      .optional()
+      .map(IdACommandMaintenanceModeSet::new);
   }
 
   /**

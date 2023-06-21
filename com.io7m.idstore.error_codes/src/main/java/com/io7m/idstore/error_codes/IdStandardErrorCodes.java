@@ -23,6 +23,13 @@ package com.io7m.idstore.error_codes;
 public final class IdStandardErrorCodes
 {
   /**
+   * The server is closed for maintenance.
+   */
+
+  public static final IdErrorCode CLOSED_FOR_MAINTENANCE =
+    new IdErrorCode("error-closed-for-maintenance");
+
+  /**
    * A rate limit was exceeded.
    */
 

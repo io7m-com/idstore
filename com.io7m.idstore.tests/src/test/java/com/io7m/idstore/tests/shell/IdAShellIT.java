@@ -905,7 +905,6 @@ public final class IdAShellIT
       "The password will expire at 2100-01-01"));
   }
 
-
   @Test
   public void testShellMailTest(
     final IdServerType server)
@@ -932,6 +931,35 @@ public final class IdAShellIT
       "Token: 123456"));
   }
 
+  @Test
+  public void testShellMaintenanceMode(
+    final IdServerType server)
+    throws Exception
+  {
+    configureAdmin(server);
+    this.startShell();
+
+    final var w = this.terminal.sendInputToTerminalWriter();
+    w.printf("login %s admin 1234%n", server.adminAPI());
+    w.println("self");
+    w.println(
+      "maintenance-mode --set 'We are performing maintenance.'"
+    );
+    w.println(
+      "maintenance-mode --unset Ignored"
+    );
+    w.flush();
+    w.close();
+
+    this.waitForShell();
+    assertEquals(0, this.exitCode);
+
+    final var output = this.terminal.terminalProducedOutput();
+    assertTrue(output.toString().contains(
+      "Server is in maintenance mode with message \"We are performing maintenance.\""));
+    assertTrue(output.toString().contains(
+      "Server is now actively serving requests."));
+  }
 
   private void startShell()
   {

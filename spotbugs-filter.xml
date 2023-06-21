@@ -787,14 +787,20 @@
 
   <!-- toString() isn't needed here. -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated"/>
+    <Or>
+      <Class name="com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated"/>
+      <Class name="com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware"/>
+    </Or>
     <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
   </Match>
 
   <!-- Lots of IOException -> UncheckedIOException, and Exception -> IllegalStateException -->
   <Match>
     <Package name="com.io7m.idstore.server.user_view"/>
-    <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
+    <Or>
+      <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
+      <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CHECKED"/>
+    </Or>
   </Match>
 
   <!-- Specifically there to instantiate lots of other classes. -->

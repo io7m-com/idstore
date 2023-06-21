@@ -164,4 +164,12 @@ public interface IdMetricsServiceType extends AutoCloseable, RPServiceType
   void onLoginPauseTime(
     IdUserDomain type,
     Duration duration);
+
+  /**
+   * The server is open for business, or closed for maintenance.
+   *
+   * @param closed {@code true} if the server is closed
+   */
+
+  void onClosedForMaintenance(boolean closed);
 }

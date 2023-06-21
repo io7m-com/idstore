@@ -73,9 +73,11 @@ public final class IdUVCSS extends IdHTTPServletFunctional
       throw new UncheckedIOException(e);
     }
 
-    return withInstrumentation(services, USER, (request, information) -> {
+    final IdHTTPServletFunctionalCoreType main = (request, information) -> {
       return execute(request, branding, resetCssData);
-    });
+    };
+
+    return withInstrumentation(services, USER, main);
   }
 
   private static IdHTTPServletResponseType execute(

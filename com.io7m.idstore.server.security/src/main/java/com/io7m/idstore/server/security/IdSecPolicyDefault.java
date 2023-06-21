@@ -31,6 +31,7 @@ import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS;
 import static com.io7m.idstore.model.IdAdminPermission.ADMIN_WRITE_PERMISSIONS_SELF;
 import static com.io7m.idstore.model.IdAdminPermission.AUDIT_READ;
 import static com.io7m.idstore.model.IdAdminPermission.MAIL_TEST;
+import static com.io7m.idstore.model.IdAdminPermission.MAINTENANCE_MODE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_BAN;
 import static com.io7m.idstore.model.IdAdminPermission.USER_CREATE;
 import static com.io7m.idstore.model.IdAdminPermission.USER_DELETE;
@@ -225,7 +226,23 @@ public final class IdSecPolicyDefault implements IdSecPolicyType
       return checkMailTest(e);
     }
 
+    if (action instanceof final IdSecAdminActionMaintenanceMode e) {
+      return checkMaintenanceMode(e);
+    }
+
     return new IdSecPolicyResultDenied("Operation not permitted.");
+  }
+
+  private static IdSecPolicyResultType checkMaintenanceMode(
+    final IdSecAdminActionMaintenanceMode e)
+  {
+    if (!e.admin().permissions().implies(MAINTENANCE_MODE)) {
+      return new IdSecPolicyResultDenied(
+        "Setting maintenance mode requires the %s permission."
+          .formatted(MAINTENANCE_MODE)
+      );
+    }
+    return new IdSecPolicyResultPermitted();
   }
 
   private static IdSecPolicyResultType checkMailTest(

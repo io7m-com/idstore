@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.protocol.admin.cb;
 
+import com.io7m.cedarbridge.runtime.api.CBCore;
 import com.io7m.cedarbridge.runtime.api.CBIntegerUnsigned16;
 import com.io7m.cedarbridge.runtime.api.CBMap;
 import com.io7m.cedarbridge.runtime.api.CBString;
@@ -54,6 +55,7 @@ import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.protocol.admin.IdACommandMailTest;
+import com.io7m.idstore.protocol.admin.IdACommandMaintenanceModeSet;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
@@ -99,6 +101,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseMailTest;
+import com.io7m.idstore.protocol.admin.IdAResponseMaintenanceModeSet;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
@@ -355,8 +358,15 @@ public final class IdACB1Validation
       return toWireResponseUserUpdate(c);
     } else if (response instanceof final IdAResponseUserLoginHistory c) {
       return toWireResponseUserLoginHistory(c);
+
+      /*
+       * General.
+       */
+
     } else if (response instanceof final IdAResponseMailTest c) {
       return toWireResponseMailTest(c);
+    } else if (response instanceof final IdAResponseMaintenanceModeSet c) {
+      return toWireResponseMaintenanceModeSet(c);
     }
 
     throw new IdProtocolException(
@@ -373,6 +383,15 @@ public final class IdACB1Validation
     return new IdA1ResponseMailTest(
       new CBUUID(c.requestId()),
       string(c.token().value())
+    );
+  }
+
+  private static IdA1ResponseMaintenanceModeSet toWireResponseMaintenanceModeSet(
+    final IdAResponseMaintenanceModeSet c)
+  {
+    return new IdA1ResponseMaintenanceModeSet(
+      new CBUUID(c.requestId()),
+      string(c.message())
     );
   }
 
@@ -548,6 +567,8 @@ public final class IdACB1Validation
 
     } else if (command instanceof final IdACommandMailTest c) {
       return toWireCommandMailTest(c);
+    } else if (command instanceof final IdACommandMaintenanceModeSet c) {
+      return toWireCommandMaintenanceModeSet(c);
     }
 
     throw new IdProtocolException(
@@ -555,6 +576,14 @@ public final class IdACB1Validation
       PROTOCOL_ERROR,
       Map.of(),
       Optional.empty()
+    );
+  }
+
+  private static ProtocolIdAv1Type toWireCommandMaintenanceModeSet(
+    final IdACommandMaintenanceModeSet c)
+  {
+    return new IdA1CommandMaintenanceModeSet(
+      fromOptional(c.message().map(CBCore::string))
     );
   }
 
@@ -925,6 +954,10 @@ public final class IdACB1Validation
         return fromWireResponseMailTest(c);
       } else if (message instanceof final IdA1CommandMailTest c) {
         return fromWireCommandMailTest(c);
+      } else if (message instanceof final IdA1ResponseMaintenanceModeSet c) {
+        return fromWireResponseMaintenanceModeSet(c);
+      } else if (message instanceof final IdA1CommandMaintenanceModeSet c) {
+        return fromWireCommandMaintenanceModeSet(c);
       }
 
     } catch (final Exception e) {
@@ -944,6 +977,24 @@ public final class IdACB1Validation
       PROTOCOL_ERROR,
       Map.of(),
       Optional.empty()
+    );
+  }
+
+  private static IdAMessageType fromWireCommandMaintenanceModeSet(
+    final IdA1CommandMaintenanceModeSet c)
+  {
+    return new IdACommandMaintenanceModeSet(
+      c.fieldMessage()
+        .asOptional().map(CBString::value)
+    );
+  }
+
+  private static IdAMessageType fromWireResponseMaintenanceModeSet(
+    final IdA1ResponseMaintenanceModeSet c)
+  {
+    return new IdAResponseMaintenanceModeSet(
+      c.fieldRequestId().value(),
+      c.fieldMessage().value()
     );
   }
 

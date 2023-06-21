@@ -119,6 +119,8 @@
   [case UserBan]
   [documentation MailTest "A permission that allows for sending test mail."]
   [case MailTest]
+  [documentation MaintenanceMode "A permission that allows for changing the server's maintenance mode."]
+  [case MaintenanceMode]
 ]
 
 [documentation IdA1AdminColumn "A column to use for sorting admins."]
@@ -493,6 +495,12 @@
   [field token cb:String]
 ]
 
+[documentation IdA1CommandMaintenanceModeSet "Move the server to/from maintenance mode."]
+[record IdA1CommandMaintenanceModeSet
+  [documentation message "The message (if maintenance mode is to be turned on)."]
+  [field message [cb:Option cb:String]]
+]
+
 [documentation IdA1CommandLogin "A request to log in."]
 [record IdA1CommandLogin
   [documentation userName "The username."]
@@ -767,6 +775,14 @@
   [field page [IdA1Page IdA1AuditEvent]]
 ]
 
+[documentation IdA1ResponseMaintenanceModeSet "A response to IdA1CommandMaintenanceModeSet."]
+[record IdA1ResponseMaintenanceModeSet
+  [documentation requestId "The ID of the request that yielded this response."]
+  [field requestId cb:UUID]
+  [documentation message "The response message."]
+  [field message cb:String]
+]
+
 [documentation IdA1ResponseMailTest "A response to IdA1CommandMailTest."]
 [record IdA1ResponseMailTest
   [documentation requestId "The ID of the request that yielded this response."]
@@ -944,6 +960,7 @@
       IdA1CommandAuditSearchPrevious
       IdA1CommandLogin
       IdA1CommandMailTest
+      IdA1CommandMaintenanceModeSet
       IdA1CommandUserBanCreate
       IdA1CommandUserBanDelete
       IdA1CommandUserBanGet
@@ -982,6 +999,7 @@
       IdA1ResponseError
       IdA1ResponseLogin
       IdA1ResponseMailTest
+      IdA1ResponseMaintenanceModeSet
       IdA1ResponseUserBanCreate
       IdA1ResponseUserBanDelete
       IdA1ResponseUserBanGet

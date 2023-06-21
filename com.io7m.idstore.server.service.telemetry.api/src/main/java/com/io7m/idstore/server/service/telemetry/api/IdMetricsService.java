@@ -58,6 +58,7 @@ public final class IdMetricsService implements IdMetricsServiceType
   private final boolean isNoOp;
   private volatile long loginPauseTimeUser;
   private volatile long loginPauseTimeAdmin;
+  private volatile long closedForMaintenance;
 
   private record TimeSample(
     IdUserDomain type,
@@ -91,6 +92,14 @@ public final class IdMetricsService implements IdMetricsServiceType
         .setDescription("The idstore server is up.")
         .ofLongs()
         .buildWithCallback(m -> m.record(1L))
+    );
+
+    this.resources.add(
+      telemetry.meter()
+        .gaugeBuilder("idstore_closed_for_maintenance")
+        .setDescription("The idstore server is closed for maintenance.")
+        .ofLongs()
+        .buildWithCallback(m -> m.record(this.closedForMaintenance))
     );
 
     this.httpTimeNow = new EnumMap<>(IdUserDomain.class);
@@ -456,5 +465,12 @@ public final class IdMetricsService implements IdMetricsServiceType
         this.loginPauseTimeAdmin = duration.toNanos();
       }
     }
+  }
+
+  @Override
+  public void onClosedForMaintenance(
+    final boolean closed)
+  {
+    this.closedForMaintenance = closed ? 1L : 0L;
   }
 }

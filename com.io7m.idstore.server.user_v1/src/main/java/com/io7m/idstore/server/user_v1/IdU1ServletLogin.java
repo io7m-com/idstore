@@ -20,7 +20,6 @@ package com.io7m.idstore.server.user_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
 import com.io7m.idstore.error_codes.IdException;
-import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
 import com.io7m.idstore.protocol.user.IdUResponseLogin;
@@ -49,11 +48,13 @@ import java.util.Optional;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
+import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreFixedDelay.withFixedDelay;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
+import static com.io7m.idstore.server.user_v1.IdU1ServletCoreMaintenanceAware.withMaintenanceAwareness;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreTransactional.withTransaction;
 
 /**
@@ -94,31 +95,26 @@ public final class IdU1ServletLogin extends IdHTTPServletFunctional
         .rateLimit()
         .userLoginDelay();
 
-    return (request, information) -> {
-      return withInstrumentation(
-        services,
-        IdUserDomain.USER,
-        (req0, info0) -> {
-          return withFixedDelay(
-            services,
-            delay,
-            (req1, info1) -> {
-              return withTransaction(
-                services,
-                (req2, info2, transaction) -> {
-                  return execute(
-                    strings,
-                    limits,
-                    messages,
-                    logins,
-                    req2,
-                    info2,
-                    transaction
-                  );
-                }).execute(req1, info1);
-            }).execute(req0, info0);
-        }).execute(request, information);
-    };
+    final var transactional =
+      withTransaction(services, (request, info, transaction) -> {
+        return execute(
+          strings,
+          limits,
+          messages,
+          logins,
+          request,
+          info,
+          transaction
+        );
+      });
+
+    final var fixedDelay =
+      withFixedDelay(services, delay, transactional);
+
+    final var maintenanceAware =
+      withMaintenanceAwareness(services, fixedDelay);
+
+    return withInstrumentation(services, USER, maintenanceAware);
   }
 
   private static IdHTTPServletResponseType execute(

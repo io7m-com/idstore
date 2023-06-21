@@ -16,12 +16,15 @@
 
 package com.io7m.idstore.server.user_view;
 
+import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.server.http.IdHTTPServletFunctional;
+import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
 import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
 import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
 import com.io7m.idstore.server.http.IdHTTPServletResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
+import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.templating.IdFMPasswordUpdateData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
@@ -36,6 +39,7 @@ import java.nio.charset.StandardCharsets;
 import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
+import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
 
 /**
  * The page that displays a password update form.
@@ -64,13 +68,17 @@ public final class IdUVPasswordUpdate extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pagePasswordUpdateTemplate();
 
-    return withInstrumentation(services, USER, (request, information) -> {
-      return withAuthentication(
-        services,
-        (req0, info0, session, user) -> {
-          return execute(branding, template, info0);
-        }).execute(request, information);
-    });
+    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
+      (request, information, session, user) -> {
+        return execute(branding, template, information);
+      };
+
+    final var authenticated =
+      withAuthentication(services, main);
+    final var maintenanceAware =
+      withMaintenanceAwareness(services, authenticated);
+
+    return withInstrumentation(services, USER, maintenanceAware);
   }
 
   private static IdHTTPServletResponseType execute(

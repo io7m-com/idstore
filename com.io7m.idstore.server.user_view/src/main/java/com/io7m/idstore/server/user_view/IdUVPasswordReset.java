@@ -35,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 
 import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
 
 /**
  * The page that displays a password reset form.
@@ -63,9 +64,11 @@ public final class IdUVPasswordReset extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pagePasswordResetTemplate();
 
-    return withInstrumentation(services, USER, (request, information) -> {
-      return execute(branding, template);
-    });
+    final IdHTTPServletFunctionalCoreType main =
+      (request, information) -> execute(branding, template);
+    final var maintenanceAware =
+      withMaintenanceAwareness(services, main);
+    return withInstrumentation(services, USER, maintenanceAware);
   }
 
   private static IdHTTPServletResponseType execute(

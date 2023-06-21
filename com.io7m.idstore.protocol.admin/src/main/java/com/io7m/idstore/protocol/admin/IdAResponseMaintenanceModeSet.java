@@ -14,30 +14,33 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.protocol.admin;
 
-package com.io7m.idstore.server.http;
-
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
- * A functional servlet core. Consumes a request (and request information) and
- * returns a response.
+ * A response to {@link IdACommandMaintenanceModeSet}.
+ *
+ * @param requestId The request ID
+ * @param message   The response message
  */
 
-@FunctionalInterface
-public interface IdHTTPServletFunctionalCoreType
+public record IdAResponseMaintenanceModeSet(
+  UUID requestId,
+  String message)
+  implements IdAResponseType
 {
   /**
-   * Execute the core.
+   * A response to {@link IdACommandMaintenanceModeSet}.
    *
-   * @param request     The request
-   * @param information The extra request information
-   *
-   * @return The response
+   * @param requestId The request ID
+   * @param message   The response message
    */
 
-  IdHTTPServletResponseType execute(
-    HttpServletRequest request,
-    IdHTTPServletRequestInformation information
-  );
+  public IdAResponseMaintenanceModeSet
+  {
+    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(message, "message");
+  }
 }

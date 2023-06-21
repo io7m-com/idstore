@@ -14,30 +14,29 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.server.security;
 
-package com.io7m.idstore.server.http;
+import com.io7m.idstore.model.IdAdmin;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 /**
- * A functional servlet core. Consumes a request (and request information) and
- * returns a response.
+ * An admin wants to set or unset maintenance mode.
+ *
+ * @param admin The admin
  */
 
-@FunctionalInterface
-public interface IdHTTPServletFunctionalCoreType
+public record IdSecAdminActionMaintenanceMode(IdAdmin admin)
+  implements IdSecAdminActionType
 {
   /**
-   * Execute the core.
+   * An admin wants to set or unset maintenance mode.
    *
-   * @param request     The request
-   * @param information The extra request information
-   *
-   * @return The response
+   * @param admin The admin
    */
 
-  IdHTTPServletResponseType execute(
-    HttpServletRequest request,
-    IdHTTPServletRequestInformation information
-  );
+  public IdSecAdminActionMaintenanceMode
+  {
+    Objects.requireNonNull(admin, "admin");
+  }
 }
