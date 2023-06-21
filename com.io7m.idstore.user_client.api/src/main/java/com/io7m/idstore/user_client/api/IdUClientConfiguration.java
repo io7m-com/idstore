@@ -17,6 +17,7 @@
 package com.io7m.idstore.user_client.api;
 
 import com.io7m.hibiscus.api.HBConfigurationType;
+import io.opentelemetry.api.OpenTelemetry;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -24,21 +25,25 @@ import java.util.Objects;
 /**
  * The user client configuration.
  *
- * @param locale The locale
+ * @param openTelemetry The OpenTelemetry API
+ * @param locale        The locale
  */
 
 public record IdUClientConfiguration(
+  OpenTelemetry openTelemetry,
   Locale locale)
   implements HBConfigurationType
 {
   /**
    * The user client configuration.
    *
-   * @param locale The locale
+   * @param openTelemetry The OpenTelemetry API
+   * @param locale        The locale
    */
 
   public IdUClientConfiguration
   {
+    Objects.requireNonNull(openTelemetry, "openTelemetry");
     Objects.requireNonNull(locale, "locale");
   }
 }

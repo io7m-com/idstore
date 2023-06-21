@@ -23,6 +23,7 @@ module com.io7m.idstore.user_client.api
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
+  requires transitive io.opentelemetry.api;
   requires transitive com.io7m.hibiscus.api;
   requires transitive com.io7m.idstore.protocol.user;
 
