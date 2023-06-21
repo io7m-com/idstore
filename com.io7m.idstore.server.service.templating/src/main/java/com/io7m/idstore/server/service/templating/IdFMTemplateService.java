@@ -17,7 +17,6 @@
 
 package com.io7m.idstore.server.service.templating;
 
-import freemarker.core.XMLOutputFormat;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
