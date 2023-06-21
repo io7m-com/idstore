@@ -36,6 +36,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
+import org.apache.commons.text.StringEscapeUtils;
 import org.postgresql.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -331,20 +332,31 @@ public final class IdDatabases implements IdDatabaseFactoryType
     final var passwordOpt = configuration.readerRolePassword();
     if (passwordOpt.isPresent()) {
       LOG.debug("updating idstore_read_only role to allow password logins");
-      try (var st = connection.prepareStatement(
-        "ALTER USER idstore_read_only WITH PASSWORD '?'")) {
-        st.setString(1, passwordOpt.get());
-        st.execute();
+
+      /*
+       * Yes, this particular SQL statement really does need to be constructed
+       * with string concatenation. Parameters and a prepared statement will
+       * not work. Yes, this is dangerous.
+       */
+
+      final var text = new StringBuilder(64);
+      text.append("ALTER ROLE idstore_read_only WITH PASSWORD ");
+      text.append('\'');
+      text.append(StringEscapeUtils.unescapeJava(
+        configuration.workerRolePassword())
+      );
+      text.append('\'');
+
+      try (var st = connection.createStatement()) {
+        st.execute(text.toString());
       }
-      try (var st = connection.prepareStatement(
-        "ALTER USER idstore_read_only SET LOGIN")) {
-        st.execute();
+      try (var st = connection.createStatement()) {
+        st.execute("ALTER ROLE idstore_read_only LOGIN");
       }
     } else {
       LOG.debug("updating idstore_read_only role to disallow logins");
-      try (var st = connection.prepareStatement(
-        "ALTER USER idstore_read_only SET NOLOGIN")) {
-        st.execute();
+      try (var st = connection.createStatement()) {
+        st.execute("ALTER ROLE idstore_read_only NOLOGIN");
       }
     }
   }
@@ -358,14 +370,25 @@ public final class IdDatabases implements IdDatabaseFactoryType
     final Connection connection)
     throws SQLException
   {
-    try (var st = connection.prepareStatement(
-      "ALTER USER idstore WITH PASSWORD '?'")) {
-      st.setString(1, configuration.workerRolePassword());
-      st.execute();
+    /*
+     * Yes, this particular SQL statement really does need to be constructed
+     * with string concatenation. Parameters and a prepared statement will
+     * not work. Yes, this is dangerous.
+     */
+
+    final var text = new StringBuilder(64);
+    text.append("ALTER ROLE idstore WITH PASSWORD ");
+    text.append('\'');
+    text.append(StringEscapeUtils.unescapeJava(
+      configuration.workerRolePassword())
+    );
+    text.append('\'');
+
+    try (var st = connection.createStatement()) {
+      st.execute(text.toString());
     }
-    try (var st = connection.prepareStatement(
-      "ALTER USER idstore SET LOGIN")) {
-      st.execute();
+    try (var st = connection.createStatement()) {
+      st.execute("ALTER ROLE idstore LOGIN");
     }
   }
 

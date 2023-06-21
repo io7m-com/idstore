@@ -159,6 +159,24 @@
     <Bug pattern="CC_CYCLOMATIC_COMPLEXITY"/>
   </Match>
 
+  <!-- This is, depressingly, the only way to use ALTER ROLE. -->
+  <Match>
+    <Class name="com.io7m.idstore.database.postgres.IdDatabases"/>
+    <Method name="updateWorkerRolePassword"/>
+    <Or>
+      <Bug pattern="SQL_INJECTION_JDBC"/>
+      <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
+    </Or>
+  </Match>
+  <Match>
+    <Class name="com.io7m.idstore.database.postgres.IdDatabases"/>
+    <Method name="updateReadOnlyRolePassword"/>
+    <Or>
+      <Bug pattern="SQL_INJECTION_JDBC"/>
+      <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
+    </Or>
+  </Match>
+
   <!--                              -->
   <!-- com.io7m.idstore.error_codes -->
   <!--                              -->
