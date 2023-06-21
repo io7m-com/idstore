@@ -29,6 +29,7 @@ module com.io7m.idstore.server.service.telemetry.api
   requires transitive com.io7m.repetoir.core;
   requires transitive io.opentelemetry.api;
   requires transitive com.io7m.idstore.server.api;
+  requires io.opentelemetry.context;
 
   exports com.io7m.idstore.server.service.telemetry.api;
 }

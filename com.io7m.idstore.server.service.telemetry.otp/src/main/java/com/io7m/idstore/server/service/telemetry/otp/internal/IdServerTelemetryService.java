@@ -21,6 +21,7 @@ import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceTyp
 import io.opentelemetry.api.logs.Logger;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.propagation.TextMapPropagator;
 
 import java.util.Objects;
 
@@ -34,19 +35,22 @@ public final class IdServerTelemetryService
   private final Tracer tracer;
   private final Meter meter;
   private final Logger logger;
+  private final TextMapPropagator textMapPropagator;
 
   /**
    * An OpenTelemetry service.
    *
-   * @param inTracer The tracer instance
-   * @param inMeter  The meter instance
-   * @param inLogger The logger instance
+   * @param inTracer            The tracer instance
+   * @param inMeter             The meter instance
+   * @param inLogger            The logger instance
+   * @param inTextMapPropagator The text map propagator
    */
 
   public IdServerTelemetryService(
     final Tracer inTracer,
     final Meter inMeter,
-    final Logger inLogger)
+    final Logger inLogger,
+    final TextMapPropagator inTextMapPropagator)
   {
     this.tracer =
       Objects.requireNonNull(inTracer, "tracer");
@@ -54,6 +58,8 @@ public final class IdServerTelemetryService
       Objects.requireNonNull(inMeter, "meter");
     this.logger =
       Objects.requireNonNull(inLogger, "logger");
+    this.textMapPropagator =
+      Objects.requireNonNull(inTextMapPropagator, "textMapPropagator");
   }
 
   @Override
@@ -61,6 +67,12 @@ public final class IdServerTelemetryService
   {
     return "[IdServerTelemetryService 0x%s]"
       .formatted(Long.toUnsignedString(this.hashCode(), 16));
+  }
+
+  @Override
+  public TextMapPropagator textMapPropagator()
+  {
+    return this.textMapPropagator;
   }
 
   @Override

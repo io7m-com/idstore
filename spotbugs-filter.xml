@@ -63,7 +63,10 @@
 
   <!-- We don't use nullable annotations because we don't use null. -->
   <Match>
-    <Bug pattern="AI_ANNOTATION_ISSUES_NEEDS_NULLABLE"/>
+    <Or>
+      <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
+      <Bug pattern="AI_ANNOTATION_ISSUES_NEEDS_NULLABLE"/>
+    </Or>
   </Match>
 
   <!--                               -->

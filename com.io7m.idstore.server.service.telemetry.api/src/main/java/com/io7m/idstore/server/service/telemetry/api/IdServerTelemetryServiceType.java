@@ -24,6 +24,7 @@ import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.propagation.TextMapPropagator;
 
 /**
  * The type of server telemetry services.
@@ -31,6 +32,12 @@ import io.opentelemetry.api.trace.Tracer;
 
 public interface IdServerTelemetryServiceType extends RPServiceType
 {
+  /**
+   * @return The text map propagator for trace contexts
+   */
+
+  TextMapPropagator textMapPropagator();
+
   /**
    * @return The main tracer
    */

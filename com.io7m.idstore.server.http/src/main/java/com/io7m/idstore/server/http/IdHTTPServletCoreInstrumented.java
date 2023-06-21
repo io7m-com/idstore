@@ -22,6 +22,7 @@ import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.context.Context;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.Instant;
@@ -85,11 +86,20 @@ public final class IdHTTPServletCoreInstrumented
     final HttpServletRequest request,
     final IdHTTPServletRequestInformation information)
   {
+    final var context =
+      this.telemetry.textMapPropagator()
+        .extract(
+          Context.current(),
+          request,
+          IdHTTPServletRequestContextExtractor.instance()
+        );
+
     final var tracer =
       this.telemetry.tracer();
 
     final var span =
       tracer.spanBuilder(request.getServletPath())
+        .setParent(context)
         .setStartTimestamp(Instant.now())
         .setSpanKind(SpanKind.SERVER)
         .setAttribute(HTTP_CLIENT_IP, information.remoteAddress())

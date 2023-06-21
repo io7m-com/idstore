@@ -143,7 +143,13 @@ public final class IdServerTelemetryServices
         .loggerBuilder("com.io7m.idstore")
         .build();
 
-    return new IdServerTelemetryService(tracer, meter, logger);
+    return new IdServerTelemetryService(
+      tracer,
+      meter,
+      logger,
+      openTelemetry.getPropagators()
+        .getTextMapPropagator()
+    );
   }
 
   private static SdkLoggerProvider createLoggerProvider(

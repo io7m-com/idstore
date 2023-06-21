@@ -20,6 +20,7 @@ import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.logs.Logger;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.propagation.TextMapPropagator;
 
 import java.util.Objects;
 
@@ -33,12 +34,14 @@ public final class IdServerTelemetryNoOp
   private final Tracer tracer;
   private final Meter meter;
   private final Logger logger;
+  private final TextMapPropagator textMapPropagator;
   private final boolean isNoOp;
 
   private IdServerTelemetryNoOp(
     final Tracer inTracer,
     final Meter inMeter,
     final Logger inLogger,
+    final TextMapPropagator inTextMapPropagator,
     final boolean noOp)
   {
     this.tracer =
@@ -47,6 +50,8 @@ public final class IdServerTelemetryNoOp
       Objects.requireNonNull(inMeter, "inMeter");
     this.logger =
       Objects.requireNonNull(inLogger, "inLogger");
+    this.textMapPropagator =
+      Objects.requireNonNull(inTextMapPropagator, "inTextMapPropagator");
     this.isNoOp = noOp;
   }
 
@@ -61,13 +66,17 @@ public final class IdServerTelemetryNoOp
       noop.getTracer("noop"),
       noop.getMeter("noop"),
       noop.getLogsBridge().get("noop"),
+      noop.getPropagators()
+        .getTextMapPropagator(),
       true
     );
   }
 
-  /**
-   * @return The main tracer
-   */
+  @Override
+  public TextMapPropagator textMapPropagator()
+  {
+    return this.textMapPropagator;
+  }
 
   @Override
   public Tracer tracer()
