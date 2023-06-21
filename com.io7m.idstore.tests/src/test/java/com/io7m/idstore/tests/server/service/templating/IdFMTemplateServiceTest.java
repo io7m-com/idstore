@@ -44,6 +44,7 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.file.Files;
@@ -56,6 +57,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdFMTemplateServiceTest
 {
@@ -129,6 +131,36 @@ public final class IdFMTemplateServiceTest
     ), writer);
 
     writer.flush();
+  }
+
+  @Test
+  public void testGetLoginEscaped()
+    throws IOException, TemplateException
+  {
+    final var service =
+      IdFMTemplateService.create();
+
+    final var template =
+      service.pageLoginTemplate();
+
+    final var writer =
+      new StringWriter();
+
+    template.process(new IdFMLoginData(
+      "idstore: Login",
+      "<idstore",
+      true,
+      Optional.empty(),
+      Optional.of("<Error!>"),
+      Optional.empty()
+    ), writer);
+
+    writer.flush();
+
+    final String text = writer.toString();
+    assertTrue(text.contains("&lt;idstore"));
+    assertTrue(text.contains("&lt;Error!&gt;"));
+    System.out.println(text);
   }
 
   @Test
@@ -218,6 +250,50 @@ public final class IdFMTemplateServiceTest
     );
 
     writer.flush();
+  }
+
+  @Test
+  public void testEmailVerificationEscape()
+    throws IOException, TemplateException
+  {
+    final var service =
+      IdFMTemplateService.create();
+
+    final var template =
+      service.emailVerificationTemplate();
+
+    final var writer =
+      new StringWriter();
+
+    final var tokenPermit =
+      IdToken.generate();
+    final var tokenDeny =
+      IdToken.generate();
+
+    final var verification =
+      new IdEmailVerification(
+        UUID.randomUUID(),
+        new IdEmail("someone@example.com"),
+        tokenPermit,
+        tokenDeny,
+        IdEmailVerificationOperation.EMAIL_ADD,
+        OffsetDateTime.now().plusDays(1L)
+      );
+
+    template.process(
+      new IdFMEmailVerificationData(
+        "<<<idstore>>>",
+        verification,
+        "[2610:1c1:1:606c::50:15]",
+        "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0",
+        Optional.empty(),
+        URI.create("https://id.example.com/deny?token=%s".formatted(tokenDeny))
+      ),
+      writer
+    );
+
+    writer.flush();
+    assertTrue(writer.toString().contains("<<<idstore>>>"));
   }
 
   @Test
