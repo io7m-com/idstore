@@ -68,8 +68,10 @@ public final class IdServerConfigurations
 
     final var databaseConfiguration =
       new IdDatabaseConfiguration(
-        fileDbConfig.user(),
-        fileDbConfig.password(),
+        fileDbConfig.ownerRoleName(),
+        fileDbConfig.ownerRolePassword(),
+        fileDbConfig.workerRolePassword(),
+        fileDbConfig.readerRolePassword(),
         fileDbConfig.address(),
         fileDbConfig.port(),
         fileDbConfig.databaseName(),

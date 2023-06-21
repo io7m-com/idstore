@@ -164,6 +164,8 @@ public final class IdDatabaseExtension
       new IdDatabaseConfiguration(
         "postgres",
         "12345678",
+        "12345678",
+        Optional.of("12345678"),
         CONTAINER.getHost(),
         CONTAINER.getFirstMappedPort().intValue(),
         "idstore",

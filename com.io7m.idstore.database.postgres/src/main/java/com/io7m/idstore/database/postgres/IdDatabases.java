@@ -34,6 +34,8 @@ import com.io7m.trasco.vanilla.TrExecutors;
 import com.io7m.trasco.vanilla.TrSchemaRevisionSetParsers;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.StatusCode;
 import org.postgresql.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,6 +169,14 @@ public final class IdDatabases implements IdDatabaseFactoryType
     Objects.requireNonNull(telemetry, "telemetry");
     Objects.requireNonNull(startupMessages, "startupMessages");
 
+    createOrUpgrade(telemetry, configuration, startupMessages);
+    return connect(telemetry, configuration);
+  }
+
+  private static IdDatabaseType connect(
+    final IdDatabaseTelemetry telemetry,
+    final IdDatabaseConfiguration configuration)
+  {
     final var resources = CloseableCollection.create(() -> {
       return new IdDatabaseException(
         "Closing a resource failed.",
@@ -176,89 +186,195 @@ public final class IdDatabases implements IdDatabaseFactoryType
       );
     });
 
-    try {
-      final var url = new StringBuilder(128);
-      url.append("jdbc:postgresql://");
-      url.append(configuration.address());
-      url.append(':');
-      url.append(configuration.port());
-      url.append('/');
-      url.append(configuration.databaseName());
+    final var url = new StringBuilder(128);
+    url.append("jdbc:postgresql://");
+    url.append(configuration.address());
+    url.append(':');
+    url.append(configuration.port());
+    url.append('/');
+    url.append(configuration.databaseName());
 
-      final var config = new HikariConfig();
-      config.setJdbcUrl(url.toString());
-      config.setUsername(configuration.user());
-      config.setPassword(configuration.password());
-      config.setAutoCommit(false);
+    final var config = new HikariConfig();
+    config.setJdbcUrl(url.toString());
+    config.setUsername(configuration.ownerRoleName());
+    config.setPassword(configuration.ownerRolePassword());
+    config.setAutoCommit(false);
 
-      final var dataSource =
-        resources.add(new HikariDataSource(config));
+    final var dataSource =
+      resources.add(new HikariDataSource(config));
 
-      final var parsers = new TrSchemaRevisionSetParsers();
-      final TrSchemaRevisionSet revisions;
-      try (var stream = IdDatabases.class.getResourceAsStream(
-        "/com/io7m/idstore/database/postgres/internal/database.xml")) {
-        revisions = parsers.parse(URI.create("urn:source"), stream);
-      }
+    return new IdDatabase(
+      telemetry,
+      configuration.clock(),
+      dataSource,
+      resources
+    );
+  }
 
-      try (var connection = dataSource.getConnection()) {
-        connection.setAutoCommit(false);
-
-        new TrExecutors().create(
-          new TrExecutorConfiguration(
-            IdDatabases::schemaVersionGet,
-            IdDatabases::schemaVersionSet,
-            event -> publishTrEvent(startupMessages, event),
-            revisions,
-            switch (configuration.upgrade()) {
-              case UPGRADE_DATABASE -> PERFORM_UPGRADES;
-              case DO_NOT_UPGRADE_DATABASE -> FAIL_INSTEAD_OF_UPGRADING;
-            },
-            connection
-          )
-        ).execute();
-        connection.commit();
-      }
-
-      return new IdDatabase(
-        telemetry,
-        configuration.clock(),
-        dataSource,
-        resources
-      );
-    } catch (final IOException e) {
-      throw new IdDatabaseException(
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
-        e,
-        IO_ERROR,
-        Map.of(),
-        Optional.empty()
-      );
-    } catch (final TrException e) {
-      throw new IdDatabaseException(
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
-        e,
-        TRASCO_ERROR,
-        Map.of(),
-        Optional.empty()
-      );
-    } catch (final ParsingException e) {
-      throw new IdDatabaseException(
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
-        e,
-        SQL_REVISION_ERROR,
-        Map.of(),
-        Optional.empty()
-      );
-    } catch (final SQLException e) {
-      throw new IdDatabaseException(
-        requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
-        e,
+  private static void createOrUpgrade(
+    final IdDatabaseTelemetry telemetry,
+    final IdDatabaseConfiguration configuration,
+    final Consumer<String> startupMessages)
+    throws IdDatabaseException
+  {
+    final var resources = CloseableCollection.create(() -> {
+      return new IdDatabaseException(
+        "Closing a resource failed.",
         SQL_ERROR,
         Map.of(),
         Optional.empty()
       );
+    });
+
+    final var span =
+      telemetry.tracer()
+        .spanBuilder("DatabaseSetup")
+        .startSpan();
+
+    try (var ignored0 = span.makeCurrent()) {
+      try (var ignored1 = resources) {
+        final var url = new StringBuilder(128);
+        url.append("jdbc:postgresql://");
+        url.append(configuration.address());
+        url.append(':');
+        url.append(configuration.port());
+        url.append('/');
+        url.append(configuration.databaseName());
+
+        final var config = new HikariConfig();
+        config.setJdbcUrl(url.toString());
+        config.setUsername(configuration.ownerRoleName());
+        config.setPassword(configuration.ownerRolePassword());
+        config.setAutoCommit(false);
+
+        final var dataSource =
+          resources.add(new HikariDataSource(config));
+
+        final var parsers = new TrSchemaRevisionSetParsers();
+        final TrSchemaRevisionSet revisions;
+        try (var stream = IdDatabases.class.getResourceAsStream(
+          "/com/io7m/idstore/database/postgres/internal/database.xml")) {
+          revisions = parsers.parse(URI.create("urn:source"), stream);
+        }
+
+        try (var connection = dataSource.getConnection()) {
+          connection.setAutoCommit(false);
+
+          new TrExecutors().create(
+            new TrExecutorConfiguration(
+              IdDatabases::schemaVersionGet,
+              IdDatabases::schemaVersionSet,
+              event -> publishTrEvent(startupMessages, event),
+              revisions,
+              switch (configuration.upgrade()) {
+                case UPGRADE_DATABASE -> PERFORM_UPGRADES;
+                case DO_NOT_UPGRADE_DATABASE -> FAIL_INSTEAD_OF_UPGRADING;
+              },
+              connection
+            )
+          ).execute();
+
+          updateWorkerRolePassword(configuration, connection);
+          updateReadOnlyRolePassword(configuration, connection);
+          connection.commit();
+        }
+      } catch (final IOException e) {
+        failSpan(e);
+        throw new IdDatabaseException(
+          requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+          e,
+          IO_ERROR,
+          Map.of(),
+          Optional.empty()
+        );
+      } catch (final TrException e) {
+        failSpan(e);
+        throw new IdDatabaseException(
+          requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+          e,
+          TRASCO_ERROR,
+          Map.of(),
+          Optional.empty()
+        );
+      } catch (final ParsingException e) {
+        failSpan(e);
+        throw new IdDatabaseException(
+          requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+          e,
+          SQL_REVISION_ERROR,
+          Map.of(),
+          Optional.empty()
+        );
+      } catch (final SQLException e) {
+        failSpan(e);
+        throw new IdDatabaseException(
+          requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+          e,
+          SQL_ERROR,
+          Map.of(),
+          Optional.empty()
+        );
+      }
     }
+  }
+
+  /**
+   * Update the read-only role password. If no password is specified, then
+   * logging in is prevented.
+   */
+
+  private static void updateReadOnlyRolePassword(
+    final IdDatabaseConfiguration configuration,
+    final Connection connection)
+    throws SQLException
+  {
+    final var passwordOpt = configuration.readerRolePassword();
+    if (passwordOpt.isPresent()) {
+      LOG.debug("updating idstore_read_only role to allow password logins");
+      try (var st = connection.prepareStatement(
+        "ALTER USER idstore_read_only WITH PASSWORD '?'")) {
+        st.setString(1, passwordOpt.get());
+        st.execute();
+      }
+      try (var st = connection.prepareStatement(
+        "ALTER USER idstore_read_only SET LOGIN")) {
+        st.execute();
+      }
+    } else {
+      LOG.debug("updating idstore_read_only role to disallow logins");
+      try (var st = connection.prepareStatement(
+        "ALTER USER idstore_read_only SET NOLOGIN")) {
+        st.execute();
+      }
+    }
+  }
+
+  /**
+   * Update the worker role password. Might be a no-op.
+   */
+
+  private static void updateWorkerRolePassword(
+    final IdDatabaseConfiguration configuration,
+    final Connection connection)
+    throws SQLException
+  {
+    try (var st = connection.prepareStatement(
+      "ALTER USER idstore WITH PASSWORD '?'")) {
+      st.setString(1, configuration.workerRolePassword());
+      st.execute();
+    }
+    try (var st = connection.prepareStatement(
+      "ALTER USER idstore SET LOGIN")) {
+      st.execute();
+    }
+  }
+
+  private static void failSpan(
+    final Exception e)
+  {
+    final Span span = Span.current();
+    span.recordException(e);
+    span.setStatus(StatusCode.ERROR);
   }
 
   private static void publishEvent(
@@ -268,6 +384,9 @@ public final class IdDatabases implements IdDatabaseFactoryType
     try {
       LOG.trace("{}", message);
       startupMessages.accept(message);
+
+      final var span = Span.current();
+      span.addEvent(message);
     } catch (final Exception e) {
       LOG.error("ignored consumer exception: ", e);
     }

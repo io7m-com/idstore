@@ -564,6 +564,13 @@
     <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
   </Match>
 
+  <!-- Translating generated classes to records. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles"/>
+    <Method name="processDatabase"/>
+    <Bug pattern="CE_CLASS_ENVY"/>
+  </Match>
+
   <!--                                        -->
   <!-- com.io7m.idstore.server.service.events -->
   <!--                                        -->

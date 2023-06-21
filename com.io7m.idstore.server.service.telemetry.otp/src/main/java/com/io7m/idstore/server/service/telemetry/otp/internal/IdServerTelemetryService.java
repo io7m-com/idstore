@@ -20,7 +20,6 @@ package com.io7m.idstore.server.service.telemetry.otp.internal;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import io.opentelemetry.api.logs.Logger;
 import io.opentelemetry.api.metrics.Meter;
-import io.opentelemetry.api.metrics.ObservableLongGauge;
 import io.opentelemetry.api.trace.Tracer;
 
 import java.util.Objects;
@@ -35,7 +34,6 @@ public final class IdServerTelemetryService
   private final Tracer tracer;
   private final Meter meter;
   private final Logger logger;
-  private final ObservableLongGauge up;
 
   /**
    * An OpenTelemetry service.
@@ -56,12 +54,6 @@ public final class IdServerTelemetryService
       Objects.requireNonNull(inMeter, "meter");
     this.logger =
       Objects.requireNonNull(inLogger, "logger");
-
-    this.up =
-      this.meter.gaugeBuilder("idstore_up")
-        .setDescription("The idstore server is up.")
-        .ofLongs()
-        .buildWithCallback(m -> m.record(1L));
   }
 
   @Override
@@ -104,6 +96,6 @@ public final class IdServerTelemetryService
   @Override
   public void close()
   {
-    this.up.close();
+
   }
 }

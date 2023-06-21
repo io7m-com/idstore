@@ -274,6 +274,8 @@ public abstract class IdWithServerContract
       new IdDatabaseConfiguration(
         "postgres",
         "12345678",
+        "12345678",
+        Optional.of("12345678"),
         CONTAINER.getContainerIpAddress(),
         CONTAINER.getFirstMappedPort().intValue(),
         "postgres",

@@ -17,24 +17,29 @@
 package com.io7m.idstore.server.api;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Configuration for the database.
  *
- * @param user         The database user
- * @param password     The database password
- * @param address      The database address
- * @param create       {@code} true if the database should be created
- * @param databaseName The database name
- * @param kind         The underlying SQL database kind
- * @param port         The database port
- * @param upgrade      {@code true} if the database schema should be upgraded
+ * @param ownerRoleName      The name of the role that owns the database; used for database setup and migrations
+ * @param ownerRolePassword  The password of the role that owns the database
+ * @param workerRolePassword The password of the worker role used for normal database operation
+ * @param readerRolePassword The password of the role used for read-only database access
+ * @param address            The database address
+ * @param create             {@code} true if the database should be created
+ * @param databaseName       The database name
+ * @param kind               The underlying SQL database kind
+ * @param port               The database port
+ * @param upgrade            {@code true} if the database schema should be upgraded
  */
 
 public record IdServerDatabaseConfiguration(
   IdServerDatabaseKind kind,
-  String user,
-  String password,
+  String ownerRoleName,
+  String ownerRolePassword,
+  String workerRolePassword,
+  Optional<String> readerRolePassword,
   String address,
   int port,
   String databaseName,
@@ -45,21 +50,25 @@ public record IdServerDatabaseConfiguration(
   /**
    * Configuration for the database.
    *
-   * @param user         The database user
-   * @param password     The database password
-   * @param address      The database address
-   * @param create       {@code} true if the database should be created
-   * @param databaseName The database name
-   * @param kind         The underlying SQL database kind
-   * @param port         The database port
-   * @param upgrade      {@code true} if the database schema should be upgraded
+   * @param ownerRoleName      The name of the role that owns the database; used for database setup and migrations
+   * @param ownerRolePassword  The password of the role that owns the database
+   * @param workerRolePassword The password of the worker role used for normal database operation
+   * @param readerRolePassword The password of the role used for read-only database access
+   * @param address            The database address
+   * @param create             {@code} true if the database should be created
+   * @param databaseName       The database name
+   * @param kind               The underlying SQL database kind
+   * @param port               The database port
+   * @param upgrade            {@code true} if the database schema should be upgraded
    */
 
   public IdServerDatabaseConfiguration
   {
     Objects.requireNonNull(kind, "kind");
-    Objects.requireNonNull(user, "user");
-    Objects.requireNonNull(password, "password");
+    Objects.requireNonNull(ownerRoleName, "ownerRoleName");
+    Objects.requireNonNull(ownerRolePassword, "ownerRolePassword");
+    Objects.requireNonNull(workerRolePassword, "workerRolePassword");
+    Objects.requireNonNull(readerRolePassword, "readerRolePassword");
     Objects.requireNonNull(address, "address");
     Objects.requireNonNull(databaseName, "databaseName");
   }

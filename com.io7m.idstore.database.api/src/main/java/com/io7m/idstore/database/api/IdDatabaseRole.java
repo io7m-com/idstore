@@ -23,12 +23,6 @@ package com.io7m.idstore.database.api;
 public enum IdDatabaseRole
 {
   /**
-   * The administration role.
-   */
-
-  ADMIN,
-
-  /**
    * The main idstore role.
    */
 

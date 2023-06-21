@@ -85,6 +85,14 @@ public final class IdMetricsService implements IdMetricsServiceType
     this.resources =
       CloseableCollection.create();
 
+    this.resources.add(
+      telemetry.meter()
+        .gaugeBuilder("idstore_up")
+        .setDescription("The idstore server is up.")
+        .ofLongs()
+        .buildWithCallback(m -> m.record(1L))
+    );
+
     this.httpTimeNow = new EnumMap<>(IdUserDomain.class);
     for (final var domain : DOMAINS) {
       this.httpTimeNow.put(domain, new ConcurrentLinkedQueue<>());

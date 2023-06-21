@@ -139,8 +139,9 @@
 
   <Database Kind="POSTGRESQL"
             Name="postgres"
-            User="postgres"
-            Password="12345678"
+            OwnerRoleName="postgres"
+            OwnerRolePassword="12345678"
+            WorkerRolePassword="1234abcd"
             Address="localhost"
             Port="54322"
             Create="true"

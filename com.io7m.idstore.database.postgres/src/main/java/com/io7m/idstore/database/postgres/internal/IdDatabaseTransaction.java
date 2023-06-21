@@ -102,13 +102,17 @@ final class IdDatabaseTransaction
     throws SQLException
   {
     switch (role) {
-      case ADMIN -> {
-
-      }
       case IDSTORE -> {
         try (var st =
                this.connection.connection()
                  .prepareStatement("set role idstore")) {
+          st.execute();
+        }
+      }
+      case IDSTORE_READ_ONLY -> {
+        try (var st =
+               this.connection.connection()
+                 .prepareStatement("set role idstore_read_only")) {
           st.execute();
         }
       }

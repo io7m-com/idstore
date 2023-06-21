@@ -478,8 +478,10 @@ public final class IdServer implements IdServerType
 
         final var setupConfiguration =
           new IdDatabaseConfiguration(
-            baseConfiguration.user(),
-            baseConfiguration.password(),
+            baseConfiguration.ownerRoleName(),
+            baseConfiguration.ownerRolePassword(),
+            baseConfiguration.workerRolePassword(),
+            baseConfiguration.readerRolePassword(),
             baseConfiguration.address(),
             baseConfiguration.port(),
             baseConfiguration.databaseName(),
