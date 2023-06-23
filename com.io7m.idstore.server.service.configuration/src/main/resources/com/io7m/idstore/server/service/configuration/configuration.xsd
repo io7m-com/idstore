@@ -557,54 +557,6 @@
     </complexType>
   </element>
 
-  <element name="DatabaseOwner">
-    <complexType>
-      <attribute name="User"
-                 use="required"
-                 type="string">
-        <annotation>
-          <documentation>
-            The username that will be used to connect to the database for installation and upgrades.
-          </documentation>
-        </annotation>
-      </attribute>
-
-      <attribute name="Password"
-                 use="required"
-                 type="string">
-        <annotation>
-          <documentation>
-            The password that will be used to connect to the database for installation and upgrades.
-          </documentation>
-        </annotation>
-      </attribute>
-    </complexType>
-  </element>
-
-  <element name="DatabaseUser">
-    <complexType>
-      <attribute name="User"
-                 use="required"
-                 type="string">
-        <annotation>
-          <documentation>
-            The username that will be used to connect to the database for normal usage.
-          </documentation>
-        </annotation>
-      </attribute>
-
-      <attribute name="Password"
-                 use="required"
-                 type="string">
-        <annotation>
-          <documentation>
-            The password that will be used to connect to the database for normal usage.
-          </documentation>
-        </annotation>
-      </attribute>
-    </complexType>
-  </element>
-
   <element name="Database">
     <annotation>
       <documentation>
