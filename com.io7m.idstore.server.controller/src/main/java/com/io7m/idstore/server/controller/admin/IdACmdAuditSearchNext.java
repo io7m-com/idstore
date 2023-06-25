@@ -25,6 +25,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.security.IdSecAdminActionAuditRead;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR_SEARCH_START;
 
 /**
  * IdACmdAuditSearchNext
@@ -65,7 +66,7 @@ public final class IdACmdAuditSearchNext
 
     if (searchOpt.isEmpty()) {
       throw context.failFormatted(
-        400, API_MISUSE_ERROR, "errorSearchStart");
+        400, API_MISUSE_ERROR, ERROR_SEARCH_START);
     }
 
     final var search = searchOpt.get();

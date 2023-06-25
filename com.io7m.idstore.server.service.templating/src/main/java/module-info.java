@@ -25,7 +25,9 @@ module com.io7m.idstore.server.service.templating
 
   requires com.io7m.idstore.model;
   requires com.io7m.idstore.server.api;
+
   requires freemarker;
+  requires com.io7m.repetoir.core;
 
   exports com.io7m.idstore.server.service.templating;
 }

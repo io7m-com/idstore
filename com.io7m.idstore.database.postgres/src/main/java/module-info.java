@@ -26,7 +26,9 @@ module com.io7m.idstore.database.postgres
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires transitive com.io7m.idstore.database.api;
+  requires com.io7m.idstore.database.api;
+  requires com.io7m.idstore.error_codes;
+  requires com.io7m.idstore.model;
 
   requires com.io7m.anethum.api;
   requires com.io7m.jaffirm.core;
@@ -36,14 +38,13 @@ module com.io7m.idstore.database.postgres
   requires com.io7m.trasco.api;
   requires com.io7m.trasco.vanilla;
   requires com.zaxxer.hikari;
+  requires io.opentelemetry.api;
+  requires io.opentelemetry.context;
+  requires io.opentelemetry.semconv;
   requires org.apache.commons.text;
   requires org.jooq;
   requires org.postgresql.jdbc;
   requires org.slf4j;
-
-  requires io.opentelemetry.api;
-  requires io.opentelemetry.context;
-  requires io.opentelemetry.semconv;
 
   exports com.io7m.idstore.database.postgres;
   exports com.io7m.idstore.database.postgres.internal.tables to org.jooq;

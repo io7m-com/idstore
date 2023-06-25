@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0010</version>
+    <version>1.0.0-beta0011</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.user_v1</artifactId>
@@ -102,6 +102,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.server.service.maintenance</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.strings</artifactId>
       <version>${project.version}</version>
     </dependency>
 

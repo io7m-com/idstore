@@ -35,6 +35,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.junreachable.UnreachableCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,13 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_SERVER;
+import static com.io7m.idstore.strings.IdStringConstants.CONNECT_FAILURE;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR_UNEXPECTED_CONTENT_TYPE;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR_UNEXPECTED_RESPONSE_TYPE;
+import static com.io7m.idstore.strings.IdStringConstants.EXPECTED_CONTENT_TYPE;
+import static com.io7m.idstore.strings.IdStringConstants.EXPECTED_RESPONSE_TYPE;
+import static com.io7m.idstore.strings.IdStringConstants.RECEIVED_CONTENT_TYPE;
+import static com.io7m.idstore.strings.IdStringConstants.RECEIVED_RESPONSE_TYPE;
 import static java.util.Objects.requireNonNullElse;
 
 /**
@@ -84,7 +92,7 @@ public final class IdAHandler1 extends IdAHandlerAbstract
 
   IdAHandler1(
     final IdAClientConfiguration inConfiguration,
-    final IdAStrings inStrings,
+    final IdStrings inStrings,
     final HttpClient inHttpClient,
     final URI baseURI)
   {
@@ -223,7 +231,7 @@ public final class IdAHandler1 extends IdAHandlerAbstract
           nullUUID(),
           requireNonNullElse(
             e.getMessage(),
-            this.strings().format("connectFailure")
+            this.local(CONNECT_FAILURE)
           ),
           IO_ERROR,
           Map.of(),
@@ -273,18 +281,18 @@ public final class IdAHandler1 extends IdAHandlerAbstract
   {
     final var attributes = new HashMap<String, String>();
     attributes.put(
-      this.local("Expected Content Type"),
+      this.local(EXPECTED_CONTENT_TYPE),
       expectedContentType
     );
     attributes.put(
-      this.local("Received Content Type"),
+      this.local(RECEIVED_CONTENT_TYPE),
       contentType
     );
 
     return new HBResultFailure<>(
       new IdAResponseError(
         nullUUID(),
-        this.local("Received an unexpected content type."),
+        this.local(ERROR_UNEXPECTED_CONTENT_TYPE),
         PROTOCOL_ERROR,
         attributes,
         Optional.empty(),
@@ -301,31 +309,24 @@ public final class IdAHandler1 extends IdAHandlerAbstract
   {
     final var attributes = new HashMap<String, String>();
     attributes.put(
-      this.local("Expected Response Type"),
+      this.local(EXPECTED_RESPONSE_TYPE),
       message.responseClass().getSimpleName()
     );
     attributes.put(
-      this.local("Received Response Type"),
+      this.local(RECEIVED_RESPONSE_TYPE),
       responseActual.getClass().getSimpleName()
     );
 
     return new HBResultFailure<>(
       new IdAResponseError(
         nullUUID(),
-        this.local("Received an unexpected response type."),
+        this.local(ERROR_UNEXPECTED_RESPONSE_TYPE),
         PROTOCOL_ERROR,
         attributes,
         Optional.empty(),
         BLAME_SERVER
       )
     );
-  }
-
-  private String local(
-    final String id,
-    final Object... args)
-  {
-    return this.strings().format(id, args);
   }
 
   @Override

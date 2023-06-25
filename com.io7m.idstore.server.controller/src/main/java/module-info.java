@@ -33,11 +33,12 @@ module com.io7m.idstore.server.controller
   requires com.io7m.idstore.server.service.clock;
   requires com.io7m.idstore.server.service.configuration;
   requires com.io7m.idstore.server.service.mail;
+  requires com.io7m.idstore.server.service.maintenance;
   requires com.io7m.idstore.server.service.ratelimit;
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.telemetry.api;
   requires com.io7m.idstore.server.service.templating;
-  requires com.io7m.idstore.server.service.maintenance;
+  requires com.io7m.idstore.strings;
 
   requires com.io7m.jaffirm.core;
   requires com.io7m.jdeferthrow.core;
@@ -55,5 +56,4 @@ module com.io7m.idstore.server.controller
   exports com.io7m.idstore.server.controller.command_exec;
   exports com.io7m.idstore.server.controller.user;
   exports com.io7m.idstore.server.controller.user_pwreset;
-  exports com.io7m.idstore.server.controller;
 }

@@ -24,6 +24,7 @@ import com.io7m.idstore.database.api.IdDatabaseTelemetry;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.postgres.internal.IdDatabase;
 import com.io7m.jmulticlose.core.CloseableCollection;
+import com.io7m.trasco.api.TrArguments;
 import com.io7m.trasco.api.TrEventExecutingSQL;
 import com.io7m.trasco.api.TrEventType;
 import com.io7m.trasco.api.TrEventUpgrading;
@@ -271,6 +272,7 @@ public final class IdDatabases implements IdDatabaseFactoryType
                 case UPGRADE_DATABASE -> PERFORM_UPGRADES;
                 case DO_NOT_UPGRADE_DATABASE -> FAIL_INSTEAD_OF_UPGRADING;
               },
+              TrArguments.empty(),
               connection
             )
           ).execute();

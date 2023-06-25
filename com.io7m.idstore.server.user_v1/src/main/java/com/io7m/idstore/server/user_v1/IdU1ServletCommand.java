@@ -26,7 +26,6 @@ import com.io7m.idstore.protocol.user.IdUMessageType;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
 import com.io7m.idstore.server.controller.user.IdUCommandExecutor;
@@ -39,6 +38,7 @@ import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -58,6 +58,7 @@ import static com.io7m.idstore.server.user_v1.IdU1Errors.errorResponseOf;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreAuthenticated.withAuthentication;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreMaintenanceAware.withMaintenanceAwareness;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreTransactional.withTransaction;
+import static com.io7m.idstore.strings.IdStringConstants.COMMAND_NOT_HERE;
 
 /**
  * The v1 command servlet.
@@ -85,7 +86,7 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
     final var messages =
       services.requireService(IdUCB1Messages.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var telemetry =
       services.requireService(IdServerTelemetryServiceType.class);
 
@@ -120,7 +121,7 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
     final IdUCB1Messages messages,
     final IdServerTelemetryServiceType telemetry,
     final IdRequestLimits limits,
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdSessionUser session,
     final IdUser user,
     final IdDatabaseTransactionType transaction)
@@ -147,7 +148,7 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
         information,
         BLAME_CLIENT,
         new IdProtocolException(
-          strings.format("commandNotHere"),
+          strings.format(COMMAND_NOT_HERE),
           API_MISUSE_ERROR,
           Map.of(),
           Optional.empty()

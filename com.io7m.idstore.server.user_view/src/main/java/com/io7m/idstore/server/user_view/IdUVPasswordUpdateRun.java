@@ -21,7 +21,6 @@ import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandPasswordUpdate;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCmdPasswordUpdate;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
@@ -37,6 +36,7 @@ import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jvindicator.core.Vindication;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
@@ -52,6 +52,9 @@ import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withIns
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR;
+import static com.io7m.idstore.strings.IdStringConstants.PASSWORD_UPDATE_SUCCESS;
+import static com.io7m.idstore.strings.IdStringConstants.PASSWORD_UPDATE_SUCCESS_TITLE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -81,7 +84,7 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
     final var database =
       services.requireService(IdDatabaseType.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var branding =
       services.requireService(IdServerBrandingServiceType.class);
     final var template =
@@ -114,7 +117,7 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
   private static IdHTTPServletResponseType execute(
     final RPServiceDirectoryType services,
     final IdDatabaseType database,
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> template,
     final IdSessionUser session,
@@ -137,7 +140,7 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
           information.requestId(),
           true,
           false,
-          strings.format("error"),
+          strings.format(ERROR),
           e.getMessage(),
           DESTINATION_ON_FAILURE
         )
@@ -176,7 +179,7 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
           information.requestId(),
           true,
           true,
-          strings.format("error"),
+          strings.format(ERROR),
           e.getMessage(),
           DESTINATION_ON_FAILURE
         )
@@ -188,7 +191,7 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
           information.requestId(),
           true,
           e.httpStatusCode() >= 500,
-          strings.format("error"),
+          strings.format(ERROR),
           e.getMessage(),
           DESTINATION_ON_FAILURE
         )
@@ -199,7 +202,7 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
   }
 
   private static IdHTTPServletResponseType showConfirmed(
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> template,
     final IdHTTPServletRequestInformation information)
@@ -207,13 +210,13 @@ public final class IdUVPasswordUpdateRun extends IdHTTPServletFunctional
     try (var writer = new StringWriter()) {
       template.process(
         new IdFMMessageData(
-          branding.htmlTitle(strings.format("passwordUpdateSuccessTitle")),
+          branding.htmlTitle(strings.format(PASSWORD_UPDATE_SUCCESS_TITLE)),
           branding.title(),
           information.requestId(),
           false,
           false,
-          strings.format("passwordUpdateSuccessTitle"),
-          strings.format("passwordUpdateSuccess"),
+          strings.format(PASSWORD_UPDATE_SUCCESS_TITLE),
+          strings.format(PASSWORD_UPDATE_SUCCESS),
           DESTINATION_ON_SUCCESS
         ),
         writer

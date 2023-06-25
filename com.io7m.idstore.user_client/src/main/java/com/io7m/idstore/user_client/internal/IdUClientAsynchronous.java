@@ -20,6 +20,7 @@ import com.io7m.hibiscus.basic.HBClientAsynchronousAbstract;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientAsynchronousType;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientCredentials;
@@ -53,7 +54,7 @@ public final class IdUClientAsynchronous
 
   public IdUClientAsynchronous(
     final IdUClientConfiguration inConfiguration,
-    final IdUStrings inStrings,
+    final IdStrings inStrings,
     final HttpClient inHttpClient)
   {
     super(

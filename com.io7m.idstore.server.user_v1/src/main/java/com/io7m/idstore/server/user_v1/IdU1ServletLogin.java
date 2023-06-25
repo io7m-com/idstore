@@ -24,7 +24,6 @@ import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.user.IdUCommandLogin;
 import com.io7m.idstore.protocol.user.IdUResponseLogin;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUserLoggedIn;
 import com.io7m.idstore.server.controller.user.IdUserLoginService;
@@ -36,6 +35,7 @@ import com.io7m.idstore.server.http.IdHTTPServletResponseType;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -56,6 +56,7 @@ import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withIns
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreMaintenanceAware.withMaintenanceAwareness;
 import static com.io7m.idstore.server.user_v1.IdU1ServletCoreTransactional.withTransaction;
+import static com.io7m.idstore.strings.IdStringConstants.COMMAND_NOT_HERE;
 
 /**
  * The v1 login servlet.
@@ -83,7 +84,7 @@ public final class IdU1ServletLogin extends IdHTTPServletFunctional
     final var messages =
       services.requireService(IdUCB1Messages.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var logins =
       services.requireService(IdUserLoginService.class);
 
@@ -118,7 +119,7 @@ public final class IdU1ServletLogin extends IdHTTPServletFunctional
   }
 
   private static IdHTTPServletResponseType execute(
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdRequestLimits limits,
     final IdUCB1Messages messages,
     final IdUserLoginService logins,
@@ -178,7 +179,7 @@ public final class IdU1ServletLogin extends IdHTTPServletFunctional
   }
 
   private static IdUCommandLogin readLoginCommand(
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdRequestLimits limits,
     final IdUCB1Messages messages,
     final HttpServletRequest request)
@@ -193,7 +194,7 @@ public final class IdU1ServletLogin extends IdHTTPServletFunctional
     }
 
     throw new IdProtocolException(
-      strings.format("commandNotHere"),
+      strings.format(COMMAND_NOT_HERE),
       API_MISUSE_ERROR,
       Map.of(),
       Optional.empty()

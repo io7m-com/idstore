@@ -27,6 +27,7 @@ import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.strings.IdStrings;
 
 import java.net.http.HttpClient;
 import java.util.Map;
@@ -60,7 +61,7 @@ public final class IdAClientSynchronous
 
   public IdAClientSynchronous(
     final IdAClientConfiguration inConfiguration,
-    final IdAStrings inStrings,
+    final IdStrings inStrings,
     final HttpClient inHttpClient)
   {
     super(

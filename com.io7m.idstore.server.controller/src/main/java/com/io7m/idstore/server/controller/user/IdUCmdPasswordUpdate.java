@@ -29,6 +29,7 @@ import com.io7m.idstore.server.security.IdSecUserActionPasswordUpdate;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
+import com.io7m.idstore.strings.IdStringConstants;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -78,7 +79,7 @@ public final class IdUCmdPasswordUpdate
       throw context.failFormatted(
         400,
         PASSWORD_RESET_MISMATCH,
-        "passwordResetMismatch"
+        IdStringConstants.PASSWORD_RESET_MISMATCH
       );
     }
 

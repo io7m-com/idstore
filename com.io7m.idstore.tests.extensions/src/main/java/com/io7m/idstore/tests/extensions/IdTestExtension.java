@@ -32,6 +32,7 @@ import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerSessionConfiguration;
 import com.io7m.idstore.server.api.IdServerType;
 import com.io7m.idstore.server.vanilla.IdServers;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.jmulticlose.core.ClosingResourceFailedException;
@@ -195,6 +196,7 @@ public final class IdTestExtension
         "idstore",
         IdDatabaseCreate.CREATE_DATABASE,
         IdDatabaseUpgrade.UPGRADE_DATABASE,
+        IdStrings.create(Locale.ROOT),
         Clock.systemUTC()
       );
 

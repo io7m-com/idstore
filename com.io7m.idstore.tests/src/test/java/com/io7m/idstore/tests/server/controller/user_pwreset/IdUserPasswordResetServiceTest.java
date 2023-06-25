@@ -33,7 +33,6 @@ import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserPasswordReset;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerConfigurations;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetService;
 import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetServiceType;
@@ -48,6 +47,7 @@ import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceTyp
 import com.io7m.idstore.server.service.templating.IdFMEmailPasswordResetData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.tests.IdFakeClock;
 import com.io7m.idstore.tests.IdTestDirectories;
 import com.io7m.idstore.tests.server.api.IdServerConfigurationsTest;
@@ -112,7 +112,7 @@ public final class IdUserPasswordResetServiceTest
   private IdServerClock serverClock;
   private IdServerConfiguration configuration;
   private IdServerMailServiceType mailService;
-  private IdServerStrings strings;
+  private IdStrings strings;
   private IdServerTelemetryServiceType telemetry;
   private Path directory;
   private IdEventServiceType events;
@@ -157,7 +157,7 @@ public final class IdUserPasswordResetServiceTest
     this.database =
       Mockito.mock(IdDatabaseType.class);
     this.strings =
-      new IdServerStrings(Locale.ROOT);
+      IdStrings.create(Locale.ROOT);
     this.rateLimit =
       Mockito.mock(IdRateLimitPasswordResetServiceType.class);
     this.events =

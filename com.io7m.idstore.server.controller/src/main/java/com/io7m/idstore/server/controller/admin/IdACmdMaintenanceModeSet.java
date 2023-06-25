@@ -20,9 +20,12 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandMaintenanceModeSet;
 import com.io7m.idstore.protocol.admin.IdAResponseMaintenanceModeSet;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.security.IdSecAdminActionMaintenanceMode;
 import com.io7m.idstore.server.service.maintenance.IdClosedForMaintenanceService;
+import com.io7m.idstore.strings.IdStrings;
+
+import static com.io7m.idstore.strings.IdStringConstants.MAINTENANCE_MODE_SET_OFF;
+import static com.io7m.idstore.strings.IdStringConstants.MAINTENANCE_MODE_SET_ON;
 
 /**
  * IdACommandMaintenanceMode
@@ -52,7 +55,7 @@ public final class IdACmdMaintenanceModeSet
     final var maintenance =
       services.requireService(IdClosedForMaintenanceService.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
 
     context.securityCheck(new IdSecAdminActionMaintenanceMode(context.admin()));
 
@@ -61,10 +64,10 @@ public final class IdACmdMaintenanceModeSet
     if (messageOpt.isPresent()) {
       final String messageText = messageOpt.get();
       maintenance.closeForMaintenance(messageText);
-      response = strings.format("maintenanceModeSetOn", messageText);
+      response = strings.format(MAINTENANCE_MODE_SET_ON, messageText);
     } else {
       maintenance.openForBusiness();
-      response = strings.format("maintenanceModeSetOff");
+      response = strings.format(MAINTENANCE_MODE_SET_OFF);
     }
 
     return new IdAResponseMaintenanceModeSet(context.requestId(), response);

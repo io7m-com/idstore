@@ -27,6 +27,7 @@ import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.strings.IdStrings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_CLIENT;
+import static com.io7m.idstore.strings.IdStringConstants.NOT_LOGGED_IN;
 
 /**
  * The initial "disconnected" protocol handler.
@@ -57,7 +59,7 @@ public final class IdAHandlerDisconnected extends IdAHandlerAbstract
 
   public IdAHandlerDisconnected(
     final IdAClientConfiguration inConfiguration,
-    final IdAStrings inStrings,
+    final IdStrings inStrings,
     final HttpClient inHttpClient)
   {
     super(inConfiguration, inStrings, inHttpClient);
@@ -68,7 +70,7 @@ public final class IdAHandlerDisconnected extends IdAHandlerAbstract
     return new HBResultFailure<>(
       new IdAResponseError(
         UUID.randomUUID(),
-        this.strings().format("notLoggedIn"),
+        this.local(NOT_LOGGED_IN),
         IdStandardErrorCodes.NOT_LOGGED_IN,
         Map.of(),
         Optional.empty(),

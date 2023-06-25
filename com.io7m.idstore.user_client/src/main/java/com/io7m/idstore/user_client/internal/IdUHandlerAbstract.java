@@ -17,6 +17,8 @@
 package com.io7m.idstore.user_client.internal;
 
 
+import com.io7m.idstore.strings.IdStringConstantType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 
 import java.net.http.HttpClient;
@@ -29,13 +31,13 @@ import java.util.Objects;
 public abstract class IdUHandlerAbstract
   implements IdUHandlerType
 {
-  private final IdUStrings strings;
+  private final IdStrings strings;
   private final HttpClient httpClient;
   private final IdUClientConfiguration configuration;
 
   protected IdUHandlerAbstract(
     final IdUClientConfiguration inConfiguration,
-    final IdUStrings inStrings,
+    final IdStrings inStrings,
     final HttpClient inHttpClient)
   {
     this.configuration =
@@ -46,9 +48,11 @@ public abstract class IdUHandlerAbstract
       Objects.requireNonNull(inHttpClient, "httpClient");
   }
 
-  protected final IdUStrings strings()
+  protected final String local(
+    final IdStringConstantType s,
+    final Object... arguments)
   {
-    return this.strings;
+    return this.strings.format(s, arguments);
   }
 
   protected final HttpClient httpClient()
@@ -59,5 +63,10 @@ public abstract class IdUHandlerAbstract
   protected final IdUClientConfiguration configuration()
   {
     return this.configuration;
+  }
+
+  protected final IdStrings strings()
+  {
+    return this.strings;
   }
 }

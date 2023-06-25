@@ -17,7 +17,6 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
 import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
 import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
@@ -27,6 +26,7 @@ import com.io7m.idstore.server.service.maintenance.IdClosedForMaintenanceService
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +36,7 @@ import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.Objects;
 
+import static com.io7m.idstore.strings.IdStringConstants.MAINTENANCE_MODE_TITLE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -47,7 +48,7 @@ public final class IdUVServletCoreMaintenanceAware
 {
   private final IdHTTPServletFunctionalCoreType core;
   private final IdClosedForMaintenanceService maintenance;
-  private final IdServerStrings strings;
+  private final IdStrings strings;
   private final IdServerBrandingServiceType branding;
   private final IdFMTemplateType<IdFMMessageData> errorTemplate;
 
@@ -60,7 +61,7 @@ public final class IdUVServletCoreMaintenanceAware
     this.maintenance =
       services.requireService(IdClosedForMaintenanceService.class);
     this.strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     this.branding =
       services.requireService(IdServerBrandingServiceType.class);
     this.errorTemplate =
@@ -95,12 +96,12 @@ public final class IdUVServletCoreMaintenanceAware
       try (var writer = new StringWriter()) {
         this.errorTemplate.process(
           new IdFMMessageData(
-            this.branding.htmlTitle(this.strings.format("maintenanceModeTitle")),
+            this.branding.htmlTitle(this.strings.format(MAINTENANCE_MODE_TITLE)),
             this.branding.title(),
             information.requestId(),
             false,
             false,
-            this.strings.format("maintenanceModeTitle"),
+            this.strings.format(MAINTENANCE_MODE_TITLE),
             closed.get(),
             "/"
           ),

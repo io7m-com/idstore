@@ -18,6 +18,7 @@ package com.io7m.idstore.admin_client.internal;
 
 import com.io7m.genevan.core.GenProtocolClientHandlerType;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
+import com.io7m.idstore.strings.IdStrings;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -43,6 +44,6 @@ public interface IdAHandlerFactoryType
   IdAHandlerType createHandler(
     IdAClientConfiguration configuration,
     HttpClient inHttpClient,
-    IdAStrings inStrings,
+    IdStrings inStrings,
     URI baseURI);
 }

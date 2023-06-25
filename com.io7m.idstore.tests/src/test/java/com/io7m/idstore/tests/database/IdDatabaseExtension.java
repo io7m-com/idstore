@@ -38,6 +38,7 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdVersion;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.jmulticlose.core.ClosingResourceFailedException;
@@ -57,6 +58,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.time.Clock;
 import java.time.OffsetDateTime;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -171,6 +173,7 @@ public final class IdDatabaseExtension
         "idstore",
         IdDatabaseCreate.CREATE_DATABASE,
         IdDatabaseUpgrade.UPGRADE_DATABASE,
+        IdStrings.create(Locale.ROOT),
         Clock.systemUTC()
       );
 

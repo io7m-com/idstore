@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0010</version>
+    <version>1.0.0-beta0011</version>
   </parent>
 
   <artifactId>com.io7m.idstore.admin_client</artifactId>
@@ -49,6 +49,11 @@
       <artifactId>com.io7m.idstore.protocol.admin.cb</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.strings</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>com.io7m.junreachable</groupId>
@@ -61,10 +66,6 @@
     <dependency>
       <groupId>com.io7m.verdant</groupId>
       <artifactId>com.io7m.verdant.core.cb</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.io7m.jxtrand</groupId>
-      <artifactId>com.io7m.jxtrand.vanilla</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

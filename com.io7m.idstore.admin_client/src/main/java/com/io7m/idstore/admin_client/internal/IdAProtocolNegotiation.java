@@ -25,6 +25,7 @@ import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.verdant.core.VProtocolException;
 import com.io7m.verdant.core.VProtocols;
 import com.io7m.verdant.core.cb.VProtocolMessages;
@@ -67,7 +68,7 @@ public final class IdAProtocolNegotiation
   private static List<IdAServerEndpoint> fetchSupportedVersions(
     final URI base,
     final HttpClient httpClient,
-    final IdAStrings strings)
+    final IdStrings strings)
     throws InterruptedException, IdAClientException
   {
     LOG.debug("retrieving supported server protocols");
@@ -172,10 +173,10 @@ public final class IdAProtocolNegotiation
   /**
    * Negotiate a protocol handler.
    *
-   * @param configuration     The configuration
-   * @param httpClient The HTTP client
-   * @param strings    The string resources
-   * @param base       The base URI
+   * @param configuration The configuration
+   * @param httpClient    The HTTP client
+   * @param strings       The string resources
+   * @param base          The base URI
    *
    * @return The protocol handler
    *
@@ -186,7 +187,7 @@ public final class IdAProtocolNegotiation
   public static IdAHandlerType negotiateProtocolHandler(
     final IdAClientConfiguration configuration,
     final HttpClient httpClient,
-    final IdAStrings strings,
+    final IdStrings strings,
     final URI base)
     throws IdAClientException, InterruptedException
   {

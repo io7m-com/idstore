@@ -26,7 +26,6 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.server.api.IdServerConfigurations;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
@@ -41,6 +40,7 @@ import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.tests.IdFakeClock;
 import com.io7m.idstore.tests.IdTestDirectories;
 import com.io7m.idstore.tests.server.api.IdServerConfigurationsTest;
@@ -64,7 +64,7 @@ public abstract class IdUCmdAbstractContract
   private IdDatabaseTransactionType transaction;
   private IdFakeClock clock;
   private IdServerClock serverClock;
-  private IdServerStrings strings;
+  private IdStrings strings;
   private OffsetDateTime timeStart;
   private IdFMTemplateServiceType templates;
   private Path directory;
@@ -155,7 +155,7 @@ public abstract class IdUCmdAbstractContract
     this.timeStart =
       this.serverClock.now();
     this.strings =
-      new IdServerStrings(Locale.ROOT);
+      IdStrings.create(Locale.ROOT);
     this.templates =
       mock(IdFMTemplateServiceType.class);
     this.metrics =
@@ -182,7 +182,7 @@ public abstract class IdUCmdAbstractContract
     );
 
     this.services.register(
-      IdServerStrings.class,
+      IdStrings.class,
       this.strings
     );
 

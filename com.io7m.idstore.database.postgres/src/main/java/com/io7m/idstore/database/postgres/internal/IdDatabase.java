@@ -58,26 +58,27 @@ public final class IdDatabase implements IdDatabaseType
   private final LongCounter transactionCommits;
   private final LongCounter transactionRollbacks;
   private final ConcurrentLinkedQueue<Long> connectionTimes;
+  private final IdDatabaseTelemetry telemetry;
 
   /**
    * The default postgres server database implementation.
    *
-   * @param telemetry     A telemetry
+   * @param inTelemetry     A telemetry
    * @param inClock      The clock
    * @param inDataSource A pooled data source
    * @param inResources  The resources to be closed
    */
 
   public IdDatabase(
-    final IdDatabaseTelemetry telemetry,
+    final IdDatabaseTelemetry inTelemetry,
     final Clock inClock,
     final HikariDataSource inDataSource,
     final CloseableCollectionType<IdDatabaseException> inResources)
   {
-    Objects.requireNonNull(telemetry, "telemetry");
-
+    this.telemetry =
+      Objects.requireNonNull(inTelemetry, "telemetry");
     this.tracer =
-      telemetry.tracer();
+      inTelemetry.tracer();
     this.resources =
       Objects.requireNonNull(inResources, "resources");
 
@@ -92,7 +93,7 @@ public final class IdDatabase implements IdDatabaseType
       this.dataSource.getHikariPoolMXBean();
 
     final var meter =
-      telemetry.meter();
+      inTelemetry.meter();
 
     this.transactions =
       meter.counterBuilder("idstore_db_transactions")
@@ -274,6 +275,8 @@ public final class IdDatabase implements IdDatabaseType
   void setConnectionTimeNow(
     final long nanos)
   {
-    this.connectionTimes.add(Long.valueOf(nanos));
+    if (!this.telemetry.isNoOp()) {
+      this.connectionTimes.add(Long.valueOf(nanos));
+    }
   }
 }

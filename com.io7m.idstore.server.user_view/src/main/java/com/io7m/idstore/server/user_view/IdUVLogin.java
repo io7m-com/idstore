@@ -19,7 +19,6 @@ package com.io7m.idstore.server.user_view;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUserLoggedIn;
 import com.io7m.idstore.server.controller.user.IdUserLoginService;
@@ -35,6 +34,7 @@ import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceTyp
 import com.io7m.idstore.server.service.templating.IdFMLoginData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,6 +55,7 @@ import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR_INVALID_USERNAME_PASSWORD;
 
 /**
  * The page that displays the login form, or executes the login if a username
@@ -86,7 +87,7 @@ public final class IdUVLogin extends IdHTTPServletFunctional
     final var logins =
       services.requireService(IdUserLoginService.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var template =
       services.requireService(IdFMTemplateServiceType.class)
         .pageLoginTemplate();
@@ -120,7 +121,7 @@ public final class IdUVLogin extends IdHTTPServletFunctional
     final IdDatabaseType database,
     final IdServerBrandingServiceType branding,
     final IdUserLoginService logins,
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdFMTemplateType<IdFMLoginData> template,
     final IdServerTelemetryServiceType telemetry,
     final IdServerRateLimitConfiguration rateLimit,
@@ -160,7 +161,7 @@ public final class IdUVLogin extends IdHTTPServletFunctional
           setSpanErrorCode(e.errorCode());
           session.setAttribute(
             "ErrorMessage",
-            strings.format("errorInvalidUsernamePassword")
+            strings.format(ERROR_INVALID_USERNAME_PASSWORD)
           );
           return showLoginForm(branding, template, session, 401);
         }

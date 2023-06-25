@@ -25,7 +25,6 @@ import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.api.IdProtocolException;
 import com.io7m.idstore.protocol.api.IdProtocolMessageType;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.security.IdSecActionType;
 import com.io7m.idstore.server.security.IdSecPolicyResultDenied;
 import com.io7m.idstore.server.security.IdSecurity;
@@ -33,6 +32,9 @@ import com.io7m.idstore.server.security.IdSecurityException;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.sessions.IdSessionType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
+import com.io7m.idstore.strings.IdStringConstantType;
+import com.io7m.idstore.strings.IdStringConstants;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.trace.Tracer;
 
@@ -60,7 +62,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
   private final UUID requestId;
   private final IdDatabaseTransactionType transaction;
   private final IdServerClock clock;
-  private final IdServerStrings strings;
+  private final IdStrings strings;
   private final S session;
   private final String remoteHost;
   private final String remoteUserAgent;
@@ -102,7 +104,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
     this.clock =
       inServices.requireService(IdServerClock.class);
     this.strings =
-      inServices.requireService(IdServerStrings.class);
+      inServices.requireService(IdStrings.class);
     this.tracer =
       inServices.requireService(IdServerTelemetryServiceType.class)
         .tracer();
@@ -239,7 +241,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
   {
     return new IdCommandExecutionFailure(
       this.strings.format(
-        "mailSystemFailure",
+        IdStringConstants.MAIL_SYSTEM_FAILURE,
         email,
         e.getMessage()
       ),
@@ -407,7 +409,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
   public final IdCommandExecutionFailure failFormatted(
     final int statusCode,
     final IdErrorCode errorCode,
-    final String text,
+    final IdStringConstantType text,
     final Object... args)
   {
     return new IdCommandExecutionFailure(

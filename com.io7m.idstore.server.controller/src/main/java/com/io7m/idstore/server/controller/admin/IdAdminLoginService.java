@@ -19,10 +19,10 @@ package com.io7m.idstore.server.controller.admin;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTransactionType;
+import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordException;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginServiceType;
@@ -31,6 +31,8 @@ import com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoggedIn;
 import com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoginAuthenticationFailed;
 import com.io7m.idstore.server.service.telemetry.api.IdEventAdminLoginRateLimitExceeded;
 import com.io7m.idstore.server.service.telemetry.api.IdEventServiceType;
+import com.io7m.idstore.strings.IdStringConstants;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceType;
 import com.io7m.seltzer.api.SStructuredErrorType;
 
@@ -41,8 +43,10 @@ import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
+import static com.io7m.idstore.strings.IdStringConstants.BANNED_NO_EXPIRE;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR_INVALID_USERNAME_PASSWORD;
+import static com.io7m.idstore.strings.IdStringConstants.LOGIN_RATE_LIMITED;
 
 /**
  * A service that handles the logic for admin logins.
@@ -51,7 +55,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEE
 public final class IdAdminLoginService implements RPServiceType
 {
   private final IdServerClock clock;
-  private final IdServerStrings strings;
+  private final IdStrings strings;
   private final IdSessionAdminService sessions;
   private final IdEventServiceType events;
   private final IdRateLimitAdminLoginServiceType rateLimit;
@@ -68,7 +72,7 @@ public final class IdAdminLoginService implements RPServiceType
 
   public IdAdminLoginService(
     final IdServerClock inClock,
-    final IdServerStrings inStrings,
+    final IdStrings inStrings,
     final IdSessionAdminService inSessions,
     final IdRateLimitAdminLoginServiceType inRateLimit,
     final IdEventServiceType inEvents)
@@ -171,7 +175,7 @@ public final class IdAdminLoginService implements RPServiceType
       );
 
       throw new IdCommandExecutionFailure(
-        this.strings.format("loginRateLimited"),
+        this.strings.format(LOGIN_RATE_LIMITED),
         RATE_LIMIT_EXCEEDED,
         Map.of(
           "Wait Duration", this.rateLimit.waitTime().toString()
@@ -200,7 +204,7 @@ public final class IdAdminLoginService implements RPServiceType
       );
 
       throw new IdCommandExecutionFailure(
-        this.strings.format("errorInvalidUsernamePassword"),
+        this.strings.format(ERROR_INVALID_USERNAME_PASSWORD),
         AUTHENTICATION_ERROR,
         Map.of(),
         Optional.empty(),
@@ -236,8 +240,8 @@ public final class IdAdminLoginService implements RPServiceType
 
     if (expiresOpt.isEmpty()) {
       throw new IdCommandExecutionFailure(
-        this.strings.format("bannedNoExpire", ban.reason()),
-        BANNED,
+        this.strings.format(BANNED_NO_EXPIRE, ban.reason()),
+        IdStandardErrorCodes.BANNED,
         Map.of(),
         Optional.empty(),
         requestId,
@@ -254,8 +258,8 @@ public final class IdAdminLoginService implements RPServiceType
 
     if (timeNow.compareTo(timeExpires) < 0) {
       throw new IdCommandExecutionFailure(
-        this.strings.format("banned", ban.reason(), timeExpires),
-        BANNED,
+        this.strings.format(IdStringConstants.BANNED, ban.reason(), timeExpires),
+        IdStandardErrorCodes.BANNED,
         Map.of(),
         Optional.empty(),
         requestId,
@@ -270,7 +274,7 @@ public final class IdAdminLoginService implements RPServiceType
   {
     if (cause instanceof final SStructuredErrorType<?> struct) {
       return new IdCommandExecutionFailure(
-        this.strings.format("errorInvalidUsernamePassword"),
+        this.strings.format(ERROR_INVALID_USERNAME_PASSWORD),
         cause,
         AUTHENTICATION_ERROR,
         struct.attributes(),
@@ -280,7 +284,7 @@ public final class IdAdminLoginService implements RPServiceType
       );
     }
     return new IdCommandExecutionFailure(
-      this.strings.format("errorInvalidUsernamePassword"),
+      this.strings.format(ERROR_INVALID_USERNAME_PASSWORD),
       cause,
       AUTHENTICATION_ERROR,
       Map.of(),

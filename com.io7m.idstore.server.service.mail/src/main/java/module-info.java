@@ -27,9 +27,11 @@ module com.io7m.idstore.server.service.mail
   requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server.service.telemetry.api;
 
-  requires org.slf4j;
+  requires com.io7m.repetoir.core;
+  requires io.opentelemetry.api;
   requires io.opentelemetry.context;
   requires jakarta.mail;
+  requires org.slf4j;
 
   exports com.io7m.idstore.server.service.mail;
 }

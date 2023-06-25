@@ -26,6 +26,7 @@ import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import java.util.Objects;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
+import static com.io7m.idstore.strings.IdStringConstants.COMMAND_NOT_HERE;
 
 /**
  * IdACmdAdminSelf
@@ -56,7 +57,7 @@ public final class IdACmdAdminLogin
     throw context.failFormatted(
       400,
       API_MISUSE_ERROR,
-      "commandNotHere"
+      COMMAND_NOT_HERE
     );
   }
 }

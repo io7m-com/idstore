@@ -23,12 +23,13 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandUserEmailAdd;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.security.IdSecAdminActionUserUpdateEmail;
+import com.io7m.idstore.strings.IdStrings;
 
 import java.util.Objects;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
+import static com.io7m.idstore.strings.IdStringConstants.EMAIL_DUPLICATE;
 
 /**
  * IdACmdUserEmailAdd
@@ -61,7 +62,7 @@ public final class IdACmdUserEmailAdd
     context.securityCheck(new IdSecAdminActionUserUpdateEmail(admin));
 
     final var strings =
-      context.services().requireService(IdServerStrings.class);
+      context.services().requireService(IdStrings.class);
 
     transaction.adminIdSet(admin.id());
 
@@ -73,7 +74,7 @@ public final class IdACmdUserEmailAdd
     } catch (final IdDatabaseException e) {
       if (Objects.equals(e.errorCode(), SQL_ERROR_UNIQUE)) {
         throw new IdDatabaseException(
-          strings.format("emailDuplicate"),
+          strings.format(EMAIL_DUPLICATE),
           e,
           SQL_ERROR_UNIQUE,
           e.attributes(),

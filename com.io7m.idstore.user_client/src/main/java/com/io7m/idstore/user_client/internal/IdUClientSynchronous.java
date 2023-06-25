@@ -21,6 +21,7 @@ import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientCredentials;
 import com.io7m.idstore.user_client.api.IdUClientEventType;
@@ -59,7 +60,7 @@ public final class IdUClientSynchronous
 
   public IdUClientSynchronous(
     final IdUClientConfiguration inConfiguration,
-    final IdUStrings inStrings,
+    final IdStrings inStrings,
     final HttpClient inHttpClient)
   {
     super(

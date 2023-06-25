@@ -23,7 +23,9 @@ module com.io7m.idstore.server.api
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires transitive com.io7m.idstore.database.api;
+  requires com.io7m.idstore.database.api;
+  requires com.io7m.idstore.strings;
+  requires com.io7m.idstore.model;
 
   requires com.io7m.cxbutton.core;
 
