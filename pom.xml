@@ -78,12 +78,12 @@
     <com.io7m.quarrel.version>1.2.0</com.io7m.quarrel.version>
     <com.io7m.quixote.version>1.0.0</com.io7m.quixote.version>
     <com.io7m.seltzer.version>1.0.0</com.io7m.seltzer.version>
-    <com.io7m.trasco.version>1.0.0-beta0003</com.io7m.trasco.version>
+    <com.io7m.trasco.version>1.0.0</com.io7m.trasco.version>
     <com.io7m.verdant.version>1.0.0</com.io7m.verdant.version>
     <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
     <io7m.api.previousVersion>1.0.0-SNAPSHOT</io7m.api.previousVersion>
     <jetty.version>11.0.15</jetty.version>
-    <jooq.version>3.18.4</jooq.version>
+    <jooq.version>3.18.5</jooq.version>
     <logback.version>1.4.8</logback.version>
     <opentelemetry.version>1.27.0</opentelemetry.version>
     <org.jline.version>3.23.0</org.jline.version>
@@ -557,7 +557,7 @@
       <dependency>
         <groupId>com.github.davidmoten</groupId>
         <artifactId>subethasmtp</artifactId>
-        <version>6.0.5</version>
+        <version>6.0.6</version>
         <exclusions>
           <exclusion>
             <groupId>com.google.code.findbugs</groupId>
@@ -605,7 +605,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.3.1</version>
+        <version>5.4.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
