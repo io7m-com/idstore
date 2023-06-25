@@ -28,4 +28,7 @@ module com.io7m.idstore.strings
   requires com.io7m.repetoir.core;
 
   exports com.io7m.idstore.strings;
+
+  opens com.io7m.idstore.strings
+    to com.io7m.jxtrand.vanilla;
 }
