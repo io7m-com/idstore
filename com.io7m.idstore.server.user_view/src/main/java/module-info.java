@@ -26,15 +26,17 @@ module com.io7m.idstore.server.user_view
   requires com.io7m.idstore.database.api;
   requires com.io7m.idstore.error_codes;
   requires com.io7m.idstore.protocol.user;
+  requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server.controller;
   requires com.io7m.idstore.server.http;
   requires com.io7m.idstore.server.service.branding;
   requires com.io7m.idstore.server.service.clock;
   requires com.io7m.idstore.server.service.configuration;
+  requires com.io7m.idstore.server.service.maintenance;
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.telemetry.api;
   requires com.io7m.idstore.server.service.templating;
-  requires com.io7m.idstore.server.service.maintenance;
+  requires com.io7m.idstore.strings;
 
   requires io.opentelemetry.api;
   requires org.eclipse.jetty.http;

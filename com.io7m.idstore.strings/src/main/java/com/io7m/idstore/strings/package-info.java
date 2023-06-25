@@ -14,32 +14,13 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.user_client.internal;
-
-import com.io7m.jxtrand.vanilla.JXTAbstractStrings;
-
-import java.util.Locale;
-
 /**
- * The string resources.
+ * Identity server (Strings)
  */
 
-public final class IdUStrings extends JXTAbstractStrings
-{
-  /**
-   * The string resources.
-   *
-   * @param locale The application locale
-   */
+@Export
+@Version("1.0.0")
+package com.io7m.idstore.strings;
 
-  public IdUStrings(
-    final Locale locale)
-  {
-    super(
-      locale,
-      IdUStrings.class,
-      "/com/io7m/idstore/user_client/internal",
-      "Messages"
-    );
-  }
-}
+import org.osgi.annotation.bundle.Export;
+import org.osgi.annotation.versioning.Version;

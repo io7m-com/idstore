@@ -25,6 +25,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailPrevious;
 import com.io7m.idstore.server.security.IdSecAdminActionUserRead;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR_SEARCH_START;
 
 /**
  * IdACmdUserSearchByEmailPrevious
@@ -66,7 +67,7 @@ public final class IdACmdUserSearchByEmailPrevious
 
     if (searchOpt.isEmpty()) {
       throw context.failFormatted(
-        400, API_MISUSE_ERROR, "errorSearchStart");
+        400, API_MISUSE_ERROR, ERROR_SEARCH_START);
     }
 
     return new IdAResponseUserSearchByEmailPrevious(

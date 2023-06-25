@@ -16,13 +16,13 @@
 
 package com.io7m.idstore.user_client;
 
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientAsynchronousType;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientFactoryType;
 import com.io7m.idstore.user_client.api.IdUClientSynchronousType;
 import com.io7m.idstore.user_client.internal.IdUClientAsynchronous;
 import com.io7m.idstore.user_client.internal.IdUClientSynchronous;
-import com.io7m.idstore.user_client.internal.IdUStrings;
 
 import java.net.CookieManager;
 import java.net.http.HttpClient;
@@ -51,7 +51,7 @@ public final class IdUClients implements IdUClientFactoryType
     final var locale =
       configuration.locale();
     final var strings =
-      new IdUStrings(locale);
+      IdStrings.create(locale);
 
     final var httpClient =
       HttpClient.newBuilder()
@@ -70,7 +70,7 @@ public final class IdUClients implements IdUClientFactoryType
     final var locale =
       configuration.locale();
     final var strings =
-      new IdUStrings(locale);
+      IdStrings.create(locale);
 
     final var httpClient =
       HttpClient.newBuilder()

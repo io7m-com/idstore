@@ -23,6 +23,7 @@ import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.user.IdUCommandType;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientCredentials;
 import com.io7m.idstore.user_client.api.IdUClientEventType;
@@ -37,6 +38,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
+import static com.io7m.idstore.strings.IdStringConstants.NOT_LOGGED_IN;
 
 /**
  * The initial "disconnected" protocol handler.
@@ -57,7 +59,7 @@ public final class IdUHandlerDisconnected extends IdUHandlerAbstract
 
   public IdUHandlerDisconnected(
     final IdUClientConfiguration inConfiguration,
-    final IdUStrings inStrings,
+    final IdStrings inStrings,
     final HttpClient inHttpClient)
   {
     super(inConfiguration, inStrings, inHttpClient);
@@ -68,7 +70,7 @@ public final class IdUHandlerDisconnected extends IdUHandlerAbstract
     return new HBResultFailure<>(
       new IdUResponseError(
         UUID.randomUUID(),
-        this.strings().format("notLoggedIn"),
+        this.local(NOT_LOGGED_IN),
         IdStandardErrorCodes.NOT_LOGGED_IN,
         Map.of(),
         Optional.empty(),

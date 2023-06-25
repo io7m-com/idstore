@@ -23,11 +23,13 @@ module com.io7m.idstore.server.service.configuration
   requires static org.osgi.annotation.versioning;
   requires static org.osgi.annotation.bundle;
 
-  requires transitive com.io7m.idstore.server.api;
+  requires com.io7m.idstore.model;
+  requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server.service.telemetry.api;
 
-  requires jakarta.xml.bind;
   requires com.io7m.cxbutton.core;
+  requires com.io7m.repetoir.core;
+  requires jakarta.xml.bind;
 
   opens com.io7m.idstore.server.service.configuration.jaxb
     to jakarta.xml.bind;

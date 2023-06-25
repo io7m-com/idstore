@@ -26,5 +26,7 @@ module com.io7m.idstore.server.service.health
   requires com.io7m.idstore.database.api;
   requires com.io7m.idstore.server.service.telemetry.api;
 
+  requires com.io7m.repetoir.core;
+
   exports com.io7m.idstore.server.service.health;
 }

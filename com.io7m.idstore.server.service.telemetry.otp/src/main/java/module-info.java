@@ -26,17 +26,20 @@ module com.io7m.idstore.server.service.telemetry.otp
   requires static org.osgi.annotation.versioning;
   requires static org.osgi.annotation.bundle;
 
-  requires transitive com.io7m.idstore.server.service.telemetry.api;
+  requires com.io7m.idstore.server.service.telemetry.api;
+  requires com.io7m.idstore.model;
+  requires com.io7m.idstore.server.api;
 
-  requires org.slf4j;
+  requires io.opentelemetry.api;
   requires io.opentelemetry.context;
   requires io.opentelemetry.exporter.otlp;
   requires io.opentelemetry.sdk.common;
+  requires io.opentelemetry.sdk.logs;
   requires io.opentelemetry.sdk.metrics;
   requires io.opentelemetry.sdk.trace;
   requires io.opentelemetry.sdk;
   requires io.opentelemetry.semconv;
-  requires io.opentelemetry.sdk.logs;
+  requires org.slf4j;
 
   provides IdServerTelemetryServiceFactoryType
     with IdServerTelemetryServices;

@@ -58,6 +58,7 @@
     <module>com.io7m.idstore.server.user_view</module>
     <module>com.io7m.idstore.server.vanilla</module>
     <module>com.io7m.idstore.shell.admin</module>
+    <module>com.io7m.idstore.strings</module>
     <module>com.io7m.idstore.tests.arbitraries</module>
     <module>com.io7m.idstore.tests.extensions</module>
     <module>com.io7m.idstore.tests</module>
@@ -631,6 +632,12 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>jaxb2-maven-plugin</artifactId>
           <version>3.1.0</version>
+        </plugin>
+
+        <plugin>
+          <groupId>com.io7m.jxtrand</groupId>
+          <artifactId>com.io7m.jxtrand.maven_plugin</artifactId>
+          <version>${com.io7m.jxtrand.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>

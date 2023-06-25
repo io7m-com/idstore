@@ -18,7 +18,6 @@
 package com.io7m.idstore.server.user_view;
 
 import com.io7m.idstore.model.IdValidityException;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetServiceType;
 import com.io7m.idstore.server.http.IdHTTPServletFunctional;
@@ -30,6 +29,7 @@ import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jvindicator.core.Vindication;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
@@ -44,6 +44,8 @@ import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.strings.IdStringConstants.EMAIL_PASSWORD_RESET_SUCCESS;
+import static com.io7m.idstore.strings.IdStringConstants.EMAIL_PASSWORD_RESET_SUCCESS_TITLE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -73,7 +75,7 @@ public final class IdUVPasswordResetConfirmRun
     final var userPasswordResets =
       services.requireService(IdUserPasswordResetServiceType.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var branding =
       services.requireService(IdServerBrandingServiceType.class);
     final var errorTemplate =
@@ -98,7 +100,7 @@ public final class IdUVPasswordResetConfirmRun
 
   private static IdHTTPServletResponseType execute(
     final IdUserPasswordResetServiceType userPasswordResets,
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> messageTemplate,
     final HttpServletRequest request,
@@ -154,7 +156,7 @@ public final class IdUVPasswordResetConfirmRun
   }
 
   private static IdHTTPServletResponseType showConfirmed(
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> messageTemplate,
     final IdHTTPServletRequestInformation information)
@@ -162,13 +164,13 @@ public final class IdUVPasswordResetConfirmRun
     try (var writer = new StringWriter()) {
       messageTemplate.process(
         new IdFMMessageData(
-          branding.htmlTitle(strings.format("emailPasswordResetSuccessTitle")),
+          branding.htmlTitle(strings.format(EMAIL_PASSWORD_RESET_SUCCESS_TITLE)),
           branding.title(),
           information.requestId(),
           false,
           false,
-          strings.format("emailPasswordResetSuccessTitle"),
-          strings.format("emailPasswordResetSuccess"),
+          strings.format(EMAIL_PASSWORD_RESET_SUCCESS_TITLE),
+          strings.format(EMAIL_PASSWORD_RESET_SUCCESS),
           "/"
         ),
         writer

@@ -26,6 +26,7 @@ import com.io7m.idstore.server.security.IdSecAdminActionAdminDelete;
 import java.util.Objects;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.OPERATION_NOT_PERMITTED;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR_DELETE_SELF;
 
 /**
  * IdACmdAdminDelete
@@ -62,7 +63,10 @@ public final class IdACmdAdminDelete
 
     if (Objects.equals(admin.id(), command.adminId())) {
       throw context.failFormatted(
-        400, OPERATION_NOT_PERMITTED, "errorDeleteSelf");
+        400,
+        OPERATION_NOT_PERMITTED,
+        ERROR_DELETE_SELF
+      );
     }
 
     transaction.adminIdSet(admin.id());

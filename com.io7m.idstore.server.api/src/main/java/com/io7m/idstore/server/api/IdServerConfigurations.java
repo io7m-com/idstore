@@ -19,6 +19,7 @@ package com.io7m.idstore.server.api;
 
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseFactoryType;
+import com.io7m.idstore.strings.IdStrings;
 
 import java.time.Clock;
 import java.util.ArrayList;
@@ -66,6 +67,9 @@ public final class IdServerConfigurations
     final var fileDbConfig =
       file.databaseConfiguration();
 
+    final var strings =
+      IdStrings.create(locale);
+
     final var databaseConfiguration =
       new IdDatabaseConfiguration(
         fileDbConfig.ownerRoleName(),
@@ -77,6 +81,7 @@ public final class IdServerConfigurations
         fileDbConfig.databaseName(),
         fileDbConfig.create() ? CREATE_DATABASE : DO_NOT_CREATE_DATABASE,
         fileDbConfig.upgrade() ? UPGRADE_DATABASE : DO_NOT_UPGRADE_DATABASE,
+        strings,
         clock
       );
 

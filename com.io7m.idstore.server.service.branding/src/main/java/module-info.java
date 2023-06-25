@@ -23,10 +23,12 @@ module com.io7m.idstore.server.service.branding
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires com.io7m.cxbutton.core;
   requires com.io7m.idstore.model;
   requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server.service.templating;
+
+  requires com.io7m.cxbutton.core;
+  requires com.io7m.repetoir.core;
   requires freemarker;
 
   exports com.io7m.idstore.server.service.branding;

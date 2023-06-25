@@ -35,7 +35,6 @@ import com.io7m.idstore.server.admin_v1.IdA1Server;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerException;
 import com.io7m.idstore.server.api.IdServerType;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.admin.IdAdminLoginService;
 import com.io7m.idstore.server.controller.user.IdUserLoginService;
 import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetService;
@@ -72,6 +71,7 @@ import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.verdant.IdVerdantMessages;
 import com.io7m.idstore.server.user_v1.IdU1Server;
 import com.io7m.idstore.server.user_view.IdUVServer;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.repetoir.core.RPServiceDirectory;
@@ -243,8 +243,8 @@ public final class IdServer implements IdServerType
     final var eventService = IdEventService.create(this.telemetry, metrics);
     services.register(IdEventServiceType.class, eventService);
 
-    final var strings = new IdServerStrings(this.configuration.locale());
-    services.register(IdServerStrings.class, strings);
+    final var strings = IdStrings.create(this.configuration.locale());
+    services.register(IdStrings.class, strings);
 
     final var mailService =
       IdServerMailService.create(
@@ -493,6 +493,7 @@ public final class IdServer implements IdServerType
             baseConfiguration.databaseName(),
             IdDatabaseCreate.CREATE_DATABASE,
             IdDatabaseUpgrade.UPGRADE_DATABASE,
+            baseConfiguration.strings(),
             baseConfiguration.clock()
           );
 

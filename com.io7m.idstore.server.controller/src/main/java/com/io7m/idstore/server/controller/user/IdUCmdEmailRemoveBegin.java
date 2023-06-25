@@ -29,7 +29,6 @@ import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveBegin;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecUserActionEmailRemoveBegin;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
@@ -40,6 +39,7 @@ import com.io7m.idstore.server.service.telemetry.api.IdEventServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdEventUserEmailVerificationRateLimitExceeded;
 import com.io7m.idstore.server.service.templating.IdFMEmailVerificationData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
+import com.io7m.idstore.strings.IdStrings;
 import io.opentelemetry.api.trace.Span;
 
 import java.io.StringWriter;
@@ -52,6 +52,9 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATI
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_REMOVE;
+import static com.io7m.idstore.strings.IdStringConstants.EMAIL_REMOVE_LAST;
+import static com.io7m.idstore.strings.IdStringConstants.EMAIL_VERIFICATION_RATE_LIMITED;
+import static com.io7m.idstore.strings.IdStringConstants.NOT_FOUND;
 
 /**
  * IdUCmdEmailRemoveBegin
@@ -84,7 +87,7 @@ public final class IdUCmdEmailRemoveBegin
     final var mailService =
       services.requireService(IdServerMailServiceType.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var brandingService =
       services.requireService(IdServerBrandingServiceType.class);
     final var rateLimitService =
@@ -107,7 +110,7 @@ public final class IdUCmdEmailRemoveBegin
       throw context.fail(
         400,
         RATE_LIMIT_EXCEEDED,
-        strings.format("emailVerificationRateLimited")
+        strings.format(EMAIL_VERIFICATION_RATE_LIMITED)
       );
     }
 
@@ -369,7 +372,7 @@ public final class IdUCmdEmailRemoveBegin
       throw context.failFormatted(
         404,
         EMAIL_NONEXISTENT,
-        "notFound"
+        NOT_FOUND
       );
     }
 
@@ -377,7 +380,7 @@ public final class IdUCmdEmailRemoveBegin
       throw context.failFormatted(
         400,
         EMAIL_VERIFICATION_FAILED,
-        "emailRemoveLast"
+        EMAIL_REMOVE_LAST
       );
     }
   }

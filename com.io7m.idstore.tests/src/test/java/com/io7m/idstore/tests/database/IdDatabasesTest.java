@@ -23,6 +23,7 @@ import com.io7m.idstore.database.api.IdDatabaseTelemetry;
 import com.io7m.idstore.database.api.IdDatabaseUpgrade;
 import com.io7m.idstore.database.postgres.IdDatabases;
 import com.io7m.idstore.model.IdVersion;
+import com.io7m.idstore.strings.IdStrings;
 import io.opentelemetry.api.OpenTelemetry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +36,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Clock;
+import java.util.Locale;
 import java.util.Optional;
 
 import static com.io7m.idstore.tests.database.IdDatabaseExtension.POSTGRES_VERSION;
@@ -101,6 +103,7 @@ public final class IdDatabasesTest
         "idstore",
         IdDatabaseCreate.CREATE_DATABASE,
         IdDatabaseUpgrade.UPGRADE_DATABASE,
+        IdStrings.create(Locale.ROOT),
         Clock.systemUTC()
       );
 
@@ -115,6 +118,7 @@ public final class IdDatabasesTest
         "idstore",
         IdDatabaseCreate.CREATE_DATABASE,
         IdDatabaseUpgrade.DO_NOT_UPGRADE_DATABASE,
+        IdStrings.create(Locale.ROOT),
         Clock.systemUTC()
       );
 

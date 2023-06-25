@@ -25,7 +25,6 @@ import com.io7m.idstore.protocol.admin.IdACommandLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.protocol.api.IdProtocolException;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.admin.IdAdminLoggedIn;
 import com.io7m.idstore.server.controller.admin.IdAdminLoginService;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
@@ -37,6 +36,7 @@ import com.io7m.idstore.server.http.IdHTTPServletResponseType;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -55,6 +55,7 @@ import static com.io7m.idstore.server.admin_v1.IdA1ServletCoreTransactional.with
 import static com.io7m.idstore.server.http.IdHTTPServletCoreFixedDelay.withFixedDelay;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
+import static com.io7m.idstore.strings.IdStringConstants.COMMAND_NOT_HERE;
 
 /**
  * The v1 login servlet.
@@ -82,7 +83,7 @@ public final class IdA1ServletLogin extends IdHTTPServletFunctional
     final var messages =
       services.requireService(IdACB1Messages.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var logins =
       services.requireService(IdAdminLoginService.class);
     final var configuration =
@@ -102,26 +103,26 @@ public final class IdA1ServletLogin extends IdHTTPServletFunctional
             services,
             delay,
             (req1, info1) -> {
-            return withTransaction(
-              services,
-              (req2, info2, transaction) -> {
-                return execute(
-                  strings,
-                  limits,
-                  messages,
-                  logins,
-                  req2,
-                  info2,
-                  transaction
-                );
-              }).execute(req1, info1);
-          }).execute(req0, info0);
+              return withTransaction(
+                services,
+                (req2, info2, transaction) -> {
+                  return execute(
+                    strings,
+                    limits,
+                    messages,
+                    logins,
+                    req2,
+                    info2,
+                    transaction
+                  );
+                }).execute(req1, info1);
+            }).execute(req0, info0);
         }).execute(request, information);
     };
   }
 
   private static IdHTTPServletResponseType execute(
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdRequestLimits limits,
     final IdACB1Messages messages,
     final IdAdminLoginService logins,
@@ -181,7 +182,7 @@ public final class IdA1ServletLogin extends IdHTTPServletFunctional
   }
 
   private static IdACommandLogin readLoginCommand(
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdRequestLimits limits,
     final IdACB1Messages messages,
     final HttpServletRequest request)
@@ -196,7 +197,7 @@ public final class IdA1ServletLogin extends IdHTTPServletFunctional
     }
 
     throw new IdProtocolException(
-      strings.format("commandNotHere"),
+      strings.format(COMMAND_NOT_HERE),
       API_MISUSE_ERROR,
       Map.of(),
       Optional.empty()

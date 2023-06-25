@@ -17,19 +17,20 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
 import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
 import com.io7m.idstore.server.http.IdHTTPServletResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStrings;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 
+import static com.io7m.idstore.strings.IdStringConstants.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -56,7 +57,7 @@ public final class IdUVErrorPage
    */
 
   static IdHTTPServletResponseType showError(
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> errorTemplate,
     final IdHTTPServletRequestInformation information,
@@ -67,12 +68,12 @@ public final class IdUVErrorPage
     try (var writer = new StringWriter()) {
       errorTemplate.process(
         new IdFMMessageData(
-          branding.htmlTitle(strings.format("error")),
+          branding.htmlTitle(strings.format(ERROR)),
           branding.title(),
           information.requestId(),
           true,
           statusCode >= 500,
-          strings.format("error"),
+          strings.format(ERROR),
           message,
           destination
         ),

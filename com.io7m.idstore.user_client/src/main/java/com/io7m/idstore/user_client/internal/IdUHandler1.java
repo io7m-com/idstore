@@ -31,6 +31,7 @@ import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseLogin;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientCredentials;
 import com.io7m.idstore.user_client.api.IdUClientEventType;
@@ -55,6 +56,13 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
+import static com.io7m.idstore.strings.IdStringConstants.CONNECT_FAILURE;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR_UNEXPECTED_CONTENT_TYPE;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR_UNEXPECTED_RESPONSE_TYPE;
+import static com.io7m.idstore.strings.IdStringConstants.EXPECTED_CONTENT_TYPE;
+import static com.io7m.idstore.strings.IdStringConstants.EXPECTED_RESPONSE_TYPE;
+import static com.io7m.idstore.strings.IdStringConstants.RECEIVED_CONTENT_TYPE;
+import static com.io7m.idstore.strings.IdStringConstants.RECEIVED_RESPONSE_TYPE;
 import static com.io7m.idstore.user_client.internal.IdUCompression.decompressResponse;
 import static com.io7m.idstore.user_client.internal.IdUUUIDs.nullUUID;
 import static java.util.Objects.requireNonNullElse;
@@ -86,7 +94,7 @@ public final class IdUHandler1 extends IdUHandlerAbstract
 
   IdUHandler1(
     final IdUClientConfiguration inConfiguration,
-    final IdUStrings inStrings,
+    final IdStrings inStrings,
     final HttpClient inHttpClient,
     final URI baseURI)
   {
@@ -243,7 +251,7 @@ public final class IdUHandler1 extends IdUHandlerAbstract
           nullUUID(),
           requireNonNullElse(
             e.getMessage(),
-            this.strings().format("connectFailure")
+            this.local(CONNECT_FAILURE)
           ),
           IO_ERROR,
           Map.of(),
@@ -293,18 +301,18 @@ public final class IdUHandler1 extends IdUHandlerAbstract
   {
     final var attributes = new HashMap<String, String>();
     attributes.put(
-      this.local("Expected Content Type"),
+      this.local(EXPECTED_CONTENT_TYPE),
       expectedContentType
     );
     attributes.put(
-      this.local("Received Content Type"),
+      this.local(RECEIVED_CONTENT_TYPE),
       contentType
     );
 
     return new HBResultFailure<>(
       new IdUResponseError(
         nullUUID(),
-        this.local("Received an unexpected content type."),
+        this.local(ERROR_UNEXPECTED_CONTENT_TYPE),
         PROTOCOL_ERROR,
         attributes,
         Optional.empty(),
@@ -321,31 +329,24 @@ public final class IdUHandler1 extends IdUHandlerAbstract
   {
     final var attributes = new HashMap<String, String>();
     attributes.put(
-      this.local("Expected Response Type"),
+      this.local(EXPECTED_RESPONSE_TYPE),
       message.responseClass().getSimpleName()
     );
     attributes.put(
-      this.local("Received Response Type"),
+      this.local(RECEIVED_RESPONSE_TYPE),
       responseActual.getClass().getSimpleName()
     );
 
     return new HBResultFailure<>(
       new IdUResponseError(
         nullUUID(),
-        this.local("Received an unexpected response type."),
+        this.local(ERROR_UNEXPECTED_RESPONSE_TYPE),
         PROTOCOL_ERROR,
         attributes,
         Optional.empty(),
         BLAME_SERVER
       )
     );
-  }
-
-  private String local(
-    final String id,
-    final Object... args)
-  {
-    return this.strings().format(id, args);
   }
 
   @Override

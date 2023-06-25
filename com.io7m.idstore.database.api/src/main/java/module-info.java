@@ -23,10 +23,11 @@ module com.io7m.idstore.database.api
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires transitive com.io7m.idstore.model;
-  requires transitive com.io7m.idstore.error_codes;
-  requires transitive com.io7m.repetoir.core;
+  requires com.io7m.idstore.model;
+  requires com.io7m.idstore.error_codes;
+  requires com.io7m.idstore.strings;
 
+  requires com.io7m.repetoir.core;
   requires io.opentelemetry.api;
   requires io.opentelemetry.context;
 

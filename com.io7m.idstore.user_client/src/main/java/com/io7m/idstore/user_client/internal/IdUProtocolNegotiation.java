@@ -23,6 +23,7 @@ import com.io7m.genevan.core.GenProtocolSolved;
 import com.io7m.genevan.core.GenProtocolSolver;
 import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.verdant.core.VProtocolException;
@@ -67,7 +68,7 @@ public final class IdUProtocolNegotiation
   private static List<IdUServerEndpoint> fetchSupportedVersions(
     final URI base,
     final HttpClient httpClient,
-    final IdUStrings strings)
+    final IdStrings strings)
     throws InterruptedException, IdUClientException
   {
     LOG.debug("retrieving supported server protocols");
@@ -186,7 +187,7 @@ public final class IdUProtocolNegotiation
   public static IdUHandlerType negotiateProtocolHandler(
     final IdUClientConfiguration configuration,
     final HttpClient httpClient,
-    final IdUStrings strings,
+    final IdStrings strings,
     final URI base)
     throws IdUClientException, InterruptedException
   {

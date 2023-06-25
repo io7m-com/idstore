@@ -77,8 +77,8 @@ public final class IdUVMain extends IdHTTPServletFunctional
       services.requireService(IdDatabaseType.class);
     final var branding =
       services.requireService(IdServerBrandingServiceType.class);
-    final var templates = services.requireService(
-      IdFMTemplateServiceType.class);
+    final var templates =
+      services.requireService(IdFMTemplateServiceType.class);
     final var userTemplate =
       templates.pageUserSelfTemplate();
     final var msgTemplate =

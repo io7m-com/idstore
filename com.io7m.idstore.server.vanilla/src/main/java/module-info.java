@@ -31,6 +31,7 @@ module com.io7m.idstore.server.vanilla
 
   requires transitive com.io7m.idstore.server.api;
 
+  requires com.io7m.idstore.database.api;
   requires com.io7m.idstore.protocol.admin.cb;
   requires com.io7m.idstore.protocol.user.cb;
   requires com.io7m.idstore.server.admin_v1;
@@ -49,8 +50,10 @@ module com.io7m.idstore.server.vanilla
   requires com.io7m.idstore.server.service.verdant;
   requires com.io7m.idstore.server.user_v1;
   requires com.io7m.idstore.server.user_view;
+  requires com.io7m.idstore.strings;
 
   requires com.io7m.jmulticlose.core;
+  requires io.opentelemetry.api;
   requires org.eclipse.jetty.server;
   requires org.eclipse.jetty.util;
 

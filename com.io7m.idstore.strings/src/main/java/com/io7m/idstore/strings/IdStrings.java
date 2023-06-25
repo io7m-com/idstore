@@ -14,57 +14,57 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.strings;
 
-package com.io7m.idstore.server.controller;
-
-import com.io7m.jxtrand.vanilla.JXTAbstractStrings;
+import com.io7m.jxtrand.vanilla.JXTAbstractGenericStrings;
 import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 /**
- * The server string resources.
+ * The string resources.
  */
 
-public final class IdServerStrings extends JXTAbstractStrings
+public final class IdStrings
+  extends JXTAbstractGenericStrings<IdStringConstantType>
   implements RPServiceType
 {
-  private static final Pattern WHITESPACE =
-    Pattern.compile("\\s+");
-
   /**
-   * The client string resources.
+   * The string resources.
    *
    * @param locale The application locale
    */
 
-  public IdServerStrings(
+  private IdStrings(
     final Locale locale)
   {
     super(
       locale,
-      IdServerStrings.class,
-      "/com/io7m/idstore/server/controller",
+      IdStrings.class,
+      "/com/io7m/idstore/strings",
       "Messages"
     );
   }
 
-  @Override
-  public String format(
-    final String id,
-    final Object... args)
+  /**
+   * Create string resources.
+   *
+   * @param locale The locale
+   *
+   * @return The string resources
+   */
+
+  public static IdStrings create(
+    final Locale locale)
   {
-    return WHITESPACE.matcher(super.format(id, args))
-      .replaceAll(" ")
-      .strip();
+    return new IdStrings(locale);
   }
 
   @Override
   public String toString()
   {
     return String.format(
-      "[IdServerStrings 0x%08x]",
+      "[IdStrings 0x%08x]",
       Integer.valueOf(this.hashCode())
     );
   }
@@ -72,6 +72,6 @@ public final class IdServerStrings extends JXTAbstractStrings
   @Override
   public String description()
   {
-    return "Server string resources.";
+    return "String resource service.";
   }
 }

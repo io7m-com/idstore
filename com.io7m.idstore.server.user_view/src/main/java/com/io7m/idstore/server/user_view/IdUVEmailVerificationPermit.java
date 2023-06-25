@@ -25,7 +25,6 @@ import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddPermit;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemovePermit;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCmdEmailAddPermit;
 import com.io7m.idstore.server.controller.user.IdUCmdEmailRemovePermit;
@@ -40,6 +39,7 @@ import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jvindicator.core.Vindication;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,6 +49,7 @@ import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.strings.IdStringConstants.NOT_FOUND;
 
 /**
  * The endpoint that allows for completing email verification challenges.
@@ -77,7 +78,7 @@ public final class IdUVEmailVerificationPermit
     final var database =
       services.requireService(IdDatabaseType.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var branding =
       services.requireService(IdServerBrandingServiceType.class);
     final var errorTemplate =
@@ -104,7 +105,7 @@ public final class IdUVEmailVerificationPermit
 
   private static IdHTTPServletResponseType execute(
     final RPServiceDirectoryType services,
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdDatabaseType database,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> errorTemplate,
@@ -168,7 +169,7 @@ public final class IdUVEmailVerificationPermit
   private static IdHTTPServletResponseType runForToken(
     final RPServiceDirectoryType services,
     final IdDatabaseType database,
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> msgTemplate,
     final IdHTTPServletRequestInformation information,
@@ -192,7 +193,7 @@ public final class IdUVEmailVerificationPermit
             msgTemplate,
             information,
             400,
-            strings.format("notFound"),
+            strings.format(NOT_FOUND),
             DESTINATION_ON_FAILURE
           );
         }

@@ -19,6 +19,7 @@ package com.io7m.idstore.server.controller.user;
 import com.io7m.idstore.database.api.IdDatabaseEmailsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdToken;
@@ -28,7 +29,6 @@ import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.security.IdSecUserActionEmailAddBegin;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
@@ -39,16 +39,18 @@ import com.io7m.idstore.server.service.telemetry.api.IdEventServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdEventUserEmailVerificationRateLimitExceeded;
 import com.io7m.idstore.server.service.templating.IdFMEmailVerificationData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
+import com.io7m.idstore.strings.IdStringConstants;
+import com.io7m.idstore.strings.IdStrings;
 import io.opentelemetry.api.trace.Span;
 
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_ADD;
+import static com.io7m.idstore.strings.IdStringConstants.EMAIL_VERIFICATION_RATE_LIMITED;
 
 /**
  * IdUCmdEmailAddBegin
@@ -81,7 +83,7 @@ public final class IdUCmdEmailAddBegin
     final var mailService =
       services.requireService(IdServerMailServiceType.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var brandingService =
       services.requireService(IdServerBrandingServiceType.class);
     final var rateLimitService =
@@ -112,7 +114,7 @@ public final class IdUCmdEmailAddBegin
       throw context.fail(
         400,
         RATE_LIMIT_EXCEEDED,
-        strings.format("emailVerificationRateLimited")
+        strings.format(EMAIL_VERIFICATION_RATE_LIMITED)
       );
     }
 
@@ -353,15 +355,15 @@ public final class IdUCmdEmailAddBegin
   private static void checkPreconditions(
     final IdUCommandContext context,
     final IdDatabaseEmailsQueriesType emails,
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdEmail email)
     throws IdDatabaseException, IdCommandExecutionFailure
   {
     final var existingOpt = emails.emailExists(email);
     if (existingOpt.isPresent()) {
       throw new IdCommandExecutionFailure(
-        strings.format("emailDuplicate"),
-        EMAIL_DUPLICATE,
+        strings.format(IdStringConstants.EMAIL_DUPLICATE),
+        IdStandardErrorCodes.EMAIL_DUPLICATE,
         Map.of(),
         Optional.empty(),
         context.requestId(),

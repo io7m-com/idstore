@@ -20,7 +20,6 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
 import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
@@ -34,6 +33,7 @@ import com.io7m.idstore.server.service.templating.IdFMLoginData;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,6 +47,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -59,10 +60,11 @@ public final class IdUVServletCoreAuthenticated
   private final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> core;
   private final IdDatabaseType database;
   private final IdSessionUserService userSessions;
-  private final IdServerStrings strings;
+  private final IdStrings strings;
   private final IdFMTemplateType<IdFMMessageData> template;
   private final IdServerBrandingServiceType branding;
   private final IdFMTemplateType<IdFMLoginData> loginTemplate;
+
   private IdUVServletCoreAuthenticated(
     final RPServiceDirectoryType services,
     final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> inCore)
@@ -72,7 +74,7 @@ public final class IdUVServletCoreAuthenticated
     this.core =
       Objects.requireNonNull(inCore, "core");
     this.strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     this.database =
       services.requireService(IdDatabaseType.class);
     this.userSessions =
@@ -152,12 +154,12 @@ public final class IdUVServletCoreAuthenticated
     try (var writer = new StringWriter()) {
       this.template.process(
         new IdFMMessageData(
-          this.branding.htmlTitle(this.strings.format("error")),
+          this.branding.htmlTitle(this.strings.format(ERROR)),
           this.branding.title(),
           information.requestId(),
           true,
           true,
-          this.strings.format("error"),
+          this.strings.format(ERROR),
           e.getMessage(),
           "/"
         ),

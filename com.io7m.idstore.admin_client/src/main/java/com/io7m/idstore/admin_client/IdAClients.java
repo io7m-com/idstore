@@ -22,7 +22,7 @@ import com.io7m.idstore.admin_client.api.IdAClientFactoryType;
 import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.admin_client.internal.IdAClientAsynchronous;
 import com.io7m.idstore.admin_client.internal.IdAClientSynchronous;
-import com.io7m.idstore.admin_client.internal.IdAStrings;
+import com.io7m.idstore.strings.IdStrings;
 
 import java.net.CookieManager;
 import java.net.http.HttpClient;
@@ -50,8 +50,8 @@ public final class IdAClients implements IdAClientFactoryType
       new CookieManager();
     final var locale =
       configuration.locale();
-    final IdAStrings strings =
-      new IdAStrings(locale);
+    final var strings =
+      IdStrings.create(locale);
 
     final var httpClient =
       HttpClient.newBuilder()
@@ -69,8 +69,8 @@ public final class IdAClients implements IdAClientFactoryType
       new CookieManager();
     final var locale =
       configuration.locale();
-    final IdAStrings strings =
-      new IdAStrings(locale);
+    final var strings =
+      IdStrings.create(locale);
 
     final var httpClient =
       HttpClient.newBuilder()

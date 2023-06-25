@@ -17,6 +17,7 @@
 package com.io7m.idstore.user_client.internal;
 
 import com.io7m.genevan.core.GenProtocolClientHandlerType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 
 import java.net.URI;
@@ -43,6 +44,6 @@ public interface IdUHandlerFactoryType
   IdUHandlerType createHandler(
     IdUClientConfiguration configuration,
     HttpClient inHttpClient,
-    IdUStrings inStrings,
+    IdStrings inStrings,
     URI baseURI);
 }

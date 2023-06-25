@@ -28,6 +28,7 @@ module com.io7m.idstore.user_client
 
   requires com.io7m.idstore.protocol.user.cb;
   requires com.io7m.idstore.protocol.user;
+  requires com.io7m.idstore.strings;
 
   requires com.io7m.genevan.core;
   requires com.io7m.hibiscus.api;

@@ -23,7 +23,6 @@ import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
@@ -33,6 +32,8 @@ import com.io7m.idstore.server.service.telemetry.api.IdEventServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdEventUserLoggedIn;
 import com.io7m.idstore.server.service.telemetry.api.IdEventUserLoginAuthenticationFailed;
 import com.io7m.idstore.server.service.telemetry.api.IdEventUserLoginRateLimitExceeded;
+import com.io7m.idstore.strings.IdStringConstants;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceType;
 
 import java.util.Map;
@@ -44,6 +45,10 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_E
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.BANNED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
+import static com.io7m.idstore.strings.IdStringConstants.BANNED_NO_EXPIRE;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR_INVALID_USERNAME_PASSWORD;
+import static com.io7m.idstore.strings.IdStringConstants.LOGIN_RATE_LIMITED;
+import static com.io7m.idstore.strings.IdStringConstants.WAIT_DURATION;
 
 /**
  * A service that handles the logic for user logins.
@@ -52,7 +57,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT
 public final class IdUserLoginService implements RPServiceType
 {
   private final IdServerClock clock;
-  private final IdServerStrings strings;
+  private final IdStrings strings;
   private final IdSessionUserService sessions;
   private final IdServerConfigurationService configurations;
   private final IdRateLimitUserLoginServiceType rateLimit;
@@ -71,7 +76,7 @@ public final class IdUserLoginService implements RPServiceType
 
   public IdUserLoginService(
     final IdServerClock inClock,
-    final IdServerStrings inStrings,
+    final IdStrings inStrings,
     final IdSessionUserService inSessions,
     final IdServerConfigurationService inConfigurations,
     final IdRateLimitUserLoginServiceType inRateLimit,
@@ -186,7 +191,7 @@ public final class IdUserLoginService implements RPServiceType
       );
 
       throw new IdCommandExecutionFailure(
-        this.strings.format("errorInvalidUsernamePassword"),
+        this.strings.format(ERROR_INVALID_USERNAME_PASSWORD),
         AUTHENTICATION_ERROR,
         Map.of(),
         Optional.empty(),
@@ -208,10 +213,11 @@ public final class IdUserLoginService implements RPServiceType
       );
 
       throw new IdCommandExecutionFailure(
-        this.strings.format("loginRateLimited"),
+        this.strings.format(LOGIN_RATE_LIMITED),
         RATE_LIMIT_EXCEEDED,
         Map.of(
-          "Wait Duration", this.rateLimit.waitTime().toString()
+          this.strings.format(WAIT_DURATION),
+          this.rateLimit.waitTime().toString()
         ),
         Optional.empty(),
         requestId,
@@ -246,7 +252,7 @@ public final class IdUserLoginService implements RPServiceType
 
     if (expiresOpt.isEmpty()) {
       throw new IdCommandExecutionFailure(
-        this.strings.format("bannedNoExpire", ban.reason()),
+        this.strings.format(BANNED_NO_EXPIRE, ban.reason()),
         BANNED,
         Map.of(),
         Optional.empty(),
@@ -264,7 +270,7 @@ public final class IdUserLoginService implements RPServiceType
 
     if (timeNow.compareTo(timeExpires) < 0) {
       throw new IdCommandExecutionFailure(
-        this.strings.format("banned", ban.reason(), timeExpires),
+        this.strings.format(IdStringConstants.BANNED, ban.reason(), timeExpires),
         BANNED,
         Map.of(),
         Optional.empty(),
@@ -279,7 +285,7 @@ public final class IdUserLoginService implements RPServiceType
     final Exception cause)
   {
     return new IdCommandExecutionFailure(
-      this.strings.format("errorInvalidUsernamePassword"),
+      this.strings.format(ERROR_INVALID_USERNAME_PASSWORD),
       cause,
       AUTHENTICATION_ERROR,
       Map.of(),

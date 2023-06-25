@@ -16,6 +16,8 @@
 
 package com.io7m.idstore.database.api;
 
+import com.io7m.idstore.strings.IdStrings;
+
 import java.time.Clock;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,6 +34,7 @@ import java.util.Optional;
  * @param create             The creation specification
  * @param address            The database address
  * @param databaseName       The database name
+ * @param strings            The string resources
  * @param clock              A clock for time retrievals
  */
 
@@ -45,6 +48,7 @@ public record IdDatabaseConfiguration(
   String databaseName,
   IdDatabaseCreate create,
   IdDatabaseUpgrade upgrade,
+  IdStrings strings,
   Clock clock)
 {
   /**
@@ -59,6 +63,7 @@ public record IdDatabaseConfiguration(
    * @param create             The creation specification
    * @param address            The database address
    * @param databaseName       The database name
+   * @param strings            The string resources
    * @param clock              A clock for time retrievals
    */
 
@@ -72,6 +77,7 @@ public record IdDatabaseConfiguration(
     Objects.requireNonNull(databaseName, "databaseName");
     Objects.requireNonNull(create, "create");
     Objects.requireNonNull(upgrade, "upgrade");
+    Objects.requireNonNull(strings, "strings");
     Objects.requireNonNull(clock, "clock");
   }
 }

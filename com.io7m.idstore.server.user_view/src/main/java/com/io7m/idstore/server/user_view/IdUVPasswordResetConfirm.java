@@ -18,7 +18,6 @@
 package com.io7m.idstore.server.user_view;
 
 import com.io7m.idstore.model.IdToken;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetServiceType;
 import com.io7m.idstore.server.http.IdHTTPServletFunctional;
@@ -31,6 +30,7 @@ import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMPasswordResetConfirmData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -73,7 +73,7 @@ public final class IdUVPasswordResetConfirm
     final var userPasswordResets =
       services.requireService(IdUserPasswordResetServiceType.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var branding =
       services.requireService(IdServerBrandingServiceType.class);
     final var errorTemplate =
@@ -102,7 +102,7 @@ public final class IdUVPasswordResetConfirm
 
   private static IdHTTPServletResponseType execute(
     final IdUserPasswordResetServiceType userPasswordResets,
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> errorTemplate,
     final IdFMTemplateType<IdFMPasswordResetConfirmData> formTemplate,

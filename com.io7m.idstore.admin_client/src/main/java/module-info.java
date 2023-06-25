@@ -28,6 +28,7 @@ module com.io7m.idstore.admin_client
 
   requires com.io7m.idstore.protocol.admin;
   requires com.io7m.idstore.protocol.admin.cb;
+  requires com.io7m.idstore.strings;
 
   requires com.io7m.genevan.core;
   requires com.io7m.hibiscus.api;

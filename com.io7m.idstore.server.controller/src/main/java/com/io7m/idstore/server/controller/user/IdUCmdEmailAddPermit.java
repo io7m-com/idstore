@@ -33,6 +33,8 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATI
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_NONEXISTENT;
 import static com.io7m.idstore.model.IdEmailVerificationOperation.EMAIL_ADD;
 import static com.io7m.idstore.model.IdEmailVerificationResolution.PERMITTED;
+import static com.io7m.idstore.strings.IdStringConstants.NOT_FOUND;
+import static com.io7m.idstore.strings.IdStringConstants.OPERATION_NOT_PERMITTED;
 
 /**
  * IdUCmdEmailAddPermit
@@ -74,7 +76,7 @@ public final class IdUCmdEmailAddPermit
       throw context.failFormatted(
         404,
         EMAIL_VERIFICATION_NONEXISTENT,
-        "notFound"
+        NOT_FOUND
       );
     }
 
@@ -83,7 +85,7 @@ public final class IdUCmdEmailAddPermit
       throw context.failFormatted(
         400,
         EMAIL_VERIFICATION_FAILED,
-        "operationNotPermitted"
+        OPERATION_NOT_PERMITTED
       );
     }
 

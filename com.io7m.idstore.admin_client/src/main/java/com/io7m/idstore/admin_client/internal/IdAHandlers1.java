@@ -20,6 +20,7 @@ import com.io7m.genevan.core.GenProtocolIdentifier;
 import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
+import com.io7m.idstore.strings.IdStrings;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -56,7 +57,7 @@ public final class IdAHandlers1
   public IdAHandlerType createHandler(
     final IdAClientConfiguration configuration,
     final HttpClient inHttpClient,
-    final IdAStrings inStrings,
+    final IdStrings inStrings,
     final URI inBaseURI)
   {
     return new IdAHandler1(configuration, inStrings, inHttpClient, inBaseURI);

@@ -25,7 +25,6 @@ import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
 import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
 import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
@@ -34,6 +33,7 @@ import com.io7m.idstore.server.http.IdHTTPServletResponseType;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -46,6 +46,7 @@ import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_SERVER;
 import static com.io7m.idstore.server.admin_v1.IdA1Errors.errorResponseOf;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
+import static com.io7m.idstore.strings.IdStringConstants.UNAUTHORIZED;
 
 /**
  * A core that executes the given core under authentication.
@@ -58,7 +59,7 @@ public final class IdA1ServletCoreAuthenticated
   private final IdDatabaseType database;
   private final IdSessionAdminService adminSessions;
   private final IdACB1Messages messages;
-  private final IdServerStrings strings;
+  private final IdStrings strings;
 
   private IdA1ServletCoreAuthenticated(
     final RPServiceDirectoryType services,
@@ -69,7 +70,7 @@ public final class IdA1ServletCoreAuthenticated
     this.core =
       Objects.requireNonNull(inCore, "core");
     this.strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     this.database =
       services.requireService(IdDatabaseType.class);
     this.adminSessions =
@@ -145,7 +146,7 @@ public final class IdA1ServletCoreAuthenticated
       this.messages.serialize(
         new IdAResponseError(
           information.requestId(),
-          this.strings.format("unauthorized"),
+          this.strings.format(UNAUTHORIZED),
           IdStandardErrorCodes.AUTHENTICATION_ERROR,
           Map.of(),
           Optional.empty(),

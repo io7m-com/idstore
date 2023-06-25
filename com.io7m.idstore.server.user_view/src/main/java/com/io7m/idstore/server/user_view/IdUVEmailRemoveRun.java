@@ -23,7 +23,6 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUCommandEmailRemoveBegin;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCmdEmailRemoveBegin;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
@@ -38,6 +37,7 @@ import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jvindicator.core.Vindication;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,6 +48,9 @@ import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withIns
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
 import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.strings.IdStringConstants.EMAIL_VERIFICATION_SENT;
+import static com.io7m.idstore.strings.IdStringConstants.EMAIL_VERIFICATION_TITLE;
+import static com.io7m.idstore.strings.IdStringConstants.ERROR;
 
 /**
  * The page that executes the email removal.
@@ -76,7 +79,7 @@ public final class IdUVEmailRemoveRun extends IdHTTPServletFunctional
     final var database =
       services.requireService(IdDatabaseType.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
     final var branding =
       services.requireService(IdServerBrandingServiceType.class);
     final var template =
@@ -108,7 +111,7 @@ public final class IdUVEmailRemoveRun extends IdHTTPServletFunctional
 
   private static IdHTTPServletResponseType execute(
     final RPServiceDirectoryType services,
-    final IdServerStrings strings,
+    final IdStrings strings,
     final IdDatabaseType database,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> template,
@@ -130,7 +133,7 @@ public final class IdUVEmailRemoveRun extends IdHTTPServletFunctional
           information.requestId(),
           true,
           false,
-          strings.format("error"),
+          strings.format(ERROR),
           e.getMessage(),
           DESTINATION_ON_FAILURE
         )
@@ -165,8 +168,8 @@ public final class IdUVEmailRemoveRun extends IdHTTPServletFunctional
             information.requestId(),
             false,
             false,
-            strings.format("emailVerificationTitle"),
-            strings.format("emailVerificationSent", email),
+            strings.format(EMAIL_VERIFICATION_TITLE),
+            strings.format(EMAIL_VERIFICATION_SENT, email),
             DESTINATION_ON_SUCCESS
           )
         );
@@ -178,7 +181,7 @@ public final class IdUVEmailRemoveRun extends IdHTTPServletFunctional
           information.requestId(),
           true,
           true,
-          strings.format("error"),
+          strings.format(ERROR),
           e.getMessage(),
           DESTINATION_ON_FAILURE
         )
@@ -190,7 +193,7 @@ public final class IdUVEmailRemoveRun extends IdHTTPServletFunctional
           information.requestId(),
           true,
           e.httpStatusCode() >= 500,
-          strings.format("error"),
+          strings.format(ERROR),
           e.getMessage(),
           DESTINATION_ON_FAILURE
         )

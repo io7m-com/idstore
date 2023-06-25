@@ -23,16 +23,17 @@ import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.protocol.admin.IdACommandAdminUpdateCredentials;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminUpdate;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jaffirm.core.Invariants;
 
 import java.util.Objects;
 import java.util.Optional;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
+import static com.io7m.idstore.strings.IdStringConstants.ADMIN_ID_NAME_DUPLICATE;
 
 /**
  * IdACmdAdminUpdate
@@ -66,7 +67,7 @@ public final class IdACmdAdminUpdateCredentials
     final var clock =
       services.requireService(IdServerClock.class);
     final var strings =
-      services.requireService(IdServerStrings.class);
+      services.requireService(IdStrings.class);
 
     final var transaction =
       context.transaction();
@@ -109,7 +110,7 @@ public final class IdACmdAdminUpdateCredentials
     } catch (final IdDatabaseException e) {
       if (Objects.equals(e.errorCode(), SQL_ERROR_UNIQUE)) {
         throw new IdDatabaseException(
-          strings.format("adminIdNameDuplicate", command.idName()),
+          strings.format(ADMIN_ID_NAME_DUPLICATE, command.idName()),
           e,
           SQL_ERROR_UNIQUE,
           e.attributes(),

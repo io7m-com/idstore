@@ -31,7 +31,6 @@ import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
 import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.server.api.IdServerConfigurations;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.admin.IdAdminLoginService;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
@@ -46,6 +45,7 @@ import com.io7m.idstore.server.service.telemetry.api.IdEventServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdMetricsService;
 import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryNoOp;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.tests.IdFakeClock;
 import com.io7m.idstore.tests.IdTestDirectories;
 import com.io7m.idstore.tests.server.api.IdServerConfigurationsTest;
@@ -84,7 +84,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
 {
   private IdFakeClock clock;
   private IdServerClock serverClock;
-  private IdServerStrings strings;
+  private IdStrings strings;
   private IdSessionAdminService sessions;
   private IdAdminLoginService login;
   private IdDatabaseTransactionType transaction;
@@ -155,7 +155,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
     this.serverClock =
       new IdServerClock(this.clock);
     this.strings =
-      new IdServerStrings(Locale.ROOT);
+      IdStrings.create(Locale.ROOT);
     this.sessions =
       new IdSessionAdminService(
         new IdMetricsService(IdServerTelemetryNoOp.noop()),

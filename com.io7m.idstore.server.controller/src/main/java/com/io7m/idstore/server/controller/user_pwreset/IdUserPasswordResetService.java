@@ -30,7 +30,6 @@ import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUserPasswordReset;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.server.api.IdServerConfiguration;
-import com.io7m.idstore.server.controller.IdServerStrings;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
@@ -42,6 +41,8 @@ import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceTyp
 import com.io7m.idstore.server.service.templating.IdFMEmailPasswordResetData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
+import com.io7m.idstore.strings.IdStringConstants;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jdeferthrow.core.ExceptionTracker;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.context.Context;
@@ -62,6 +63,9 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_N
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
+import static com.io7m.idstore.strings.IdStringConstants.MISSING_PARAMETER;
+import static com.io7m.idstore.strings.IdStringConstants.PASSWORD_RESET_RATE_LIMITED;
+import static com.io7m.idstore.strings.IdStringConstants.PASSWORD_RESET_REQUIRE_PARAMETERS;
 import static io.opentelemetry.api.trace.SpanKind.CLIENT;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_CLIENT_IP;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_USER_AGENT;
@@ -80,7 +84,7 @@ public final class IdUserPasswordResetService
   private final IdServerConfiguration configuration;
   private final IdServerClock clock;
   private final IdDatabaseType database;
-  private final IdServerStrings strings;
+  private final IdStrings strings;
   private final IdRateLimitPasswordResetServiceType rateLimit;
   private final IdEventServiceType events;
 
@@ -92,7 +96,7 @@ public final class IdUserPasswordResetService
     final IdServerConfiguration inConfiguration,
     final IdServerClock inClock,
     final IdDatabaseType inDatabase,
-    final IdServerStrings inStrings,
+    final IdStrings inStrings,
     final IdRateLimitPasswordResetServiceType inRateLimit,
     final IdEventServiceType inEvents)
   {
@@ -143,7 +147,7 @@ public final class IdUserPasswordResetService
     final IdServerConfiguration inConfiguration,
     final IdServerClock inClock,
     final IdDatabaseType inDatabase,
-    final IdServerStrings inStrings,
+    final IdStrings inStrings,
     final IdRateLimitPasswordResetServiceType inRateLimit,
     final IdEventServiceType inEvents)
   {
@@ -345,7 +349,8 @@ public final class IdUserPasswordResetService
 
           if (resetOpt.isEmpty()) {
             throw new IdCommandExecutionFailure(
-              this.service.strings.format("passwordResetNonexistent"),
+              this.service.strings.format(
+                IdStringConstants.PASSWORD_RESET_NONEXISTENT),
               PASSWORD_RESET_NONEXISTENT,
               Map.of(),
               Optional.empty(),
@@ -358,7 +363,8 @@ public final class IdUserPasswordResetService
           final var timeNow = this.service.clock.now();
           if (timeNow.isAfter(reset.expires())) {
             throw new IdCommandExecutionFailure(
-              this.service.strings.format("passwordResetNonexistent"),
+              this.service.strings.format(
+                IdStringConstants.PASSWORD_RESET_NONEXISTENT),
               PASSWORD_RESET_NONEXISTENT,
               Map.of(),
               Optional.empty(),
@@ -402,9 +408,12 @@ public final class IdUserPasswordResetService
     {
       if (this.password0Opt.isEmpty()) {
         throw new IdCommandExecutionFailure(
-          this.service.strings.format("missingParameter", "password0"),
+          this.service.strings.format(MISSING_PARAMETER),
           HTTP_PARAMETER_NONEXISTENT,
-          Map.of(),
+          Map.of(
+            this.service.strings.format(IdStringConstants.PARAMETER),
+            "password0"
+          ),
           Optional.empty(),
           this.requestId,
           400
@@ -413,9 +422,12 @@ public final class IdUserPasswordResetService
 
       if (this.password1Opt.isEmpty()) {
         throw new IdCommandExecutionFailure(
-          this.service.strings.format("missingParameter", "password1"),
+          this.service.strings.format(MISSING_PARAMETER),
           HTTP_PARAMETER_NONEXISTENT,
-          Map.of(),
+          Map.of(
+            this.service.strings.format(IdStringConstants.PARAMETER),
+            "password1"
+          ),
           Optional.empty(),
           this.requestId,
           400
@@ -424,9 +436,12 @@ public final class IdUserPasswordResetService
 
       if (this.tokenOpt.isEmpty()) {
         throw new IdCommandExecutionFailure(
-          this.service.strings.format("missingParameter", "token"),
+          this.service.strings.format(MISSING_PARAMETER),
           HTTP_PARAMETER_NONEXISTENT,
-          Map.of(),
+          Map.of(
+            this.service.strings.format(IdStringConstants.PARAMETER),
+            "token"
+          ),
           Optional.empty(),
           this.requestId,
           400
@@ -451,7 +466,7 @@ public final class IdUserPasswordResetService
 
       if (!this.password0.equals(this.password1)) {
         throw new IdCommandExecutionFailure(
-          this.service.strings.format("passwordResetMismatch"),
+          this.service.strings.format(IdStringConstants.PASSWORD_RESET_MISMATCH),
           PASSWORD_RESET_MISMATCH,
           Map.of(),
           Optional.empty(),
@@ -504,7 +519,7 @@ public final class IdUserPasswordResetService
 
           if (resetOpt.isEmpty()) {
             throw new IdCommandExecutionFailure(
-              this.service.strings.format("passwordResetNonexistent"),
+              this.service.strings.format(IdStringConstants.PASSWORD_RESET_NONEXISTENT),
               PASSWORD_RESET_NONEXISTENT,
               Map.of(),
               Optional.empty(),
@@ -517,7 +532,7 @@ public final class IdUserPasswordResetService
           final var timeNow = this.service.clock.now();
           if (timeNow.isAfter(reset.expires())) {
             throw new IdCommandExecutionFailure(
-              this.service.strings.format("passwordResetNonexistent"),
+              this.service.strings.format(IdStringConstants.PASSWORD_RESET_NONEXISTENT),
               PASSWORD_RESET_NONEXISTENT,
               Map.of(),
               Optional.empty(),
@@ -544,9 +559,12 @@ public final class IdUserPasswordResetService
     {
       if (this.tokenOpt.isEmpty()) {
         throw new IdCommandExecutionFailure(
-          this.service.strings.format("missingParameter", "token"),
+          this.service.strings.format(MISSING_PARAMETER),
           HTTP_PARAMETER_NONEXISTENT,
-          Map.of(),
+          Map.of(
+            this.service.strings.format(IdStringConstants.PARAMETER),
+            "token"
+          ),
           Optional.empty(),
           this.requestId,
           400
@@ -607,7 +625,7 @@ public final class IdUserPasswordResetService
           );
 
           throw new IdCommandExecutionFailure(
-            this.service.strings.format("pwResetRateLimited"),
+            this.service.strings.format(PASSWORD_RESET_RATE_LIMITED),
             RATE_LIMIT_EXCEEDED,
             Map.of(),
             Optional.empty(),
@@ -618,7 +636,7 @@ public final class IdUserPasswordResetService
 
         if (this.emailOpt.isEmpty() && this.userNameOpt.isEmpty()) {
           throw new IdCommandExecutionFailure(
-            this.service.strings.format("pwResetRequireParameters"),
+            this.service.strings.format(PASSWORD_RESET_REQUIRE_PARAMETERS),
             HTTP_PARAMETER_NONEXISTENT,
             Map.of(),
             Optional.empty(),
@@ -671,7 +689,7 @@ public final class IdUserPasswordResetService
 
           if (userOpt.isEmpty()) {
             throw new IdCommandExecutionFailure(
-              this.service.strings.format("userNonexistent"),
+              this.service.strings.format(IdStringConstants.USER_NONEXISTENT),
               USER_NONEXISTENT,
               Map.of(),
               Optional.empty(),
@@ -812,7 +830,7 @@ public final class IdUserPasswordResetService
 
           if (userOpt.isEmpty()) {
             throw new IdCommandExecutionFailure(
-              this.service.strings.format("userNonexistent"),
+              this.service.strings.format(IdStringConstants.USER_NONEXISTENT),
               USER_NONEXISTENT,
               Map.of(),
               Optional.empty(),

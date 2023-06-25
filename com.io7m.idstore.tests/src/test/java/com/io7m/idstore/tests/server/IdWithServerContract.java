@@ -41,6 +41,7 @@ import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerSessionConfiguration;
 import com.io7m.idstore.server.api.IdServerType;
 import com.io7m.idstore.server.vanilla.IdServers;
+import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.tests.IdFakeClock;
 import com.io7m.idstore.tests.IdTestDirectories;
 import com.io7m.jmulticlose.core.CloseableCollection;
@@ -281,6 +282,7 @@ public abstract class IdWithServerContract
         "postgres",
         CREATE_DATABASE,
         UPGRADE_DATABASE,
+        IdStrings.create(Locale.ROOT),
         this.clock
       );
 
