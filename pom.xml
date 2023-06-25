@@ -74,11 +74,11 @@
     <com.io7m.jbssio.version>2.0.0</com.io7m.jbssio.version>
     <com.io7m.jqpage.version>0.0.2</com.io7m.jqpage.version>
     <com.io7m.jvindicator.version>0.0.1</com.io7m.jvindicator.version>
-    <com.io7m.jxtrand.version>1.1.0</com.io7m.jxtrand.version>
+    <com.io7m.jxtrand.version>2.0.0</com.io7m.jxtrand.version>
     <com.io7m.quarrel.version>1.2.0</com.io7m.quarrel.version>
     <com.io7m.quixote.version>1.0.0</com.io7m.quixote.version>
     <com.io7m.seltzer.version>1.0.0</com.io7m.seltzer.version>
-    <com.io7m.trasco.version>1.0.0-beta0001</com.io7m.trasco.version>
+    <com.io7m.trasco.version>1.0.0-beta0003</com.io7m.trasco.version>
     <com.io7m.verdant.version>1.0.0</com.io7m.verdant.version>
     <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
     <io7m.api.previousVersion>1.0.0-SNAPSHOT</io7m.api.previousVersion>

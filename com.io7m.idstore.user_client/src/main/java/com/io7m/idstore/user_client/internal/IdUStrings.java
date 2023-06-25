@@ -18,7 +18,6 @@ package com.io7m.idstore.user_client.internal;
 
 import com.io7m.jxtrand.vanilla.JXTAbstractStrings;
 
-import java.io.IOException;
 import java.util.Locale;
 
 /**
@@ -31,13 +30,10 @@ public final class IdUStrings extends JXTAbstractStrings
    * The string resources.
    *
    * @param locale The application locale
-   *
-   * @throws IOException On I/O errors
    */
 
   public IdUStrings(
     final Locale locale)
-    throws IOException
   {
     super(
       locale,

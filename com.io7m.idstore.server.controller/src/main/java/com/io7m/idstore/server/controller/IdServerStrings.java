@@ -20,7 +20,6 @@ package com.io7m.idstore.server.controller;
 import com.io7m.jxtrand.vanilla.JXTAbstractStrings;
 import com.io7m.repetoir.core.RPServiceType;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -38,13 +37,10 @@ public final class IdServerStrings extends JXTAbstractStrings
    * The client string resources.
    *
    * @param locale The application locale
-   *
-   * @throws IOException On I/O errors
    */
 
   public IdServerStrings(
     final Locale locale)
-    throws IOException
   {
     super(
       locale,
