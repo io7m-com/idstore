@@ -16,6 +16,7 @@
 
 package com.io7m.idstore.database.postgres.internal;
 
+import com.io7m.idstore.database.api.IdDatabaseConfiguration;
 import com.io7m.idstore.database.api.IdDatabaseConnectionType;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseRole;
@@ -50,20 +51,22 @@ import static java.util.Objects.requireNonNullElse;
 public final class IdDatabase implements IdDatabaseType
 {
   private final Clock clock;
-  private final HikariDataSource dataSource;
-  private final Settings settings;
-  private final Tracer tracer;
   private final CloseableCollectionType<IdDatabaseException> resources;
-  private final LongCounter transactions;
+  private final ConcurrentLinkedQueue<Long> connectionTimes;
+  private final HikariDataSource dataSource;
+  private final IdDatabaseConfiguration configuration;
+  private final IdDatabaseTelemetry telemetry;
   private final LongCounter transactionCommits;
   private final LongCounter transactionRollbacks;
-  private final ConcurrentLinkedQueue<Long> connectionTimes;
-  private final IdDatabaseTelemetry telemetry;
+  private final LongCounter transactions;
+  private final Settings settings;
+  private final Tracer tracer;
 
   /**
    * The default postgres server database implementation.
    *
    * @param inTelemetry     A telemetry
+   * @param inConfiguration The configuration
    * @param inClock      The clock
    * @param inDataSource A pooled data source
    * @param inResources  The resources to be closed
@@ -71,12 +74,15 @@ public final class IdDatabase implements IdDatabaseType
 
   public IdDatabase(
     final IdDatabaseTelemetry inTelemetry,
+    final IdDatabaseConfiguration inConfiguration,
     final Clock inClock,
     final HikariDataSource inDataSource,
     final CloseableCollectionType<IdDatabaseException> inResources)
   {
     this.telemetry =
       Objects.requireNonNull(inTelemetry, "telemetry");
+    this.configuration =
+      Objects.requireNonNull(inConfiguration, "inConfiguration");
     this.tracer =
       inTelemetry.tracer();
     this.resources =
@@ -197,6 +203,12 @@ public final class IdDatabase implements IdDatabaseType
     throws IdDatabaseException
   {
     this.resources.close();
+  }
+
+  @Override
+  public IdDatabaseConfiguration configuration()
+  {
+    return this.configuration;
   }
 
   /**

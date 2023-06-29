@@ -47,6 +47,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.NO_SUPPORTED_PROTOCOLS;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.strings.IdStringConstants.CONNECT_FAILURE;
 import static java.net.http.HttpResponse.BodyHandlers.ofByteArray;
 import static java.util.Objects.requireNonNullElse;
 import static java.util.Optional.empty;
@@ -83,10 +84,7 @@ public final class IdAProtocolNegotiation
       response = httpClient.send(request, ofByteArray());
     } catch (final IOException e) {
       throw new IdAClientException(
-        requireNonNullElse(
-          e.getMessage(),
-          strings.format("connectFailure")
-        ),
+        requireNonNullElse(e.getMessage(), strings.format(CONNECT_FAILURE)),
         e,
         IO_ERROR,
         Map.of(),

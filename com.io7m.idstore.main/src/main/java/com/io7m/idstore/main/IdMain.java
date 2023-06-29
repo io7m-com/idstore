@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.main;
 
-import com.io7m.idstore.main.internal.IdMCmdInitialize;
+import com.io7m.idstore.main.internal.IdMCmdInitialAdmin;
 import com.io7m.idstore.main.internal.IdMCmdServer;
 import com.io7m.idstore.main.internal.IdMCmdShell;
 import com.io7m.idstore.model.IdVersion;
@@ -67,7 +67,7 @@ public final class IdMain implements Runnable
 
     final var builder = QApplication.builder(metadata);
     builder.allowAtSyntax(true);
-    builder.addCommand(new IdMCmdInitialize());
+    builder.addCommand(new IdMCmdInitialAdmin());
     builder.addCommand(new IdMCmdServer());
     builder.addCommand(new IdMCmdShell());
 

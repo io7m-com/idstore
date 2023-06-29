@@ -54,6 +54,7 @@ open module com.io7m.idstore.main
   requires com.io7m.idstore.server.user_view;
   requires com.io7m.idstore.server.vanilla;
   requires com.io7m.idstore.shell.admin;
+  requires com.io7m.idstore.strings;
 
   requires com.io7m.quarrel.core;
   requires com.io7m.quarrel.ext.logback;

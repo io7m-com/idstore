@@ -41,7 +41,7 @@ public non-sealed interface IdDatabaseAdminsQueriesType
 {
   /**
    * Create an (initial) admin. This method behaves exactly the same as
-   * {@link #adminCreate(IdName, IdRealName, IdEmail, IdPassword, Set)}  except
+   * {@link #adminCreate(IdName, IdRealName, IdEmail, IdPassword, Set)} except
    * that it does not require an existing admin account and does not write to
    * the audit log. The method will fail if any admin account already exists,
    *
@@ -64,6 +64,28 @@ public non-sealed interface IdDatabaseAdminsQueriesType
     IdEmail email,
     OffsetDateTime created,
     IdPassword password)
+    throws IdDatabaseException;
+
+  /**
+   * Update the given (initial) admin. This method behaves exactly the same as
+   * {@link #adminUpdate(UUID, Optional, Optional, Optional, Optional)} except
+   * that it does not require an existing admin account and does not write to
+   * the audit log. The method will fail if the admin account either does not
+   * exist, or exists but is not the initial admin.
+   *
+   * @param id              The admin ID
+   * @param withIdName      The new ID name, if desired
+   * @param withRealName    The new real name, if desired
+   * @param withPassword    The new password, if desired
+   *
+   * @throws IdDatabaseException On errors
+   */
+
+  void adminUpdateInitial(
+    UUID id,
+    Optional<IdName> withIdName,
+    Optional<IdRealName> withRealName,
+    Optional<IdPassword> withPassword)
     throws IdDatabaseException;
 
   /**

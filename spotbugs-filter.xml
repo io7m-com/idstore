@@ -110,6 +110,12 @@
   <!-- com.io7m.idstore.database.api -->
   <!--                               -->
 
+  <!-- Record types. -->
+  <Match>
+    <Class name="com.io7m.idstore.database.api.IdDatabaseConfiguration"/>
+    <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+  </Match>
+
   <!--                                    -->
   <!-- com.io7m.idstore.database.postgres -->
   <!--                                    -->
@@ -178,6 +184,19 @@
       <Bug pattern="SQL_INJECTION_JDBC"/>
       <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
     </Or>
+  </Match>
+
+  <!-- Waiting in a loop for the database to come up. -->
+  <Match>
+    <Class name="com.io7m.idstore.database.postgres.IdDatabases"/>
+    <Bug pattern="MDM_THREAD_YIELD"/>
+  </Match>
+
+  <!-- Not a problem. -->
+  <Match>
+    <Class name="com.io7m.idstore.database.postgres.internal.IdDatabase"/>
+    <Method name="configuration"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
   </Match>
 
   <!--                              -->
@@ -820,6 +839,13 @@
   <!--                                 -->
   <!-- com.io7m.idstore.server.vanilla -->
   <!--                                 -->
+
+  <!-- It's just a slightly more general catch. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.vanilla.internal.IdServer"/>
+    <Method name="createOrUpdateInitialAdmin"/>
+    <Bug pattern="REC_CATCH_EXCEPTION"/>
+  </Match>
 
   <!--                              -->
   <!-- com.io7m.idstore.shell.admin -->

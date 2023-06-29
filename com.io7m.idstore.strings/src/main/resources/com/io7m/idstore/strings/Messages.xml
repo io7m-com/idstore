@@ -11,6 +11,7 @@
   <entry key="command_not_here">Cannot use this command here.</entry>
   <entry key="connect_failure">An error occurred whilst trying to connect to the identity server.</entry>
   <entry key="connect_failure">An error occurred whilst trying to connect to the identity server.</entry>
+  <entry key="database_connection_failed">Failed to connect to the database.</entry>
   <entry key="email_duplicate">Email address is already in use.</entry>
   <entry key="email_password_reset_failed">Password reset failed.</entry>
   <entry key="email_password_reset_sent">A password reset link was sent. Please follow the link in the email to confirm the reset.</entry>

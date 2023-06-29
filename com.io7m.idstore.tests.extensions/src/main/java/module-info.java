@@ -14,43 +14,28 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import com.io7m.idstore.database.api.IdDatabaseFactoryType;
-import com.io7m.idstore.database.postgres.IdDatabases;
 
-/**
- * Identity server (Server database Postgresql implementation)
- */
-
-module com.io7m.idstore.database.postgres
+open module com.io7m.idstore.tests.extensions
 {
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
   requires com.io7m.idstore.database.api;
-  requires com.io7m.idstore.error_codes;
+  requires com.io7m.idstore.database.postgres;
   requires com.io7m.idstore.model;
+  requires com.io7m.idstore.server.api;
+  requires com.io7m.idstore.server.vanilla;
   requires com.io7m.idstore.strings;
 
-  requires com.io7m.anethum.api;
-  requires com.io7m.jaffirm.core;
-  requires com.io7m.jdeferthrow.core;
+  requires com.io7m.ervilla.api;
+  requires com.io7m.ervilla.postgres;
   requires com.io7m.jmulticlose.core;
-  requires com.io7m.jqpage.core;
-  requires com.io7m.trasco.api;
-  requires com.io7m.trasco.vanilla;
-  requires com.zaxxer.hikari;
+  requires com.io7m.zelador.test_extension;
   requires io.opentelemetry.api;
-  requires io.opentelemetry.context;
-  requires io.opentelemetry.semconv;
-  requires org.apache.commons.text;
-  requires org.jooq;
-  requires org.postgresql.jdbc;
+  requires jakarta.mail;
+  requires org.junit.jupiter.api;
   requires org.slf4j;
+  requires subethasmtp;
 
-  exports com.io7m.idstore.database.postgres;
-  exports com.io7m.idstore.database.postgres.internal.tables to org.jooq;
-  exports com.io7m.idstore.database.postgres.internal.tables.records to org.jooq;
-  exports com.io7m.idstore.database.postgres.internal to org.jooq;
-
-  provides IdDatabaseFactoryType with IdDatabases;
+  exports com.io7m.idstore.tests.extensions;
 }

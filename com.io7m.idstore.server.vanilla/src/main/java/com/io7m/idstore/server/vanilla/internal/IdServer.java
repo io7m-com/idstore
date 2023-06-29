@@ -17,12 +17,9 @@
 package com.io7m.idstore.server.vanilla.internal;
 
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
-import com.io7m.idstore.database.api.IdDatabaseConfiguration;
-import com.io7m.idstore.database.api.IdDatabaseCreate;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseTelemetry;
 import com.io7m.idstore.database.api.IdDatabaseType;
-import com.io7m.idstore.database.api.IdDatabaseUpgrade;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -77,6 +74,7 @@ import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.repetoir.core.RPServiceDirectory;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.StatusCode;
 import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +89,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NOT_INITIAL;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -460,8 +459,8 @@ public final class IdServer implements IdServerType
   }
 
   @Override
-  public void setup(
-    final Optional<UUID> adminId,
+  public void createOrUpdateInitialAdmin(
+    final UUID adminId,
     final IdName adminName,
     final IdEmail adminEmail,
     final IdRealName adminRealName,
@@ -474,79 +473,109 @@ public final class IdServer implements IdServerType
     Objects.requireNonNull(adminRealName, "adminRealName");
     Objects.requireNonNull(adminPassword, "adminPassword");
 
-    if (this.stopped.compareAndSet(true, false)) {
-      try {
-        this.resources = createResourceCollection();
-        this.telemetry = this.createTelemetry();
+    final var newTelemetry =
+      this.createTelemetry();
 
-        final var baseConfiguration =
-          this.configuration.databaseConfiguration();
+    final var dbTelemetry =
+      new IdDatabaseTelemetry(
+        newTelemetry.isNoOp(),
+        newTelemetry.meter(),
+        newTelemetry.tracer()
+      );
 
-        final var setupConfiguration =
-          new IdDatabaseConfiguration(
-            baseConfiguration.ownerRoleName(),
-            baseConfiguration.ownerRolePassword(),
-            baseConfiguration.workerRolePassword(),
-            baseConfiguration.readerRolePassword(),
-            baseConfiguration.address(),
-            baseConfiguration.port(),
-            baseConfiguration.databaseName(),
-            IdDatabaseCreate.CREATE_DATABASE,
-            IdDatabaseUpgrade.UPGRADE_DATABASE,
-            baseConfiguration.strings(),
-            baseConfiguration.clock()
-          );
+    final var dbConfiguration =
+      this.configuration.databaseConfiguration()
+        .withoutUpgradeOrCreate();
 
-        final var db =
-          this.resources.add(
-            this.configuration.databases()
-              .open(
-                setupConfiguration,
-                new IdDatabaseTelemetry(
-                  this.telemetry.isNoOp(),
-                  this.telemetry.meter(),
-                  this.telemetry.tracer()
-                ),
-                event -> {
+    try (var newDatabase =
+           this.configuration.databases()
+             .open(dbConfiguration, dbTelemetry, event -> {
 
-                }));
+             })) {
 
-        final var password =
+      final var span =
+        newTelemetry.tracer()
+          .spanBuilder("CreateOrUpdateInitialAdmin")
+          .startSpan();
+
+      try (var ignored = span.makeCurrent()) {
+        createOrUpdateInitialAdminSpan(
+          newDatabase,
+          adminId,
+          adminName,
+          adminEmail,
+          adminRealName,
+          adminPassword
+        );
+      } catch (final Exception e) {
+        span.recordException(e);
+        span.setStatus(StatusCode.ERROR);
+        throw e;
+      } finally {
+        span.end();
+      }
+    } catch (final IdDatabaseException e) {
+      throw new IdServerException(
+        e.getMessage(),
+        e,
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction()
+      );
+    }
+  }
+
+  private static void createOrUpdateInitialAdminSpan(
+    final IdDatabaseType database,
+    final UUID adminId,
+    final IdName adminName,
+    final IdEmail adminEmail,
+    final IdRealName adminRealName,
+    final String adminPassword)
+    throws IdServerException
+  {
+    try (var connection = database.openConnection(IDSTORE)) {
+      try (var transaction = connection.openTransaction()) {
+        final var admins =
+          transaction.queries(IdDatabaseAdminsQueriesType.class);
+
+        final var hashedPassword =
           IdPasswordAlgorithmPBKDF2HmacSHA256.create()
             .createHashed(adminPassword);
 
-        try (var connection = db.openConnection(IDSTORE)) {
-          try (var transaction = connection.openTransaction()) {
-            final var admins =
-              transaction.queries(IdDatabaseAdminsQueriesType.class);
-
-            admins.adminCreateInitial(
-              adminId.orElseGet(UUID::randomUUID),
-              adminName,
-              adminRealName,
-              adminEmail,
-              OffsetDateTime.now(baseConfiguration.clock()),
-              password
+        try {
+          admins.adminCreateInitial(
+            adminId,
+            adminName,
+            adminRealName,
+            adminEmail,
+            OffsetDateTime.now(),
+            hashedPassword
+          );
+        } catch (final IdDatabaseException e) {
+          if (Objects.equals(e.errorCode(), ADMIN_NOT_INITIAL)) {
+            LOG.info(
+              "The initial admin already exists; updating password instead.");
+            admins.adminUpdateInitial(
+              adminId,
+              Optional.of(adminName),
+              Optional.of(adminRealName),
+              Optional.of(hashedPassword)
             );
-            transaction.commit();
+          } else {
+            throw e;
           }
         }
-      } catch (final IdDatabaseException | IdPasswordException e) {
-        throw new IdServerException(
-          e.getMessage(),
-          e.errorCode(),
-          e.attributes(),
-          e.remediatingAction()
-        );
-      } finally {
-        this.close();
+
+        transaction.commit();
       }
-    } else {
+    } catch (final IdDatabaseException | IdPasswordException e) {
       throw new IdServerException(
-        "Server must be closed before setup.",
-        new IdErrorCode("server-misuse"),
-        Map.of(),
-        Optional.empty()
+        e.getMessage(),
+        e,
+        e.errorCode(),
+        e.attributes(),
+        e.remediatingAction()
       );
     }
   }

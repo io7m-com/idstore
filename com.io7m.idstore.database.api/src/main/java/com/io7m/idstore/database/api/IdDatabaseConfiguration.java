@@ -80,4 +80,25 @@ public record IdDatabaseConfiguration(
     Objects.requireNonNull(strings, "strings");
     Objects.requireNonNull(clock, "clock");
   }
+
+  /**
+   * @return this, but with DO_NOT_CREATE_DATABASE and DO_NOT_UPGRADE_DATABASE.
+   */
+
+  public IdDatabaseConfiguration withoutUpgradeOrCreate()
+  {
+    return new IdDatabaseConfiguration(
+      this.ownerRoleName(),
+      this.ownerRolePassword(),
+      this.workerRolePassword(),
+      this.readerRolePassword(),
+      this.address(),
+      this.port(),
+      this.databaseName(),
+      IdDatabaseCreate.DO_NOT_CREATE_DATABASE,
+      IdDatabaseUpgrade.DO_NOT_UPGRADE_DATABASE,
+      this.strings(),
+      this.clock()
+    );
+  }
 }

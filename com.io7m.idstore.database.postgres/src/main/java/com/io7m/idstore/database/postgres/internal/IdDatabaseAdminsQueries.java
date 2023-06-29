@@ -210,7 +210,7 @@ final class IdDatabaseAdminsQueries
         throw new IdDatabaseException(
           "Admin already exists",
           ADMIN_NOT_INITIAL,
-          Map.of(),
+          attributes,
           Optional.empty()
         );
       }
@@ -258,6 +258,97 @@ final class IdDatabaseAdminsQueries
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
       throw handleDatabaseException(transaction, e, attributes);
+    } finally {
+      querySpan.end();
+    }
+  }
+
+  @Override
+  public void adminUpdateInitial(
+    final UUID id,
+    final Optional<IdName> withIdName,
+    final Optional<IdRealName> withRealName,
+    final Optional<IdPassword> withPassword)
+    throws IdDatabaseException
+  {
+    Objects.requireNonNull(id, "id");
+    Objects.requireNonNull(withIdName, "withIdName");
+    Objects.requireNonNull(withRealName, "withRealName");
+    Objects.requireNonNull(withPassword, "withPassword");
+
+    final var transaction =
+      this.transaction();
+    final var context =
+      transaction.createContext();
+    final var querySpan =
+      transaction.createQuerySpan(
+        "IdDatabaseAdminsQueries.adminUpdateInitial");
+
+    final var attributes =
+      Map.ofEntries(
+        Map.entry("Admin ID", id.toString())
+      );
+
+    try {
+      final var record =
+        context.fetchOne(ADMINS, ADMINS.ID.eq(id));
+
+      if (record == null) {
+        throw ADMIN_DOES_NOT_EXIST.get();
+      }
+
+      if (!record.<Boolean>get(ADMINS.INITIAL).booleanValue()) {
+        throw new IdDatabaseException(
+          "Admin is not the initial admin.",
+          ADMIN_NOT_INITIAL,
+          attributes,
+          Optional.empty()
+        );
+      }
+
+      if (withIdName.isPresent()) {
+        final var name = withIdName.get();
+        record.setIdName(name.value());
+
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "ADMIN_CHANGED_ID_NAME")
+          .set(AUDIT.USER_ID, id)
+          .set(AUDIT.MESSAGE, "%s|%s".formatted(id.toString(), name.value()))
+          .execute();
+      }
+
+      if (withRealName.isPresent()) {
+        final var name = withRealName.get();
+        record.setRealName(name.value());
+
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "ADMIN_CHANGED_REAL_NAME")
+          .set(AUDIT.USER_ID, id)
+          .set(AUDIT.MESSAGE, "%s|%s".formatted(id.toString(), name.value()))
+          .execute();
+      }
+
+      if (withPassword.isPresent()) {
+        final var pass = withPassword.get();
+        record.setPasswordAlgo(pass.algorithm().identifier());
+        record.setPasswordHash(pass.hash());
+        record.setPasswordSalt(pass.salt());
+        record.setPasswordExpires(pass.expires().orElse(null));
+
+        context.insertInto(AUDIT)
+          .set(AUDIT.TIME, this.currentTime())
+          .set(AUDIT.TYPE, "ADMIN_CHANGED_PASSWORD")
+          .set(AUDIT.USER_ID, id)
+          .set(AUDIT.MESSAGE, id.toString())
+          .execute();
+      }
+
+      record.store();
+    } catch (final DataAccessException e) {
+      querySpan.recordException(e);
+      throw handleDatabaseException(this.transaction(), e, attributes);
     } finally {
       querySpan.end();
     }

@@ -22,7 +22,6 @@ import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 
 import java.net.URI;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -94,10 +93,10 @@ public interface IdServerType extends AutoCloseable
   }
 
   /**
-   * Do the work necessary to set up a server instance (such as initializing
-   * and/or upgrading the database) but do not actually start the instance.
+   * Create the initial admin, or update the existing one if the admin
+   * already exists with the given ID.
    *
-   * @param adminId       The admin ID, if a specific one is required
+   * @param adminId       The admin ID
    * @param adminName     The initial administrator to create
    * @param adminEmail    The admin email
    * @param adminRealName The admin's real name
@@ -106,8 +105,8 @@ public interface IdServerType extends AutoCloseable
    * @throws IdServerException On errors
    */
 
-  void setup(
-    Optional<UUID> adminId,
+  void createOrUpdateInitialAdmin(
+    UUID adminId,
     IdName adminName,
     IdEmail adminEmail,
     IdRealName adminRealName,

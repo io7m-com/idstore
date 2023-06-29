@@ -29,6 +29,12 @@ public interface IdDatabaseType extends AutoCloseable, RPServiceType
     throws IdDatabaseException;
 
   /**
+   * @return The configuration used to open the database
+   */
+
+  IdDatabaseConfiguration configuration();
+
+  /**
    * Open a database connection using the given role.
    *
    * @param role The role

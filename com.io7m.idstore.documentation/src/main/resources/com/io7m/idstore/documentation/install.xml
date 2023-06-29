@@ -131,7 +131,7 @@ OK]]></Verbatim>
       </Paragraph>
       <FormalItem title="Initialize">
         <Verbatim>
-          <xi:include href="c-initialize-example.txt"
+          <xi:include href="c-initial-admin-example.txt"
                       parse="text"/>
         </Verbatim>
       </FormalItem>
