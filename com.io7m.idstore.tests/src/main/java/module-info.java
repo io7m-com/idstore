@@ -92,6 +92,7 @@ open module com.io7m.idstore.tests
   exports com.io7m.idstore.tests.server.main;
   exports com.io7m.idstore.tests.server.security;
   exports com.io7m.idstore.tests.server.service.branding;
+  exports com.io7m.idstore.tests.server.service.configuration;
   exports com.io7m.idstore.tests.server.service.clock;
   exports com.io7m.idstore.tests.server.service.mail;
   exports com.io7m.idstore.tests.server.service.ratelimit;

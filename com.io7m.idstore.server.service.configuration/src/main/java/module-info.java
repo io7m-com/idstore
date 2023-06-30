@@ -26,6 +26,7 @@ module com.io7m.idstore.server.service.configuration
   requires com.io7m.idstore.model;
   requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server.service.telemetry.api;
+  requires com.io7m.idstore.database.api;
 
   requires com.io7m.cxbutton.core;
   requires com.io7m.repetoir.core;

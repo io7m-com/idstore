@@ -65,6 +65,10 @@
     </dependency>
 
     <dependency>
+      <groupId>com.io7m.jxtrand</groupId>
+      <artifactId>com.io7m.jxtrand.api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.io7m.hibiscus</groupId>
       <artifactId>com.io7m.hibiscus.api</artifactId>
     </dependency>

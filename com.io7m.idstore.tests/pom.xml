@@ -308,69 +308,10 @@
 
   <build>
     <plugins>
-      <!-- We do not use src/test/java. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <testSourceDirectory>${project.build.sourceDirectory}</testSourceDirectory>
-          <testClassesDirectory>${project.build.outputDirectory}</testClassesDirectory>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>run-it</id>
-            <phase>integration-test</phase>
-            <goals>
-              <goal>integration-test</goal>
-            </goals>
-            <configuration>
-              <testSourceDirectory>${project.build.sourceDirectory}</testSourceDirectory>
-              <testClassesDirectory>${project.build.outputDirectory}</testClassesDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
       <!-- Determine test coverage -->
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>jacoco-merge</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>merge</goal>
-            </goals>
-            <configuration>
-              <fileSets>
-                <fileSet>
-                  <directory>${project.build.directory}</directory>
-                  <includes>
-                    <include>*.exec</include>
-                  </includes>
-                </fileSet>
-              </fileSets>
-              <destFile>${project.build.directory}/jacoco-all.data</destFile>
-            </configuration>
-          </execution>
-          <execution>
-            <id>jacoco-report-merged</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>report-aggregate</goal>
-            </goals>
-            <configuration>
-              <dataFileIncludes>
-                <dataFileInclude>${project.build.directory}/jacoco-all.data</dataFileInclude>
-              </dataFileIncludes>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

@@ -113,6 +113,10 @@
     </dependency>
 
     <dependency>
+      <groupId>com.io7m.jxtrand</groupId>
+      <artifactId>com.io7m.jxtrand.api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.io7m.repetoir</groupId>
       <artifactId>com.io7m.repetoir.core</artifactId>
     </dependency>

@@ -607,8 +607,11 @@
   <!-- Translating generated classes to records. -->
   <Match>
     <Class name="com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles"/>
-    <Method name="processDatabase"/>
-    <Bug pattern="CE_CLASS_ENVY"/>
+    <Or>
+      <Bug pattern="CE_CLASS_ENVY"/>
+      <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+      <Bug pattern="REC_CATCH_EXCEPTION"/>
+    </Or>
   </Match>
 
   <!--                                        -->
