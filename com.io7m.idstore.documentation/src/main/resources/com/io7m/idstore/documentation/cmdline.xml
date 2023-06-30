@@ -44,7 +44,7 @@
     </Paragraph>
   </Section>
 
-  <xi:include href="c-initialize.xml"/>
+  <xi:include href="c-initial-admin.xml"/>
   <xi:include href="c-server.xml"/>
   <xi:include href="c-shell.xml"/>
   <xi:include href="c-version.xml"/>

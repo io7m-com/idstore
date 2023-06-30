@@ -19,9 +19,13 @@ package com.io7m.idstore.server.service.configuration;
 import com.io7m.cxbutton.core.CxButtonColors;
 import com.io7m.cxbutton.core.CxButtonStateColors;
 import com.io7m.cxbutton.core.CxColor;
+import com.io7m.idstore.database.api.IdDatabaseConfiguration;
+import com.io7m.idstore.database.api.IdDatabaseCreate;
+import com.io7m.idstore.database.api.IdDatabaseUpgrade;
 import com.io7m.idstore.server.api.IdColor;
 import com.io7m.idstore.server.api.IdServerBrandingConfiguration;
 import com.io7m.idstore.server.api.IdServerColorScheme;
+import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerConfigurationFile;
 import com.io7m.idstore.server.api.IdServerDatabaseConfiguration;
 import com.io7m.idstore.server.api.IdServerDatabaseKind;
@@ -52,8 +56,10 @@ import com.io7m.idstore.server.service.configuration.jaxb.Database;
 import com.io7m.idstore.server.service.configuration.jaxb.HTTPServiceType;
 import com.io7m.idstore.server.service.configuration.jaxb.HTTPServices;
 import com.io7m.idstore.server.service.configuration.jaxb.History;
+import com.io7m.idstore.server.service.configuration.jaxb.Logs;
 import com.io7m.idstore.server.service.configuration.jaxb.Mail;
 import com.io7m.idstore.server.service.configuration.jaxb.MailAuthentication;
+import com.io7m.idstore.server.service.configuration.jaxb.Metrics;
 import com.io7m.idstore.server.service.configuration.jaxb.OpenTelemetry;
 import com.io7m.idstore.server.service.configuration.jaxb.OpenTelemetryProtocol;
 import com.io7m.idstore.server.service.configuration.jaxb.PasswordExpiration;
@@ -62,16 +68,20 @@ import com.io7m.idstore.server.service.configuration.jaxb.SMTPSType;
 import com.io7m.idstore.server.service.configuration.jaxb.SMTPTLSType;
 import com.io7m.idstore.server.service.configuration.jaxb.SMTPType;
 import com.io7m.idstore.server.service.configuration.jaxb.Sessions;
+import com.io7m.idstore.server.service.configuration.jaxb.Traces;
 import com.io7m.repetoir.core.RPServiceType;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -79,6 +89,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.io7m.idstore.server.api.IdServerDatabaseKind.POSTGRESQL;
@@ -115,15 +126,12 @@ public final class IdServerConfigurationFiles
     final InputStream stream)
     throws IOException
   {
-    try {
-      final var schemas =
-        SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      final var schema =
-        schemas.newSchema(
-          IdServerConfigurationFiles.class.getResource(
-            "/com/io7m/idstore/server/service/configuration/configuration.xsd")
-        );
+    Objects.requireNonNull(source, "source");
+    Objects.requireNonNull(stream, "stream");
 
+    try {
+      final Schema schema =
+        createSchema();
       final var context =
         JAXBContext.newInstance(
           "com.io7m.idstore.server.service.configuration.jaxb");
@@ -135,7 +143,7 @@ public final class IdServerConfigurationFiles
       final var streamSource =
         new StreamSource(stream, source.toString());
 
-      return processConfiguration(
+      return parseConfiguration(
         (Configuration) unmarshaller.unmarshal(streamSource)
       );
     } catch (final SAXException | JAXBException | URISyntaxException e) {
@@ -143,24 +151,459 @@ public final class IdServerConfigurationFiles
     }
   }
 
-  private static IdServerConfigurationFile processConfiguration(
+  private static Schema createSchema()
+    throws SAXException
+  {
+    final var schemas =
+      SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    return schemas.newSchema(
+      IdServerConfigurationFiles.class.getResource(
+        "/com/io7m/idstore/server/service/configuration/configuration.xsd")
+    );
+  }
+
+  /**
+   * Serialize a configuration file.
+   *
+   * @param output        The output stream
+   * @param configuration The configuration
+   *
+   * @throws IOException On errors
+   */
+
+  public void serialize(
+    final OutputStream output,
+    final IdServerConfiguration configuration)
+    throws IOException
+  {
+    Objects.requireNonNull(output, "output");
+    Objects.requireNonNull(configuration, "configuration");
+
+    try {
+      final Schema schema =
+        createSchema();
+
+      final var context =
+        JAXBContext.newInstance(
+          "com.io7m.idstore.server.service.configuration.jaxb");
+      final var marshaller =
+        context.createMarshaller();
+      final var types =
+        DatatypeFactory.newInstance();
+
+      marshaller.setSchema(schema);
+      marshaller.marshal(serializeConfiguration(types, configuration), output);
+    } catch (final Exception e) {
+      throw new IOException(e);
+    }
+  }
+
+  private static Configuration serializeConfiguration(
+    final DatatypeFactory types,
+    final IdServerConfiguration configuration)
+  {
+    final var c = new Configuration();
+    c.setBranding(
+      serializeBranding(configuration.branding()));
+    c.setMail(
+      serializeMail(types, configuration.mailConfiguration()));
+    c.setHTTPServices(
+      serializeHTTP(
+        configuration.adminApiAddress(),
+        configuration.userApiAddress(),
+        configuration.userViewAddress())
+    );
+    c.setDatabase(
+      serializeDatabase(configuration.databaseConfiguration()));
+    c.setHistory(
+      serializeHistory(configuration.history()));
+    c.setSessions(
+      serializeSessions(types, configuration.sessions()));
+    c.setRateLimiting(
+      serializeRateLimiting(types, configuration.rateLimit()));
+    c.setPasswordExpiration(
+      serializePasswordExpiration(types, configuration.passwordExpiration()));
+    c.setOpenTelemetry(
+      serializeOpenTelemetry(configuration.openTelemetry()));
+    return c;
+  }
+
+  private static OpenTelemetry serializeOpenTelemetry(
+    final Optional<IdServerOpenTelemetryConfiguration> c)
+  {
+    if (c.isEmpty()) {
+      return null;
+    }
+
+    final var cc = c.get();
+    final var r = new OpenTelemetry();
+
+    r.setTraces(
+      cc.traces()
+        .map(IdServerConfigurationFiles::serializeOpenTelemetryTraces)
+        .orElse(null)
+    );
+    r.setMetrics(
+      cc.metrics()
+        .map(IdServerConfigurationFiles::serializeOpenTelemetryMetrics)
+        .orElse(null)
+    );
+    r.setLogs(
+      cc.logs()
+        .map(IdServerConfigurationFiles::serializeOpenTelemetryLogs)
+        .orElse(null)
+    );
+    r.setLogicalServiceName(cc.logicalServiceName());
+    return r;
+  }
+
+  private static Logs serializeOpenTelemetryLogs(
+    final IdLogs c)
+  {
+    final var r = new Logs();
+    r.setEndpoint(c.endpoint().toString());
+    r.setProtocol(serializeOTProtocol(c.protocol()));
+    return r;
+  }
+
+  private static Metrics serializeOpenTelemetryMetrics(
+    final IdMetrics c)
+  {
+    final var r = new Metrics();
+    r.setEndpoint(c.endpoint().toString());
+    r.setProtocol(serializeOTProtocol(c.protocol()));
+    return r;
+  }
+
+  private static Traces serializeOpenTelemetryTraces(
+    final IdTraces c)
+  {
+    final var r = new Traces();
+    r.setEndpoint(c.endpoint().toString());
+    r.setProtocol(serializeOTProtocol(c.protocol()));
+    return r;
+  }
+
+  private static OpenTelemetryProtocol serializeOTProtocol(
+    final IdOTLPProtocol protocol)
+  {
+    return switch (protocol) {
+      case GRPC -> OpenTelemetryProtocol.GRPC;
+      case HTTP -> OpenTelemetryProtocol.HTTP;
+    };
+  }
+
+  private static PasswordExpiration serializePasswordExpiration(
+    final DatatypeFactory types,
+    final IdServerPasswordExpirationConfiguration c)
+  {
+    final var r = new PasswordExpiration();
+    r.setAdminPasswordValidityDuration(
+      c.adminPasswordValidityDuration()
+        .map(d -> serializeDuration(types, d))
+        .orElse(null)
+    );
+    r.setUserPasswordValidityDuration(
+      c.userPasswordValidityDuration()
+        .map(d -> serializeDuration(types, d))
+        .orElse(null)
+    );
+    return r;
+  }
+
+  private static RateLimiting serializeRateLimiting(
+    final DatatypeFactory types,
+    final IdServerRateLimitConfiguration c)
+  {
+    final var r = new RateLimiting();
+    r.setAdminLoginDelay(
+      serializeDuration(types, c.adminLoginDelay()));
+    r.setAdminLoginRateLimit(
+      serializeDuration(types, c.adminLoginRateLimit()));
+    r.setEmailVerificationRateLimit(
+      serializeDuration(types, c.emailVerificationRateLimit()));
+    r.setPasswordResetRateLimit(
+      serializeDuration(types, c.passwordResetRateLimit()));
+    r.setUserLoginRateLimit(
+      serializeDuration(types, c.userLoginRateLimit()));
+    r.setUserLoginDelay(
+      serializeDuration(types, c.userLoginDelay()));
+    return r;
+  }
+
+  private static Sessions serializeSessions(
+    final DatatypeFactory types,
+    final IdServerSessionConfiguration s)
+  {
+    final var r = new Sessions();
+    r.setAdminSessionExpiration(
+      serializeDuration(types, s.adminSessionExpiration()));
+    r.setUserSessionExpiration(
+      serializeDuration(types, s.userSessionExpiration()));
+    return r;
+  }
+
+  private static History serializeHistory(
+    final IdServerHistoryConfiguration history)
+  {
+    final var r = new History();
+    r.setAdminLoginHistoryLimit(history.adminLoginHistoryLimit());
+    r.setUserLoginHistoryLimit(history.userLoginHistoryLimit());
+    return r;
+  }
+
+  private static Database serializeDatabase(
+    final IdDatabaseConfiguration c)
+  {
+    final var r = new Database();
+    r.setAddress(c.address());
+    r.setCreate(c.create() == IdDatabaseCreate.CREATE_DATABASE);
+    r.setKind("POSTGRESQL");
+    r.setName(c.databaseName());
+    r.setOwnerRoleName(c.ownerRoleName());
+    r.setOwnerRolePassword(c.ownerRolePassword());
+    r.setPort(c.port());
+    r.setReaderRolePassword(c.readerRolePassword().orElse(null));
+    r.setUpgrade(c.upgrade() == IdDatabaseUpgrade.UPGRADE_DATABASE);
+    r.setWorkerRolePassword(c.workerRolePassword());
+    return r;
+  }
+
+  private static HTTPServices serializeHTTP(
+    final IdServerHTTPServiceConfiguration adminAPI,
+    final IdServerHTTPServiceConfiguration userAPI,
+    final IdServerHTTPServiceConfiguration userView)
+  {
+    final var r = new HTTPServices();
+    r.setHTTPServiceAdminAPI(serializeHTTPService(adminAPI));
+    r.setHTTPServiceUserAPI(serializeHTTPService(userAPI));
+    r.setHTTPServiceUserView(serializeHTTPService(userView));
+    return r;
+  }
+
+  private static HTTPServiceType serializeHTTPService(
+    final IdServerHTTPServiceConfiguration s)
+  {
+    final var r = new HTTPServiceType();
+    r.setExternalURI(s.externalAddress().toString());
+    r.setListenAddress(s.listenAddress());
+    r.setListenPort(s.listenPort());
+    return r;
+  }
+
+  private static Mail serializeMail(
+    final DatatypeFactory types,
+    final IdServerMailConfiguration c)
+  {
+    final var m = new Mail();
+
+    final var t = c.transportConfiguration();
+    if (t instanceof final IdServerMailTransportSMTP ts) {
+      m.setSMTP(serializeMailSMTP(ts));
+    } else if (t instanceof final IdServerMailTransportSMTPS ts) {
+      m.setSMTPS(serializeMailSMTPS(ts));
+    } else if (t instanceof final IdServerMailTransportSMTP_TLS ts) {
+      m.setSMTPTLS(serializeMailSMTPTLS(ts));
+    }
+    m.setSenderAddress(
+      c.senderAddress());
+    m.setVerificationExpiration(
+      serializeDuration(types, c.verificationExpiration()));
+    m.setMailAuthentication(
+      serializeMailAuthentication(c.authenticationConfiguration()));
+
+    return m;
+  }
+
+  private static MailAuthentication serializeMailAuthentication(
+    final Optional<IdServerMailAuthenticationConfiguration> auth)
+  {
+    if (auth.isEmpty()) {
+      return null;
+    }
+
+    final var a = auth.get();
+    final var r = new MailAuthentication();
+    r.setUsername(a.userName());
+    r.setPassword(a.password());
+    return r;
+  }
+
+  private static javax.xml.datatype.Duration serializeDuration(
+    final DatatypeFactory types,
+    final Duration duration)
+  {
+    return types.newDuration(duration.toString());
+  }
+
+  private static SMTPType serializeMailSMTP(
+    final IdServerMailTransportSMTP ts)
+  {
+    final var s = new SMTPType();
+    s.setHost(ts.host());
+    s.setPort(ts.port());
+    return s;
+  }
+
+  private static SMTPSType serializeMailSMTPS(
+    final IdServerMailTransportSMTPS ts)
+  {
+    final var s = new SMTPSType();
+    s.setHost(ts.host());
+    s.setPort(ts.port());
+    return s;
+  }
+
+  private static SMTPTLSType serializeMailSMTPTLS(
+    final IdServerMailTransportSMTP_TLS ts)
+  {
+    final var s = new SMTPTLSType();
+    s.setHost(ts.host());
+    s.setPort(ts.port());
+    return s;
+  }
+
+  private static Branding serializeBranding(
+    final IdServerBrandingConfiguration branding)
+  {
+    final var b = new Branding();
+    b.setColorScheme(
+      serializeBrandingColorScheme(branding.scheme()));
+    b.setLogo(
+      serializeBrandingLogo(branding.logo()));
+    b.setLoginExtra(
+      serializeBrandingLoginExtra(branding.loginExtra()));
+    b.setProductTitle(
+      serializeBrandingProductTitle(branding.productTitle()));
+    return b;
+  }
+
+  private static ColorScheme serializeBrandingColorScheme(
+    final Optional<IdServerColorScheme> scheme)
+  {
+    if (scheme.isEmpty()) {
+      return null;
+    }
+
+    final var s = scheme.get();
+    final var c = new ColorScheme();
+    c.setButtonColors(
+      serializeBrandingButtonColors(s.buttonColors()));
+    c.setErrorBorderColor(
+      serializeColorType(s.errorBorderColor()));
+
+    c.setHeaderBackgroundColor(
+      serializeColorType(s.headerBackgroundColor()));
+    c.setHeaderLinkColor(
+      serializeColorType(s.headerLinkColor()));
+    c.setHeaderBackgroundColor(
+      serializeColorType(s.headerBackgroundColor()));
+    c.setHeaderTextColor(
+      serializeColorType(s.headerTextColor()));
+
+    c.setMainBackgroundColor(
+      serializeColorType(s.mainBackgroundColor()));
+    c.setMainLinkColor(
+      serializeColorType(s.mainLinkColor()));
+    c.setMainBackgroundColor(
+      serializeColorType(s.mainBackgroundColor()));
+    c.setMainTextColor(
+      serializeColorType(s.mainTextColor()));
+    c.setMainTableBorderColor(
+      serializeColorType(s.mainTableBorderColor()));
+    c.setMainMessageBorderColor(
+      serializeColorType(s.mainMessageBorderColor()));
+
+    return c;
+  }
+
+  private static ButtonColors serializeBrandingButtonColors(
+    final CxButtonColors cxButtonColors)
+  {
+    final var c = new ButtonColors();
+
+    c.setDisabled(
+      serializeBrandingButtonStateColors(cxButtonColors.disabled()));
+    c.setEnabled(
+      serializeBrandingButtonStateColors(cxButtonColors.enabled()));
+    c.setHover(
+      serializeBrandingButtonStateColors(cxButtonColors.hover()));
+    c.setPressed(
+      serializeBrandingButtonStateColors(cxButtonColors.pressed()));
+
+    return c;
+  }
+
+  private static ButtonStateColors serializeBrandingButtonStateColors(
+    final CxButtonStateColors s)
+  {
+    final var c = new ButtonStateColors();
+    c.setBodyColor(serializeCxColorType(s.bodyColor()));
+    c.setBorderColor(serializeCxColorType(s.borderColor()));
+    c.setEmbossEColor(serializeCxColorType(s.embossEColor()));
+    c.setEmbossNColor(serializeCxColorType(s.embossNColor()));
+    c.setEmbossWColor(serializeCxColorType(s.embossWColor()));
+    c.setEmbossSColor(serializeCxColorType(s.embossSColor()));
+    c.setTextColor(serializeCxColorType(s.textColor()));
+    return c;
+  }
+
+  private static ColorType serializeCxColorType(
+    final CxColor cxColor)
+  {
+    final var c = new ColorType();
+    c.setRed(cxColor.red());
+    c.setGreen(cxColor.green());
+    c.setBlue(cxColor.blue());
+    return c;
+  }
+
+  private static ColorType serializeColorType(
+    final IdColor idColor)
+  {
+    final var c = new ColorType();
+    c.setRed(idColor.red());
+    c.setGreen(idColor.green());
+    c.setBlue(idColor.blue());
+    return c;
+  }
+
+  private static String serializeBrandingLogo(
+    final Optional<Path> logo)
+  {
+    return logo.map(Path::toString).orElse(null);
+  }
+
+  private static String serializeBrandingLoginExtra(
+    final Optional<Path> path)
+  {
+    return path.map(Path::toString).orElse(null);
+  }
+
+  private static String serializeBrandingProductTitle(
+    final String s)
+  {
+    return s;
+  }
+
+  private static IdServerConfigurationFile parseConfiguration(
     final Configuration input)
     throws URISyntaxException
   {
     return new IdServerConfigurationFile(
-      processBranding(input.getBranding()),
-      processMail(input.getMail()),
-      processHTTP(input.getHTTPServices()),
-      processDatabase(input.getDatabase()),
-      processHistory(input.getHistory()),
-      processSessions(input.getSessions()),
-      processRateLimit(input.getRateLimiting()),
-      processPasswordExpiration(input.getPasswordExpiration()),
-      processOpenTelemetry(input.getOpenTelemetry())
+      parseBranding(input.getBranding()),
+      parseMail(input.getMail()),
+      parseHTTP(input.getHTTPServices()),
+      parseDatabase(input.getDatabase()),
+      parseHistory(input.getHistory()),
+      parseSessions(input.getSessions()),
+      parseRateLimit(input.getRateLimiting()),
+      parsePasswordExpiration(input.getPasswordExpiration()),
+      parseOpenTelemetry(input.getOpenTelemetry())
     );
   }
 
-  private static IdServerPasswordExpirationConfiguration processPasswordExpiration(
+  private static IdServerPasswordExpirationConfiguration parsePasswordExpiration(
     final PasswordExpiration passwordExpiration)
   {
     if (passwordExpiration == null) {
@@ -172,13 +615,13 @@ public final class IdServerConfigurationFiles
 
     return new IdServerPasswordExpirationConfiguration(
       Optional.ofNullable(passwordExpiration.getUserPasswordValidityDuration())
-        .map(IdServerConfigurationFiles::processDuration),
+        .map(IdServerConfigurationFiles::parseDuration),
       Optional.ofNullable(passwordExpiration.getAdminPasswordValidityDuration())
-        .map(IdServerConfigurationFiles::processDuration)
+        .map(IdServerConfigurationFiles::parseDuration)
     );
   }
 
-  private static Optional<IdServerOpenTelemetryConfiguration> processOpenTelemetry(
+  private static Optional<IdServerOpenTelemetryConfiguration> parseOpenTelemetry(
     final OpenTelemetry openTelemetry)
   {
     if (openTelemetry == null) {
@@ -189,21 +632,21 @@ public final class IdServerConfigurationFiles
       Optional.ofNullable(openTelemetry.getMetrics())
         .map(m -> new IdMetrics(
           URI.create(m.getEndpoint()),
-          processProtocol(m.getProtocol())
+          parseProtocol(m.getProtocol())
         ));
 
     final var traces =
       Optional.ofNullable(openTelemetry.getTraces())
         .map(m -> new IdTraces(
           URI.create(m.getEndpoint()),
-          processProtocol(m.getProtocol())
+          parseProtocol(m.getProtocol())
         ));
 
     final var logs =
       Optional.ofNullable(openTelemetry.getLogs())
         .map(m -> new IdLogs(
           URI.create(m.getEndpoint()),
-          processProtocol(m.getProtocol())
+          parseProtocol(m.getProtocol())
         ));
 
     return Optional.of(
@@ -216,7 +659,7 @@ public final class IdServerConfigurationFiles
     );
   }
 
-  private static IdOTLPProtocol processProtocol(
+  private static IdOTLPProtocol parseProtocol(
     final OpenTelemetryProtocol protocol)
   {
     return switch (protocol) {
@@ -225,40 +668,40 @@ public final class IdServerConfigurationFiles
     };
   }
 
-  private static IdServerRateLimitConfiguration processRateLimit(
+  private static IdServerRateLimitConfiguration parseRateLimit(
     final RateLimiting rateLimiting)
   {
     return new IdServerRateLimitConfiguration(
-      processDuration(
+      parseDuration(
         rateLimiting.getEmailVerificationRateLimit()),
-      processDuration(
+      parseDuration(
         rateLimiting.getPasswordResetRateLimit()),
-      processDurationOrDefault(
+      parseDurationOrDefault(
         rateLimiting.getUserLoginRateLimit(),
         Duration.ofSeconds(5L)
       ),
-      processDurationOrDefault(
+      parseDurationOrDefault(
         rateLimiting.getUserLoginDelay(),
         Duration.ofSeconds(1L)
       ),
-      processDurationOrDefault(
+      parseDurationOrDefault(
         rateLimiting.getAdminLoginRateLimit(),
         Duration.ofSeconds(5L)
       ),
-      processDurationOrDefault(
+      parseDurationOrDefault(
         rateLimiting.getAdminLoginDelay(),
         Duration.ofSeconds(1L)
       )
     );
   }
 
-  private static Duration processDuration(
+  private static Duration parseDuration(
     final javax.xml.datatype.Duration duration)
   {
     return Duration.parse(duration.toString());
   }
 
-  private static Duration processDurationOrDefault(
+  private static Duration parseDurationOrDefault(
     final javax.xml.datatype.Duration duration,
     final Duration defaultValue)
   {
@@ -269,16 +712,16 @@ public final class IdServerConfigurationFiles
     return Duration.parse(duration.toString());
   }
 
-  private static IdServerSessionConfiguration processSessions(
+  private static IdServerSessionConfiguration parseSessions(
     final Sessions sessions)
   {
     return new IdServerSessionConfiguration(
-      processDuration(sessions.getUserSessionExpiration()),
-      processDuration(sessions.getAdminSessionExpiration())
+      parseDuration(sessions.getUserSessionExpiration()),
+      parseDuration(sessions.getAdminSessionExpiration())
     );
   }
 
-  private static IdServerHistoryConfiguration processHistory(
+  private static IdServerHistoryConfiguration parseHistory(
     final History history)
   {
     return new IdServerHistoryConfiguration(
@@ -287,11 +730,11 @@ public final class IdServerConfigurationFiles
     );
   }
 
-  private static IdServerDatabaseConfiguration processDatabase(
+  private static IdServerDatabaseConfiguration parseDatabase(
     final Database database)
   {
     return new IdServerDatabaseConfiguration(
-      processDatabaseKind(database.getKind()),
+      parseDatabaseKind(database.getKind()),
       database.getOwnerRoleName(),
       database.getOwnerRolePassword(),
       database.getWorkerRolePassword(),
@@ -304,7 +747,7 @@ public final class IdServerConfigurationFiles
     );
   }
 
-  private static IdServerDatabaseKind processDatabaseKind(
+  private static IdServerDatabaseKind parseDatabaseKind(
     final String kind)
   {
     return switch (kind.toLowerCase(Locale.ROOT)) {
@@ -318,18 +761,18 @@ public final class IdServerConfigurationFiles
     };
   }
 
-  private static IdServerHTTPConfiguration processHTTP(
+  private static IdServerHTTPConfiguration parseHTTP(
     final HTTPServices httpServices)
     throws URISyntaxException
   {
     return new IdServerHTTPConfiguration(
-      processHTTPService(httpServices.getHTTPServiceAdminAPI()),
-      processHTTPService(httpServices.getHTTPServiceUserAPI()),
-      processHTTPService(httpServices.getHTTPServiceUserView())
+      parseHTTPService(httpServices.getHTTPServiceAdminAPI()),
+      parseHTTPService(httpServices.getHTTPServiceUserAPI()),
+      parseHTTPService(httpServices.getHTTPServiceUserView())
     );
   }
 
-  private static IdServerHTTPServiceConfiguration processHTTPService(
+  private static IdServerHTTPServiceConfiguration parseHTTPService(
     final HTTPServiceType service)
     throws URISyntaxException
   {
@@ -340,29 +783,29 @@ public final class IdServerConfigurationFiles
     );
   }
 
-  private static IdServerMailConfiguration processMail(
+  private static IdServerMailConfiguration parseMail(
     final Mail mail)
   {
     final IdServerMailTransportConfigurationType transport;
     if (mail.getSMTP() != null) {
-      transport = processSMTP(mail.getSMTP());
+      transport = parseSMTP(mail.getSMTP());
     } else if (mail.getSMTPS() != null) {
-      transport = processSMTPS(mail.getSMTPS());
+      transport = parseSMTPS(mail.getSMTPS());
     } else if (mail.getSMTPTLS() != null) {
-      transport = processSMTPTLS(mail.getSMTPTLS());
+      transport = parseSMTPTLS(mail.getSMTPTLS());
     } else {
       throw new IllegalStateException();
     }
 
     return new IdServerMailConfiguration(
       transport,
-      processMailAuth(mail.getMailAuthentication()),
+      parseMailAuth(mail.getMailAuthentication()),
       mail.getSenderAddress(),
-      processDuration(mail.getVerificationExpiration())
+      parseDuration(mail.getVerificationExpiration())
     );
   }
 
-  private static IdServerMailTransportConfigurationType processSMTP(
+  private static IdServerMailTransportConfigurationType parseSMTP(
     final SMTPType smtp)
   {
     return new IdServerMailTransportSMTP(
@@ -371,7 +814,7 @@ public final class IdServerConfigurationFiles
     );
   }
 
-  private static IdServerMailTransportConfigurationType processSMTPS(
+  private static IdServerMailTransportConfigurationType parseSMTPS(
     final SMTPSType smtp)
   {
     return new IdServerMailTransportSMTPS(
@@ -380,7 +823,7 @@ public final class IdServerConfigurationFiles
     );
   }
 
-  private static IdServerMailTransportConfigurationType processSMTPTLS(
+  private static IdServerMailTransportConfigurationType parseSMTPTLS(
     final SMTPTLSType smtp)
   {
     return new IdServerMailTransportSMTP_TLS(
@@ -389,7 +832,7 @@ public final class IdServerConfigurationFiles
     );
   }
 
-  private static Optional<IdServerMailAuthenticationConfiguration> processMailAuth(
+  private static Optional<IdServerMailAuthenticationConfiguration> parseMailAuth(
     final MailAuthentication mailAuthentication)
   {
     if (mailAuthentication == null) {
@@ -404,18 +847,18 @@ public final class IdServerConfigurationFiles
     );
   }
 
-  private static IdServerBrandingConfiguration processBranding(
+  private static IdServerBrandingConfiguration parseBranding(
     final Branding branding)
   {
     return new IdServerBrandingConfiguration(
       branding.getProductTitle(),
-      processLogo(branding.getLogo()),
-      processLoginExtra(branding.getLoginExtra()),
-      processColorScheme(branding.getColorScheme())
+      parseLogo(branding.getLogo()),
+      parseLoginExtra(branding.getLoginExtra()),
+      parseColorScheme(branding.getColorScheme())
     );
   }
 
-  private static Optional<IdServerColorScheme> processColorScheme(
+  private static Optional<IdServerColorScheme> parseColorScheme(
     final ColorScheme colorScheme)
   {
     if (colorScheme == null) {
@@ -424,52 +867,52 @@ public final class IdServerConfigurationFiles
 
     return Optional.of(
       new IdServerColorScheme(
-        processButtonColors(colorScheme.getButtonColors()),
-        processColor(colorScheme.getErrorBorderColor()),
-        processColor(colorScheme.getHeaderBackgroundColor()),
-        processColor(colorScheme.getHeaderLinkColor()),
-        processColor(colorScheme.getHeaderTextColor()),
-        processColor(colorScheme.getMainBackgroundColor()),
-        processColor(colorScheme.getMainLinkColor()),
-        processColor(colorScheme.getMainMessageBorderColor()),
-        processColor(colorScheme.getMainTableBorderColor()),
-        processColor(colorScheme.getMainTextColor())
+        parseButtonColors(colorScheme.getButtonColors()),
+        parseColor(colorScheme.getErrorBorderColor()),
+        parseColor(colorScheme.getHeaderBackgroundColor()),
+        parseColor(colorScheme.getHeaderLinkColor()),
+        parseColor(colorScheme.getHeaderTextColor()),
+        parseColor(colorScheme.getMainBackgroundColor()),
+        parseColor(colorScheme.getMainLinkColor()),
+        parseColor(colorScheme.getMainMessageBorderColor()),
+        parseColor(colorScheme.getMainTableBorderColor()),
+        parseColor(colorScheme.getMainTextColor())
       )
     );
   }
 
-  private static CxButtonColors processButtonColors(
+  private static CxButtonColors parseButtonColors(
     final ButtonColors buttonColors)
   {
     return new CxButtonColors(
-      processButtonStateColors(buttonColors.getEnabled()),
-      processButtonStateColors(buttonColors.getDisabled()),
-      processButtonStateColors(buttonColors.getPressed()),
-      processButtonStateColors(buttonColors.getHover())
+      parseButtonStateColors(buttonColors.getEnabled()),
+      parseButtonStateColors(buttonColors.getDisabled()),
+      parseButtonStateColors(buttonColors.getPressed()),
+      parseButtonStateColors(buttonColors.getHover())
     );
   }
 
-  private static CxButtonStateColors processButtonStateColors(
+  private static CxButtonStateColors parseButtonStateColors(
     final ButtonStateColors state)
   {
     return new CxButtonStateColors(
-      processCxColor(state.getTextColor()),
-      processCxColor(state.getBodyColor()),
-      processCxColor(state.getBorderColor()),
-      processCxColor(state.getEmbossEColor()),
-      processCxColor(state.getEmbossNColor()),
-      processCxColor(state.getEmbossSColor()),
-      processCxColor(state.getEmbossWColor())
+      parseCxColor(state.getTextColor()),
+      parseCxColor(state.getBodyColor()),
+      parseCxColor(state.getBorderColor()),
+      parseCxColor(state.getEmbossEColor()),
+      parseCxColor(state.getEmbossNColor()),
+      parseCxColor(state.getEmbossSColor()),
+      parseCxColor(state.getEmbossWColor())
     );
   }
 
-  private static CxColor processCxColor(
+  private static CxColor parseCxColor(
     final ColorType color)
   {
     return new CxColor(color.getRed(), color.getGreen(), color.getBlue());
   }
 
-  private static IdColor processColor(
+  private static IdColor parseColor(
     final ColorType color)
   {
     return new IdColor(
@@ -479,7 +922,7 @@ public final class IdServerConfigurationFiles
     );
   }
 
-  private static Optional<Path> processLoginExtra(
+  private static Optional<Path> parseLoginExtra(
     final String loginExtra)
   {
     if (loginExtra == null) {
@@ -489,7 +932,7 @@ public final class IdServerConfigurationFiles
     return Optional.of(Path.of(loginExtra));
   }
 
-  private static Optional<Path> processLogo(
+  private static Optional<Path> parseLogo(
     final String logo)
   {
     if (logo == null) {

@@ -29,6 +29,7 @@ module com.io7m.idstore.database.postgres
   requires com.io7m.idstore.database.api;
   requires com.io7m.idstore.error_codes;
   requires com.io7m.idstore.model;
+  requires com.io7m.idstore.strings;
 
   requires com.io7m.anethum.api;
   requires com.io7m.jaffirm.core;

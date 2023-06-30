@@ -172,6 +172,10 @@
   <suppress files="IdA1CmdAbstract\.java"
             checks="ThrowsCount"/>
 
+  <!-- The configuration service refers to a lot of XML types. -->
+  <suppress files="IdServerConfigurationFiles.java"
+            checks="ClassDataAbstractionCoupling"/>
+  
   <!-- The client service refers to a lot of command types. -->
   <suppress files="IdAGClientService\.java"
             checks="ClassDataAbstractionCoupling"/>

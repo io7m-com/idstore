@@ -9,7 +9,7 @@
   <parent>
     <groupId>com.io7m.idstore</groupId>
     <artifactId>com.io7m.idstore</artifactId>
-    <version>1.0.0-beta0013</version>
+    <version>1.0.0-beta0014</version>
   </parent>
   <artifactId>com.io7m.idstore.tests</artifactId>
 
@@ -21,6 +21,7 @@
   <properties>
     <mdep.analyze.skip>true</mdep.analyze.skip>
     <spotbugs.skip>true</spotbugs.skip>
+    <checkstyle.skip>true</checkstyle.skip>
   </properties>
 
   <dependencies>
@@ -209,6 +210,11 @@
       <artifactId>com.io7m.idstore.user_client.api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.strings</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -239,20 +245,20 @@
       <artifactId>mockito-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy-agent</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
       <groupId>com.io7m.jmulticlose</groupId>
       <artifactId>com.io7m.jmulticlose.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>junit-jupiter</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>postgresql</artifactId>
     </dependency>
     <dependency>
       <groupId>net.jqwik</groupId>
@@ -282,47 +288,26 @@
       <groupId>com.io7m.quarrel</groupId>
       <artifactId>com.io7m.quarrel.ext.xstructural</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.io7m.zelador</groupId>
+      <artifactId>com.io7m.zelador.test_extension</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.ervilla</groupId>
+      <artifactId>com.io7m.ervilla.test_extension</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.ervilla</groupId>
+      <artifactId>com.io7m.ervilla.api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.ervilla</groupId>
+      <artifactId>com.io7m.ervilla.postgres</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>
-            ${argLine}
-            --add-opens
-            org.junit.platform.commons/org.junit.platform.commons.logging=ALL-UNNAMED
-            --add-opens
-            org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED
-          </argLine>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>run-it</id>
-            <phase>integration-test</phase>
-            <goals>
-              <goal>integration-test</goal>
-            </goals>
-            <configuration>
-              <argLine>
-                ${argLine}
-                --add-opens
-                org.junit.platform.commons/org.junit.platform.commons.logging=ALL-UNNAMED
-                --add-opens
-                org.junit.platform.commons/org.junit.platform.commons.util=ALL-UNNAMED
-              </argLine>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
       <!-- Determine test coverage -->
       <plugin>
         <groupId>org.jacoco</groupId>

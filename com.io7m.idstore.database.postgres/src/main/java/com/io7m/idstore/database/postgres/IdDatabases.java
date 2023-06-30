@@ -46,16 +46,22 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_REVISION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.TRASCO_ERROR;
+import static com.io7m.idstore.strings.IdStringConstants.DATABASE_CONNECTION_FAILED;
 import static com.io7m.trasco.api.TrExecutorUpgrade.FAIL_INSTEAD_OF_UPGRADING;
 import static com.io7m.trasco.api.TrExecutorUpgrade.PERFORM_UPGRADES;
 import static java.math.BigInteger.valueOf;
@@ -207,6 +213,7 @@ public final class IdDatabases implements IdDatabaseFactoryType
 
     return new IdDatabase(
       telemetry,
+      configuration,
       configuration.clock(),
       dataSource,
       resources
@@ -242,6 +249,8 @@ public final class IdDatabases implements IdDatabaseFactoryType
         url.append(configuration.port());
         url.append('/');
         url.append(configuration.databaseName());
+
+        waitForDatabaseToComeUp(telemetry, configuration, url.toString());
 
         final var config = new HikariConfig();
         config.setJdbcUrl(url.toString());
@@ -318,6 +327,75 @@ public final class IdDatabases implements IdDatabaseFactoryType
           Optional.empty()
         );
       }
+    }
+  }
+
+  private static void waitForDatabaseToComeUp(
+    final IdDatabaseTelemetry telemetry,
+    final IdDatabaseConfiguration configuration,
+    final String url)
+    throws IOException
+  {
+    final var span =
+      telemetry.tracer()
+        .spanBuilder("DatabaseSetup")
+        .startSpan();
+
+    try (var ignored = span.makeCurrent()) {
+
+      /*
+       * Start a background thread that repeatedly tries to open a database
+       * connection.
+       */
+
+      final var completionLatch = new CountDownLatch(1);
+      final var thread = new Thread(() -> {
+        final var properties = new Properties();
+        properties.setProperty("user", configuration.ownerRoleName());
+        properties.setProperty("password", configuration.ownerRolePassword());
+
+        while (true) {
+          try (var connection =
+                 DriverManager.getConnection(url, properties)) {
+            LOG.debug("opening a database connection...");
+            if (connection.isValid(100)) {
+              completionLatch.countDown();
+              return;
+            }
+            Thread.sleep(50L);
+          } catch (final InterruptedException e) {
+            return;
+          } catch (final Exception e) {
+            LOG.debug("database not ready: {}", e.getMessage());
+          }
+        }
+      });
+      thread.setName("com.io7m.idstore.database.postgres.startup");
+      thread.start();
+
+      /*
+       * Wait for the background thread to signal to the countdown
+       * latch that a database connection has been successfully opened.
+       */
+
+      try {
+        final var completed =
+          completionLatch.await(30L, TimeUnit.SECONDS);
+
+        if (!completed) {
+          throw new TimeoutException(
+            "Timed out waiting for database connection.");
+        }
+      } catch (final Exception e) {
+        span.recordException(e);
+        span.setStatus(StatusCode.ERROR);
+        throw new IOException(
+          configuration.strings().format(DATABASE_CONNECTION_FAILED),
+          e
+        );
+      }
+    } finally {
+      span.end();
     }
   }
 

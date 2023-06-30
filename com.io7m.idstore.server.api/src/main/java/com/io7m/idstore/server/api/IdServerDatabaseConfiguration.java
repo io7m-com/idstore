@@ -22,10 +22,13 @@ import java.util.Optional;
 /**
  * Configuration for the database.
  *
- * @param ownerRoleName      The name of the role that owns the database; used for database setup and migrations
+ * @param ownerRoleName      The name of the role that owns the database; used
+ *                           for database createOrUpdateInitialAdmin and migrations
  * @param ownerRolePassword  The password of the role that owns the database
- * @param workerRolePassword The password of the worker role used for normal database operation
- * @param readerRolePassword The password of the role used for read-only database access
+ * @param workerRolePassword The password of the worker role used for normal
+ *                           database operation
+ * @param readerRolePassword The password of the role used for read-only
+ *                           database access
  * @param address            The database address
  * @param create             {@code} true if the database should be created
  * @param databaseName       The database name
@@ -50,10 +53,14 @@ public record IdServerDatabaseConfiguration(
   /**
    * Configuration for the database.
    *
-   * @param ownerRoleName      The name of the role that owns the database; used for database setup and migrations
+   * @param ownerRoleName      The name of the role that owns the database; used
+   *                           for database createOrUpdateInitialAdmin and
+   *                           migrations
    * @param ownerRolePassword  The password of the role that owns the database
-   * @param workerRolePassword The password of the worker role used for normal database operation
-   * @param readerRolePassword The password of the role used for read-only database access
+   * @param workerRolePassword The password of the worker role used for normal
+   *                           database operation
+   * @param readerRolePassword The password of the role used for read-only
+   *                           database access
    * @param address            The database address
    * @param create             {@code} true if the database should be created
    * @param databaseName       The database name

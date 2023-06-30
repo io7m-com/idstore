@@ -46,6 +46,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
+import static java.lang.Integer.toUnsignedString;
 
 /**
  * A mail service.
@@ -118,9 +119,7 @@ public final class IdServerMailService implements IdServerMailServiceType
     if (transport instanceof IdServerMailTransportSMTP) {
       p.setProperty("mail.transport.protocol", "smtp");
       p.setProperty("mail.smtp.host", transport.host());
-      p.setProperty(
-        "mail.smtp.port",
-        Integer.toUnsignedString(transport.port()));
+      p.setProperty("mail.smtp.port", toUnsignedString(transport.port()));
       p.setProperty("mail.smtp.starttls.enable", "true");
       p.setProperty("mail.smtp.starttls.required", "false");
       authOpt.ifPresent(auth -> {
@@ -130,9 +129,7 @@ public final class IdServerMailService implements IdServerMailServiceType
     } else if (transport instanceof IdServerMailTransportSMTP_TLS) {
       p.setProperty("mail.transport.protocol", "smtp");
       p.setProperty("mail.smtp.host", transport.host());
-      p.setProperty(
-        "mail.smtp.port",
-        Integer.toUnsignedString(transport.port()));
+      p.setProperty("mail.smtp.port", toUnsignedString(transport.port()));
       p.setProperty("mail.smtp.starttls.enable", "true");
       p.setProperty("mail.smtp.starttls.required", "true");
       authOpt.ifPresent(auth -> {
@@ -143,16 +140,14 @@ public final class IdServerMailService implements IdServerMailServiceType
       p.setProperty("mail.transport.protocol", "smtps");
       p.setProperty("mail.smtps.quitwait", "false");
       p.setProperty("mail.smtps.host", transport.host());
-      p.setProperty(
-        "mail.smtps.port",
-        Integer.toUnsignedString(transport.port()));
+      p.setProperty("mail.smtps.port", toUnsignedString(transport.port()));
       authOpt.ifPresent(auth -> {
         p.setProperty("mail.smtps.username", auth.userName());
         p.setProperty("mail.smtps.password", auth.password());
       });
     }
 
-    final var session = Session.getDefaultInstance(p, null);
+    final var session = Session.getInstance(p, null);
     session.setDebug(false);
 
     return new IdServerMailService(
