@@ -192,6 +192,57 @@ public final class IdTestDatabases
   }
 
   /**
+   * Create a new database fixture.
+   *
+   * @param supervisor The container supervisor
+   * @param port       The database port
+   *
+   * @return A new database fixture
+   *
+   * @throws Exception On errors
+   */
+
+  public static IdDatabaseFixture createWithHostilePasswords(
+    final EContainerSupervisorType supervisor,
+    final int port)
+    throws Exception
+  {
+    final var ownerRolePassword = "''\\'1";
+    final var workerRolePassword = "''\\'2";
+    final var readerRolePassword = "''\\'3";
+
+    final var container =
+      supervisor.start(
+        EPgSpecs.builderFromDockerIO(
+          POSTGRESQL_VERSION,
+          Optional.empty(),
+          port,
+          "idstore",
+          "idstore_install",
+          ownerRolePassword
+        ).build()
+      );
+
+    final var databaseConfiguration =
+      new IdDatabaseConfiguration(
+        "idstore_install",
+        ownerRolePassword,
+        workerRolePassword,
+        Optional.of(readerRolePassword),
+        "127.0.0.1",
+        port,
+        "idstore",
+        IdDatabaseCreate.CREATE_DATABASE,
+        IdDatabaseUpgrade.UPGRADE_DATABASE,
+        IdStrings.create(Locale.ROOT),
+        Clock.systemUTC()
+      );
+
+
+    return new IdDatabaseFixture(databaseConfiguration, container);
+  }
+
+  /**
    * Set the initial admin.
    *
    * @param t    The transaction

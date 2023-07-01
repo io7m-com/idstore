@@ -18,7 +18,6 @@
 package com.io7m.idstore.tests.server.service.configuration;
 
 import com.io7m.idstore.server.api.IdServerConfigurations;
-import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.telemetry.api.IdMetricsService;

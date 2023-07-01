@@ -37,7 +37,9 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
-import org.apache.commons.text.StringEscapeUtils;
+import org.jooq.conf.RenderNameCase;
+import org.jooq.conf.Settings;
+import org.jooq.impl.DSL;
 import org.postgresql.util.PSQLState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +68,7 @@ import static com.io7m.trasco.api.TrExecutorUpgrade.FAIL_INSTEAD_OF_UPGRADING;
 import static com.io7m.trasco.api.TrExecutorUpgrade.PERFORM_UPGRADES;
 import static java.math.BigInteger.valueOf;
 import static java.util.Objects.requireNonNullElse;
+import static org.jooq.SQLDialect.POSTGRES;
 
 /**
  * The default postgres server database implementation.
@@ -413,23 +416,18 @@ public final class IdDatabases implements IdDatabaseFactoryType
     if (passwordOpt.isPresent()) {
       LOG.debug("updating idstore_read_only role to allow password logins");
 
-      /*
-       * Yes, this particular SQL statement really does need to be constructed
-       * with string concatenation. Parameters and a prepared statement will
-       * not work. Yes, this is dangerous.
-       */
+      final var passwordText =
+        passwordOpt.get();
+      final var settings =
+        new Settings().withRenderNameCase(RenderNameCase.LOWER);
+      final var dslContext =
+         DSL.using(connection, POSTGRES, settings);
 
-      final var text = new StringBuilder(64);
-      text.append("ALTER ROLE idstore_read_only WITH PASSWORD ");
-      text.append('\'');
-      text.append(StringEscapeUtils.unescapeJava(
-        configuration.workerRolePassword())
+      dslContext.execute(
+        "ALTER ROLE idstore_read_only WITH PASSWORD {0}",
+        DSL.inline(passwordText)
       );
-      text.append('\'');
 
-      try (var st = connection.createStatement()) {
-        st.execute(text.toString());
-      }
       try (var st = connection.createStatement()) {
         st.execute("ALTER ROLE idstore_read_only LOGIN");
       }
@@ -450,23 +448,19 @@ public final class IdDatabases implements IdDatabaseFactoryType
     final Connection connection)
     throws SQLException
   {
-    /*
-     * Yes, this particular SQL statement really does need to be constructed
-     * with string concatenation. Parameters and a prepared statement will
-     * not work. Yes, this is dangerous.
-     */
+    LOG.debug("updating idstore role");
 
-    final var text = new StringBuilder(64);
-    text.append("ALTER ROLE idstore WITH PASSWORD ");
-    text.append('\'');
-    text.append(StringEscapeUtils.unescapeJava(
-      configuration.workerRolePassword())
+    final var passwordText =
+      configuration.workerRolePassword();
+    final var settings =
+      new Settings().withRenderNameCase(RenderNameCase.LOWER);
+    final var dslContext =
+      DSL.using(connection, POSTGRES, settings);
+    dslContext.execute(
+      "ALTER ROLE idstore WITH PASSWORD {0}",
+      DSL.inline(passwordText)
     );
-    text.append('\'');
 
-    try (var st = connection.createStatement()) {
-      st.execute(text.toString());
-    }
     try (var st = connection.createStatement()) {
       st.execute("ALTER ROLE idstore LOGIN");
     }

@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0014</version>
+    <version>1.0.0-beta0015</version>
   </parent>
 
   <artifactId>com.io7m.idstore.database.postgres</artifactId>
@@ -87,10 +87,6 @@
     <dependency>
       <groupId>com.io7m.anethum</groupId>
       <artifactId>com.io7m.anethum.api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-text</artifactId>
     </dependency>
 
     <dependency>

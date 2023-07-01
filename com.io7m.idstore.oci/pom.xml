@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0014</version>
+    <version>1.0.0-beta0015</version>
   </parent>
 
   <artifactId>com.io7m.idstore.oci</artifactId>
@@ -19,7 +19,7 @@
   <url>https://www.io7m.com/software/idstore</url>
 
   <properties>
-    <com.io7m.oci.versionAlpine>3.17.3</com.io7m.oci.versionAlpine>
+    <com.io7m.oci.versionAlpine>3.18.2</com.io7m.oci.versionAlpine>
     <com.io7m.oci.versionTemurin>17.0.7_7-jre-alpine</com.io7m.oci.versionTemurin>
     <spotbugs.skip>true</spotbugs.skip>
   </properties>
