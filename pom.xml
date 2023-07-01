@@ -13,7 +13,7 @@
 
   <groupId>com.io7m.idstore</groupId>
   <artifactId>com.io7m.idstore</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0-beta0015</version>
 
   <packaging>pom</packaging>
   <name>com.io7m.idstore</name>
@@ -457,7 +457,7 @@
       <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-semconv</artifactId>
-        <version>1.18.0-alpha</version>
+        <version>1.27.0-alpha</version>
       </dependency>
       <dependency>
         <groupId>io.opentelemetry</groupId>
@@ -472,7 +472,7 @@
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
-        <version>1.8.22</version>
+        <version>1.9.0-RC</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okio</groupId>
@@ -573,12 +573,12 @@
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
-        <version>5.9.3</version>
+        <version>5.10.0-M1</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-engine</artifactId>
-        <version>5.9.3</version>
+        <version>5.10.0-M1</version>
       </dependency>
       <dependency>
         <groupId>net.jqwik</groupId>
