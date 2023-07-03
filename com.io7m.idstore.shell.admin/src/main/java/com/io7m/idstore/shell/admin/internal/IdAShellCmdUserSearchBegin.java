@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUserColumn;
@@ -31,6 +30,7 @@ import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.io.PrintWriter;
 import java.time.OffsetDateTime;
@@ -42,7 +42,7 @@ import java.util.Optional;
  */
 
 public final class IdAShellCmdUserSearchBegin
-  extends IdAShellCmdAbstract<IdACommandUserSearchBegin, IdAResponseUserSearchBegin>
+  extends IdAShellCmdAbstractCR<IdACommandUserSearchBegin, IdAResponseUserSearchBegin>
 {
   private static final QParameterNamed1<OffsetDateTime> CREATED_FROM =
     new QParameterNamed1<>(
@@ -92,14 +92,14 @@ public final class IdAShellCmdUserSearchBegin
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdUserSearchBegin(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "user-search-begin",
         new QConstant("Begin searching for users."),

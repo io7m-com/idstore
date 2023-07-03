@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.protocol.admin.IdACommandAdminGet;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminGet;
@@ -26,6 +25,7 @@ import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.io.PrintWriter;
 import java.util.List;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  */
 
 public final class IdAShellCmdAdminGet
-  extends IdAShellCmdAbstract<IdACommandAdminGet, IdAResponseAdminGet>
+  extends IdAShellCmdAbstractCR<IdACommandAdminGet, IdAResponseAdminGet>
 {
   private static final QParameterNamed1<UUID> USER_ID =
     new QParameterNamed1<>(
@@ -53,14 +53,14 @@ public final class IdAShellCmdAdminGet
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminGet(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-get",
         new QConstant("Retrieve an admin."),

@@ -22,11 +22,9 @@ import com.io7m.quarrel.core.QCommandStatus;
 import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
-import org.jline.builtins.Completers;
-import org.jline.reader.Completer;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
@@ -35,7 +33,7 @@ import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
  * "set"
  */
 
-public final class IdAShellCmdSet implements IdAShellCmdType
+public final class IdAShellCmdSet extends IdAShellCmdAbstract
 {
   private static final QParameterNamed01<Boolean> TERMINATE_ON_ERRORS =
     new QParameterNamed01<>(
@@ -47,32 +45,23 @@ public final class IdAShellCmdSet implements IdAShellCmdType
       Boolean.class
     );
 
-  private final QCommandMetadata metadata;
-  private final IdAShellOptions options;
-
   /**
    * Construct a command.
    *
-   * @param inOptions The shell options
+   * @param inServices The service directory
    */
 
   public IdAShellCmdSet(
-    final IdAShellOptions inOptions)
+    final RPServiceDirectoryType inServices)
   {
-    this.options =
-      Objects.requireNonNull(inOptions, "options");
-    this.metadata =
+    super(
+      inServices,
       new QCommandMetadata(
         "set",
         new QConstant("Set shell options."),
         Optional.empty()
-      );
-  }
-
-  @Override
-  public Completer completer()
-  {
-    return new Completers.OptionCompleter(List.of(), 1);
+      )
+    );
   }
 
   @Override
@@ -87,20 +76,8 @@ public final class IdAShellCmdSet implements IdAShellCmdType
   {
     context.parameterValue(TERMINATE_ON_ERRORS)
       .ifPresent(x -> {
-        this.options.terminateOnErrors().set(x.booleanValue());
+        this.options().terminateOnErrors().set(x.booleanValue());
       });
     return SUCCESS;
-  }
-
-  @Override
-  public QCommandMetadata metadata()
-  {
-    return this.metadata;
-  }
-
-  @Override
-  public String toString()
-  {
-    return "[%s]".formatted(this.getClass().getSimpleName());
   }
 }

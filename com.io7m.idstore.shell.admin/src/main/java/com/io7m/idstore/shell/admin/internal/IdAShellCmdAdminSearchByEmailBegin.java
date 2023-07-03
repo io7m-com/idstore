@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdAdminColumn;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
@@ -29,6 +28,7 @@ import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -41,7 +41,7 @@ import static com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchBegin.
  */
 
 public final class IdAShellCmdAdminSearchByEmailBegin
-  extends IdAShellCmdAbstract<IdACommandAdminSearchByEmailBegin, IdAResponseAdminSearchByEmailBegin>
+  extends IdAShellCmdAbstractCR<IdACommandAdminSearchByEmailBegin, IdAResponseAdminSearchByEmailBegin>
 {
   private static final QParameterNamed1<OffsetDateTime> CREATED_FROM =
     new QParameterNamed1<>(
@@ -91,14 +91,14 @@ public final class IdAShellCmdAdminSearchByEmailBegin
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminSearchByEmailBegin(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-search-by-email-begin",
         new QConstant("Begin searching for admins by email."),

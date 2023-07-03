@@ -28,8 +28,7 @@ import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QParametersPositionalAny;
 import com.io7m.quarrel.core.QParametersPositionalType;
 import com.io7m.quarrel.core.QStringType.QConstant;
-import org.jline.builtins.Completers;
-import org.jline.reader.Completer;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,28 +39,25 @@ import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
  * "help"
  */
 
-public final class IdAShellCmdHelp implements IdAShellCmdType
+public final class IdAShellCmdHelp extends IdAShellCmdAbstract
 {
-  private final QCommandMetadata metadata;
-
   /**
    * Construct a command.
+   *
+   * @param inServices The services
    */
 
-  public IdAShellCmdHelp()
+  public IdAShellCmdHelp(
+    final RPServiceDirectoryType inServices)
   {
-    this.metadata =
+    super(
+      inServices,
       new QCommandMetadata(
         "help",
         new QConstant("Display help for a given command."),
         Optional.empty()
-      );
-  }
-
-  @Override
-  public Completer completer()
-  {
-    return new Completers.OptionCompleter(List.of(), 1);
+      )
+    );
   }
 
   @Override
@@ -121,17 +117,5 @@ public final class IdAShellCmdHelp implements IdAShellCmdType
     }
 
     return SUCCESS;
-  }
-
-  @Override
-  public QCommandMetadata metadata()
-  {
-    return this.metadata;
-  }
-
-  @Override
-  public String toString()
-  {
-    return "[%s]".formatted(this.getClass().getSimpleName());
   }
 }

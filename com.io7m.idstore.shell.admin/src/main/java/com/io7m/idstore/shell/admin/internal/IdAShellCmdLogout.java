@@ -16,18 +16,14 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
 import com.io7m.quarrel.core.QParameterNamedType;
-import com.io7m.quarrel.core.QParameterType;
 import com.io7m.quarrel.core.QStringType;
-import org.jline.reader.Completer;
-import org.jline.reader.impl.completer.StringsCompleter;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
@@ -36,40 +32,24 @@ import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
  * "logout"
  */
 
-public final class IdAShellCmdLogout implements IdAShellCmdType
+public final class IdAShellCmdLogout extends IdAShellCmdAbstract
 {
-  private final IdAClientSynchronousType client;
-  private final QCommandMetadata metadata;
-
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The services
    */
 
   public IdAShellCmdLogout(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
-    this.client =
-      Objects.requireNonNull(inClient, "client");
-
-    this.metadata =
+    super(
+      inServices,
       new QCommandMetadata(
         "logout",
         new QStringType.QConstant("Log out."),
         Optional.empty()
-      );
-  }
-
-  @Override
-  public Completer completer()
-  {
-    return new StringsCompleter(
-      this.onListNamedParameters()
-        .stream()
-        .map(QParameterType::name)
-        .toList()
-    );
+      ));
   }
 
   @Override
@@ -83,19 +63,7 @@ public final class IdAShellCmdLogout implements IdAShellCmdType
     final QCommandContextType context)
     throws Exception
   {
-    this.client.disconnect();
+    this.client().disconnect();
     return SUCCESS;
-  }
-
-  @Override
-  public QCommandMetadata metadata()
-  {
-    return this.metadata;
-  }
-
-  @Override
-  public String toString()
-  {
-    return "[%s]".formatted(this.getClass().getSimpleName());
   }
 }

@@ -16,13 +16,13 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchNext;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,19 +34,19 @@ import static com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchBegin.
  */
 
 public final class IdAShellCmdAdminSearchNext
-  extends IdAShellCmdAbstract<IdACommandAdminSearchNext, IdAResponseAdminSearchNext>
+  extends IdAShellCmdAbstractCR<IdACommandAdminSearchNext, IdAResponseAdminSearchNext>
 {
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminSearchNext(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-search-next",
         new QConstant("Go to the next page of admins."),

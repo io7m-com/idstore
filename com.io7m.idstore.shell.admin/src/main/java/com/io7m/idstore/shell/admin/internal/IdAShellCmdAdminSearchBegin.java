@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdAdminColumn;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminSearchParameters;
@@ -31,6 +30,7 @@ import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.io.PrintWriter;
 import java.time.OffsetDateTime;
@@ -42,7 +42,7 @@ import java.util.Optional;
  */
 
 public final class IdAShellCmdAdminSearchBegin
-  extends IdAShellCmdAbstract<IdACommandAdminSearchBegin, IdAResponseAdminSearchBegin>
+  extends IdAShellCmdAbstractCR<IdACommandAdminSearchBegin, IdAResponseAdminSearchBegin>
 {
   private static final QParameterNamed1<OffsetDateTime> CREATED_FROM =
     new QParameterNamed1<>(
@@ -92,14 +92,14 @@ public final class IdAShellCmdAdminSearchBegin
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminSearchBegin(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-search-begin",
         new QConstant("Begin searching for admins."),

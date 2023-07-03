@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandUserBanDelete;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.quarrel.core.QCommandContextType;
@@ -24,6 +23,7 @@ import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +34,7 @@ import java.util.UUID;
  */
 
 public final class IdAShellCmdUserBanDelete
-  extends IdAShellCmdAbstract<IdACommandUserBanDelete, IdAResponseUserBanDelete>
+  extends IdAShellCmdAbstractCR<IdACommandUserBanDelete, IdAResponseUserBanDelete>
 {
   private static final QParameterNamed1<UUID> USER_ID =
     new QParameterNamed1<>(
@@ -48,14 +48,14 @@ public final class IdAShellCmdUserBanDelete
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdUserBanDelete(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "user-ban-delete",
         new QConstant("Unban a user."),

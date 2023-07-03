@@ -16,13 +16,13 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailPrevious;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,19 +34,19 @@ import static com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchBegin.f
  */
 
 public final class IdAShellCmdUserSearchByEmailPrevious
-  extends IdAShellCmdAbstract<IdACommandUserSearchByEmailPrevious, IdAResponseUserSearchByEmailPrevious>
+  extends IdAShellCmdAbstractCR<IdACommandUserSearchByEmailPrevious, IdAResponseUserSearchByEmailPrevious>
 {
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdUserSearchByEmailPrevious(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "user-search-by-email-previous",
         new QConstant("Go to the previous page of users."),

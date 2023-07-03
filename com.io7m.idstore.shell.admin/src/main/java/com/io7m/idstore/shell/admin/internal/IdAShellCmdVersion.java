@@ -21,10 +21,8 @@ import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
 import com.io7m.quarrel.core.QParameterNamedType;
-import com.io7m.quarrel.core.QParameterType;
 import com.io7m.quarrel.core.QStringType.QConstant;
-import org.jline.reader.Completer;
-import org.jline.reader.impl.completer.StringsCompleter;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,32 +33,24 @@ import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
  * "version"
  */
 
-public final class IdAShellCmdVersion implements IdAShellCmdType
+public final class IdAShellCmdVersion extends IdAShellCmdAbstract
 {
-  private final QCommandMetadata metadata;
-
   /**
    * Construct a command.
+   *
+   * @param inServices The service directory
    */
 
-  public IdAShellCmdVersion()
+  public IdAShellCmdVersion(
+    final RPServiceDirectoryType inServices)
   {
-    this.metadata =
+    super(
+      inServices,
       new QCommandMetadata(
         "version",
         new QConstant("Display the shell version."),
         Optional.empty()
-      );
-  }
-
-  @Override
-  public Completer completer()
-  {
-    return new StringsCompleter(
-      this.onListNamedParameters()
-        .stream()
-        .map(QParameterType::name)
-        .toList()
+      )
     );
   }
 
@@ -81,17 +71,5 @@ public final class IdAShellCmdVersion implements IdAShellCmdType
     w.append(IdVersion.MAIN_BUILD);
     w.println();
     return SUCCESS;
-  }
-
-  @Override
-  public QCommandMetadata metadata()
-  {
-    return this.metadata;
-  }
-
-  @Override
-  public String toString()
-  {
-    return "[%s]".formatted(this.getClass().getSimpleName());
   }
 }

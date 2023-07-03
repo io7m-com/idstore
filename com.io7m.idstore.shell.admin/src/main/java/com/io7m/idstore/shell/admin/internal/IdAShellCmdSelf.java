@@ -16,13 +16,13 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSelf;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,19 +32,19 @@ import java.util.Optional;
  */
 
 public final class IdAShellCmdSelf
-  extends IdAShellCmdAbstract<IdACommandAdminSelf, IdAResponseAdminSelf>
+  extends IdAShellCmdAbstractCR<IdACommandAdminSelf, IdAResponseAdminSelf>
 {
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdSelf(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "self",
         new QConstant("Return the admin's own profile."),

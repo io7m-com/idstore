@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.protocol.admin.IdACommandUserGetByEmail;
 import com.io7m.idstore.protocol.admin.IdAResponseUserGet;
@@ -26,6 +25,7 @@ import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.Optional;
  */
 
 public final class IdAShellCmdUserGetByEmail
-  extends IdAShellCmdAbstract<IdACommandUserGetByEmail, IdAResponseUserGet>
+  extends IdAShellCmdAbstractCR<IdACommandUserGetByEmail, IdAResponseUserGet>
 {
   private static final QParameterNamed1<IdEmail> EMAIL =
     new QParameterNamed1<>(
@@ -50,14 +50,14 @@ public final class IdAShellCmdUserGetByEmail
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdUserGetByEmail(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "user-get-by-email",
         new QConstant("Retrieve a user by email address."),

@@ -20,6 +20,7 @@ import com.io7m.hibiscus.api.HBClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.repetoir.core.RPServiceType;
 
 /**
  * The type of synchronous clients.
@@ -33,7 +34,12 @@ public interface IdAClientSynchronousType
   IdAResponseType,
   IdAResponseError,
   IdAClientEventType,
-  IdAClientCredentials>
+  IdAClientCredentials>,
+  RPServiceType
 {
-
+  @Override
+  default String description()
+  {
+    return "Synchronous idstore admin client service.";
+  }
 }

@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdPage;
@@ -29,6 +28,7 @@ import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.io.PrintWriter;
 import java.time.OffsetDateTime;
@@ -40,7 +40,7 @@ import java.util.Optional;
  */
 
 public final class IdAShellCmdAuditSearchBegin
-  extends IdAShellCmdAbstract<IdACommandAuditSearchBegin, IdAResponseAuditSearchBegin>
+  extends IdAShellCmdAbstractCR<IdACommandAuditSearchBegin, IdAResponseAuditSearchBegin>
 {
   private static final QParameterNamed1<OffsetDateTime> TIME_FROM =
     new QParameterNamed1<>(
@@ -90,14 +90,14 @@ public final class IdAShellCmdAuditSearchBegin
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAuditSearchBegin(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "audit-search-begin",
         new QConstant("Begin searching for audits."),

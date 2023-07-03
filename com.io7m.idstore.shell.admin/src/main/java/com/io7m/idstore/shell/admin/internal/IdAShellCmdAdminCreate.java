@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdAdminPermission;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
@@ -31,6 +30,7 @@ import com.io7m.quarrel.core.QParameterNamed0N;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +42,7 @@ import java.util.UUID;
  */
 
 public final class IdAShellCmdAdminCreate
-  extends IdAShellCmdAbstract<IdACommandAdminCreate, IdAResponseAdminCreate>
+  extends IdAShellCmdAbstractCR<IdACommandAdminCreate, IdAResponseAdminCreate>
 {
   private static final QParameterNamed01<UUID> USER_ID =
     new QParameterNamed01<>(
@@ -101,14 +101,14 @@ public final class IdAShellCmdAdminCreate
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminCreate(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-create",
         new QConstant("Create an admin."),

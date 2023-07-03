@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdBan;
 import com.io7m.idstore.protocol.admin.IdACommandAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanCreate;
@@ -26,6 +25,7 @@ import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -37,7 +37,7 @@ import java.util.UUID;
  */
 
 public final class IdAShellCmdAdminBanCreate
-  extends IdAShellCmdAbstract<IdACommandAdminBanCreate, IdAResponseAdminBanCreate>
+  extends IdAShellCmdAbstractCR<IdACommandAdminBanCreate, IdAResponseAdminBanCreate>
 {
   private static final QParameterNamed1<UUID> USER_ID =
     new QParameterNamed1<>(
@@ -69,14 +69,14 @@ public final class IdAShellCmdAdminBanCreate
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminBanCreate(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-ban-create",
         new QConstant("Ban an admin."),

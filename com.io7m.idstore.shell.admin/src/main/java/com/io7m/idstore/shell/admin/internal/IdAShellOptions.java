@@ -17,6 +17,8 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
+import com.io7m.repetoir.core.RPServiceType;
+
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -28,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public record IdAShellOptions(
   AtomicBoolean terminateOnErrors)
+  implements RPServiceType
 {
   /**
    * Shell options.
@@ -38,5 +41,11 @@ public record IdAShellOptions(
   public IdAShellOptions
   {
     Objects.requireNonNull(terminateOnErrors, "terminateOnErrors");
+  }
+
+  @Override
+  public String description()
+  {
+    return "Shell options service.";
   }
 }

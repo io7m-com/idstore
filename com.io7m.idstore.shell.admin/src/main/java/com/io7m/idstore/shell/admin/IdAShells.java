@@ -18,6 +18,7 @@ package com.io7m.idstore.shell.admin;
 
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
+import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.shell.admin.internal.IdAShell;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminBanCreate;
@@ -45,6 +46,7 @@ import com.io7m.idstore.shell.admin.internal.IdAShellCmdLogout;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdMailTest;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdSelf;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdSet;
+import com.io7m.idstore.shell.admin.internal.IdAShellCmdType;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserBanCreate;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserBanDelete;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserBanGet;
@@ -63,6 +65,7 @@ import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchPrevious;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserUpdatePasswordExpiration;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdVersion;
 import com.io7m.idstore.shell.admin.internal.IdAShellOptions;
+import com.io7m.repetoir.core.RPServiceDirectory;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.DefaultParser;
 import org.jline.reader.impl.completer.AggregateCompleter;
@@ -120,50 +123,54 @@ public final class IdAShells implements IdAShellFactoryType
         new AtomicBoolean(false)
       );
 
-    final var commands =
+    final var services = new RPServiceDirectory();
+    services.register(IdAClientSynchronousType.class, client);
+    services.register(IdAShellOptions.class, options);
+
+    final List<IdAShellCmdType> commands =
       List.of(
-        new IdAShellCmdAdminBanCreate(client),
-        new IdAShellCmdAdminBanDelete(client),
-        new IdAShellCmdAdminBanGet(client),
-        new IdAShellCmdAdminCreate(client),
-        new IdAShellCmdAdminEmailAdd(client),
-        new IdAShellCmdAdminEmailRemove(client),
-        new IdAShellCmdAdminGet(client),
-        new IdAShellCmdAdminGetByEmail(client),
-        new IdAShellCmdAdminMaintenanceModeSet(client),
-        new IdAShellCmdAdminSearchBegin(client),
-        new IdAShellCmdAdminSearchByEmailBegin(client),
-        new IdAShellCmdAdminSearchByEmailNext(client),
-        new IdAShellCmdAdminSearchByEmailPrevious(client),
-        new IdAShellCmdAdminSearchNext(client),
-        new IdAShellCmdAdminSearchPrevious(client),
-        new IdAShellCmdAdminUpdatePasswordExpiration(client),
-        new IdAShellCmdAuditSearchBegin(client),
-        new IdAShellCmdAuditSearchNext(client),
-        new IdAShellCmdAuditSearchPrevious(client),
-        new IdAShellCmdHelp(),
-        new IdAShellCmdLogin(client),
-        new IdAShellCmdLogout(client),
-        new IdAShellCmdMailTest(client),
-        new IdAShellCmdSelf(client),
-        new IdAShellCmdSet(options),
-        new IdAShellCmdUserBanCreate(client),
-        new IdAShellCmdUserBanDelete(client),
-        new IdAShellCmdUserBanGet(client),
-        new IdAShellCmdUserCreate(client),
-        new IdAShellCmdUserEmailAdd(client),
-        new IdAShellCmdUserEmailRemove(client),
-        new IdAShellCmdUserGet(client),
-        new IdAShellCmdUserGetByEmail(client),
-        new IdAShellCmdUserLoginHistory(client),
-        new IdAShellCmdUserSearchBegin(client),
-        new IdAShellCmdUserSearchByEmailBegin(client),
-        new IdAShellCmdUserSearchByEmailNext(client),
-        new IdAShellCmdUserSearchByEmailPrevious(client),
-        new IdAShellCmdUserSearchNext(client),
-        new IdAShellCmdUserSearchPrevious(client),
-        new IdAShellCmdUserUpdatePasswordExpiration(client),
-        new IdAShellCmdVersion()
+        new IdAShellCmdAdminBanCreate(services),
+        new IdAShellCmdAdminBanDelete(services),
+        new IdAShellCmdAdminBanGet(services),
+        new IdAShellCmdAdminCreate(services),
+        new IdAShellCmdAdminEmailAdd(services),
+        new IdAShellCmdAdminEmailRemove(services),
+        new IdAShellCmdAdminGet(services),
+        new IdAShellCmdAdminGetByEmail(services),
+        new IdAShellCmdAdminMaintenanceModeSet(services),
+        new IdAShellCmdAdminSearchBegin(services),
+        new IdAShellCmdAdminSearchByEmailBegin(services),
+        new IdAShellCmdAdminSearchByEmailNext(services),
+        new IdAShellCmdAdminSearchByEmailPrevious(services),
+        new IdAShellCmdAdminSearchNext(services),
+        new IdAShellCmdAdminSearchPrevious(services),
+        new IdAShellCmdAdminUpdatePasswordExpiration(services),
+        new IdAShellCmdAuditSearchBegin(services),
+        new IdAShellCmdAuditSearchNext(services),
+        new IdAShellCmdAuditSearchPrevious(services),
+        new IdAShellCmdHelp(services),
+        new IdAShellCmdLogin(services),
+        new IdAShellCmdLogout(services),
+        new IdAShellCmdMailTest(services),
+        new IdAShellCmdSelf(services),
+        new IdAShellCmdSet(services),
+        new IdAShellCmdUserBanCreate(services),
+        new IdAShellCmdUserBanDelete(services),
+        new IdAShellCmdUserBanGet(services),
+        new IdAShellCmdUserCreate(services),
+        new IdAShellCmdUserEmailAdd(services),
+        new IdAShellCmdUserEmailRemove(services),
+        new IdAShellCmdUserGet(services),
+        new IdAShellCmdUserGetByEmail(services),
+        new IdAShellCmdUserLoginHistory(services),
+        new IdAShellCmdUserSearchBegin(services),
+        new IdAShellCmdUserSearchByEmailBegin(services),
+        new IdAShellCmdUserSearchByEmailNext(services),
+        new IdAShellCmdUserSearchByEmailPrevious(services),
+        new IdAShellCmdUserSearchNext(services),
+        new IdAShellCmdUserSearchPrevious(services),
+        new IdAShellCmdUserUpdatePasswordExpiration(services),
+        new IdAShellCmdVersion(services)
       );
 
     final var commandsNamed =
@@ -200,8 +207,7 @@ public final class IdAShells implements IdAShellFactoryType
         .build();
 
     return new IdAShell(
-      client,
-      options,
+      services,
       terminal,
       writer,
       commandsNamed,

@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdShortHumanToken;
 import com.io7m.idstore.protocol.admin.IdACommandMailTest;
@@ -27,6 +26,7 @@ import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +36,7 @@ import java.util.Optional;
  */
 
 public final class IdAShellCmdMailTest
-  extends IdAShellCmdAbstract<IdACommandMailTest, IdAResponseMailTest>
+  extends IdAShellCmdAbstractCR<IdACommandMailTest, IdAResponseMailTest>
 {
   private static final QParameterNamed1<IdEmail> EMAIL =
     new QParameterNamed1<>(
@@ -59,14 +59,14 @@ public final class IdAShellCmdMailTest
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdMailTest(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "mail-test",
         new QConstant("Send a test email."),
