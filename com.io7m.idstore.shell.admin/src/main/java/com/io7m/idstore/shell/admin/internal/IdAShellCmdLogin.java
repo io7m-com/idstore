@@ -18,23 +18,19 @@ package com.io7m.idstore.shell.admin.internal;
 
 import com.io7m.idstore.admin_client.api.IdAClientCredentials;
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QParameterPositional;
-import com.io7m.quarrel.core.QParameterType;
 import com.io7m.quarrel.core.QParametersPositionalType;
 import com.io7m.quarrel.core.QParametersPositionalTyped;
 import com.io7m.quarrel.core.QStringType.QConstant;
-import org.jline.reader.Completer;
-import org.jline.reader.impl.completer.StringsCompleter;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
@@ -43,7 +39,7 @@ import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
  * "login"
  */
 
-public final class IdAShellCmdLogin implements IdAShellCmdType
+public final class IdAShellCmdLogin extends IdAShellCmdAbstract
 {
   private static final QParameterPositional<String> SERVER =
     new QParameterPositional<>(
@@ -66,37 +62,22 @@ public final class IdAShellCmdLogin implements IdAShellCmdType
       String.class
     );
 
-  private final IdAClientSynchronousType client;
-  private final QCommandMetadata metadata;
-
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The services
    */
 
   public IdAShellCmdLogin(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
-    this.client =
-      Objects.requireNonNull(inClient, "client");
-
-    this.metadata =
+    super(
+      inServices,
       new QCommandMetadata(
         "login",
         new QConstant("Log in."),
         Optional.empty()
-      );
-  }
-
-  @Override
-  public Completer completer()
-  {
-    return new StringsCompleter(
-      this.onListNamedParameters()
-        .stream()
-        .map(QParameterType::name)
-        .toList()
+      )
     );
   }
 
@@ -136,19 +117,7 @@ public final class IdAShellCmdLogin implements IdAShellCmdType
         Map.of()
       );
 
-    this.client.loginOrElseThrow(credentials, IdAClientException::ofError);
+    this.client().loginOrElseThrow(credentials, IdAClientException::ofError);
     return SUCCESS;
-  }
-
-  @Override
-  public QCommandMetadata metadata()
-  {
-    return this.metadata;
-  }
-
-  @Override
-  public String toString()
-  {
-    return "[%s]".formatted(this.getClass().getSimpleName());
   }
 }

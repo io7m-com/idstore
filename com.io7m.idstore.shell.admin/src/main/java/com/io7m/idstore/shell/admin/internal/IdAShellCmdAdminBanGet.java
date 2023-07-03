@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandAdminBanGet;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminBanGet;
 import com.io7m.quarrel.core.QCommandContextType;
@@ -24,6 +23,7 @@ import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -36,7 +36,7 @@ import java.util.UUID;
  */
 
 public final class IdAShellCmdAdminBanGet
-  extends IdAShellCmdAbstract<IdACommandAdminBanGet, IdAResponseAdminBanGet>
+  extends IdAShellCmdAbstractCR<IdACommandAdminBanGet, IdAResponseAdminBanGet>
 {
   private static final QParameterNamed1<UUID> USER_ID =
     new QParameterNamed1<>(
@@ -50,14 +50,14 @@ public final class IdAShellCmdAdminBanGet
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminBanGet(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-ban-get",
         new QConstant("Retrieve the ban on an admin, if one exists."),
@@ -86,19 +86,19 @@ public final class IdAShellCmdAdminBanGet
     final QCommandContextType context,
     final IdAResponseAdminBanGet response)
   {
-    final var w = context.output();
+    final var output = context.output();
     response.ban().ifPresentOrElse(ban -> {
-      w.print("Admin is banned: ");
-      w.print(ban.reason());
-      w.println();
+      output.print("Admin is banned: ");
+      output.print(ban.reason());
+      output.println();
 
       ban.expires().ifPresentOrElse(time -> {
-        w.printf(
+        output.printf(
           "The ban expires on %s (%s from now).%n",
           time,
           Duration.between(OffsetDateTime.now(), time)
         );
-      }, () -> w.println("The ban does not expire."));
-    }, () -> w.println("The admin is not banned."));
+      }, () -> output.println("The ban does not expire."));
+    }, () -> output.println("The admin is not banned."));
   }
 }

@@ -16,13 +16,10 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUserColumn;
 import com.io7m.idstore.model.IdUserColumnOrdering;
 import com.io7m.idstore.model.IdUserSearchParameters;
-import com.io7m.idstore.model.IdUserSummary;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchBegin;
 import com.io7m.quarrel.core.QCommandContextType;
@@ -31,8 +28,8 @@ import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
-import java.io.PrintWriter;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +39,7 @@ import java.util.Optional;
  */
 
 public final class IdAShellCmdUserSearchBegin
-  extends IdAShellCmdAbstract<IdACommandUserSearchBegin, IdAResponseUserSearchBegin>
+  extends IdAShellCmdAbstractCR<IdACommandUserSearchBegin, IdAResponseUserSearchBegin>
 {
   private static final QParameterNamed1<OffsetDateTime> CREATED_FROM =
     new QParameterNamed1<>(
@@ -89,17 +86,26 @@ public final class IdAShellCmdUserSearchBegin
       String.class
     );
 
+  private static final QParameterNamed1<Integer> LIMIT =
+    new QParameterNamed1<>(
+      "--limit",
+      List.of(),
+      new QConstant("The maximum number of results per page."),
+      Optional.of(Integer.valueOf(10)),
+      Integer.class
+    );
+
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdUserSearchBegin(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "user-search-begin",
         new QConstant("Begin searching for users."),
@@ -116,6 +122,7 @@ public final class IdAShellCmdUserSearchBegin
     return List.of(
       CREATED_FROM,
       CREATED_TO,
+      LIMIT,
       UPDATED_FROM,
       UPDATED_TO,
       QUERY
@@ -138,7 +145,7 @@ public final class IdAShellCmdUserSearchBegin
         ),
         context.parameterValue(QUERY),
         new IdUserColumnOrdering(IdUserColumn.BY_IDNAME, true),
-        10
+        context.parameterValue(LIMIT).intValue()
       );
 
     return new IdACommandUserSearchBegin(parameters);
@@ -148,30 +155,8 @@ public final class IdAShellCmdUserSearchBegin
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserSearchBegin response)
+    throws Exception
   {
-    formatUserPage(response.page(), context.output());
-  }
-
-  static void formatUserPage(
-    final IdPage<IdUserSummary> page,
-    final PrintWriter w)
-  {
-    w.printf(
-      "# Page %s of %s, offset %s%n",
-      Integer.toUnsignedString(page.pageIndex()),
-      Integer.toUnsignedString(page.pageCount()),
-      Long.toUnsignedString(page.pageFirstOffset())
-    );
-    w.println("# User ID | Name | Real Name");
-
-    for (final var user : page.items()) {
-      w.printf(
-        "%-40s %-40s %s%n",
-        user.id(),
-        user.idName().value(),
-        user.realName().value()
-      );
-    }
-    w.flush();
+    this.formatter().formatUsers(response.page());
   }
 }

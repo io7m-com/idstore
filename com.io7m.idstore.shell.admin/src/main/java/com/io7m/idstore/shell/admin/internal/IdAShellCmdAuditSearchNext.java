@@ -16,37 +16,35 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchNext;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
-
-import static com.io7m.idstore.shell.admin.internal.IdAShellCmdAuditSearchBegin.formatAuditPage;
 
 /**
  * "audit-search-next"
  */
 
 public final class IdAShellCmdAuditSearchNext
-  extends IdAShellCmdAbstract<IdACommandAuditSearchNext, IdAResponseAuditSearchNext>
+  extends IdAShellCmdAbstractCR<IdACommandAuditSearchNext, IdAResponseAuditSearchNext>
 {
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAuditSearchNext(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "audit-search-next",
         new QConstant("Go to the next page of audit events."),
@@ -74,7 +72,8 @@ public final class IdAShellCmdAuditSearchNext
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAuditSearchNext response)
+    throws Exception
   {
-    formatAuditPage(response.page(), context.output());
+    this.formatter().formatAudits(response.page());
   }
 }

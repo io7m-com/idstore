@@ -14,32 +14,11 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.admin_client.api;
-
-import com.io7m.hibiscus.api.HBClientSynchronousType;
-import com.io7m.idstore.protocol.admin.IdACommandType;
-import com.io7m.idstore.protocol.admin.IdAResponseError;
-import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.repetoir.core.RPServiceType;
-
 /**
- * The type of synchronous clients.
+ * Inventory server (Shell [internals])
  */
 
-public interface IdAClientSynchronousType
-  extends HBClientSynchronousType<
-  IdAClientException,
-  IdACommandType<?>,
-  IdAResponseType,
-  IdAResponseType,
-  IdAResponseError,
-  IdAClientEventType,
-  IdAClientCredentials>,
-  RPServiceType
-{
-  @Override
-  default String description()
-  {
-    return "Synchronous idstore admin client service.";
-  }
-}
+@Version("1.0.0")
+package com.io7m.idstore.shell.admin.internal.formatting;
+
+import org.osgi.annotation.versioning.Version;

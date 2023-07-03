@@ -16,37 +16,35 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchPrevious;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchPrevious;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
-
-import static com.io7m.idstore.shell.admin.internal.IdAShellCmdAuditSearchBegin.formatAuditPage;
 
 /**
  * "audit-search-previous"
  */
 
 public final class IdAShellCmdAuditSearchPrevious
-  extends IdAShellCmdAbstract<IdACommandAuditSearchPrevious, IdAResponseAuditSearchPrevious>
+  extends IdAShellCmdAbstractCR<IdACommandAuditSearchPrevious, IdAResponseAuditSearchPrevious>
 {
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAuditSearchPrevious(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "audit-search-previous",
         new QConstant("Go to the previous page of audit events."),
@@ -74,7 +72,8 @@ public final class IdAShellCmdAuditSearchPrevious
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAuditSearchPrevious response)
+    throws Exception
   {
-    formatAuditPage(response.page(), context.output());
+    this.formatter().formatAudits(response.page());
   }
 }

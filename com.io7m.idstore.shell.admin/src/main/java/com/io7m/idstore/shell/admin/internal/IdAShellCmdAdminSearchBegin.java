@@ -16,12 +16,9 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdAdminColumn;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminSearchParameters;
-import com.io7m.idstore.model.IdAdminSummary;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchBegin;
@@ -31,8 +28,8 @@ import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
-import java.io.PrintWriter;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +39,7 @@ import java.util.Optional;
  */
 
 public final class IdAShellCmdAdminSearchBegin
-  extends IdAShellCmdAbstract<IdACommandAdminSearchBegin, IdAResponseAdminSearchBegin>
+  extends IdAShellCmdAbstractCR<IdACommandAdminSearchBegin, IdAResponseAdminSearchBegin>
 {
   private static final QParameterNamed1<OffsetDateTime> CREATED_FROM =
     new QParameterNamed1<>(
@@ -89,17 +86,26 @@ public final class IdAShellCmdAdminSearchBegin
       String.class
     );
 
+  private static final QParameterNamed1<Integer> LIMIT =
+    new QParameterNamed1<>(
+      "--limit",
+      List.of(),
+      new QConstant("The maximum number of results per page."),
+      Optional.of(Integer.valueOf(10)),
+      Integer.class
+    );
+
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminSearchBegin(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-search-begin",
         new QConstant("Begin searching for admins."),
@@ -116,6 +122,7 @@ public final class IdAShellCmdAdminSearchBegin
     return List.of(
       CREATED_FROM,
       CREATED_TO,
+      LIMIT,
       UPDATED_FROM,
       UPDATED_TO,
       QUERY
@@ -138,7 +145,7 @@ public final class IdAShellCmdAdminSearchBegin
         ),
         context.parameterValue(QUERY),
         new IdAdminColumnOrdering(IdAdminColumn.BY_IDNAME, true),
-        10
+        context.parameterValue(LIMIT).intValue()
       );
 
     return new IdACommandAdminSearchBegin(parameters);
@@ -148,30 +155,8 @@ public final class IdAShellCmdAdminSearchBegin
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminSearchBegin response)
+    throws Exception
   {
-    formatAdminPage(response.page(), context.output());
-  }
-
-  static void formatAdminPage(
-    final IdPage<IdAdminSummary> page,
-    final PrintWriter w)
-  {
-    w.printf(
-      "# Page %s of %s, offset %s%n",
-      Integer.toUnsignedString(page.pageIndex()),
-      Integer.toUnsignedString(page.pageCount()),
-      Long.toUnsignedString(page.pageFirstOffset())
-    );
-    w.println("# Admin ID | Name | Real Name");
-
-    for (final var admin : page.items()) {
-      w.printf(
-        "%-40s %-40s %s%n",
-        admin.id(),
-        admin.idName().value(),
-        admin.realName().value()
-      );
-    }
-    w.flush();
+    this.formatter().formatAdmins(response.page());
   }
 }

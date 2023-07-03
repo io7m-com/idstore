@@ -16,37 +16,35 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchNext;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchNext;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
-
-import static com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchBegin.formatUserPage;
 
 /**
  * "user-search-next"
  */
 
 public final class IdAShellCmdUserSearchNext
-  extends IdAShellCmdAbstract<IdACommandUserSearchNext, IdAResponseUserSearchNext>
+  extends IdAShellCmdAbstractCR<IdACommandUserSearchNext, IdAResponseUserSearchNext>
 {
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdUserSearchNext(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "user-search-next",
         new QConstant("Go to the next page of users."),
@@ -74,7 +72,8 @@ public final class IdAShellCmdUserSearchNext
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserSearchNext response)
+    throws Exception
   {
-    formatUserPage(response.page(), context.output());
+    this.formatter().formatUsers(response.page());
   }
 }

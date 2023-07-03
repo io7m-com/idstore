@@ -17,87 +17,74 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
-import com.io7m.idstore.model.IdPasswordException;
-import com.io7m.idstore.protocol.admin.IdACommandType;
-import com.io7m.idstore.protocol.admin.IdAResponseType;
-import com.io7m.quarrel.core.QCommandContextType;
+import com.io7m.idstore.shell.admin.internal.formatting.IdAFormatterType;
 import com.io7m.quarrel.core.QCommandMetadata;
-import com.io7m.quarrel.core.QCommandStatus;
-import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QParameterType;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 import org.jline.reader.Completer;
 import org.jline.reader.impl.completer.StringsCompleter;
+import org.jline.terminal.Terminal;
 
 import java.util.Objects;
 
-import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
-
 /**
- * The abstract command implementation.
- *
- * @param <C> The command type
- * @param <R> The response type
+ * The abstract base class for shell commands.
  */
 
-public abstract class IdAShellCmdAbstract<
-  C extends IdACommandType<R>,
-  R extends IdAResponseType>
+public abstract class IdAShellCmdAbstract
   implements IdAShellCmdType
 {
-  private final IdAClientSynchronousType client;
-  private final Class<R> responseClass;
+  private final RPServiceDirectoryType services;
   private final QCommandMetadata metadata;
 
-  /**
-   * Construct a command.
-   *
-   * @param inMetadata      The metadata
-   * @param inCommandClass  The command class
-   * @param inResponseClass The response class
-   * @param inClient        The client
-   */
-
   protected IdAShellCmdAbstract(
-    final IdAClientSynchronousType inClient,
-    final QCommandMetadata inMetadata,
-    final Class<C> inCommandClass,
-    final Class<R> inResponseClass)
+    final RPServiceDirectoryType inServices,
+    final QCommandMetadata inMetadata)
   {
-    this.client =
-      Objects.requireNonNull(inClient, "client");
+    this.services =
+      Objects.requireNonNull(inServices, "services");
     this.metadata =
       Objects.requireNonNull(inMetadata, "metadata");
-    Objects.requireNonNull(inCommandClass, "commandClass");
-    this.responseClass =
-      Objects.requireNonNull(inResponseClass, "responseClass");
   }
 
-  protected abstract C onCreateCommand(
-    QCommandContextType context
-  )
-    throws IdPasswordException, Exception;
+  @Override
+  public final QCommandMetadata metadata()
+  {
+    return this.metadata;
+  }
 
-  protected abstract void onFormatResponse(
-    QCommandContextType context,
-    R response)
-    throws QException;
+  protected final IdAClientSynchronousType client()
+  {
+    return this.services().requireService(IdAClientSynchronousType.class);
+  }
 
+  protected final Terminal terminal()
+  {
+    return this.services()
+      .requireService(IdAShellTerminalHolder.class)
+      .terminal();
+  }
+
+  protected final IdAShellOptions options()
+  {
+    return this.services().requireService(IdAShellOptions.class);
+  }
+
+  protected final RPServiceDirectoryType services()
+  {
+    return this.services;
+  }
+
+  protected final IdAFormatterType formatter()
+  {
+    return this.options().formatter();
+  }
 
   @Override
-  public final QCommandStatus onExecute(
-    final QCommandContextType context)
-    throws Exception
+  public final String toString()
   {
-    final var r =
-      this.client.executeOrElseThrow(
-        this.onCreateCommand(context),
-        IdAClientException::ofError
-      );
-
-    this.onFormatResponse(context, this.responseClass.cast(r));
-    return SUCCESS;
+    return "[%s]".formatted(this.getClass().getSimpleName());
   }
 
   @Override
@@ -109,17 +96,5 @@ public abstract class IdAShellCmdAbstract<
         .map(QParameterType::name)
         .toList()
     );
-  }
-
-  @Override
-  public final String toString()
-  {
-    return "[%s]".formatted(this.getClass().getSimpleName());
-  }
-
-  @Override
-  public final QCommandMetadata metadata()
-  {
-    return this.metadata;
   }
 }

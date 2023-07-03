@@ -26,8 +26,10 @@ module com.io7m.idstore.shell.admin
   requires com.io7m.idstore.admin_client.api;
   requires com.io7m.idstore.admin_client;
 
-  requires transitive com.io7m.quarrel.core;
   requires com.io7m.jmulticlose.core;
+  requires com.io7m.quarrel.core;
+  requires com.io7m.repetoir.core;
+  requires com.io7m.tabla.core;
   requires org.jline;
   requires org.slf4j;
 

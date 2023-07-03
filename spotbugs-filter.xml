@@ -69,6 +69,11 @@
     </Or>
   </Match>
 
+  <!-- We don't care about the primitive optional variants. -->
+  <Match>
+    <Bug pattern="OI_OPTIONAL_ISSUES_PRIMITIVE_VARIANT_PREFERRED"/>
+  </Match>
+
   <!--                               -->
   <!-- com.io7m.idstore.admin_client -->
   <!--                               -->
@@ -856,7 +861,10 @@
 
   <!-- Record types. -->
   <Match>
-    <Class name="com.io7m.idstore.shell.admin.internal.IdAShellOptions"/>
+    <Or>
+      <Class name="com.io7m.idstore.shell.admin.internal.IdAShellTerminalHolder"/>
+      <Class name="com.io7m.idstore.shell.admin.internal.IdAShellOptions"/>
+    </Or>
     <Or>
       <Bug pattern="EI_EXPOSE_REP"/>
       <Bug pattern="EI_EXPOSE_REP2"/>

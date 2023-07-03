@@ -206,6 +206,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println("logout");
@@ -224,6 +225,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
@@ -233,7 +235,9 @@ public final class IdAShellIT
         "--name someone "
     );
     w.println("audit-search-begin");
+    w.println("set --formatter PRETTY");
     w.println("audit-search-next");
+    w.println("set --formatter RAW");
     w.println("audit-search-previous");
     w.println("logout");
     w.flush();
@@ -257,6 +261,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -276,7 +281,7 @@ public final class IdAShellIT
     assertEquals(0, this.exitCode);
 
     final var output = this.terminal.terminalProducedOutput();
-    assertTrue(output.toString().contains("Email: fresh0@example.com"));
+    assertTrue(output.toString().contains("fresh0@example.com"));
   }
 
   @Test
@@ -321,6 +326,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -339,6 +345,8 @@ public final class IdAShellIT
     w.println(
       "user-email-remove --user 3a193a61-9427-4c24-8bd4-667d19914970 --email fresh3@example.com");
     w.println("user-get --user 3a193a61-9427-4c24-8bd4-667d19914970");
+    w.println("set --formatter RAW");
+    w.println("user-get --user 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("logout");
     w.flush();
     w.close();
@@ -347,9 +355,9 @@ public final class IdAShellIT
     assertEquals(0, this.exitCode);
 
     final var output = this.terminal.terminalProducedOutput();
-    assertTrue(output.toString().contains("Email: fresh1@example.com"));
-    assertTrue(output.toString().contains("Email: fresh2@example.com"));
-    assertFalse(output.toString().contains("Email: fresh3@example.com"));
+    assertTrue(output.toString().contains("│ fresh1@example.com"));
+    assertTrue(output.toString().contains("│ fresh2@example.com"));
+    assertFalse(output.toString().contains("│ fresh3@example.com"));
   }
 
   @Test
@@ -360,6 +368,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -371,6 +380,7 @@ public final class IdAShellIT
     );
     w.println("user-search-begin");
     w.println("user-search-next");
+    w.println("set --formatter RAW");
     w.println("user-search-previous");
     w.println("logout");
     w.flush();
@@ -380,9 +390,9 @@ public final class IdAShellIT
     assertEquals(0, this.exitCode);
 
     final var output = this.terminal.terminalProducedOutput();
-    assertTrue(output.toString().contains("# Page 1 of 1, offset 0"));
+    assertTrue(output.toString().contains("Page 1 of 1, offset 0"));
     assertTrue(output.toString().contains(
-      "3a193a61-9427-4c24-8bd4-667d19914970     someone"));
+      "3a193a61-9427-4c24-8bd4-667d19914970"));
   }
 
   @Test
@@ -393,6 +403,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -404,6 +415,7 @@ public final class IdAShellIT
     );
     w.println("user-search-by-email-begin");
     w.println("user-search-by-email-next");
+    w.println("set --formatter RAW");
     w.println("user-search-by-email-previous");
     w.println("logout");
     w.flush();
@@ -413,9 +425,9 @@ public final class IdAShellIT
     assertEquals(0, this.exitCode);
 
     final var output = this.terminal.terminalProducedOutput();
-    assertTrue(output.toString().contains("# Page 1 of 1, offset 0"));
+    assertTrue(output.toString().contains("Page 1 of 1, offset 0"));
     assertTrue(output.toString().contains(
-      "3a193a61-9427-4c24-8bd4-667d19914970     someone"));
+      "3a193a61-9427-4c24-8bd4-667d19914970"));
   }
 
   @Test
@@ -426,6 +438,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -435,6 +448,9 @@ public final class IdAShellIT
         "--real-name Real " +
         "--name someone "
     );
+    w.println("set --formatter RAW");
+    w.println("user-login-history --user 3a193a61-9427-4c24-8bd4-667d19914970");
+    w.println("set --formatter PRETTY");
     w.println("user-login-history --user 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("logout");
     w.flush();
@@ -444,7 +460,7 @@ public final class IdAShellIT
     assertEquals(0, this.exitCode);
 
     final var output = this.terminal.terminalProducedOutput();
-    assertTrue(output.toString().contains("# Time"));
+    assertTrue(output.toString().contains("Time"));
   }
 
   @Test
@@ -455,6 +471,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -498,6 +515,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -511,6 +529,8 @@ public final class IdAShellIT
     );
     w.println("admin-get --admin 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("admin-get-by-email --email fresh0@example.com");
+    w.println("set --formatter RAW");
+    w.println("admin-get-by-email --email fresh0@example.com");
     w.println("logout");
     w.flush();
     w.close();
@@ -519,7 +539,7 @@ public final class IdAShellIT
     assertEquals(0, this.exitCode);
 
     final var output = this.terminal.terminalProducedOutput();
-    assertTrue(output.toString().contains("Email: fresh0@example.com"));
+    assertTrue(output.toString().contains("fresh0@example.com"));
   }
 
   @Test
@@ -530,6 +550,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("admin-get --admin 3a193a61-9427-4c24-8bd4-667d19914970");
     w.flush();
@@ -564,6 +585,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -584,6 +606,8 @@ public final class IdAShellIT
     w.println(
       "admin-email-remove --admin 3a193a61-9427-4c24-8bd4-667d19914970 --email fresh3@example.com");
     w.println("admin-get --admin 3a193a61-9427-4c24-8bd4-667d19914970");
+    w.println("set --formatter RAW");
+    w.println("admin-get --admin 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("logout");
     w.flush();
     w.close();
@@ -592,9 +616,9 @@ public final class IdAShellIT
     assertEquals(0, this.exitCode);
 
     final var output = this.terminal.terminalProducedOutput();
-    assertTrue(output.toString().contains("Email: fresh1@example.com"));
-    assertTrue(output.toString().contains("Email: fresh2@example.com"));
-    assertFalse(output.toString().contains("Email: fresh3@example.com"));
+    assertTrue(output.toString().contains("│ fresh1@example.com"));
+    assertTrue(output.toString().contains("│ fresh2@example.com"));
+    assertFalse(output.toString().contains("│ fresh3@example.com"));
   }
 
   @Test
@@ -605,6 +629,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -618,6 +643,7 @@ public final class IdAShellIT
     );
     w.println("admin-search-begin");
     w.println("admin-search-next");
+    w.println("set --formatter RAW");
     w.println("admin-search-previous");
     w.println("logout");
     w.flush();
@@ -627,9 +653,9 @@ public final class IdAShellIT
     assertEquals(0, this.exitCode);
 
     final var output = this.terminal.terminalProducedOutput();
-    assertTrue(output.toString().contains("# Page 1 of 1, offset 0"));
+    assertTrue(output.toString().contains("Page 1 of 1, offset 0"));
     assertTrue(output.toString().contains(
-      "3a193a61-9427-4c24-8bd4-667d19914970     someone"));
+      "3a193a61-9427-4c24-8bd4-667d19914970"));
   }
 
   @Test
@@ -640,6 +666,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -653,6 +680,7 @@ public final class IdAShellIT
     );
     w.println("admin-search-by-email-begin");
     w.println("admin-search-by-email-next");
+    w.println("set --formatter RAW");
     w.println("admin-search-by-email-previous");
     w.println("logout");
     w.flush();
@@ -662,9 +690,9 @@ public final class IdAShellIT
     assertEquals(0, this.exitCode);
 
     final var output = this.terminal.terminalProducedOutput();
-    assertTrue(output.toString().contains("# Page 1 of 1, offset 0"));
+    assertTrue(output.toString().contains("Page 1 of 1, offset 0"));
     assertTrue(output.toString().contains(
-      "3a193a61-9427-4c24-8bd4-667d19914970     someone"));
+      "3a193a61-9427-4c24-8bd4-667d19914970"));
   }
 
   @Test
@@ -675,6 +703,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -734,6 +763,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -767,6 +797,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -800,6 +831,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -834,6 +866,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -865,6 +898,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -896,6 +930,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -928,6 +963,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(
@@ -953,6 +989,7 @@ public final class IdAShellIT
     this.startShell();
 
     final var w = this.terminal.sendInputToTerminalWriter();
+    w.println("set --terminate-on-errors true");
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println("self");
     w.println(

@@ -14,32 +14,24 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.admin_client.api;
 
-import com.io7m.hibiscus.api.HBClientSynchronousType;
-import com.io7m.idstore.protocol.admin.IdACommandType;
-import com.io7m.idstore.protocol.admin.IdAResponseError;
-import com.io7m.idstore.protocol.admin.IdAResponseType;
+package com.io7m.idstore.shell.admin.internal;
+
 import com.io7m.repetoir.core.RPServiceType;
+import org.jline.terminal.Terminal;
 
 /**
- * The type of synchronous clients.
+ * A terminal holder.
+ * @param terminal The terminal
  */
 
-public interface IdAClientSynchronousType
-  extends HBClientSynchronousType<
-  IdAClientException,
-  IdACommandType<?>,
-  IdAResponseType,
-  IdAResponseType,
-  IdAResponseError,
-  IdAClientEventType,
-  IdAClientCredentials>,
-  RPServiceType
+public record IdAShellTerminalHolder(
+  Terminal terminal)
+  implements RPServiceType
 {
   @Override
-  default String description()
+  public String description()
   {
-    return "Synchronous idstore admin client service.";
+    return "Shell terminal holder service.";
   }
 }

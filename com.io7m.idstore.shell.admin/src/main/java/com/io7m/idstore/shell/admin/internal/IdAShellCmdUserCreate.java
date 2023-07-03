@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPasswordAlgorithmPBKDF2HmacSHA256;
@@ -29,6 +28,7 @@ import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +39,7 @@ import java.util.UUID;
  */
 
 public final class IdAShellCmdUserCreate
-  extends IdAShellCmdAbstract<IdACommandUserCreate, IdAResponseUserCreate>
+  extends IdAShellCmdAbstractCR<IdACommandUserCreate, IdAResponseUserCreate>
 {
   private static final QParameterNamed01<UUID> USER_ID =
     new QParameterNamed01<>(
@@ -89,14 +89,14 @@ public final class IdAShellCmdUserCreate
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdUserCreate(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "user-create",
         new QConstant("Create a user."),

@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0015</version>
+    <version>1.0.0-beta0016</version>
   </parent>
 
   <artifactId>com.io7m.idstore.shell.admin</artifactId>
@@ -45,6 +45,14 @@
       <version>${project.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.io7m.tabla</groupId>
+      <artifactId>com.io7m.tabla.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.repetoir</groupId>
+      <artifactId>com.io7m.repetoir.core</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.io7m.hibiscus</groupId>
       <artifactId>com.io7m.hibiscus.api</artifactId>

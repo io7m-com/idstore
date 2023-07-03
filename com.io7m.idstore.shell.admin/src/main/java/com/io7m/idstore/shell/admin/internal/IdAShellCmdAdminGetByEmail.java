@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.protocol.admin.IdACommandAdminGetByEmail;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminGet;
@@ -26,6 +25,7 @@ import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ import java.util.Optional;
  */
 
 public final class IdAShellCmdAdminGetByEmail
-  extends IdAShellCmdAbstract<IdACommandAdminGetByEmail, IdAResponseAdminGet>
+  extends IdAShellCmdAbstractCR<IdACommandAdminGetByEmail, IdAResponseAdminGet>
 {
   private static final QParameterNamed1<IdEmail> EMAIL =
     new QParameterNamed1<>(
@@ -50,14 +50,14 @@ public final class IdAShellCmdAdminGetByEmail
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminGetByEmail(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-get-by-email",
         new QConstant("Retrieve an admin by email address."),
@@ -85,7 +85,7 @@ public final class IdAShellCmdAdminGetByEmail
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminGet response)
-    throws QException
+    throws Exception
   {
     final var adminOpt = response.admin();
     if (adminOpt.isEmpty()) {
@@ -100,6 +100,6 @@ public final class IdAShellCmdAdminGetByEmail
       );
     }
 
-    IdAShellCmdAdminGet.formatAdmin(adminOpt.get(), context.output());
+    this.formatter().formatAdmin(adminOpt.get());
   }
 }

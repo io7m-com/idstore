@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.model.IdAdminColumn;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminSearchByEmailParameters;
@@ -29,19 +28,18 @@ import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import static com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchBegin.formatAdminPage;
 
 /**
  * "admin-search-by-email-begin"
  */
 
 public final class IdAShellCmdAdminSearchByEmailBegin
-  extends IdAShellCmdAbstract<IdACommandAdminSearchByEmailBegin, IdAResponseAdminSearchByEmailBegin>
+  extends IdAShellCmdAbstractCR<IdACommandAdminSearchByEmailBegin, IdAResponseAdminSearchByEmailBegin>
 {
   private static final QParameterNamed1<OffsetDateTime> CREATED_FROM =
     new QParameterNamed1<>(
@@ -88,17 +86,26 @@ public final class IdAShellCmdAdminSearchByEmailBegin
       String.class
     );
 
+  private static final QParameterNamed1<Integer> LIMIT =
+    new QParameterNamed1<>(
+      "--limit",
+      List.of(),
+      new QConstant("The maximum number of results per page."),
+      Optional.of(Integer.valueOf(10)),
+      Integer.class
+    );
+
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminSearchByEmailBegin(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-search-by-email-begin",
         new QConstant("Begin searching for admins by email."),
@@ -115,9 +122,10 @@ public final class IdAShellCmdAdminSearchByEmailBegin
     return List.of(
       CREATED_FROM,
       CREATED_TO,
+      LIMIT,
+      QUERY,
       UPDATED_FROM,
-      UPDATED_TO,
-      QUERY
+      UPDATED_TO
     );
   }
 
@@ -137,7 +145,7 @@ public final class IdAShellCmdAdminSearchByEmailBegin
         ),
         context.parameterValue(QUERY).orElse(""),
         new IdAdminColumnOrdering(IdAdminColumn.BY_IDNAME, true),
-        10
+        context.parameterValue(LIMIT).intValue()
       );
 
     return new IdACommandAdminSearchByEmailBegin(parameters);
@@ -147,7 +155,8 @@ public final class IdAShellCmdAdminSearchByEmailBegin
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminSearchByEmailBegin response)
+    throws Exception
   {
-    formatAdminPage(response.page(), context.output());
+    this.formatter().formatAdmins(response.page());
   }
 }

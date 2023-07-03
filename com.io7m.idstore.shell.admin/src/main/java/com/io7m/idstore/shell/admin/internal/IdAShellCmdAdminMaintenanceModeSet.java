@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandMaintenanceModeSet;
 import com.io7m.idstore.protocol.admin.IdAResponseMaintenanceModeSet;
 import com.io7m.quarrel.core.QCommandContextType;
@@ -25,6 +24,7 @@ import com.io7m.quarrel.core.QException;
 import com.io7m.quarrel.core.QParameterNamed01;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ import java.util.Optional;
  */
 
 public final class IdAShellCmdAdminMaintenanceModeSet
-  extends IdAShellCmdAbstract<IdACommandMaintenanceModeSet, IdAResponseMaintenanceModeSet>
+  extends IdAShellCmdAbstractCR<IdACommandMaintenanceModeSet, IdAResponseMaintenanceModeSet>
 {
   private static final QParameterNamed01<String> SET =
     new QParameterNamed01<>(
@@ -58,14 +58,14 @@ public final class IdAShellCmdAdminMaintenanceModeSet
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminMaintenanceModeSet(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "maintenance-mode",
         new QConstant("Enable/disable maintenance mode."),

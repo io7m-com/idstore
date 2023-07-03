@@ -16,37 +16,35 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchByEmailNext;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchByEmailNext;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
-
-import static com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchBegin.formatUserPage;
 
 /**
  * "user-search-by-email-next"
  */
 
 public final class IdAShellCmdUserSearchByEmailNext
-  extends IdAShellCmdAbstract<IdACommandUserSearchByEmailNext, IdAResponseUserSearchByEmailNext>
+  extends IdAShellCmdAbstractCR<IdACommandUserSearchByEmailNext, IdAResponseUserSearchByEmailNext>
 {
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdUserSearchByEmailNext(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "user-search-by-email-next",
         new QConstant("Go to the next page of users."),
@@ -74,7 +72,8 @@ public final class IdAShellCmdUserSearchByEmailNext
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserSearchByEmailNext response)
+    throws Exception
   {
-    formatUserPage(response.page(), context.output());
+    this.formatter().formatUsers(response.page());
   }
 }

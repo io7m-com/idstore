@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandUserLoginHistory;
 import com.io7m.idstore.protocol.admin.IdAResponseUserLoginHistory;
 import com.io7m.quarrel.core.QCommandContextType;
@@ -24,6 +23,7 @@ import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +34,7 @@ import java.util.UUID;
  */
 
 public final class IdAShellCmdUserLoginHistory
-  extends IdAShellCmdAbstract<IdACommandUserLoginHistory, IdAResponseUserLoginHistory>
+  extends IdAShellCmdAbstractCR<IdACommandUserLoginHistory, IdAResponseUserLoginHistory>
 {
   private static final QParameterNamed1<UUID> USER_ID =
     new QParameterNamed1<>(
@@ -48,14 +48,14 @@ public final class IdAShellCmdUserLoginHistory
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdUserLoginHistory(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "user-login-history",
         new QConstant("Retrieve a user's login history."),
@@ -83,17 +83,8 @@ public final class IdAShellCmdUserLoginHistory
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserLoginHistory response)
+    throws Exception
   {
-    final var out = context.output();
-    out.printf("# %-22s | %-15s | %s%n", "Time", "Host", "User Agent");
-    for (final var history : response.history()) {
-      out.printf(
-        "%-24s |%-16s |%s%n",
-        history.time(),
-        history.host(),
-        history.userAgent()
-      );
-    }
-    out.flush();
+    this.formatter().formatLoginHistory(response.history());
   }
 }

@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0015</version>
+    <version>1.0.0-beta0016</version>
   </parent>
 
   <artifactId>com.io7m.idstore.admin_client.api</artifactId>
@@ -33,6 +33,10 @@
     <dependency>
       <groupId>com.io7m.hibiscus</groupId>
       <artifactId>com.io7m.hibiscus.api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.repetoir</groupId>
+      <artifactId>com.io7m.repetoir.core</artifactId>
     </dependency>
 
     <dependency>

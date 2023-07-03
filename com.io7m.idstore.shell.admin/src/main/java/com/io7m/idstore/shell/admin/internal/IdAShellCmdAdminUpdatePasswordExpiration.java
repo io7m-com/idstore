@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
 import com.io7m.idstore.protocol.admin.IdACommandAdminUpdatePasswordExpiration;
 import com.io7m.idstore.protocol.admin.IdAPasswordExpirationSetType;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
@@ -25,6 +24,7 @@ import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
+import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +35,7 @@ import java.util.UUID;
  */
 
 public final class IdAShellCmdAdminUpdatePasswordExpiration
-  extends IdAShellCmdAbstract<IdACommandAdminUpdatePasswordExpiration, IdAResponseAdminUpdate>
+  extends IdAShellCmdAbstractCR<IdACommandAdminUpdatePasswordExpiration, IdAResponseAdminUpdate>
 {
   private static final QParameterNamed1<UUID> USER_ID =
     new QParameterNamed1<>(
@@ -58,14 +58,14 @@ public final class IdAShellCmdAdminUpdatePasswordExpiration
   /**
    * Construct a command.
    *
-   * @param inClient The client
+   * @param inServices The service directory
    */
 
   public IdAShellCmdAdminUpdatePasswordExpiration(
-    final IdAClientSynchronousType inClient)
+    final RPServiceDirectoryType inServices)
   {
     super(
-      inClient,
+      inServices,
       new QCommandMetadata(
         "admin-update-password-expiration",
         new QConstant("Update an admin's password expiration."),
