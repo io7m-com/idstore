@@ -26,6 +26,7 @@ import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.model.IdUserSummary;
 import com.io7m.tabla.core.TTableRendererType;
 import com.io7m.tabla.core.TTableType;
+import com.io7m.tabla.core.TTableWidthConstraintRange;
 import com.io7m.tabla.core.Tabla;
 import org.jline.terminal.Terminal;
 
@@ -69,11 +70,19 @@ public final class IdAFormatterPretty implements IdAFormatterType
 
   private int width()
   {
-    var width = Math.max(0, this.terminal.getWidth() - 8);
+    var width = Math.max(0, this.terminal.getWidth());
     if (width == 0) {
-      width = 100;
+      width = 80;
     }
     return width;
+  }
+
+  private int widthFor(
+    final int columns)
+  {
+    final var columnPad = 2;
+    final var columnEdge = 1;
+    return this.width() - (2 + (columns * (columnEdge + columnPad)));
   }
 
   @Override
@@ -83,7 +92,7 @@ public final class IdAFormatterPretty implements IdAFormatterType
   {
     final var builder =
       Tabla.builder()
-        .setWidthConstraint(tableWidthExact(this.width(), SOFT_CONSTRAINT))
+        .setWidthConstraint(this.softTableWidth(2))
         .declareColumn("Attribute", atLeastContentOrHeader())
         .declareColumn("Value", atLeastContentOrHeader());
 
@@ -122,6 +131,12 @@ public final class IdAFormatterPretty implements IdAFormatterType
     this.renderTable(builder.build());
   }
 
+  private TTableWidthConstraintRange softTableWidth(
+    final int columns)
+  {
+    return tableWidthExact(this.widthFor(columns), SOFT_CONSTRAINT);
+  }
+
   @Override
   public void formatAdmins(
     final IdPage<IdAdminSummary> page)
@@ -132,7 +147,7 @@ public final class IdAFormatterPretty implements IdAFormatterType
 
     final var builder =
       Tabla.builder()
-        .setWidthConstraint(tableWidthExact(this.width(), SOFT_CONSTRAINT))
+        .setWidthConstraint(this.softTableWidth(3))
         .declareColumn("ID", atLeastContentOrHeader())
         .declareColumn("Name", atLeastContentOrHeader())
         .declareColumn("Real Name", atLeastContentOrHeader());
@@ -157,7 +172,7 @@ public final class IdAFormatterPretty implements IdAFormatterType
 
     final var builder =
       Tabla.builder()
-        .setWidthConstraint(tableWidthExact(this.width(), SOFT_CONSTRAINT))
+        .setWidthConstraint(this.softTableWidth(5))
         .declareColumn("ID", atLeastContentOrHeader())
         .declareColumn("Time", atLeastContentOrHeader())
         .declareColumn("Owner", atLeastContentOrHeader())
@@ -186,7 +201,7 @@ public final class IdAFormatterPretty implements IdAFormatterType
 
     final var builder =
       Tabla.builder()
-        .setWidthConstraint(tableWidthExact(this.width(), SOFT_CONSTRAINT))
+        .setWidthConstraint(this.softTableWidth(3))
         .declareColumn("ID", atLeastContentOrHeader())
         .declareColumn("Name", atLeastContentOrHeader())
         .declareColumn("Real Name", atLeastContentOrHeader());
@@ -208,7 +223,7 @@ public final class IdAFormatterPretty implements IdAFormatterType
   {
     final var builder =
       Tabla.builder()
-        .setWidthConstraint(tableWidthExact(this.width(), SOFT_CONSTRAINT))
+        .setWidthConstraint(this.softTableWidth(3))
         .declareColumn("Time", atLeastContentOrHeader())
         .declareColumn("Host", atLeastContentOrHeader())
         .declareColumn("User Agent", atLeastContentOrHeader());
@@ -230,7 +245,7 @@ public final class IdAFormatterPretty implements IdAFormatterType
   {
     final var builder =
       Tabla.builder()
-        .setWidthConstraint(tableWidthExact(this.width(), SOFT_CONSTRAINT))
+        .setWidthConstraint(this.softTableWidth(2))
         .declareColumn("Attribute", atLeastContentOrHeader())
         .declareColumn("Value", atLeastContentOrHeader());
 

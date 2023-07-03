@@ -96,6 +96,21 @@
           </Cell>
           <Cell>Filter events by type.</Cell>
         </Row>
+        <Row>
+          <Cell>
+            <Term type="parameter">--limit</Term>
+          </Cell>
+          <Cell>
+            <Term type="type">java.lang.Integer</Term>
+          </Cell>
+          <Cell>
+            <Term type="expression">[1, 1]</Term>
+          </Cell>
+          <Cell>
+            <Term type="constant">10</Term>
+          </Cell>
+          <Cell>The maximum number of results per page.</Cell>
+        </Row>
       </Table>
     </FormalItem>
   </Subsection>

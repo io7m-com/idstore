@@ -86,6 +86,15 @@ public final class IdAShellCmdUserSearchBegin
       String.class
     );
 
+  private static final QParameterNamed1<Integer> LIMIT =
+    new QParameterNamed1<>(
+      "--limit",
+      List.of(),
+      new QConstant("The maximum number of results per page."),
+      Optional.of(Integer.valueOf(10)),
+      Integer.class
+    );
+
   /**
    * Construct a command.
    *
@@ -113,6 +122,7 @@ public final class IdAShellCmdUserSearchBegin
     return List.of(
       CREATED_FROM,
       CREATED_TO,
+      LIMIT,
       UPDATED_FROM,
       UPDATED_TO,
       QUERY
@@ -135,7 +145,7 @@ public final class IdAShellCmdUserSearchBegin
         ),
         context.parameterValue(QUERY),
         new IdUserColumnOrdering(IdUserColumn.BY_IDNAME, true),
-        10
+        context.parameterValue(LIMIT).intValue()
       );
 
     return new IdACommandUserSearchBegin(parameters);

@@ -84,6 +84,15 @@ public final class IdAShellCmdAuditSearchBegin
       String.class
     );
 
+  private static final QParameterNamed1<Integer> LIMIT =
+    new QParameterNamed1<>(
+      "--limit",
+      List.of(),
+      new QConstant("The maximum number of results per page."),
+      Optional.of(Integer.valueOf(10)),
+      Integer.class
+    );
+
   /**
    * Construct a command.
    *
@@ -109,11 +118,12 @@ public final class IdAShellCmdAuditSearchBegin
   public List<QParameterNamedType<?>> onListNamedParameters()
   {
     return List.of(
+      LIMIT,
+      MESSAGE,
+      OWNER,
       TIME_FROM,
       TIME_TO,
-      OWNER,
-      TYPE,
-      MESSAGE
+      TYPE
     );
   }
 
@@ -130,7 +140,7 @@ public final class IdAShellCmdAuditSearchBegin
         context.parameterValue(OWNER),
         context.parameterValue(TYPE),
         context.parameterValue(MESSAGE),
-        100
+        context.parameterValue(LIMIT).intValue()
       );
 
     return new IdACommandAuditSearchBegin(parameters);

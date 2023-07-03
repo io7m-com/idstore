@@ -86,6 +86,15 @@ public final class IdAShellCmdAdminSearchByEmailBegin
       String.class
     );
 
+  private static final QParameterNamed1<Integer> LIMIT =
+    new QParameterNamed1<>(
+      "--limit",
+      List.of(),
+      new QConstant("The maximum number of results per page."),
+      Optional.of(Integer.valueOf(10)),
+      Integer.class
+    );
+
   /**
    * Construct a command.
    *
@@ -113,9 +122,10 @@ public final class IdAShellCmdAdminSearchByEmailBegin
     return List.of(
       CREATED_FROM,
       CREATED_TO,
+      LIMIT,
+      QUERY,
       UPDATED_FROM,
-      UPDATED_TO,
-      QUERY
+      UPDATED_TO
     );
   }
 
@@ -135,7 +145,7 @@ public final class IdAShellCmdAdminSearchByEmailBegin
         ),
         context.parameterValue(QUERY).orElse(""),
         new IdAdminColumnOrdering(IdAdminColumn.BY_IDNAME, true),
-        10
+        context.parameterValue(LIMIT).intValue()
       );
 
     return new IdACommandAdminSearchByEmailBegin(parameters);
