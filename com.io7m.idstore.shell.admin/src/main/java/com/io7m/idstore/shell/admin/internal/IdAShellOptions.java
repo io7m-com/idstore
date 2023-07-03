@@ -17,30 +17,74 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
+import com.io7m.idstore.shell.admin.internal.formatting.IdAFormatterPretty;
+import com.io7m.idstore.shell.admin.internal.formatting.IdAFormatterType;
 import com.io7m.repetoir.core.RPServiceType;
+import org.jline.terminal.Terminal;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Shell options.
- *
- * @param terminateOnErrors Terminate execution on errors
  */
 
-public record IdAShellOptions(
-  AtomicBoolean terminateOnErrors)
+public final class IdAShellOptions
   implements RPServiceType
 {
+  private final AtomicBoolean terminateOnErrors;
+  private IdAFormatterType formatter;
+
   /**
    * Shell options.
    *
-   * @param terminateOnErrors Terminate execution on errors
+   * @param inTerminal The terminal
    */
 
-  public IdAShellOptions
+  public IdAShellOptions(
+    final Terminal inTerminal)
   {
-    Objects.requireNonNull(terminateOnErrors, "terminateOnErrors");
+    this.terminateOnErrors =
+      new AtomicBoolean(false);
+    this.formatter =
+      new IdAFormatterPretty(inTerminal);
+  }
+
+  /**
+   * @return A flag indicating if the shell should exit on errors
+   */
+
+  public AtomicBoolean terminateOnErrors()
+  {
+    return this.terminateOnErrors;
+  }
+
+  /**
+   * Set the formatter.
+   *
+   * @param inFormatter The formatter
+   */
+
+  public void setFormatter(
+    final IdAFormatterType inFormatter)
+  {
+    this.formatter =
+      Objects.requireNonNull(inFormatter, "formatter");
+  }
+
+  /**
+   * @return The shell formatter
+   */
+
+  public IdAFormatterType formatter()
+  {
+    return this.formatter;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[%s]".formatted(this.getClass().getSimpleName());
   }
 
   @Override

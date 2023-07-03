@@ -15,23 +15,10 @@
  */
 
 /**
- * Identity server (Admin shell)
+ * Inventory server (Shell [internals])
  */
 
-module com.io7m.idstore.shell.admin
-{
-  requires static org.osgi.annotation.bundle;
-  requires static org.osgi.annotation.versioning;
+@Version("1.0.0")
+package com.io7m.idstore.shell.admin.internal.formatting;
 
-  requires com.io7m.idstore.admin_client.api;
-  requires com.io7m.idstore.admin_client;
-
-  requires com.io7m.jmulticlose.core;
-  requires com.io7m.quarrel.core;
-  requires com.io7m.repetoir.core;
-  requires com.io7m.tabla.core;
-  requires org.jline;
-  requires org.slf4j;
-
-  exports com.io7m.idstore.shell.admin;
-}
+import org.osgi.annotation.versioning.Version;

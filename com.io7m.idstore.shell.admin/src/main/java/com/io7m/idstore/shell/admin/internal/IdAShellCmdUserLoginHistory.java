@@ -83,17 +83,8 @@ public final class IdAShellCmdUserLoginHistory
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserLoginHistory response)
+    throws Exception
   {
-    final var out = context.output();
-    out.printf("# %-22s | %-15s | %s%n", "Time", "Host", "User Agent");
-    for (final var history : response.history()) {
-      out.printf(
-        "%-24s |%-16s |%s%n",
-        history.time(),
-        history.host(),
-        history.userAgent()
-      );
-    }
-    out.flush();
+    this.formatter().formatLoginHistory(response.history());
   }
 }

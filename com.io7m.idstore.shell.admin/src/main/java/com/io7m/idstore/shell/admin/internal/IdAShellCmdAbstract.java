@@ -18,11 +18,13 @@
 package com.io7m.idstore.shell.admin.internal;
 
 import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
+import com.io7m.idstore.shell.admin.internal.formatting.IdAFormatterType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import org.jline.reader.Completer;
 import org.jline.reader.impl.completer.StringsCompleter;
+import org.jline.terminal.Terminal;
 
 import java.util.Objects;
 
@@ -54,17 +56,29 @@ public abstract class IdAShellCmdAbstract
 
   protected final IdAClientSynchronousType client()
   {
-    return this.services.requireService(IdAClientSynchronousType.class);
+    return this.services().requireService(IdAClientSynchronousType.class);
+  }
+
+  protected final Terminal terminal()
+  {
+    return this.services()
+      .requireService(IdAShellTerminalHolder.class)
+      .terminal();
   }
 
   protected final IdAShellOptions options()
   {
-    return this.services.requireService(IdAShellOptions.class);
+    return this.services().requireService(IdAShellOptions.class);
   }
 
   protected final RPServiceDirectoryType services()
   {
     return this.services;
+  }
+
+  protected final IdAFormatterType formatter()
+  {
+    return this.options().formatter();
   }
 
   @Override

@@ -19,8 +19,6 @@ package com.io7m.idstore.shell.admin.internal;
 import com.io7m.idstore.model.IdAdminColumn;
 import com.io7m.idstore.model.IdAdminColumnOrdering;
 import com.io7m.idstore.model.IdAdminSearchParameters;
-import com.io7m.idstore.model.IdAdminSummary;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.protocol.admin.IdACommandAdminSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchBegin;
@@ -32,7 +30,6 @@ import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
-import java.io.PrintWriter;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -148,30 +145,8 @@ public final class IdAShellCmdAdminSearchBegin
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminSearchBegin response)
+    throws Exception
   {
-    formatAdminPage(response.page(), context.output());
-  }
-
-  static void formatAdminPage(
-    final IdPage<IdAdminSummary> page,
-    final PrintWriter w)
-  {
-    w.printf(
-      "# Page %s of %s, offset %s%n",
-      Integer.toUnsignedString(page.pageIndex()),
-      Integer.toUnsignedString(page.pageCount()),
-      Long.toUnsignedString(page.pageFirstOffset())
-    );
-    w.println("# Admin ID | Name | Real Name");
-
-    for (final var admin : page.items()) {
-      w.printf(
-        "%-40s %-40s %s%n",
-        admin.id(),
-        admin.idName().value(),
-        admin.realName().value()
-      );
-    }
-    w.flush();
+    this.formatter().formatAdmins(response.page());
   }
 }

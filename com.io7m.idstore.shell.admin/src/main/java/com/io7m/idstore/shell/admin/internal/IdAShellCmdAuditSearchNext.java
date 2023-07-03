@@ -27,8 +27,6 @@ import com.io7m.repetoir.core.RPServiceDirectoryType;
 import java.util.List;
 import java.util.Optional;
 
-import static com.io7m.idstore.shell.admin.internal.IdAShellCmdAuditSearchBegin.formatAuditPage;
-
 /**
  * "audit-search-next"
  */
@@ -74,7 +72,8 @@ public final class IdAShellCmdAuditSearchNext
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAuditSearchNext response)
+    throws Exception
   {
-    formatAuditPage(response.page(), context.output());
+    this.formatter().formatAudits(response.page());
   }
 }

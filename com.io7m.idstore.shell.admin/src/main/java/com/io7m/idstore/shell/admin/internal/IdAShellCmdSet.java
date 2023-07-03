@@ -16,6 +16,8 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
+import com.io7m.idstore.shell.admin.internal.formatting.IdAFormatterPretty;
+import com.io7m.idstore.shell.admin.internal.formatting.IdAFormatterRaw;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
@@ -35,6 +37,12 @@ import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
 
 public final class IdAShellCmdSet extends IdAShellCmdAbstract
 {
+  enum Formatter
+  {
+    RAW,
+    PRETTY
+  }
+
   private static final QParameterNamed01<Boolean> TERMINATE_ON_ERRORS =
     new QParameterNamed01<>(
       "--terminate-on-errors",
@@ -43,6 +51,16 @@ public final class IdAShellCmdSet extends IdAShellCmdAbstract
         "Terminate execution on the first command that returns an error."),
       Optional.empty(),
       Boolean.class
+    );
+
+  private static final QParameterNamed01<Formatter> FORMATTER =
+    new QParameterNamed01<>(
+      "--formatter",
+      List.of(),
+      new QConstant(
+        "Set the shell formatter."),
+      Optional.empty(),
+      Formatter.class
     );
 
   /**
@@ -67,13 +85,27 @@ public final class IdAShellCmdSet extends IdAShellCmdAbstract
   @Override
   public List<QParameterNamedType<?>> onListNamedParameters()
   {
-    return List.of(TERMINATE_ON_ERRORS);
+    return List.of(TERMINATE_ON_ERRORS, FORMATTER);
   }
 
   @Override
   public QCommandStatus onExecute(
     final QCommandContextType context)
   {
+    context.parameterValue(FORMATTER)
+      .ifPresent(r -> {
+        switch (r) {
+          case RAW -> {
+            this.options()
+              .setFormatter(new IdAFormatterRaw(this.terminal()));
+          }
+          case PRETTY -> {
+            this.options()
+              .setFormatter(new IdAFormatterPretty(this.terminal()));
+          }
+        }
+      });
+
     context.parameterValue(TERMINATE_ON_ERRORS)
       .ifPresent(x -> {
         this.options().terminateOnErrors().set(x.booleanValue());

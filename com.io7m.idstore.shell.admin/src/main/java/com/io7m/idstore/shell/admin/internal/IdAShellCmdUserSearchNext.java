@@ -27,8 +27,6 @@ import com.io7m.repetoir.core.RPServiceDirectoryType;
 import java.util.List;
 import java.util.Optional;
 
-import static com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchBegin.formatUserPage;
-
 /**
  * "user-search-next"
  */
@@ -74,7 +72,8 @@ public final class IdAShellCmdUserSearchNext
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserSearchNext response)
+    throws Exception
   {
-    formatUserPage(response.page(), context.output());
+    this.formatter().formatUsers(response.page());
   }
 }

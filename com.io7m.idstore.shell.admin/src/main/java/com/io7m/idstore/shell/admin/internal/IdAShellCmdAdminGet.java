@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.protocol.admin.IdACommandAdminGet;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminGet;
 import com.io7m.quarrel.core.QCommandContextType;
@@ -27,12 +26,10 @@ import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * "admin-get"
@@ -71,35 +68,6 @@ public final class IdAShellCmdAdminGet
     );
   }
 
-  static void formatAdmin(
-    final IdAdmin admin,
-    final PrintWriter out)
-  {
-    out.print("Admin ID: ");
-    out.println(admin.id());
-    out.print("Name: ");
-    out.println(admin.idName().value());
-    out.print("Real Name: ");
-    out.println(admin.realName().value());
-    out.print("Time Created: ");
-    out.println(admin.timeCreated());
-    out.print("Time Updated: ");
-    out.println(admin.timeUpdated());
-    for (final var email : admin.emails().toList()) {
-      out.print("Email: ");
-      out.println(email.value());
-    }
-    out.print("Permissions: ");
-    out.println(
-      admin.permissions()
-        .impliedPermissions()
-        .stream()
-        .map(Enum::name)
-        .collect(Collectors.joining(" "))
-    );
-    out.flush();
-  }
-
   @Override
   public List<QParameterNamedType<?>> onListNamedParameters()
   {
@@ -117,7 +85,7 @@ public final class IdAShellCmdAdminGet
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminGet response)
-    throws QException
+    throws Exception
   {
     final var adminOpt = response.admin();
     if (adminOpt.isEmpty()) {
@@ -132,6 +100,6 @@ public final class IdAShellCmdAdminGet
       );
     }
 
-    formatAdmin(adminOpt.get(), context.output());
+    this.formatter().formatAdmin(adminOpt.get());
   }
 }

@@ -27,8 +27,6 @@ import com.io7m.repetoir.core.RPServiceDirectoryType;
 import java.util.List;
 import java.util.Optional;
 
-import static com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminSearchBegin.formatAdminPage;
-
 /**
  * "admin-search-previous"
  */
@@ -74,7 +72,8 @@ public final class IdAShellCmdAdminSearchPrevious
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminSearchPrevious response)
+    throws Exception
   {
-    formatAdminPage(response.page(), context.output());
+    this.formatter().formatAdmins(response.page());
   }
 }

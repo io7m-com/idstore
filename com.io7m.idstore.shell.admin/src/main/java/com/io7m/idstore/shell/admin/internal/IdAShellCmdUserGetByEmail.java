@@ -85,7 +85,7 @@ public final class IdAShellCmdUserGetByEmail
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserGet response)
-    throws QException
+    throws Exception
   {
     final var userOpt = response.user();
     if (userOpt.isEmpty()) {
@@ -100,6 +100,6 @@ public final class IdAShellCmdUserGetByEmail
       );
     }
 
-    IdAShellCmdUserGet.formatUser(userOpt.get(), context.output());
+    this.formatter().formatUser(userOpt.get());
   }
 }

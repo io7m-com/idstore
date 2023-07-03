@@ -16,9 +16,7 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdAuditSearchParameters;
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.protocol.admin.IdACommandAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchBegin;
@@ -30,7 +28,6 @@ import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
-import java.io.PrintWriter;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -143,32 +140,8 @@ public final class IdAShellCmdAuditSearchBegin
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAuditSearchBegin response)
+    throws Exception
   {
-    formatAuditPage(response.page(), context.output());
-  }
-
-  static void formatAuditPage(
-    final IdPage<IdAuditEvent> page,
-    final PrintWriter w)
-  {
-    w.printf(
-      "# Page %s of %s, offset %s%n",
-      Integer.toUnsignedString(page.pageIndex()),
-      Integer.toUnsignedString(page.pageCount()),
-      Long.toUnsignedString(page.pageFirstOffset())
-    );
-    w.println("# ID | Time | Owner | Type | Message");
-
-    for (final var audit : page.items()) {
-      w.printf(
-        "%-12s | %-24s | %-36s | %-24s | %s%n",
-        Long.toUnsignedString(audit.id()),
-        audit.time(),
-        audit.owner(),
-        audit.type(),
-        audit.message()
-      );
-    }
-    w.flush();
+    this.formatter().formatAudits(response.page());
   }
 }

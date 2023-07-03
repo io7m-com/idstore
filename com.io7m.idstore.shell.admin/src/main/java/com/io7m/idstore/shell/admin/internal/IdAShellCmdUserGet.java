@@ -16,7 +16,6 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.model.IdUser;
 import com.io7m.idstore.protocol.admin.IdACommandUserGet;
 import com.io7m.idstore.protocol.admin.IdAResponseUserGet;
 import com.io7m.quarrel.core.QCommandContextType;
@@ -27,7 +26,6 @@ import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,27 +68,6 @@ public final class IdAShellCmdUserGet
     );
   }
 
-  static void formatUser(
-    final IdUser user,
-    final PrintWriter out)
-  {
-    out.print("User ID: ");
-    out.println(user.id());
-    out.print("Name: ");
-    out.println(user.idName().value());
-    out.print("Real Name: ");
-    out.println(user.realName().value());
-    out.print("Time Created: ");
-    out.println(user.timeCreated());
-    out.print("Time Updated: ");
-    out.println(user.timeUpdated());
-    for (final var email : user.emails().toList()) {
-      out.print("Email: ");
-      out.println(email.value());
-    }
-    out.flush();
-  }
-
   @Override
   public List<QParameterNamedType<?>> onListNamedParameters()
   {
@@ -108,7 +85,7 @@ public final class IdAShellCmdUserGet
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserGet response)
-    throws QException
+    throws Exception
   {
     final var userOpt = response.user();
     if (userOpt.isEmpty()) {
@@ -123,6 +100,6 @@ public final class IdAShellCmdUserGet
       );
     }
 
-    formatUser(userOpt.get(), context.output());
+    this.formatter().formatUser(userOpt.get());
   }
 }

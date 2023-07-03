@@ -86,19 +86,19 @@ public final class IdAShellCmdAdminBanGet
     final QCommandContextType context,
     final IdAResponseAdminBanGet response)
   {
-    final var w = context.output();
+    final var output = context.output();
     response.ban().ifPresentOrElse(ban -> {
-      w.print("Admin is banned: ");
-      w.print(ban.reason());
-      w.println();
+      output.print("Admin is banned: ");
+      output.print(ban.reason());
+      output.println();
 
       ban.expires().ifPresentOrElse(time -> {
-        w.printf(
+        output.printf(
           "The ban expires on %s (%s from now).%n",
           time,
           Duration.between(OffsetDateTime.now(), time)
         );
-      }, () -> w.println("The ban does not expire."));
-    }, () -> w.println("The admin is not banned."));
+      }, () -> output.println("The ban does not expire."));
+    }, () -> output.println("The admin is not banned."));
   }
 }

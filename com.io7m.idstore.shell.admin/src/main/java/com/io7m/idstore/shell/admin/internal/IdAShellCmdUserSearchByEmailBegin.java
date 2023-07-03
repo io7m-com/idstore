@@ -34,8 +34,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchBegin.formatUserPage;
-
 /**
  * "user-search-by-email-begin"
  */
@@ -147,7 +145,8 @@ public final class IdAShellCmdUserSearchByEmailBegin
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserSearchByEmailBegin response)
+    throws Exception
   {
-    formatUserPage(response.page(), context.output());
+    this.formatter().formatUsers(response.page());
   }
 }

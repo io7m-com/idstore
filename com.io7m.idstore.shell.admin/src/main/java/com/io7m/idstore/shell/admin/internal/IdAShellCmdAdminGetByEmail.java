@@ -85,7 +85,7 @@ public final class IdAShellCmdAdminGetByEmail
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseAdminGet response)
-    throws QException
+    throws Exception
   {
     final var adminOpt = response.admin();
     if (adminOpt.isEmpty()) {
@@ -100,6 +100,6 @@ public final class IdAShellCmdAdminGetByEmail
       );
     }
 
-    IdAShellCmdAdminGet.formatAdmin(adminOpt.get(), context.output());
+    this.formatter().formatAdmin(adminOpt.get());
   }
 }

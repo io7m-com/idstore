@@ -14,24 +14,24 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
+package com.io7m.idstore.shell.admin.internal;
+
+import com.io7m.repetoir.core.RPServiceType;
+import org.jline.terminal.Terminal;
+
 /**
- * Identity server (Admin shell)
+ * A terminal holder.
+ * @param terminal The terminal
  */
 
-module com.io7m.idstore.shell.admin
+public record IdAShellTerminalHolder(
+  Terminal terminal)
+  implements RPServiceType
 {
-  requires static org.osgi.annotation.bundle;
-  requires static org.osgi.annotation.versioning;
-
-  requires com.io7m.idstore.admin_client.api;
-  requires com.io7m.idstore.admin_client;
-
-  requires com.io7m.jmulticlose.core;
-  requires com.io7m.quarrel.core;
-  requires com.io7m.repetoir.core;
-  requires com.io7m.tabla.core;
-  requires org.jline;
-  requires org.slf4j;
-
-  exports com.io7m.idstore.shell.admin;
+  @Override
+  public String description()
+  {
+    return "Shell terminal holder service.";
+  }
 }

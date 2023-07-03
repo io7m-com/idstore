@@ -16,12 +16,10 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.model.IdUserColumn;
 import com.io7m.idstore.model.IdUserColumnOrdering;
 import com.io7m.idstore.model.IdUserSearchParameters;
-import com.io7m.idstore.model.IdUserSummary;
 import com.io7m.idstore.protocol.admin.IdACommandUserSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchBegin;
 import com.io7m.quarrel.core.QCommandContextType;
@@ -32,7 +30,6 @@ import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
-import java.io.PrintWriter;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -148,30 +145,8 @@ public final class IdAShellCmdUserSearchBegin
   protected void onFormatResponse(
     final QCommandContextType context,
     final IdAResponseUserSearchBegin response)
+    throws Exception
   {
-    formatUserPage(response.page(), context.output());
-  }
-
-  static void formatUserPage(
-    final IdPage<IdUserSummary> page,
-    final PrintWriter w)
-  {
-    w.printf(
-      "# Page %s of %s, offset %s%n",
-      Integer.toUnsignedString(page.pageIndex()),
-      Integer.toUnsignedString(page.pageCount()),
-      Long.toUnsignedString(page.pageFirstOffset())
-    );
-    w.println("# User ID | Name | Real Name");
-
-    for (final var user : page.items()) {
-      w.printf(
-        "%-40s %-40s %s%n",
-        user.id(),
-        user.idName().value(),
-        user.realName().value()
-      );
-    }
-    w.flush();
+    this.formatter().formatUsers(response.page());
   }
 }

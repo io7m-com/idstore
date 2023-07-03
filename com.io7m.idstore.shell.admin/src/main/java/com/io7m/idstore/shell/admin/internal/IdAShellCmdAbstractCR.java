@@ -18,13 +18,11 @@
 package com.io7m.idstore.shell.admin.internal;
 
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.model.IdPasswordException;
 import com.io7m.idstore.protocol.admin.IdACommandType;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
-import com.io7m.quarrel.core.QException;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.Objects;
@@ -69,12 +67,12 @@ public abstract class IdAShellCmdAbstractCR<
 
   protected abstract C onCreateCommand(
     QCommandContextType context)
-    throws IdPasswordException, Exception;
+    throws Exception;
 
   protected abstract void onFormatResponse(
     QCommandContextType context,
     R response)
-    throws QException;
+    throws Exception;
 
   @Override
   public final QCommandStatus onExecute(

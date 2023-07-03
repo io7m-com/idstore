@@ -65,6 +65,7 @@ import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserSearchPrevious;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdUserUpdatePasswordExpiration;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdVersion;
 import com.io7m.idstore.shell.admin.internal.IdAShellOptions;
+import com.io7m.idstore.shell.admin.internal.IdAShellTerminalHolder;
 import com.io7m.repetoir.core.RPServiceDirectory;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.reader.impl.DefaultParser;
@@ -77,7 +78,6 @@ import org.jline.terminal.TerminalBuilder;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -119,13 +119,15 @@ public final class IdAShells implements IdAShellFactoryType
       terminal.writer();
 
     final var options =
-      new IdAShellOptions(
-        new AtomicBoolean(false)
-      );
+      new IdAShellOptions(terminal);
 
     final var services = new RPServiceDirectory();
     services.register(IdAClientSynchronousType.class, client);
     services.register(IdAShellOptions.class, options);
+    services.register(
+      IdAShellTerminalHolder.class,
+      new IdAShellTerminalHolder(terminal)
+    );
 
     final List<IdAShellCmdType> commands =
       List.of(

@@ -46,6 +46,10 @@
     </dependency>
 
     <dependency>
+      <groupId>com.io7m.tabla</groupId>
+      <artifactId>com.io7m.tabla.core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.io7m.repetoir</groupId>
       <artifactId>com.io7m.repetoir.core</artifactId>
     </dependency>
