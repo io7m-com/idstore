@@ -13,7 +13,7 @@
 
   <groupId>com.io7m.idstore</groupId>
   <artifactId>com.io7m.idstore</artifactId>
-  <version>1.0.0-beta0016</version>
+  <version>1.0.0-beta0017</version>
 
   <packaging>pom</packaging>
   <name>com.io7m.idstore</name>
@@ -85,7 +85,7 @@
     <com.io7m.verdant.version>1.0.0</com.io7m.verdant.version>
     <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
     <com.io7m.zelador.version>0.0.1</com.io7m.zelador.version>
-    <io7m.api.previousVersion>1.0.0-beta0016</io7m.api.previousVersion>
+    <io7m.api.previousVersion>1.0.0-beta0017</io7m.api.previousVersion>
     <jetty.version>11.0.15</jetty.version>
     <jooq.version>3.18.5</jooq.version>
     <logback.version>1.4.8</logback.version>
