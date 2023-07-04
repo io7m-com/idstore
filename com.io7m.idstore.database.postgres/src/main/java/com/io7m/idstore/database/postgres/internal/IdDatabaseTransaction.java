@@ -103,11 +103,7 @@ final class IdDatabaseTransaction
   {
     switch (role) {
       case IDSTORE -> {
-        try (var st =
-               this.connection.connection()
-                 .prepareStatement("set role idstore")) {
-          st.execute();
-        }
+        // Transactions start in this role already.
       }
       case IDSTORE_READ_ONLY -> {
         try (var st =
