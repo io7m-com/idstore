@@ -45,6 +45,7 @@ import com.io7m.idstore.model.IdUserSummary;
 import com.io7m.jqpage.core.JQField;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPageDefinition;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPagination;
+import com.io7m.jqpage.core.JQKeysetRandomAccessPaginationParameters;
 import com.io7m.jqpage.core.JQOrder;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -1204,14 +1205,14 @@ final class IdDatabaseUsersQueries
       final var pages =
         JQKeysetRandomAccessPagination.createPageDefinitions(
           context,
-          USERS,
-          List.of(orderField),
-          List.of(allConditions),
-          List.of(),
-          Integer.toUnsignedLong(parameters.limit()),
-          statement -> {
-            querySpan.setAttribute(DB_STATEMENT, statement.toString());
-          }
+          JQKeysetRandomAccessPaginationParameters.forTable(USERS)
+            .addSortField(orderField)
+            .setPageSize(Integer.toUnsignedLong(parameters.limit()))
+            .addWhereCondition(allConditions)
+            .setStatementListener(statement -> {
+              querySpan.setAttribute(DB_STATEMENT, statement.toString());
+            })
+            .build()
         );
 
       return new IdDatabaseUsersQueries.UsersSearch(pages);
@@ -1279,14 +1280,15 @@ final class IdDatabaseUsersQueries
       final var pages =
         JQKeysetRandomAccessPagination.createPageDefinitions(
           context,
-          baseTable,
-          List.of(orderField),
-          List.of(allConditions),
-          List.of(USERS.ID),
-          Integer.toUnsignedLong(parameters.limit()),
-          statement -> {
-            querySpan.setAttribute(DB_STATEMENT, statement.toString());
-          }
+          JQKeysetRandomAccessPaginationParameters.forTable(baseTable)
+            .addSortField(orderField)
+            .addWhereCondition(allConditions)
+            .addGroupByField(USERS.ID)
+            .setPageSize(Integer.toUnsignedLong(parameters.limit()))
+            .setStatementListener(statement -> {
+              querySpan.setAttribute(DB_STATEMENT, statement.toString());
+            })
+            .build()
         );
 
       return new IdDatabaseUsersQueries.UsersByEmailSearch(

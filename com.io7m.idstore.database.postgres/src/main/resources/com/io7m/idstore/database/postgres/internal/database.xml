@@ -3,8 +3,9 @@
 <Schemas xmlns="urn:com.io7m.trasco.database.statements:1:0">
   <Schema versionCurrent="0">
     <Comment>
-      The idstore role is a least-privilege role that can perform only those operations required to run the system and
-      no others. The role is initially set to "nologin" as a password will be assigned later and logins enabled.
+      The idstore role is a least-privilege role that can perform only those
+      operations required to run the system and no others. The role is initially
+      set to "nologin" as a password will be assigned later and logins enabled.
     </Comment>
 
     <Statement><![CDATA[
@@ -15,7 +16,8 @@ create role idstore with nosuperuser nocreatedb nocreaterole noinherit nologin;
 ]]></Statement>
 
     <Comment>
-      The idstore_none role is a no-privilege role that cannot perform any actions.
+      The idstore_none role is a no-privilege role that cannot perform any
+      actions.
     </Comment>
 
     <Statement><![CDATA[
@@ -26,9 +28,10 @@ create role idstore_none with nosuperuser nocreatedb nocreaterole noinherit nolo
 ]]></Statement>
 
     <Comment>
-      The schema version table stores the current version of the database schema. Implementations are expected to query
-      this table on connecting to the database in order to ensure that the calling code is compatible with the tables in
-      the database.
+      The schema version table stores the current version of the database
+      schema. Implementations are expected to query this table on connecting to
+      the database in order to ensure that the calling code is compatible with
+      the tables in the database.
     </Comment>
 
     <Statement><![CDATA[
@@ -79,7 +82,8 @@ create table admins (
 )
 ]]></Statement>
 
-    <Statement>grant select, insert, update, delete on admins to idstore</Statement>
+    <Statement>grant select, insert, update, delete on admins to idstore
+    </Statement>
     <Statement>grant select (id) on admins to idstore_none</Statement>
 
     <Statement><![CDATA[
@@ -134,13 +138,15 @@ create table users (
 )
 ]]></Statement>
 
-    <Statement>grant select, insert, update, delete on users to idstore</Statement>
+    <Statement>grant select, insert, update, delete on users to idstore
+    </Statement>
     <Statement>grant select (id) on users to idstore_none</Statement>
 
     <Comment>
-      The emails table stores the set of email addresses used by users/admins. Note that
-      email addresses *do* have a unique constraint, but it's enforced by a separate index
-      that determines uniqueness based on the lowercase email address.
+      The emails table stores the set of email addresses used by users/admins.
+      Note that email addresses *do* have a unique constraint, but it's enforced
+      by a separate index that determines uniqueness based on the lowercase
+      email address.
     </Comment>
 
     <Statement><![CDATA[
@@ -167,8 +173,8 @@ create unique index emails_unique_lower_email_idx on emails (lower(email_address
 ]]></Statement>
 
     <Comment>
-      The email_check_delete trigger enforces the constraint that users must have at least one email address at any
-      time.
+      The email_check_delete trigger enforces the constraint that users must
+      have at least one email address at any time.
     </Comment>
 
     <Statement><![CDATA[
@@ -207,7 +213,8 @@ create trigger email_check_delete_trigger
 ]]></Statement>
 
     <Comment>
-      The audit table stores a list of auditable events. Who did it? What did they do? When did they do it?
+      The audit table stores a list of auditable events. Who did it? What did
+      they do? When did they do it?
     </Comment>
 
     <Statement><![CDATA[
@@ -240,12 +247,14 @@ create table login_history (
 )
 ]]></Statement>
 
-    <Statement>grant insert, select, delete on login_history to idstore</Statement>
+    <Statement>grant insert, select, delete on login_history to idstore
+    </Statement>
 
     <Comment>
-      The email_verifications table records the email verification operations in process. A verification has an
-      associated user/admin, email address, verification token, expiration date, and operation. The operation is a value
-      of com.io7m.idstore.model.IdEmailVerificationOperation.
+      The email_verifications table records the email verification operations in
+      process. A verification has an associated user/admin, email address,
+      verification token, expiration date, and operation. The operation is a
+      value of com.io7m.idstore.model.IdEmailVerificationOperation.
     </Comment>
 
     <Statement><![CDATA[
@@ -262,10 +271,12 @@ create table email_verifications (
 )
 ]]></Statement>
 
-    <Statement>grant insert, select, delete on email_verifications to idstore</Statement>
+    <Statement>grant insert, select, delete on email_verifications to idstore
+    </Statement>
 
     <Comment>
-      The bans table records the reason any given account might be banned, and when that ban expires (if it expires).
+      The bans table records the reason any given account might be banned, and
+      when that ban expires (if it expires).
     </Comment>
 
     <Statement><![CDATA[
@@ -278,11 +289,13 @@ create table bans (
 )
 ]]></Statement>
 
-    <Statement>grant insert, select, update, delete on bans to idstore</Statement>
+    <Statement>grant insert, select, update, delete on bans to idstore
+    </Statement>
 
     <Comment>
-      The user_password_resets table records the password reset operations in process. A verification
-      has an associated user, verification token, and expiration date.
+      The user_password_resets table records the password reset operations in
+      process. A verification has an associated user, verification token, and
+      expiration date.
     </Comment>
 
     <Statement><![CDATA[
@@ -295,13 +308,15 @@ create table user_password_resets (
 )
 ]]></Statement>
 
-    <Statement>grant insert, select, delete on user_password_resets to idstore</Statement>
+    <Statement>grant insert, select, delete on user_password_resets to idstore
+    </Statement>
   </Schema>
 
   <Schema versionCurrent="2">
     <Comment>
-      The idstore_read_only role is a read-only role that can read all data but cannot change anything.
-      The role is initially set to "nologin" as a password may be assigned later and logins enabled.
+      The idstore_read_only role is a read-only role that can read all data but
+      cannot change anything. The role is initially set to "nologin" as a
+      password may be assigned later and logins enabled.
     </Comment>
 
     <Statement><![CDATA[
@@ -314,12 +329,16 @@ create role idstore_read_only with nosuperuser nocreatedb nocreaterole noinherit
     <Statement>grant select on admins to idstore_read_only</Statement>
     <Statement>grant select on audit to idstore_read_only</Statement>
     <Statement>grant select on bans to idstore_read_only</Statement>
-    <Statement>grant select on email_verifications to idstore_read_only</Statement>
+    <Statement>
+      grant select on email_verifications to idstore_read_only
+    </Statement>
     <Statement>grant select on emails to idstore_read_only</Statement>
     <Statement>grant select on login_history to idstore_read_only</Statement>
     <Statement>grant select on schema_version to idstore_read_only</Statement>
     <Statement>grant select on user_ids to idstore_read_only</Statement>
-    <Statement>grant select on user_password_resets to idstore_read_only</Statement>
+    <Statement>
+      grant select on user_password_resets to idstore_read_only
+    </Statement>
     <Statement>grant select on users to idstore_read_only</Statement>
   </Schema>
 </Schemas>

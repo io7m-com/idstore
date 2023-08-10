@@ -26,6 +26,7 @@ import com.io7m.idstore.model.IdPage;
 import com.io7m.jqpage.core.JQField;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPageDefinition;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPagination;
+import com.io7m.jqpage.core.JQKeysetRandomAccessPaginationParameters;
 import com.io7m.jqpage.core.JQOrder;
 import org.jooq.Condition;
 import org.jooq.Select;
@@ -115,14 +116,14 @@ final class IdDatabaseAuditQueries
       final var pages =
         JQKeysetRandomAccessPagination.createPageDefinitions(
           context,
-          baseTable,
-          List.of(new JQField(AUDIT.ID, JQOrder.ASCENDING)),
-          List.of(allConditions),
-          List.of(),
-          Integer.toUnsignedLong(parameters.limit()),
-          statement -> {
-            querySpan.setAttribute(DB_STATEMENT, statement.toString());
-          }
+          JQKeysetRandomAccessPaginationParameters.forTable(baseTable)
+            .setPageSize(Integer.toUnsignedLong(parameters.limit()))
+            .addSortField(new JQField(AUDIT.ID, JQOrder.ASCENDING))
+            .addWhereCondition(allConditions)
+            .setStatementListener(statement -> {
+              querySpan.setAttribute(DB_STATEMENT, statement.toString());
+            })
+            .build()
         );
 
       return new AuditEventsSearch(baseTable, pages);

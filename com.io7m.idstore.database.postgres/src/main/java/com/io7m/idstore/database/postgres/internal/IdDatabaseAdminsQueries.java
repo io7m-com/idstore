@@ -41,6 +41,7 @@ import com.io7m.idstore.model.IdRealName;
 import com.io7m.jqpage.core.JQField;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPageDefinition;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPagination;
+import com.io7m.jqpage.core.JQKeysetRandomAccessPaginationParameters;
 import com.io7m.jqpage.core.JQOrder;
 import org.jooq.Condition;
 import org.jooq.Result;
@@ -714,14 +715,14 @@ final class IdDatabaseAdminsQueries
       final var pages =
         JQKeysetRandomAccessPagination.createPageDefinitions(
           context,
-          ADMINS,
-          List.of(orderField),
-          List.of(allConditions),
-          List.of(),
-          Integer.toUnsignedLong(parameters.limit()),
-          statement -> {
-            querySpan.setAttribute(DB_STATEMENT, statement.toString());
-          }
+          JQKeysetRandomAccessPaginationParameters.forTable(ADMINS)
+            .addSortField(orderField)
+            .addWhereCondition(allConditions)
+            .setPageSize(Integer.toUnsignedLong(parameters.limit()))
+            .setStatementListener(statement -> {
+              querySpan.setAttribute(DB_STATEMENT, statement.toString());
+            })
+            .build()
         );
 
       return new AdminsSearch(pages);
@@ -1180,14 +1181,15 @@ final class IdDatabaseAdminsQueries
       final var pages =
         JQKeysetRandomAccessPagination.createPageDefinitions(
           context,
-          baseTable,
-          List.of(orderField),
-          List.of(allConditions),
-          List.of(ADMINS.ID),
-          Integer.toUnsignedLong(parameters.limit()),
-          statement -> {
-            querySpan.setAttribute(DB_STATEMENT, statement.toString());
-          }
+          JQKeysetRandomAccessPaginationParameters.forTable(baseTable)
+            .addSortField(orderField)
+            .addWhereCondition(allConditions)
+            .addGroupByField(ADMINS.ID)
+            .setPageSize(Integer.toUnsignedLong(parameters.limit()))
+            .setStatementListener(statement -> {
+              querySpan.setAttribute(DB_STATEMENT, statement.toString());
+            })
+            .build()
         );
 
       return new AdminsByEmailSearch(pages);
