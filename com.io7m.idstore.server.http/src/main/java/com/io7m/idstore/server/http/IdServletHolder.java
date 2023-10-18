@@ -17,7 +17,7 @@
 package com.io7m.idstore.server.http;
 
 import jakarta.servlet.Servlet;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 
 import java.util.Objects;
 import java.util.function.Supplier;

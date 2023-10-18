@@ -129,6 +129,8 @@ import java.util.stream.Collectors;
 import static com.io7m.cedarbridge.runtime.api.CBCore.string;
 import static com.io7m.cedarbridge.runtime.api.CBOptionType.fromOptional;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
+import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_CLIENT;
+import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_SERVER;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireAdmin;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireCommandAdminBanCreate;
 import static com.io7m.idstore.protocol.admin.cb.internal.IdACB1ValidationAdmin.fromWireCommandAdminBanDelete;
@@ -282,99 +284,74 @@ public final class IdACB1Validation
     final IdAResponseType response)
     throws IdProtocolException
   {
-    if (response instanceof final IdAResponseError c) {
-      return toWireResponseError(c);
-    } else if (response instanceof final IdAResponseLogin c) {
-      return toWireResponseLogin(c);
+    return switch (response) {
+      case final IdAResponseError c -> toWireResponseError(c);
+      case final IdAResponseLogin c -> toWireResponseLogin(c);
 
       /*
        * Admin commands
        */
 
-    } else if (response instanceof final IdAResponseAdminBanCreate c) {
-      return toWireResponseAdminBanCreate(c);
-    } else if (response instanceof final IdAResponseAdminBanDelete c) {
-      return toWireResponseAdminBanDelete(c);
-    } else if (response instanceof final IdAResponseAdminBanGet c) {
-      return toWireResponseAdminBanGet(c);
-    } else if (response instanceof final IdAResponseAdminCreate c) {
-      return toWireResponseAdminCreate(c);
-    } else if (response instanceof final IdAResponseAdminDelete c) {
-      return toWireResponseAdminDelete(c);
-    } else if (response instanceof final IdAResponseAdminGet c) {
-      return toWireResponseAdminGet(c);
-    } else if (response instanceof final IdAResponseAdminSearchBegin c) {
-      return toWireResponseAdminSearchBegin(c);
-    } else if (response instanceof final IdAResponseAdminSearchByEmailBegin c) {
-      return toWireResponseAdminSearchByEmailBegin(c);
-    } else if (response instanceof final IdAResponseAdminSearchByEmailNext c) {
-      return toWireResponseAdminSearchByEmailNext(c);
-    } else if (response instanceof final IdAResponseAdminSearchByEmailPrevious c) {
-      return toWireResponseAdminSearchByEmailPrevious(c);
-    } else if (response instanceof final IdAResponseAdminSearchNext c) {
-      return toWireResponseAdminSearchNext(c);
-    } else if (response instanceof final IdAResponseAdminSearchPrevious c) {
-      return toWireResponseAdminSearchPrevious(c);
-    } else if (response instanceof final IdAResponseAdminSelf c) {
-      return toWireResponseAdminSelf(c);
-    } else if (response instanceof final IdAResponseAdminUpdate c) {
-      return toWireResponseAdminUpdate(c);
-    } else if (response instanceof final IdAResponseAuditSearchBegin c) {
-      return toWireResponseAuditSearchBegin(c);
-    } else if (response instanceof final IdAResponseAuditSearchNext c) {
-      return toWireResponseAuditSearchNext(c);
-    } else if (response instanceof final IdAResponseAuditSearchPrevious c) {
-      return toWireResponseAuditSearchPrevious(c);
+      case final IdAResponseAdminBanCreate c -> toWireResponseAdminBanCreate(c);
+      case final IdAResponseAdminBanDelete c -> toWireResponseAdminBanDelete(c);
+      case final IdAResponseAdminBanGet c -> toWireResponseAdminBanGet(c);
+      case final IdAResponseAdminCreate c -> toWireResponseAdminCreate(c);
+      case final IdAResponseAdminDelete c -> toWireResponseAdminDelete(c);
+      case final IdAResponseAdminGet c -> toWireResponseAdminGet(c);
+      case final IdAResponseAdminSearchBegin c ->
+        toWireResponseAdminSearchBegin(c);
+      case final IdAResponseAdminSearchByEmailBegin c ->
+        toWireResponseAdminSearchByEmailBegin(c);
+      case final IdAResponseAdminSearchByEmailNext c ->
+        toWireResponseAdminSearchByEmailNext(c);
+      case final IdAResponseAdminSearchByEmailPrevious c ->
+        toWireResponseAdminSearchByEmailPrevious(c);
+      case final IdAResponseAdminSearchNext c ->
+        toWireResponseAdminSearchNext(c);
+      case final IdAResponseAdminSearchPrevious c ->
+        toWireResponseAdminSearchPrevious(c);
+      case final IdAResponseAdminSelf c -> toWireResponseAdminSelf(c);
+      case final IdAResponseAdminUpdate c -> toWireResponseAdminUpdate(c);
+      case final IdAResponseAuditSearchBegin c ->
+        toWireResponseAuditSearchBegin(c);
+      case final IdAResponseAuditSearchNext c ->
+        toWireResponseAuditSearchNext(c);
+      case final IdAResponseAuditSearchPrevious c ->
+        toWireResponseAuditSearchPrevious(c);
 
       /*
        * User responses.
        */
 
-    } else if (response instanceof final IdAResponseUserBanCreate c) {
-      return toWireResponseUserBanCreate(c);
-    } else if (response instanceof final IdAResponseUserBanDelete c) {
-      return toWireResponseUserBanDelete(c);
-    } else if (response instanceof final IdAResponseUserBanGet c) {
-      return toWireResponseUserBanGet(c);
-    } else if (response instanceof final IdAResponseUserCreate c) {
-      return toWireResponseUserCreate(c);
-    } else if (response instanceof final IdAResponseUserDelete c) {
-      return toWireResponseUserDelete(c);
-    } else if (response instanceof final IdAResponseUserGet c) {
-      return toWireResponseUserGet(c);
-    } else if (response instanceof final IdAResponseUserSearchBegin c) {
-      return toWireResponseUserSearchBegin(c);
-    } else if (response instanceof final IdAResponseUserSearchByEmailBegin c) {
-      return toWireResponseUserSearchByEmailBegin(c);
-    } else if (response instanceof final IdAResponseUserSearchByEmailNext c) {
-      return toWireResponseUserSearchByEmailNext(c);
-    } else if (response instanceof final IdAResponseUserSearchByEmailPrevious c) {
-      return toWireResponseUserSearchByEmailPrevious(c);
-    } else if (response instanceof final IdAResponseUserSearchNext c) {
-      return toWireResponseUserSearchNext(c);
-    } else if (response instanceof final IdAResponseUserSearchPrevious c) {
-      return toWireResponseUserSearchPrevious(c);
-    } else if (response instanceof final IdAResponseUserUpdate c) {
-      return toWireResponseUserUpdate(c);
-    } else if (response instanceof final IdAResponseUserLoginHistory c) {
-      return toWireResponseUserLoginHistory(c);
+      case final IdAResponseUserBanCreate c -> toWireResponseUserBanCreate(c);
+      case final IdAResponseUserBanDelete c -> toWireResponseUserBanDelete(c);
+      case final IdAResponseUserBanGet c -> toWireResponseUserBanGet(c);
+      case final IdAResponseUserCreate c -> toWireResponseUserCreate(c);
+      case final IdAResponseUserDelete c -> toWireResponseUserDelete(c);
+      case final IdAResponseUserGet c -> toWireResponseUserGet(c);
+      case final IdAResponseUserSearchBegin c ->
+        toWireResponseUserSearchBegin(c);
+      case final IdAResponseUserSearchByEmailBegin c ->
+        toWireResponseUserSearchByEmailBegin(c);
+      case final IdAResponseUserSearchByEmailNext c ->
+        toWireResponseUserSearchByEmailNext(c);
+      case final IdAResponseUserSearchByEmailPrevious c ->
+        toWireResponseUserSearchByEmailPrevious(c);
+      case final IdAResponseUserSearchNext c -> toWireResponseUserSearchNext(c);
+      case final IdAResponseUserSearchPrevious c ->
+        toWireResponseUserSearchPrevious(c);
+      case final IdAResponseUserUpdate c -> toWireResponseUserUpdate(c);
+      case final IdAResponseUserLoginHistory c ->
+        toWireResponseUserLoginHistory(c);
 
       /*
        * General.
        */
 
-    } else if (response instanceof final IdAResponseMailTest c) {
-      return toWireResponseMailTest(c);
-    } else if (response instanceof final IdAResponseMaintenanceModeSet c) {
-      return toWireResponseMaintenanceModeSet(c);
-    }
-
-    throw new IdProtocolException(
-      "Unrecognized message: %s".formatted(response),
-      PROTOCOL_ERROR,
-      Map.of(),
-      Optional.empty()
-    );
+      case final IdAResponseMailTest c -> toWireResponseMailTest(c);
+      case final IdAResponseMaintenanceModeSet c ->
+        toWireResponseMaintenanceModeSet(c);
+    };
   }
 
   private static IdA1ResponseMailTest toWireResponseMailTest(
@@ -466,117 +443,87 @@ public final class IdACB1Validation
     final IdACommandType<?> command)
     throws IdProtocolException
   {
-    if (command instanceof final IdACommandLogin c) {
-      return toWireCommandLogin(c);
+    return switch (command) {
+      case final IdACommandLogin c -> toWireCommandLogin(c);
 
       /*
        * Admin commands.
        */
 
-    } else if (command instanceof final IdACommandAdminBanCreate c) {
-      return toWireCommandAdminBanCreate(c);
-    } else if (command instanceof final IdACommandAdminBanDelete c) {
-      return toWireCommandAdminBanDelete(c);
-    } else if (command instanceof final IdACommandAdminBanGet c) {
-      return toWireCommandAdminBanGet(c);
-    } else if (command instanceof final IdACommandAdminCreate c) {
-      return toWireCommandAdminCreate(c);
-    } else if (command instanceof final IdACommandAdminDelete c) {
-      return toWireCommandAdminDelete(c);
-    } else if (command instanceof final IdACommandAdminEmailAdd c) {
-      return toWireCommandAdminEmailAdd(c);
-    } else if (command instanceof final IdACommandAdminEmailRemove c) {
-      return toWireCommandAdminEmailRemove(c);
-    } else if (command instanceof final IdACommandAdminGet c) {
-      return toWireCommandAdminGet(c);
-    } else if (command instanceof final IdACommandAdminGetByEmail c) {
-      return toWireCommandAdminGetByEmail(c);
-    } else if (command instanceof final IdACommandAdminPermissionGrant c) {
-      return toWireCommandAdminPermissionGrant(c);
-    } else if (command instanceof final IdACommandAdminPermissionRevoke c) {
-      return toWireCommandAdminPermissionRevoke(c);
-    } else if (command instanceof final IdACommandAdminSearchBegin c) {
-      return toWireCommandAdminSearchBegin(c);
-    } else if (command instanceof final IdACommandAdminSearchByEmailBegin c) {
-      return toWireCommandAdminSearchByEmailBegin(c);
-    } else if (command instanceof final IdACommandAdminSearchByEmailNext c) {
-      return toWireCommandAdminSearchByEmailNext();
-    } else if (command instanceof final IdACommandAdminSearchByEmailPrevious c) {
-      return toWireCommandAdminSearchByEmailPrevious();
-    } else if (command instanceof final IdACommandAdminSearchNext c) {
-      return toWireCommandAdminSearchNext();
-    } else if (command instanceof final IdACommandAdminSearchPrevious c) {
-      return toWireCommandAdminSearchPrevious();
-    } else if (command instanceof final IdACommandAdminSelf c) {
-      return toWireCommandAdminSelf();
-    } else if (command instanceof final IdACommandAdminUpdateCredentials c) {
-      return toWireCommandAdminUpdateCredentials(c);
-    } else if (command instanceof final IdACommandAdminUpdatePasswordExpiration c) {
-      return toWireCommandAdminUpdatePasswordExpiration(c);
-    } else if (command instanceof final IdACommandAuditSearchBegin c) {
-      return toWireCommandAuditSearchBegin(c);
-    } else if (command instanceof final IdACommandAuditSearchNext c) {
-      return toWireCommandAuditSearchNext();
-    } else if (command instanceof final IdACommandAuditSearchPrevious c) {
-      return toWireCommandAuditSearchPrevious();
+      case final IdACommandAdminBanCreate c -> toWireCommandAdminBanCreate(c);
+      case final IdACommandAdminBanDelete c -> toWireCommandAdminBanDelete(c);
+      case final IdACommandAdminBanGet c -> toWireCommandAdminBanGet(c);
+      case final IdACommandAdminCreate c -> toWireCommandAdminCreate(c);
+      case final IdACommandAdminDelete c -> toWireCommandAdminDelete(c);
+      case final IdACommandAdminEmailAdd c -> toWireCommandAdminEmailAdd(c);
+      case final IdACommandAdminEmailRemove c ->
+        toWireCommandAdminEmailRemove(c);
+      case final IdACommandAdminGet c -> toWireCommandAdminGet(c);
+      case final IdACommandAdminGetByEmail c -> toWireCommandAdminGetByEmail(c);
+      case final IdACommandAdminPermissionGrant c ->
+        toWireCommandAdminPermissionGrant(c);
+      case final IdACommandAdminPermissionRevoke c ->
+        toWireCommandAdminPermissionRevoke(c);
+      case final IdACommandAdminSearchBegin c ->
+        toWireCommandAdminSearchBegin(c);
+      case final IdACommandAdminSearchByEmailBegin c ->
+        toWireCommandAdminSearchByEmailBegin(c);
+      case final IdACommandAdminSearchByEmailNext c ->
+        toWireCommandAdminSearchByEmailNext();
+      case final IdACommandAdminSearchByEmailPrevious c ->
+        toWireCommandAdminSearchByEmailPrevious();
+      case final IdACommandAdminSearchNext c -> toWireCommandAdminSearchNext();
+      case final IdACommandAdminSearchPrevious c ->
+        toWireCommandAdminSearchPrevious();
+      case final IdACommandAdminSelf c -> toWireCommandAdminSelf();
+      case final IdACommandAdminUpdateCredentials c ->
+        toWireCommandAdminUpdateCredentials(c);
+      case final IdACommandAdminUpdatePasswordExpiration c ->
+        toWireCommandAdminUpdatePasswordExpiration(c);
+      case final IdACommandAuditSearchBegin c ->
+        toWireCommandAuditSearchBegin(c);
+      case final IdACommandAuditSearchNext c -> toWireCommandAuditSearchNext();
+      case final IdACommandAuditSearchPrevious c ->
+        toWireCommandAuditSearchPrevious();
 
       /*
        * User commands.
        */
 
-    } else if (command instanceof final IdACommandUserBanCreate c) {
-      return toWireCommandUserBanCreate(c);
-    } else if (command instanceof final IdACommandUserBanDelete c) {
-      return toWireCommandUserBanDelete(c);
-    } else if (command instanceof final IdACommandUserBanGet c) {
-      return toWireCommandUserBanGet(c);
-    } else if (command instanceof final IdACommandUserCreate c) {
-      return toWireCommandUserCreate(c);
-    } else if (command instanceof final IdACommandUserDelete c) {
-      return toWireCommandUserDelete(c);
-    } else if (command instanceof final IdACommandUserEmailAdd c) {
-      return toWireCommandUserEmailAdd(c);
-    } else if (command instanceof final IdACommandUserEmailRemove c) {
-      return toWireCommandUserEmailRemove(c);
-    } else if (command instanceof final IdACommandUserGet c) {
-      return toWireCommandUserGet(c);
-    } else if (command instanceof final IdACommandUserGetByEmail c) {
-      return toWireCommandUserGetByEmail(c);
-    } else if (command instanceof final IdACommandUserSearchBegin c) {
-      return toWireCommandUserSearchBegin(c);
-    } else if (command instanceof final IdACommandUserSearchByEmailBegin c) {
-      return toWireCommandUserSearchByEmailBegin(c);
-    } else if (command instanceof final IdACommandUserSearchByEmailNext c) {
-      return toWireCommandUserSearchByEmailNext();
-    } else if (command instanceof final IdACommandUserSearchByEmailPrevious c) {
-      return toWireCommandUserSearchByEmailPrevious();
-    } else if (command instanceof final IdACommandUserSearchNext c) {
-      return toWireCommandUserSearchNext();
-    } else if (command instanceof final IdACommandUserSearchPrevious c) {
-      return toWireCommandUserSearchPrevious();
-    } else if (command instanceof final IdACommandUserUpdateCredentials c) {
-      return toWireCommandUserUpdateCredentials(c);
-    } else if (command instanceof final IdACommandUserLoginHistory c) {
-      return toWireCommandUserLoginHistory(c);
-    } else if (command instanceof final IdACommandUserUpdatePasswordExpiration c) {
-      return toWireCommandUserUpdatePasswordExpiration(c);
+      case final IdACommandUserBanCreate c -> toWireCommandUserBanCreate(c);
+      case final IdACommandUserBanDelete c -> toWireCommandUserBanDelete(c);
+      case final IdACommandUserBanGet c -> toWireCommandUserBanGet(c);
+      case final IdACommandUserCreate c -> toWireCommandUserCreate(c);
+      case final IdACommandUserDelete c -> toWireCommandUserDelete(c);
+      case final IdACommandUserEmailAdd c -> toWireCommandUserEmailAdd(c);
+      case final IdACommandUserEmailRemove c -> toWireCommandUserEmailRemove(c);
+      case final IdACommandUserGet c -> toWireCommandUserGet(c);
+      case final IdACommandUserGetByEmail c -> toWireCommandUserGetByEmail(c);
+      case final IdACommandUserSearchBegin c -> toWireCommandUserSearchBegin(c);
+      case final IdACommandUserSearchByEmailBegin c ->
+        toWireCommandUserSearchByEmailBegin(c);
+      case final IdACommandUserSearchByEmailNext c ->
+        toWireCommandUserSearchByEmailNext();
+      case final IdACommandUserSearchByEmailPrevious c ->
+        toWireCommandUserSearchByEmailPrevious();
+      case final IdACommandUserSearchNext c -> toWireCommandUserSearchNext();
+      case final IdACommandUserSearchPrevious c ->
+        toWireCommandUserSearchPrevious();
+      case final IdACommandUserUpdateCredentials c ->
+        toWireCommandUserUpdateCredentials(c);
+      case final IdACommandUserLoginHistory c ->
+        toWireCommandUserLoginHistory(c);
+      case final IdACommandUserUpdatePasswordExpiration c ->
+        toWireCommandUserUpdatePasswordExpiration(c);
 
       /*
        * Other commands.
        */
 
-    } else if (command instanceof final IdACommandMailTest c) {
-      return toWireCommandMailTest(c);
-    } else if (command instanceof final IdACommandMaintenanceModeSet c) {
-      return toWireCommandMaintenanceModeSet(c);
-    }
-
-    throw new IdProtocolException(
-      "Unrecognized message: %s".formatted(command),
-      PROTOCOL_ERROR,
-      Map.of(),
-      Optional.empty()
-    );
+      case final IdACommandMailTest c -> toWireCommandMailTest(c);
+      case final IdACommandMaintenanceModeSet c ->
+        toWireCommandMaintenanceModeSet(c);
+    };
   }
 
   private static ProtocolIdAv1Type toWireCommandMaintenanceModeSet(
@@ -619,18 +566,14 @@ public final class IdACB1Validation
   private static IdA1PasswordExpirationSet toWirePasswordExpirationSet(
     final IdAPasswordExpirationSetType set)
   {
-    if (set instanceof IdAPasswordExpirationSetNever) {
-      return new IdA1PasswordExpirationSet.Never();
-    }
-    if (set instanceof IdAPasswordExpirationSetRefresh) {
-      return new IdA1PasswordExpirationSet.Refresh();
-    }
-    if (set instanceof final IdAPasswordExpirationSetSpecific s) {
-      return new IdA1PasswordExpirationSet.Specific(
-        new CBOffsetDateTime(s.time())
-      );
-    }
-    throw new IllegalStateException("Unrecognized set type: " + set);
+    return switch (set) {
+      case final IdAPasswordExpirationSetNever m ->
+        new IdA1PasswordExpirationSet.Never();
+      case final IdAPasswordExpirationSetRefresh m ->
+        new IdA1PasswordExpirationSet.Refresh();
+      case final IdAPasswordExpirationSetSpecific s ->
+        new IdA1PasswordExpirationSet.Specific(new CBOffsetDateTime(s.time()));
+    };
   }
 
   private static IdA1CommandUserLoginHistory toWireCommandUserLoginHistory(
@@ -699,20 +642,11 @@ public final class IdACB1Validation
 
   private static IdAResponseBlame fromWireBlame(
     final IdA1ResponseBlame blame)
-    throws IdProtocolException
   {
-    if (blame instanceof IdA1ResponseBlame.BlameClient) {
-      return IdAResponseBlame.BLAME_CLIENT;
-    }
-    if (blame instanceof IdA1ResponseBlame.BlameServer) {
-      return IdAResponseBlame.BLAME_SERVER;
-    }
-    throw new IdProtocolException(
-      "Unrecognized blame: %s".formatted(blame),
-      PROTOCOL_ERROR,
-      Map.of(),
-      Optional.empty()
-    );
+    return switch (blame) {
+      case final IdA1ResponseBlame.BlameClient m -> BLAME_CLIENT;
+      case final IdA1ResponseBlame.BlameServer m -> BLAME_SERVER;
+    };
   }
 
   private static IdAResponseLogin fromWireResponseLogin(
@@ -750,18 +684,10 @@ public final class IdACB1Validation
     final IdAMessageType message)
     throws IdProtocolException
   {
-    if (message instanceof final IdACommandType<?> command) {
-      return convertToWireCommand(command);
-    } else if (message instanceof final IdAResponseType response) {
-      return toWireResponse(response);
-    } else {
-      throw new IdProtocolException(
-        "Unrecognized message: %s".formatted(message),
-        PROTOCOL_ERROR,
-        Map.of(),
-        Optional.empty()
-      );
-    }
+    return switch (message) {
+      case final IdACommandType<?> command -> convertToWireCommand(command);
+      case final IdAResponseType response -> toWireResponse(response);
+    };
   }
 
   @Override
@@ -770,196 +696,170 @@ public final class IdACB1Validation
     throws IdProtocolException
   {
     try {
-      if (message instanceof final IdA1CommandLogin c) {
-        return fromWireCommandLogin(c);
-      } else if (message instanceof final IdA1ResponseLogin c) {
-        return fromWireResponseLogin(c);
-      } else if (message instanceof final IdA1ResponseError c) {
-        return fromWireResponseError(c);
+      return switch (message) {
+        case final IdA1CommandLogin c -> fromWireCommandLogin(c);
+        case final IdA1ResponseLogin c -> fromWireResponseLogin(c);
+        case final IdA1ResponseError c -> fromWireResponseError(c);
 
         /*
          * Admin commands.
          */
 
-      } else if (message instanceof final IdA1CommandAdminBanCreate c) {
-        return fromWireCommandAdminBanCreate(c);
-      } else if (message instanceof final IdA1CommandAdminBanDelete c) {
-        return fromWireCommandAdminBanDelete(c);
-      } else if (message instanceof final IdA1CommandAdminBanGet c) {
-        return fromWireCommandAdminBanGet(c);
-      } else if (message instanceof final IdA1CommandAdminCreate c) {
-        return fromWireCommandAdminCreate(c);
-      } else if (message instanceof final IdA1CommandAdminDelete c) {
-        return fromWireCommandAdminDelete(c);
-      } else if (message instanceof final IdA1CommandAdminEmailAdd c) {
-        return fromWireCommandAdminEmailAdd(c);
-      } else if (message instanceof final IdA1CommandAdminEmailRemove c) {
-        return fromWireCommandAdminEmailRemove(c);
-      } else if (message instanceof final IdA1CommandAdminGet c) {
-        return fromWireCommandAdminGet(c);
-      } else if (message instanceof final IdA1CommandAdminGetByEmail c) {
-        return fromWireCommandAdminGetByEmail(c);
-      } else if (message instanceof final IdA1CommandAdminPermissionGrant c) {
-        return fromWireCommandAdminPermissionGrant(c);
-      } else if (message instanceof final IdA1CommandAdminPermissionRevoke c) {
-        return fromWireCommandAdminPermissionRevoke(c);
-      } else if (message instanceof final IdA1CommandAdminSearchBegin c) {
-        return fromWireCommandAdminSearchBegin(c);
-      } else if (message instanceof final IdA1CommandAdminSearchByEmailBegin c) {
-        return fromWireCommandAdminSearchByEmailBegin(c);
-      } else if (message instanceof final IdA1CommandAdminSearchByEmailNext c) {
-        return fromWireCommandAdminSearchByEmailNext();
-      } else if (message instanceof final IdA1CommandAdminSearchByEmailPrevious c) {
-        return fromWireCommandAdminSearchByEmailPrevious();
-      } else if (message instanceof final IdA1CommandAdminSearchNext c) {
-        return fromWireCommandAdminSearchNext();
-      } else if (message instanceof final IdA1CommandAdminSearchPrevious c) {
-        return fromWireCommandAdminSearchPrevious();
-      } else if (message instanceof final IdA1CommandAdminSelf c) {
-        return fromWireCommandAdminSelf();
-      } else if (message instanceof final IdA1CommandAdminUpdateCredentials c) {
-        return fromWireCommandAdminUpdateCredentials(c);
-      } else if (message instanceof final IdA1CommandAdminUpdatePasswordExpiration c) {
-        return fromWireCommandAdminUpdatePasswordExpiration(c);
-      } else if (message instanceof final IdA1CommandAuditSearchBegin c) {
-        return fromWireCommandAuditSearchBegin(c);
-      } else if (message instanceof final IdA1CommandAuditSearchNext c) {
-        return fromWireCommandAuditSearchNext();
-      } else if (message instanceof final IdA1CommandAuditSearchPrevious c) {
-        return fromWireCommandAuditSearchPrevious();
+        case final IdA1CommandAdminBanCreate c ->
+          fromWireCommandAdminBanCreate(c);
+        case final IdA1CommandAdminBanDelete c ->
+          fromWireCommandAdminBanDelete(c);
+        case final IdA1CommandAdminBanGet c -> fromWireCommandAdminBanGet(c);
+        case final IdA1CommandAdminCreate c -> fromWireCommandAdminCreate(c);
+        case final IdA1CommandAdminDelete c -> fromWireCommandAdminDelete(c);
+        case final IdA1CommandAdminEmailAdd c ->
+          fromWireCommandAdminEmailAdd(c);
+        case final IdA1CommandAdminEmailRemove c ->
+          fromWireCommandAdminEmailRemove(c);
+        case final IdA1CommandAdminGet c -> fromWireCommandAdminGet(c);
+        case final IdA1CommandAdminGetByEmail c ->
+          fromWireCommandAdminGetByEmail(c);
+        case final IdA1CommandAdminPermissionGrant c ->
+          fromWireCommandAdminPermissionGrant(c);
+        case final IdA1CommandAdminPermissionRevoke c ->
+          fromWireCommandAdminPermissionRevoke(c);
+        case final IdA1CommandAdminSearchBegin c ->
+          fromWireCommandAdminSearchBegin(c);
+        case final IdA1CommandAdminSearchByEmailBegin c ->
+          fromWireCommandAdminSearchByEmailBegin(c);
+        case final IdA1CommandAdminSearchByEmailNext c ->
+          fromWireCommandAdminSearchByEmailNext();
+        case final IdA1CommandAdminSearchByEmailPrevious c ->
+          fromWireCommandAdminSearchByEmailPrevious();
+        case final IdA1CommandAdminSearchNext c ->
+          fromWireCommandAdminSearchNext();
+        case final IdA1CommandAdminSearchPrevious c ->
+          fromWireCommandAdminSearchPrevious();
+        case final IdA1CommandAdminSelf c -> fromWireCommandAdminSelf();
+        case final IdA1CommandAdminUpdateCredentials c ->
+          fromWireCommandAdminUpdateCredentials(c);
+        case final IdA1CommandAdminUpdatePasswordExpiration c ->
+          fromWireCommandAdminUpdatePasswordExpiration(c);
+        case final IdA1CommandAuditSearchBegin c ->
+          fromWireCommandAuditSearchBegin(c);
+        case final IdA1CommandAuditSearchNext c ->
+          fromWireCommandAuditSearchNext();
+        case final IdA1CommandAuditSearchPrevious c ->
+          fromWireCommandAuditSearchPrevious();
 
         /*
          * Admin responses.
          */
 
-      } else if (message instanceof final IdA1ResponseAdminBanCreate c) {
-        return fromWireResponseAdminBanCreate(c);
-      } else if (message instanceof final IdA1ResponseAdminBanDelete c) {
-        return fromWireResponseAdminBanDelete(c);
-      } else if (message instanceof final IdA1ResponseAdminBanGet c) {
-        return fromWireResponseAdminBanGet(c);
-      } else if (message instanceof final IdA1ResponseAdminCreate c) {
-        return fromWireResponseAdminCreate(c);
-      } else if (message instanceof final IdA1ResponseAdminDelete c) {
-        return fromWireResponseAdminDelete(c);
-      } else if (message instanceof final IdA1ResponseAdminGet c) {
-        return fromWireResponseAdminGet(c);
-      } else if (message instanceof final IdA1ResponseAdminSearchBegin c) {
-        return fromWireResponseAdminSearchBegin(c);
-      } else if (message instanceof final IdA1ResponseAdminSearchByEmailBegin c) {
-        return fromWireResponseAdminSearchByEmailBegin(c);
-      } else if (message instanceof final IdA1ResponseAdminSearchByEmailNext c) {
-        return fromWireResponseAdminSearchByEmailNext(c);
-      } else if (message instanceof final IdA1ResponseAdminSearchByEmailPrevious c) {
-        return fromWireResponseAdminSearchByEmailPrevious(c);
-      } else if (message instanceof final IdA1ResponseAdminSearchNext c) {
-        return fromWireResponseAdminSearchNext(c);
-      } else if (message instanceof final IdA1ResponseAdminSearchPrevious c) {
-        return fromWireResponseAdminSearchPrevious(c);
-      } else if (message instanceof final IdA1ResponseAdminSelf c) {
-        return fromWireResponseAdminSelf(c);
-      } else if (message instanceof final IdA1ResponseAdminUpdate c) {
-        return fromWireResponseAdminUpdate(c);
+        case final IdA1ResponseAdminBanCreate c ->
+          fromWireResponseAdminBanCreate(c);
+        case final IdA1ResponseAdminBanDelete c ->
+          fromWireResponseAdminBanDelete(c);
+        case final IdA1ResponseAdminBanGet c -> fromWireResponseAdminBanGet(c);
+        case final IdA1ResponseAdminCreate c -> fromWireResponseAdminCreate(c);
+        case final IdA1ResponseAdminDelete c -> fromWireResponseAdminDelete(c);
+        case final IdA1ResponseAdminGet c -> fromWireResponseAdminGet(c);
+        case final IdA1ResponseAdminSearchBegin c ->
+          fromWireResponseAdminSearchBegin(c);
+        case final IdA1ResponseAdminSearchByEmailBegin c ->
+          fromWireResponseAdminSearchByEmailBegin(c);
+        case final IdA1ResponseAdminSearchByEmailNext c ->
+          fromWireResponseAdminSearchByEmailNext(c);
+        case final IdA1ResponseAdminSearchByEmailPrevious c ->
+          fromWireResponseAdminSearchByEmailPrevious(c);
+        case final IdA1ResponseAdminSearchNext c ->
+          fromWireResponseAdminSearchNext(c);
+        case final IdA1ResponseAdminSearchPrevious c ->
+          fromWireResponseAdminSearchPrevious(c);
+        case final IdA1ResponseAdminSelf c -> fromWireResponseAdminSelf(c);
+        case final IdA1ResponseAdminUpdate c -> fromWireResponseAdminUpdate(c);
 
         /*
          * Audit responses.
          */
 
-      } else if (message instanceof final IdA1ResponseAuditSearchBegin c) {
-        return fromWireResponseAuditSearchBegin(c);
-      } else if (message instanceof final IdA1ResponseAuditSearchNext c) {
-        return fromWireResponseAuditSearchNext(c);
-      } else if (message instanceof final IdA1ResponseAuditSearchPrevious c) {
-        return fromWireResponseAuditSearchPrevious(c);
+        case final IdA1ResponseAuditSearchBegin c ->
+          fromWireResponseAuditSearchBegin(c);
+        case final IdA1ResponseAuditSearchNext c ->
+          fromWireResponseAuditSearchNext(c);
+        case final IdA1ResponseAuditSearchPrevious c ->
+          fromWireResponseAuditSearchPrevious(c);
 
         /*
          * User commands.
          */
 
-      } else if (message instanceof final IdA1CommandUserBanCreate c) {
-        return fromWireCommandUserBanCreate(c);
-      } else if (message instanceof final IdA1CommandUserBanDelete c) {
-        return fromWireCommandUserBanDelete(c);
-      } else if (message instanceof final IdA1CommandUserBanGet c) {
-        return fromWireCommandUserBanGet(c);
-      } else if (message instanceof final IdA1CommandUserCreate c) {
-        return fromWireCommandUserCreate(c);
-      } else if (message instanceof final IdA1CommandUserDelete c) {
-        return fromWireCommandUserDelete(c);
-      } else if (message instanceof final IdA1CommandUserEmailAdd c) {
-        return fromWireCommandUserEmailAdd(c);
-      } else if (message instanceof final IdA1CommandUserEmailRemove c) {
-        return fromWireCommandUserEmailRemove(c);
-      } else if (message instanceof final IdA1CommandUserGet c) {
-        return fromWireCommandUserGet(c);
-      } else if (message instanceof final IdA1CommandUserGetByEmail c) {
-        return fromWireCommandUserGetByEmail(c);
-      } else if (message instanceof final IdA1CommandUserSearchBegin c) {
-        return fromWireCommandUserSearchBegin(c);
-      } else if (message instanceof final IdA1CommandUserSearchByEmailBegin c) {
-        return fromWireCommandUserSearchByEmailBegin(c);
-      } else if (message instanceof final IdA1CommandUserSearchByEmailNext c) {
-        return fromWireCommandUserSearchByEmailNext();
-      } else if (message instanceof final IdA1CommandUserSearchByEmailPrevious c) {
-        return fromWireCommandUserSearchByEmailPrevious();
-      } else if (message instanceof final IdA1CommandUserSearchNext c) {
-        return fromWireCommandUserSearchNext();
-      } else if (message instanceof final IdA1CommandUserSearchPrevious c) {
-        return fromWireCommandUserSearchPrevious();
-      } else if (message instanceof final IdA1CommandUserUpdateCredentials c) {
-        return fromWireCommandUserUpdateCredentials(c);
-      } else if (message instanceof final IdA1CommandUserUpdatePasswordExpiration c) {
-        return fromWireCommandUserUpdatePasswordExpiration(c);
-      } else if (message instanceof final IdA1CommandUserLoginHistory c) {
-        return fromWireCommandUserLoginHistory(c);
+        case final IdA1CommandUserBanCreate c ->
+          fromWireCommandUserBanCreate(c);
+        case final IdA1CommandUserBanDelete c ->
+          fromWireCommandUserBanDelete(c);
+        case final IdA1CommandUserBanGet c -> fromWireCommandUserBanGet(c);
+        case final IdA1CommandUserCreate c -> fromWireCommandUserCreate(c);
+        case final IdA1CommandUserDelete c -> fromWireCommandUserDelete(c);
+        case final IdA1CommandUserEmailAdd c -> fromWireCommandUserEmailAdd(c);
+        case final IdA1CommandUserEmailRemove c ->
+          fromWireCommandUserEmailRemove(c);
+        case final IdA1CommandUserGet c -> fromWireCommandUserGet(c);
+        case final IdA1CommandUserGetByEmail c ->
+          fromWireCommandUserGetByEmail(c);
+        case final IdA1CommandUserSearchBegin c ->
+          fromWireCommandUserSearchBegin(c);
+        case final IdA1CommandUserSearchByEmailBegin c ->
+          fromWireCommandUserSearchByEmailBegin(c);
+        case final IdA1CommandUserSearchByEmailNext c ->
+          fromWireCommandUserSearchByEmailNext();
+        case final IdA1CommandUserSearchByEmailPrevious c ->
+          fromWireCommandUserSearchByEmailPrevious();
+        case final IdA1CommandUserSearchNext c ->
+          fromWireCommandUserSearchNext();
+        case final IdA1CommandUserSearchPrevious c ->
+          fromWireCommandUserSearchPrevious();
+        case final IdA1CommandUserUpdateCredentials c ->
+          fromWireCommandUserUpdateCredentials(c);
+        case final IdA1CommandUserUpdatePasswordExpiration c ->
+          fromWireCommandUserUpdatePasswordExpiration(c);
+        case final IdA1CommandUserLoginHistory c ->
+          fromWireCommandUserLoginHistory(c);
 
         /*
          * User responses.
          */
 
-      } else if (message instanceof final IdA1ResponseUserBanCreate c) {
-        return fromWireResponseUserBanCreate(c);
-      } else if (message instanceof final IdA1ResponseUserBanDelete c) {
-        return fromWireResponseUserBanDelete(c);
-      } else if (message instanceof final IdA1ResponseUserBanGet c) {
-        return fromWireResponseUserBanGet(c);
-      } else if (message instanceof final IdA1ResponseUserCreate c) {
-        return fromWireResponseUserCreate(c);
-      } else if (message instanceof final IdA1ResponseUserDelete c) {
-        return fromWireResponseUserDelete(c);
-      } else if (message instanceof final IdA1ResponseUserGet c) {
-        return fromWireResponseUserGet(c);
-      } else if (message instanceof final IdA1ResponseUserSearchBegin c) {
-        return fromWireResponseUserSearchBegin(c);
-      } else if (message instanceof final IdA1ResponseUserSearchByEmailBegin c) {
-        return fromWireResponseUserSearchByEmailBegin(c);
-      } else if (message instanceof final IdA1ResponseUserSearchByEmailNext c) {
-        return fromWireResponseUserSearchByEmailNext(c);
-      } else if (message instanceof final IdA1ResponseUserSearchByEmailPrevious c) {
-        return fromWireResponseUserSearchByEmailPrevious(c);
-      } else if (message instanceof final IdA1ResponseUserSearchNext c) {
-        return fromWireResponseUserSearchNext(c);
-      } else if (message instanceof final IdA1ResponseUserSearchPrevious c) {
-        return fromWireResponseUserSearchPrevious(c);
-      } else if (message instanceof final IdA1ResponseUserUpdate c) {
-        return fromWireResponseUserUpdate(c);
-      } else if (message instanceof final IdA1ResponseUserLoginHistory c) {
-        return fromWireResponseUserLoginHistory(c);
+        case final IdA1ResponseUserBanCreate c ->
+          fromWireResponseUserBanCreate(c);
+        case final IdA1ResponseUserBanDelete c ->
+          fromWireResponseUserBanDelete(c);
+        case final IdA1ResponseUserBanGet c -> fromWireResponseUserBanGet(c);
+        case final IdA1ResponseUserCreate c -> fromWireResponseUserCreate(c);
+        case final IdA1ResponseUserDelete c -> fromWireResponseUserDelete(c);
+        case final IdA1ResponseUserGet c -> fromWireResponseUserGet(c);
+        case final IdA1ResponseUserSearchBegin c ->
+          fromWireResponseUserSearchBegin(c);
+        case final IdA1ResponseUserSearchByEmailBegin c ->
+          fromWireResponseUserSearchByEmailBegin(c);
+        case final IdA1ResponseUserSearchByEmailNext c ->
+          fromWireResponseUserSearchByEmailNext(c);
+        case final IdA1ResponseUserSearchByEmailPrevious c ->
+          fromWireResponseUserSearchByEmailPrevious(c);
+        case final IdA1ResponseUserSearchNext c ->
+          fromWireResponseUserSearchNext(c);
+        case final IdA1ResponseUserSearchPrevious c ->
+          fromWireResponseUserSearchPrevious(c);
+        case final IdA1ResponseUserUpdate c -> fromWireResponseUserUpdate(c);
+        case final IdA1ResponseUserLoginHistory c ->
+          fromWireResponseUserLoginHistory(c);
 
         /*
          * Other commands/responses.
          */
 
-      } else if (message instanceof final IdA1ResponseMailTest c) {
-        return fromWireResponseMailTest(c);
-      } else if (message instanceof final IdA1CommandMailTest c) {
-        return fromWireCommandMailTest(c);
-      } else if (message instanceof final IdA1ResponseMaintenanceModeSet c) {
-        return fromWireResponseMaintenanceModeSet(c);
-      } else if (message instanceof final IdA1CommandMaintenanceModeSet c) {
-        return fromWireCommandMaintenanceModeSet(c);
-      }
-
+        case final IdA1ResponseMailTest c -> fromWireResponseMailTest(c);
+        case final IdA1CommandMailTest c -> fromWireCommandMailTest(c);
+        case final IdA1ResponseMaintenanceModeSet c ->
+          fromWireResponseMaintenanceModeSet(c);
+        case final IdA1CommandMaintenanceModeSet c ->
+          fromWireCommandMaintenanceModeSet(c);
+      };
     } catch (final Exception e) {
       throw new IdProtocolException(
         Objects.requireNonNullElse(
@@ -971,13 +871,6 @@ public final class IdACB1Validation
         Optional.empty()
       );
     }
-
-    throw new IdProtocolException(
-      "Unrecognized message: %s".formatted(message),
-      PROTOCOL_ERROR,
-      Map.of(),
-      Optional.empty()
-    );
   }
 
   private static IdAMessageType fromWireCommandMaintenanceModeSet(
@@ -1028,16 +921,14 @@ public final class IdACB1Validation
   private static IdAPasswordExpirationSetType fromWirePasswordExpirationSet(
     final IdA1PasswordExpirationSet set)
   {
-    if (set instanceof IdA1PasswordExpirationSet.Never) {
-      return new IdAPasswordExpirationSetNever();
-    }
-    if (set instanceof IdA1PasswordExpirationSet.Refresh) {
-      return new IdAPasswordExpirationSetRefresh();
-    }
-    if (set instanceof final IdA1PasswordExpirationSet.Specific s) {
-      return new IdAPasswordExpirationSetSpecific(s.fieldTime().value());
-    }
-    throw new IllegalStateException("Unrecognized set type: " + set);
+    return switch (set) {
+      case final IdA1PasswordExpirationSet.Never never ->
+        new IdAPasswordExpirationSetNever();
+      case final IdA1PasswordExpirationSet.Refresh refresh ->
+        new IdAPasswordExpirationSetRefresh();
+      case final IdA1PasswordExpirationSet.Specific s ->
+        new IdAPasswordExpirationSetSpecific(s.fieldTime().value());
+    };
   }
 
   private static IdAMessageType fromWireCommandUserUpdatePasswordExpiration(

@@ -31,10 +31,10 @@ module com.io7m.idstore.server.http
   requires io.opentelemetry.api;
   requires io.opentelemetry.context;
   requires io.opentelemetry.semconv;
-  requires jetty.servlet.api;
   requires org.eclipse.jetty.http;
-  requires org.eclipse.jetty.servlet;
+  requires org.eclipse.jetty.ee10.servlet;
   requires org.eclipse.jetty.util;
+  requires jakarta.servlet;
 
   exports com.io7m.idstore.server.http;
 }

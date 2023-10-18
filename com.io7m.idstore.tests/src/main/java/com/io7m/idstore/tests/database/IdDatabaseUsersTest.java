@@ -17,7 +17,7 @@
 package com.io7m.idstore.tests.database;
 
 import com.io7m.ervilla.api.EContainerSupervisorType;
-import com.io7m.ervilla.test_extension.ErvillaCloseAfterAll;
+import com.io7m.ervilla.test_extension.ErvillaCloseAfterSuite;
 import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.database.api.IdDatabaseConnectionType;
@@ -35,6 +35,7 @@ import com.io7m.idstore.model.IdUserSearchByEmailParameters;
 import com.io7m.idstore.model.IdUserSearchParameters;
 import com.io7m.idstore.model.IdUserSummary;
 import com.io7m.idstore.tests.IdTestUserSet;
+import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.idstore.tests.extensions.IdTestDatabases.ExpectedEvent;
 import com.io7m.zelador.test_extension.CloseableResourcesType;
@@ -67,7 +68,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith({ErvillaExtension.class, ZeladorExtension.class})
-@ErvillaConfiguration(disabledIfUnsupported = true)
+@ErvillaConfiguration(disabledIfUnsupported = true, projectName = "com.io7m.idstore")
 public final class IdDatabaseUsersTest
 {
   private static IdTestDatabases.IdDatabaseFixture DATABASE_FIXTURE;
@@ -77,11 +78,11 @@ public final class IdDatabaseUsersTest
 
   @BeforeAll
   public static void setupOnce(
-    final @ErvillaCloseAfterAll EContainerSupervisorType containers)
+    final @ErvillaCloseAfterSuite EContainerSupervisorType containers)
     throws Exception
   {
     DATABASE_FIXTURE =
-      IdTestDatabases.create(containers, 15432);
+      IdTestContainerInstances.database(containers);
   }
 
   @BeforeEach
@@ -1142,7 +1143,11 @@ public final class IdDatabaseUsersTest
       IdTestDatabases.createAdminInitial(this.transaction, "admin", "12345678");
 
     final var user =
-      IdTestDatabases.createUser(this.transaction, adminId, "someone", "12345678");
+      IdTestDatabases.createUser(
+        this.transaction,
+        adminId,
+        "someone",
+        "12345678");
 
     this.transaction.adminIdSet(adminId);
 
@@ -1182,7 +1187,11 @@ public final class IdDatabaseUsersTest
     final var adminId =
       IdTestDatabases.createAdminInitial(this.transaction, "admin", "12345678");
     final var user =
-      IdTestDatabases.createUser(this.transaction, adminId, "someone", "12345678");
+      IdTestDatabases.createUser(
+        this.transaction,
+        adminId,
+        "someone",
+        "12345678");
 
     this.transaction.adminIdSet(adminId);
 

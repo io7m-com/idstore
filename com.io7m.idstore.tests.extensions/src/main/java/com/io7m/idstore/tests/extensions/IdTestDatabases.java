@@ -122,23 +122,29 @@ public final class IdTestDatabases
     public void reset()
       throws IOException, InterruptedException
     {
-      this.container.executeAndWaitIndefinitely(
-        List.of(
-          "dropdb",
-          "-w",
-          "-U",
-          "idstore_install",
-          "idstore"
-        )
-      );
+      assertEquals(
+        0,
+        this.container.executeAndWaitIndefinitely(
+          List.of(
+            "dropdb",
+            "-w",
+            "-f",
+            "-U",
+            "idstore_install",
+            "idstore"
+          )
+        ));
 
-      this.container.executeAndWaitIndefinitely(
-        List.of(
-          "createdb",
-          "-w",
-          "-U",
-          "idstore_install",
-          "idstore"
+      assertEquals(
+        0,
+        this.container.executeAndWaitIndefinitely(
+          List.of(
+            "createdb",
+            "-w",
+            "-U",
+            "idstore_install",
+            "idstore"
+          )
         )
       );
     }

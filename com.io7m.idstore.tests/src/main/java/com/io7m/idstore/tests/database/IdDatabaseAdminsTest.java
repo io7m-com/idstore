@@ -18,7 +18,7 @@
 package com.io7m.idstore.tests.database;
 
 import com.io7m.ervilla.api.EContainerSupervisorType;
-import com.io7m.ervilla.test_extension.ErvillaCloseAfterAll;
+import com.io7m.ervilla.test_extension.ErvillaCloseAfterSuite;
 import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
@@ -37,6 +37,7 @@ import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdPage;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
+import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.idstore.tests.extensions.IdTestDatabases.ExpectedEvent;
 import com.io7m.zelador.test_extension.CloseableResourcesType;
@@ -72,7 +73,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith({ErvillaExtension.class, ZeladorExtension.class})
-@ErvillaConfiguration(disabledIfUnsupported = true)
+@ErvillaConfiguration(disabledIfUnsupported = true, projectName = "com.io7m.idstore")
 public final class IdDatabaseAdminsTest
 {
   private static IdTestDatabases.IdDatabaseFixture DATABASE_FIXTURE;
@@ -82,11 +83,11 @@ public final class IdDatabaseAdminsTest
 
   @BeforeAll
   public static void setupOnce(
-    final @ErvillaCloseAfterAll EContainerSupervisorType containers)
+    final @ErvillaCloseAfterSuite EContainerSupervisorType containers)
     throws Exception
   {
     DATABASE_FIXTURE =
-      IdTestDatabases.create(containers, 15432);
+      IdTestContainerInstances.database(containers);
   }
 
   @BeforeEach

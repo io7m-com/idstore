@@ -17,7 +17,7 @@
 package com.io7m.idstore.tests.shell;
 
 import com.io7m.ervilla.api.EContainerSupervisorType;
-import com.io7m.ervilla.test_extension.ErvillaCloseAfterAll;
+import com.io7m.ervilla.test_extension.ErvillaCloseAfterSuite;
 import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.model.IdEmail;
@@ -27,6 +27,7 @@ import com.io7m.idstore.server.api.IdServerException;
 import com.io7m.idstore.shell.admin.IdAShellConfiguration;
 import com.io7m.idstore.shell.admin.IdAShellType;
 import com.io7m.idstore.shell.admin.IdAShells;
+import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.idstore.tests.extensions.IdTestServers;
 import com.io7m.zelador.test_extension.CloseableResourcesType;
@@ -56,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Timeout(value = 10L)
 @ExtendWith({ErvillaExtension.class, ZeladorExtension.class})
-@ErvillaConfiguration(disabledIfUnsupported = true)
+@ErvillaConfiguration(disabledIfUnsupported = true, projectName = "com.io7m.idstore")
 public final class IdAShellIT
 {
   private static final Logger LOG =
@@ -74,11 +75,11 @@ public final class IdAShellIT
 
   @BeforeAll
   public static void setupOnce(
-    final @ErvillaCloseAfterAll EContainerSupervisorType containers)
+    final @ErvillaCloseAfterSuite EContainerSupervisorType containers)
     throws Exception
   {
     DATABASE_FIXTURE =
-      IdTestDatabases.create(containers, 15432);
+      IdTestContainerInstances.database(containers);
   }
 
   private UUID configureAdmin()
@@ -229,10 +230,10 @@ public final class IdAShellIT
     w.printf("login %s admin 1234%n", this.adminAPI());
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println("audit-search-begin");
     w.println("set --formatter PRETTY");
@@ -266,10 +267,10 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println("user-get --user 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("user-get-by-email --email fresh0@example.com");
@@ -331,10 +332,10 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println(
       "user-email-add --user 3a193a61-9427-4c24-8bd4-667d19914970 --email fresh1@example.com");
@@ -373,10 +374,10 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println("user-search-begin");
     w.println("user-search-next");
@@ -408,10 +409,10 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println("user-search-by-email-begin");
     w.println("user-search-by-email-next");
@@ -443,10 +444,10 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println("set --formatter RAW");
     w.println("user-login-history --user 3a193a61-9427-4c24-8bd4-667d19914970");
@@ -476,21 +477,21 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println("user-ban-create " +
-                "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
-                "--expires-on 2100-01-01T00:00:00+00:00 " +
-                "--reason REASON!");
+              "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
+              "--expires-on 2100-01-01T00:00:00+00:00 " +
+              "--reason REASON!");
     w.println("user-ban-get --user 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("user-ban-delete --user 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("user-ban-get --user 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("user-ban-create " +
-                "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
-                "--reason REASON!");
+              "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
+              "--reason REASON!");
     w.println("user-ban-get --user 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("logout");
     w.flush();
@@ -520,12 +521,12 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone " +
-        "--permission ADMIN_READ " +
-        "--permission AUDIT_READ "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone " +
+      "--permission ADMIN_READ " +
+      "--permission AUDIT_READ "
     );
     w.println("admin-get --admin 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("admin-get-by-email --email fresh0@example.com");
@@ -590,12 +591,12 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone " +
-        "--permission ADMIN_READ " +
-        "--permission AUDIT_READ "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone " +
+      "--permission ADMIN_READ " +
+      "--permission AUDIT_READ "
     );
     w.println(
       "admin-email-add --admin 3a193a61-9427-4c24-8bd4-667d19914970 --email fresh1@example.com");
@@ -634,12 +635,12 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone " +
-        "--permission ADMIN_READ " +
-        "--permission AUDIT_READ "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone " +
+      "--permission ADMIN_READ " +
+      "--permission AUDIT_READ "
     );
     w.println("admin-search-begin");
     w.println("admin-search-next");
@@ -671,12 +672,12 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone " +
-        "--permission ADMIN_READ " +
-        "--permission AUDIT_READ "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone " +
+      "--permission ADMIN_READ " +
+      "--permission AUDIT_READ "
     );
     w.println("admin-search-by-email-begin");
     w.println("admin-search-by-email-next");
@@ -708,21 +709,21 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println("admin-ban-create " +
-                "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
-                "--expires-on 2100-01-01T00:00:00+00:00 " +
-                "--reason REASON!");
+              "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
+              "--expires-on 2100-01-01T00:00:00+00:00 " +
+              "--reason REASON!");
     w.println("admin-ban-get --admin 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("admin-ban-delete --admin 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("admin-ban-get --admin 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("admin-ban-create " +
-                "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
-                "--reason REASON!");
+              "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
+              "--reason REASON!");
     w.println("admin-ban-get --admin 3a193a61-9427-4c24-8bd4-667d19914970");
     w.println("logout");
     w.flush();
@@ -768,17 +769,17 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone " +
-        "--permission ADMIN_READ " +
-        "--permission AUDIT_READ "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone " +
+      "--permission ADMIN_READ " +
+      "--permission AUDIT_READ "
     );
     w.println(
       "admin-update-password-expiration " +
-        "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--expires never");
+      "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires never");
     w.flush();
     w.close();
 
@@ -802,17 +803,17 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone " +
-        "--permission ADMIN_READ " +
-        "--permission AUDIT_READ "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone " +
+      "--permission ADMIN_READ " +
+      "--permission AUDIT_READ "
     );
     w.println(
       "admin-update-password-expiration " +
-        "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--expires default");
+      "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires default");
     w.flush();
     w.close();
 
@@ -836,17 +837,17 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "admin-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone " +
-        "--permission ADMIN_READ " +
-        "--permission AUDIT_READ "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone " +
+      "--permission ADMIN_READ " +
+      "--permission AUDIT_READ "
     );
     w.println(
       "admin-update-password-expiration " +
-        "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--expires 2100-01-01T00:00:00+00:00");
+      "--admin 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires 2100-01-01T00:00:00+00:00");
     w.flush();
     w.close();
 
@@ -871,15 +872,15 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println(
       "user-update-password-expiration " +
-        "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--expires never");
+      "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires never");
     w.flush();
     w.close();
 
@@ -903,15 +904,15 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println(
       "user-update-password-expiration " +
-        "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--expires default");
+      "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires default");
     w.flush();
     w.close();
 
@@ -935,15 +936,15 @@ public final class IdAShellIT
     w.println("self");
     w.println(
       "user-create --id 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--email fresh0@example.com " +
-        "--password 12345678 " +
-        "--real-name Real " +
-        "--name someone "
+      "--email fresh0@example.com " +
+      "--password 12345678 " +
+      "--real-name Real " +
+      "--name someone "
     );
     w.println(
       "user-update-password-expiration " +
-        "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
-        "--expires 2100-01-01T00:00:00+00:00");
+      "--user 3a193a61-9427-4c24-8bd4-667d19914970 " +
+      "--expires 2100-01-01T00:00:00+00:00");
     w.flush();
     w.close();
 
@@ -978,7 +979,7 @@ public final class IdAShellIT
     final var output = this.terminal.terminalProducedOutput();
     assertTrue(output.toString().contains(
       "Mail sent successfully.\n" +
-        "Token: 123456"));
+      "Token: 123456"));
   }
 
   @Test

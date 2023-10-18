@@ -17,7 +17,7 @@
 package com.io7m.idstore.tests.database;
 
 import com.io7m.ervilla.api.EContainerSupervisorType;
-import com.io7m.ervilla.test_extension.ErvillaCloseAfterAll;
+import com.io7m.ervilla.test_extension.ErvillaCloseAfterSuite;
 import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.database.api.IdDatabaseConnectionType;
@@ -37,7 +37,7 @@ import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith({ErvillaExtension.class, ZeladorExtension.class})
-@ErvillaConfiguration(disabledIfUnsupported = true)
+@ErvillaConfiguration(disabledIfUnsupported = true, projectName = "com.io7m.idstore")
 public final class IdDatabasePasswordsTest
 {
   private static IdTestDatabases.IdDatabaseFixture DATABASE_FIXTURE;
@@ -47,11 +47,11 @@ public final class IdDatabasePasswordsTest
 
   @BeforeAll
   public static void setupOnce(
-    final @ErvillaCloseAfterAll EContainerSupervisorType containers)
+    final @ErvillaCloseAfterSuite EContainerSupervisorType containers)
     throws Exception
   {
     DATABASE_FIXTURE =
-      IdTestDatabases.createWithHostilePasswords(containers, 15432);
+      IdTestDatabases.createWithHostilePasswords(containers, 15433);
   }
 
   @BeforeEach

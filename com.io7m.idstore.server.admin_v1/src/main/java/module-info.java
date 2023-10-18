@@ -44,9 +44,9 @@ module com.io7m.idstore.server.admin_v1
 
   requires com.io7m.verdant.core;
   requires io.opentelemetry.api;
+  requires org.eclipse.jetty.ee10.servlet;
   requires org.eclipse.jetty.http;
   requires org.eclipse.jetty.server;
-  requires org.eclipse.jetty.servlet;
   requires org.slf4j;
 
   exports com.io7m.idstore.server.admin_v1;

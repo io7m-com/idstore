@@ -61,10 +61,10 @@ open module com.io7m.idstore.tests
   requires freemarker;
   requires io.opentelemetry.api;
   requires jakarta.mail;
+  requires jakarta.servlet;
   requires java.net.http;
   requires java.sql;
   requires java.xml;
-  requires jetty.servlet.api;
   requires net.bytebuddy.agent;
   requires net.bytebuddy;
   requires net.jqwik.api;

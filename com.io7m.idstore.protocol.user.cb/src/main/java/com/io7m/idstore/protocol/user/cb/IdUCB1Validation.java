@@ -84,36 +84,22 @@ public final class IdUCB1Validation
 
   private static ProtocolIdUv1Type toWireResponse(
     final IdUResponseType response)
-    throws IdProtocolException
   {
-    if (response instanceof final IdUResponseError c) {
-      return toWireResponseError(c);
-    } else if (response instanceof final IdUResponseLogin c) {
-      return toWireResponseLogin(c);
-    } else if (response instanceof final IdUResponseUserSelf c) {
-      return toWireResponseUserSelf(c);
-    } else if (response instanceof final IdUResponseUserUpdate c) {
-      return toWireResponseUserUpdate(c);
-    } else if (response instanceof final IdUResponseEmailRemovePermit c) {
-      return toWireResponseEmailRemovePermit(c);
-    } else if (response instanceof final IdUResponseEmailRemoveDeny c) {
-      return toWireResponseEmailRemoveDeny(c);
-    } else if (response instanceof final IdUResponseEmailRemoveBegin c) {
-      return toWireResponseEmailRemoveBegin(c);
-    } else if (response instanceof final IdUResponseEmailAddPermit c) {
-      return toWireResponseEmailAddPermit(c);
-    } else if (response instanceof final IdUResponseEmailAddDeny c) {
-      return toWireResponseEmailAddDeny(c);
-    } else if (response instanceof final IdUResponseEmailAddBegin c) {
-      return toWireResponseEmailAddBegin(c);
-    }
-
-    throw new IdProtocolException(
-      "Unrecognized message: %s".formatted(response),
-      PROTOCOL_ERROR,
-      Map.of(),
-      Optional.empty()
-    );
+    return switch (response) {
+      case final IdUResponseError c -> toWireResponseError(c);
+      case final IdUResponseLogin c -> toWireResponseLogin(c);
+      case final IdUResponseUserSelf c -> toWireResponseUserSelf(c);
+      case final IdUResponseUserUpdate c -> toWireResponseUserUpdate(c);
+      case final IdUResponseEmailRemovePermit c ->
+        toWireResponseEmailRemovePermit(c);
+      case final IdUResponseEmailRemoveDeny c ->
+        toWireResponseEmailRemoveDeny(c);
+      case final IdUResponseEmailRemoveBegin c ->
+        toWireResponseEmailRemoveBegin(c);
+      case final IdUResponseEmailAddPermit c -> toWireResponseEmailAddPermit(c);
+      case final IdUResponseEmailAddDeny c -> toWireResponseEmailAddDeny(c);
+      case final IdUResponseEmailAddBegin c -> toWireResponseEmailAddBegin(c);
+    };
   }
 
   private static IdU1ResponseEmailRemovePermit toWireResponseEmailRemovePermit(
@@ -203,36 +189,21 @@ public final class IdUCB1Validation
 
   private static ProtocolIdUv1Type convertToWireCommand(
     final IdUCommandType<?> command)
-    throws IdProtocolException
   {
-    if (command instanceof final IdUCommandLogin c) {
-      return toWireCommandLogin(c);
-    } else if (command instanceof final IdUCommandUserSelf c) {
-      return toWireCommandUserSelf(c);
-    } else if (command instanceof final IdUCommandEmailAddBegin c) {
-      return toWireCommandEmailAddBegin(c);
-    } else if (command instanceof final IdUCommandEmailAddPermit c) {
-      return toWireCommandEmailAddPermit(c);
-    } else if (command instanceof final IdUCommandEmailAddDeny c) {
-      return toWireCommandEmailAddDeny(c);
-    } else if (command instanceof final IdUCommandEmailRemoveBegin c) {
-      return toWireCommandEmailRemoveBegin(c);
-    } else if (command instanceof final IdUCommandEmailRemovePermit c) {
-      return toWireCommandEmailRemovePermit(c);
-    } else if (command instanceof final IdUCommandEmailRemoveDeny c) {
-      return toWireCommandEmailRemoveDeny(c);
-    } else if (command instanceof final IdUCommandRealnameUpdate c) {
-      return toWireCommandRealnameUpdate(c);
-    } else if (command instanceof final IdUCommandPasswordUpdate c) {
-      return toWireCommandPasswordUpdate(c);
-    }
-
-    throw new IdProtocolException(
-      "Unrecognized message: %s".formatted(command),
-      PROTOCOL_ERROR,
-      Map.of(),
-      Optional.empty()
-    );
+    return switch (command) {
+      case final IdUCommandLogin c -> toWireCommandLogin(c);
+      case final IdUCommandUserSelf c -> toWireCommandUserSelf(c);
+      case final IdUCommandEmailAddBegin c -> toWireCommandEmailAddBegin(c);
+      case final IdUCommandEmailAddPermit c -> toWireCommandEmailAddPermit(c);
+      case final IdUCommandEmailAddDeny c -> toWireCommandEmailAddDeny(c);
+      case final IdUCommandEmailRemoveBegin c ->
+        toWireCommandEmailRemoveBegin(c);
+      case final IdUCommandEmailRemovePermit c ->
+        toWireCommandEmailRemovePermit(c);
+      case final IdUCommandEmailRemoveDeny c -> toWireCommandEmailRemoveDeny(c);
+      case final IdUCommandRealnameUpdate c -> toWireCommandRealnameUpdate(c);
+      case final IdUCommandPasswordUpdate c -> toWireCommandPasswordUpdate(c);
+    };
   }
 
   private static IdU1CommandRealnameUpdate toWireCommandRealnameUpdate(
@@ -331,20 +302,13 @@ public final class IdUCB1Validation
 
   private static IdUResponseBlame fromWireBlame(
     final IdU1ResponseBlame blame)
-    throws IdProtocolException
   {
-    if (blame instanceof IdU1ResponseBlame.BlameClient) {
-      return IdUResponseBlame.BLAME_CLIENT;
-    }
-    if (blame instanceof IdU1ResponseBlame.BlameServer) {
-      return IdUResponseBlame.BLAME_SERVER;
-    }
-    throw new IdProtocolException(
-      "Unrecognized blame: %s".formatted(blame),
-      PROTOCOL_ERROR,
-      Map.of(),
-      Optional.empty()
-    );
+    return switch (blame) {
+      case final IdU1ResponseBlame.BlameClient m ->
+        IdUResponseBlame.BLAME_CLIENT;
+      case final IdU1ResponseBlame.BlameServer m ->
+        IdUResponseBlame.BLAME_SERVER;
+    };
   }
 
   private static IdUResponseLogin fromWireResponseLogin(
@@ -382,18 +346,10 @@ public final class IdUCB1Validation
     final IdUMessageType message)
     throws IdProtocolException
   {
-    if (message instanceof final IdUCommandType<?> command) {
-      return convertToWireCommand(command);
-    } else if (message instanceof final IdUResponseType response) {
-      return toWireResponse(response);
-    } else {
-      throw new IdProtocolException(
-        "Unrecognized message: %s".formatted(message),
-        PROTOCOL_ERROR,
-        Map.of(),
-        Optional.empty()
-      );
-    }
+    return switch (message) {
+      case final IdUCommandType<?> command -> convertToWireCommand(command);
+      case final IdUResponseType response -> toWireResponse(response);
+    };
   }
 
   @Override
@@ -407,68 +363,58 @@ public final class IdUCB1Validation
        * Commands.
        */
 
-      if (message instanceof final IdU1CommandLogin c) {
-        return fromWireCommandLogin(c);
-      } else if (message instanceof final IdU1CommandEmailAddBegin c) {
-        return fromWireCommandEmailAddBegin(c);
-      } else if (message instanceof final IdU1CommandEmailAddPermit c) {
-        return fromWireCommandEmailAddPermit(c);
-      } else if (message instanceof final IdU1CommandEmailAddDeny c) {
-        return fromWireCommandEmailAddDeny(c);
-      } else if (message instanceof final IdU1CommandEmailRemoveBegin c) {
-        return fromWireCommandEmailRemoveBegin(c);
-      } else if (message instanceof final IdU1CommandEmailRemovePermit c) {
-        return fromWireCommandEmailRemovePermit(c);
-      } else if (message instanceof final IdU1CommandEmailRemoveDeny c) {
-        return fromWireCommandEmailRemoveDeny(c);
-      } else if (message instanceof final IdU1CommandUserSelf c) {
-        return fromWireCommandUserSelf(c);
-      } else if (message instanceof final IdU1CommandRealnameUpdate c) {
-        return fromWireCommandRealnameUpdate(c);
-      } else if (message instanceof final IdU1CommandPasswordUpdate c) {
-        return fromWireCommandPasswordUpdate(c);
+      return switch (message) {
+        case final IdU1CommandLogin c -> fromWireCommandLogin(c);
+        case final IdU1CommandEmailAddBegin c ->
+          fromWireCommandEmailAddBegin(c);
+        case final IdU1CommandEmailAddPermit c ->
+          fromWireCommandEmailAddPermit(c);
+        case final IdU1CommandEmailAddDeny c -> fromWireCommandEmailAddDeny(c);
+        case final IdU1CommandEmailRemoveBegin c ->
+          fromWireCommandEmailRemoveBegin(c);
+        case final IdU1CommandEmailRemovePermit c ->
+          fromWireCommandEmailRemovePermit(c);
+        case final IdU1CommandEmailRemoveDeny c ->
+          fromWireCommandEmailRemoveDeny(c);
+        case final IdU1CommandUserSelf c -> fromWireCommandUserSelf(c);
+        case final IdU1CommandRealnameUpdate c ->
+          fromWireCommandRealnameUpdate(c);
+        case final IdU1CommandPasswordUpdate c ->
+          fromWireCommandPasswordUpdate(c);
 
         /*
          * Responses.
          */
 
-      } else if (message instanceof final IdU1ResponseLogin c) {
-        return fromWireResponseLogin(c);
-      } else if (message instanceof final IdU1ResponseError c) {
-        return fromWireResponseError(c);
-      } else if (message instanceof final IdU1ResponseUserSelf c) {
-        return fromWireResponseUserSelf(c);
-      } else if (message instanceof final IdU1ResponseUserUpdate c) {
-        return fromWireResponseUserUpdate(c);
-      } else if (message instanceof final IdU1ResponseEmailAddBegin c) {
-        return fromWireResponseEmailAddBegin(c);
-      } else if (message instanceof final IdU1ResponseEmailAddPermit c) {
-        return fromWireResponseEmailAddPermit(c);
-      } else if (message instanceof final IdU1ResponseEmailAddDeny c) {
-        return fromWireResponseEmailAddDeny(c);
-      } else if (message instanceof final IdU1ResponseEmailRemoveBegin c) {
-        return fromWireResponseEmailRemoveBegin(c);
-      } else if (message instanceof final IdU1ResponseEmailRemovePermit c) {
-        return fromWireResponseEmailRemovePermit(c);
-      } else if (message instanceof final IdU1ResponseEmailRemoveDeny c) {
-        return fromWireResponseEmailRemoveDeny(c);
-      }
+        case final IdU1ResponseLogin c -> fromWireResponseLogin(c);
+        case final IdU1ResponseError c -> fromWireResponseError(c);
+        case final IdU1ResponseUserSelf c -> fromWireResponseUserSelf(c);
+        case final IdU1ResponseUserUpdate c -> fromWireResponseUserUpdate(c);
+        case final IdU1ResponseEmailAddBegin c ->
+          fromWireResponseEmailAddBegin(c);
+        case final IdU1ResponseEmailAddPermit c ->
+          fromWireResponseEmailAddPermit(c);
+        case final IdU1ResponseEmailAddDeny c ->
+          fromWireResponseEmailAddDeny(c);
+        case final IdU1ResponseEmailRemoveBegin c ->
+          fromWireResponseEmailRemoveBegin(c);
+        case final IdU1ResponseEmailRemovePermit c ->
+          fromWireResponseEmailRemovePermit(c);
+        case final IdU1ResponseEmailRemoveDeny c ->
+          fromWireResponseEmailRemoveDeny(c);
+      };
+
     } catch (final Exception e) {
       throw new IdProtocolException(
-        Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName()),
+        Objects.requireNonNullElse(
+          e.getMessage(),
+          e.getClass().getSimpleName()),
         e,
         PROTOCOL_ERROR,
         Map.of(),
         Optional.empty()
       );
     }
-
-    throw new IdProtocolException(
-      "Unrecognized message: %s".formatted(message),
-      PROTOCOL_ERROR,
-      Map.of(),
-      Optional.empty()
-    );
   }
 
   private static IdUCommandRealnameUpdate fromWireCommandRealnameUpdate(

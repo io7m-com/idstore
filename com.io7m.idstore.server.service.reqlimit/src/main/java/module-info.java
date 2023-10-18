@@ -26,7 +26,7 @@ module com.io7m.idstore.server.service.reqlimit
   requires transitive com.io7m.idstore.error_codes;
 
   requires com.io7m.repetoir.core;
-  requires jetty.servlet.api;
+  requires jakarta.servlet;
   requires org.apache.commons.io;
 
   exports com.io7m.idstore.server.service.reqlimit;

@@ -16,26 +16,23 @@
 
 package com.io7m.idstore.server.http;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.server.Dispatcher;
+import org.eclipse.jetty.ee10.servlet.Dispatcher;
+import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.handler.ErrorHandler;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.Callback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.util.Optional;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A simple error handler.
  */
 
-public final class IdPlainErrorHandler extends ErrorHandler
+public final class IdPlainErrorHandler implements Request.Handler
 {
   private static final Logger LOG =
     LoggerFactory.getLogger(IdPlainErrorHandler.class);
@@ -49,54 +46,58 @@ public final class IdPlainErrorHandler extends ErrorHandler
 
   }
 
-  private static void exceptionResponse(
-    final HttpServletResponse response,
-    final Throwable exception)
+  private static boolean exceptionResponse(
+    final Response response,
+    final Throwable exception,
+    final Callback callback)
     throws IOException
   {
-    LOG.error("exception: ", exception);
-    response.setContentType("text/plain");
+    LOG.error("Exception: ", exception);
 
-    try (var out = response.getOutputStream()) {
-      try (var w = new BufferedWriter(new OutputStreamWriter(out, UTF_8))) {
-        w.write("Internal server error.");
-        w.write('\r');
-        w.write('\n');
-      }
+    response.getHeaders()
+        .put("Content-Type", "text/plain");
+
+    try (var writer = new StringWriter()) {
+      writer.append("Internal server error.");
+      writer.append('\r');
+      writer.append('\n');
+      writer.flush();
+      Content.Sink.write(response, true, writer.toString(), callback);
     }
+    return true;
   }
 
   @Override
-  public void handle(
-    final String target,
-    final Request baseRequest,
-    final HttpServletRequest request,
-    final HttpServletResponse response)
-    throws IOException
+  public boolean handle(
+    final Request request,
+    final Response response,
+    final Callback callback)
+    throws Exception
   {
     final var exception =
-      (Throwable) baseRequest.getAttribute(Dispatcher.ERROR_EXCEPTION);
+      (Throwable) request.getAttribute(Dispatcher.ERROR_EXCEPTION);
     final var message =
-      (String) baseRequest.getAttribute(Dispatcher.ERROR_MESSAGE);
+      (String) request.getAttribute(Dispatcher.ERROR_MESSAGE);
     final var errorCode =
-      baseRequest.getAttribute(Dispatcher.ERROR_STATUS_CODE);
+      request.getAttribute(Dispatcher.ERROR_STATUS_CODE);
 
     if (exception != null) {
-      exceptionResponse(response, exception);
-      return;
+      return exceptionResponse(response, exception, callback);
     }
 
-    response.setContentType("text/plain");
+    response.getHeaders()
+      .put("Content-Type", "text/plain");
 
-    try (var out = response.getOutputStream()) {
-      try (var w = new BufferedWriter(new OutputStreamWriter(out, UTF_8))) {
-        w.write(errorCode.toString());
-        w.write(" ");
-        w.write(Optional.ofNullable(message).orElse(""));
-        w.write("\r");
-        w.write("\n");
-        w.flush();
-      }
+    try (var writer = new StringWriter()) {
+      writer.append(errorCode.toString());
+      writer.append(' ');
+      writer.write(Optional.ofNullable(message).orElse(""));
+      writer.append('\r');
+      writer.append('\n');
+      writer.flush();
+      Content.Sink.write(response, true, writer.toString(), callback);
     }
+
+    return true;
   }
 }

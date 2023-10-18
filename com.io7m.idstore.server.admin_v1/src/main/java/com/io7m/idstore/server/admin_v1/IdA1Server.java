@@ -25,16 +25,16 @@ import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
+import org.eclipse.jetty.ee10.servlet.FilterHolder;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.SessionHandler;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration.ConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
-import org.eclipse.jetty.server.session.DefaultSessionCache;
-import org.eclipse.jetty.server.session.DefaultSessionIdManager;
-import org.eclipse.jetty.server.session.NullSessionDataStore;
-import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.session.DefaultSessionCache;
+import org.eclipse.jetty.session.DefaultSessionIdManager;
+import org.eclipse.jetty.session.NullSessionDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +42,7 @@ import java.net.InetSocketAddress;
 import java.util.EnumSet;
 
 import static jakarta.servlet.DispatcherType.REQUEST;
+
 
 /**
  * The Admin API v1 server.
@@ -130,8 +131,10 @@ public final class IdA1Server
      * that can survive server restarts.
      */
 
-    final var sessionIds = new DefaultSessionIdManager(server);
-    server.setSessionIdManager(sessionIds);
+    final var sessionIds =
+      new DefaultSessionIdManager(server);
+
+    server.addBean(sessionIds);
 
     final var sessionHandler = new SessionHandler();
     sessionHandler.setSessionCookie("IDSTORE_ADMIN_API_SESSION");

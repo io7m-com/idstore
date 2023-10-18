@@ -618,7 +618,7 @@ public final class IdACB1ValidationAdmin
     final CBOptionType<IdA1Admin> fieldAdmin)
     throws IdProtocolException, IdPasswordException
   {
-    if (fieldAdmin instanceof CBSome<IdA1Admin> some) {
+    if (fieldAdmin instanceof final CBSome<IdA1Admin> some) {
       return Optional.of(fromWireAdmin(some.value()));
     }
     return Optional.empty();
@@ -925,49 +925,39 @@ public final class IdACB1ValidationAdmin
   private static IdAdminPermission fromWireAdminPermission(
     final IdA1AdminPermission p)
   {
-    if (p instanceof AdminDelete) {
-      return IdAdminPermission.ADMIN_DELETE;
-    } else if (p instanceof AdminRead) {
-      return IdAdminPermission.ADMIN_READ;
-    } else if (p instanceof AdminBan) {
-      return IdAdminPermission.ADMIN_BAN;
-    } else if (p instanceof AdminCreate) {
-      return IdAdminPermission.ADMIN_CREATE;
-    } else if (p instanceof AdminWritePermissionsSelf) {
-      return IdAdminPermission.ADMIN_WRITE_PERMISSIONS_SELF;
-    } else if (p instanceof AdminWritePermissions) {
-      return IdAdminPermission.ADMIN_WRITE_PERMISSIONS;
-    } else if (p instanceof AdminWriteEmail) {
-      return IdAdminPermission.ADMIN_WRITE_EMAIL;
-    } else if (p instanceof AdminWriteEmailSelf) {
-      return IdAdminPermission.ADMIN_WRITE_EMAIL_SELF;
-    } else if (p instanceof AdminWriteCredentials) {
-      return IdAdminPermission.ADMIN_WRITE_CREDENTIALS;
-    } else if (p instanceof AdminWriteCredentialsSelf) {
-      return IdAdminPermission.ADMIN_WRITE_CREDENTIALS_SELF;
-    } else if (p instanceof UserBan) {
-      return IdAdminPermission.USER_BAN;
-    } else if (p instanceof UserCreate) {
-      return IdAdminPermission.USER_CREATE;
-    } else if (p instanceof UserDelete) {
-      return IdAdminPermission.USER_DELETE;
-    } else if (p instanceof UserRead) {
-      return IdAdminPermission.USER_READ;
-    } else if (p instanceof UserWriteCredentials) {
-      return IdAdminPermission.USER_WRITE_CREDENTIALS;
-    } else if (p instanceof UserWriteEmail) {
-      return IdAdminPermission.USER_WRITE_EMAIL;
-    } else if (p instanceof AuditRead) {
-      return IdAdminPermission.AUDIT_READ;
-    } else if (p instanceof MailTest) {
-      return IdAdminPermission.MAIL_TEST;
-    } else if (p instanceof MaintenanceMode) {
-      return IdAdminPermission.MAINTENANCE_MODE;
-    } else {
-      throw new IllegalArgumentException(
+    return switch (p) {
+      case final AdminDelete adminDelete -> IdAdminPermission.ADMIN_DELETE;
+      case final AdminRead adminRead -> IdAdminPermission.ADMIN_READ;
+      case final AdminBan adminBan -> IdAdminPermission.ADMIN_BAN;
+      case final AdminCreate adminCreate -> IdAdminPermission.ADMIN_CREATE;
+      case final AdminWritePermissionsSelf adminWritePermissionsSelf ->
+        IdAdminPermission.ADMIN_WRITE_PERMISSIONS_SELF;
+      case final AdminWritePermissions adminWritePermissions ->
+        IdAdminPermission.ADMIN_WRITE_PERMISSIONS;
+      case final AdminWriteEmail adminWriteEmail ->
+        IdAdminPermission.ADMIN_WRITE_EMAIL;
+      case final AdminWriteEmailSelf adminWriteEmailSelf ->
+        IdAdminPermission.ADMIN_WRITE_EMAIL_SELF;
+      case final AdminWriteCredentials adminWriteCredentials ->
+        IdAdminPermission.ADMIN_WRITE_CREDENTIALS;
+      case final AdminWriteCredentialsSelf adminWriteCredentialsSelf ->
+        IdAdminPermission.ADMIN_WRITE_CREDENTIALS_SELF;
+      case final UserBan userBan -> IdAdminPermission.USER_BAN;
+      case final UserCreate userCreate -> IdAdminPermission.USER_CREATE;
+      case final UserDelete userDelete -> IdAdminPermission.USER_DELETE;
+      case final UserRead userRead -> IdAdminPermission.USER_READ;
+      case final UserWriteCredentials userWriteCredentials ->
+        IdAdminPermission.USER_WRITE_CREDENTIALS;
+      case final UserWriteEmail userWriteEmail ->
+        IdAdminPermission.USER_WRITE_EMAIL;
+      case final AuditRead auditRead -> IdAdminPermission.AUDIT_READ;
+      case final MailTest mailTest -> IdAdminPermission.MAIL_TEST;
+      case final MaintenanceMode maintenanceMode ->
+        IdAdminPermission.MAINTENANCE_MODE;
+      case null, default -> throw new IllegalArgumentException(
         "Unrecognized permission: %s".formatted(p)
       );
-    }
+    };
   }
 
   private static IdAdminSummary fromWireAdminSummary(
