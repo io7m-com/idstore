@@ -26,11 +26,11 @@ import com.io7m.idstore.protocol.user.IdUCommandEmailAddBegin;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCmdEmailAddBegin;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreAuthenticatedType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionMessage;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
@@ -40,14 +40,14 @@ import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jvindicator.core.Vindication;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreAuthenticated.withAuthentication;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreMaintenanceAware.withMaintenanceAwareness;
 import static com.io7m.idstore.strings.IdStringConstants.EMAIL_VERIFICATION_SENT;
 import static com.io7m.idstore.strings.IdStringConstants.EMAIL_VERIFICATION_TITLE;
 import static com.io7m.idstore.strings.IdStringConstants.ERROR;
@@ -56,7 +56,7 @@ import static com.io7m.idstore.strings.IdStringConstants.ERROR;
  * The page that executes the email addition.
  */
 
-public final class IdUVEmailAddRun extends IdHTTPServletFunctional
+public final class IdUVEmailAddRun extends IdHTTPHandlerFunctional
 {
   private static final String DESTINATION_ON_FAILURE = "/email-add";
   private static final String DESTINATION_ON_SUCCESS = "/";
@@ -73,7 +73,7 @@ public final class IdUVEmailAddRun extends IdHTTPServletFunctional
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var database =
@@ -86,7 +86,7 @@ public final class IdUVEmailAddRun extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
+    final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
       (request, information, session, user) -> {
         return execute(
           services,
@@ -109,7 +109,7 @@ public final class IdUVEmailAddRun extends IdHTTPServletFunctional
     return withInstrumentation(services, USER, maintenanceAware);
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final RPServiceDirectoryType services,
     final IdStrings strings,
     final IdDatabaseType database,
@@ -117,8 +117,8 @@ public final class IdUVEmailAddRun extends IdHTTPServletFunctional
     final IdFMTemplateType<IdFMMessageData> template,
     final IdSessionUser session,
     final IdUser user,
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
     final var vindicator =
       Vindication.startWithExceptions(IdValidityException::new);
@@ -126,7 +126,7 @@ public final class IdUVEmailAddRun extends IdHTTPServletFunctional
       vindicator.addRequiredParameter("email", IdEmail::new);
 
     try {
-      vindicator.check(request.getParameterMap());
+      vindicator.check(request.query().toMap());
     } catch (final IdValidityException e) {
       session.messageCurrentSet(
         new IdSessionMessage(

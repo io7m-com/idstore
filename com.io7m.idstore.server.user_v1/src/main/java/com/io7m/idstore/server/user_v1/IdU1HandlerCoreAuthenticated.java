@@ -22,23 +22,25 @@ import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreAuthenticatedType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
@@ -52,18 +54,18 @@ import static com.io7m.idstore.strings.IdStringConstants.UNAUTHORIZED;
  * A core that executes the given core under authentication.
  */
 
-public final class IdU1ServletCoreAuthenticated
-  implements IdHTTPServletFunctionalCoreType
+public final class IdU1HandlerCoreAuthenticated
+  implements IdHTTPHandlerFunctionalCoreType
 {
-  private final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> core;
+  private final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> core;
   private final IdDatabaseType database;
   private final IdSessionUserService userSessions;
   private final IdUCB1Messages messages;
   private final IdStrings strings;
 
-  private IdU1ServletCoreAuthenticated(
+  private IdU1HandlerCoreAuthenticated(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> inCore)
+    final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> inCore)
   {
     Objects.requireNonNull(services, "services");
 
@@ -86,24 +88,33 @@ public final class IdU1ServletCoreAuthenticated
    * @return A core that executes the given core under authentication
    */
 
-  public static IdHTTPServletFunctionalCoreType withAuthentication(
+  public static IdHTTPHandlerFunctionalCoreType withAuthentication(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> inCore)
+    final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> inCore)
   {
-    return new IdU1ServletCoreAuthenticated(services, inCore);
+    return new IdU1HandlerCoreAuthenticated(services, inCore);
   }
 
   @Override
-  public IdHTTPServletResponseType execute(
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+  public IdHTTPResponseType execute(
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
-    final var httpSession =
-      request.getSession(true);
-    final var userSessionId =
-      (IdSessionSecretIdentifier) httpSession.getAttribute("ID");
+    final var headers =
+      request.headers();
+    final var cookies =
+      headers.cookies();
+    final var cookie =
+      cookies.get("IDSTORE_USER_API_SESSION");
 
-    if (userSessionId == null) {
+    if (cookie == null) {
+      return this.notAuthenticated(information);
+    }
+
+    final IdSessionSecretIdentifier userSessionId;
+    try {
+      userSessionId = new IdSessionSecretIdentifier(cookie);
+    } catch (final IdValidityException e) {
       return this.notAuthenticated(information);
     }
 
@@ -137,11 +148,12 @@ public final class IdU1ServletCoreAuthenticated
     );
   }
 
-  private IdHTTPServletResponseType notAuthenticated(
-    final IdHTTPServletRequestInformation information)
+  private IdHTTPResponseType notAuthenticated(
+    final IdHTTPRequestInformation information)
   {
-    return new IdHTTPServletResponseFixedSize(
+    return new IdHTTPResponseFixedSize(
       401,
+      Set.of(),
       IdUCB1Messages.contentType(),
       this.messages.serialize(
         new IdUResponseError(

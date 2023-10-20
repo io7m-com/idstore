@@ -125,16 +125,16 @@
       <artifactId>com.io7m.verdant.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
+      <groupId>io.helidon.webserver</groupId>
+      <artifactId>helidon-webserver</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
+      <groupId>io.helidon.http</groupId>
+      <artifactId>helidon-http</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.toolchain</groupId>
-      <artifactId>jetty-jakarta-servlet-api</artifactId>
+      <groupId>io.helidon.common</groupId>
+      <artifactId>helidon-common-parameters</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

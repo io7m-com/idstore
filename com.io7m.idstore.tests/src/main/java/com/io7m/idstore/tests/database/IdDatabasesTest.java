@@ -17,7 +17,7 @@
 package com.io7m.idstore.tests.database;
 
 import com.io7m.ervilla.api.EContainerSupervisorType;
-import com.io7m.ervilla.test_extension.ErvillaCloseAfterAll;
+import com.io7m.ervilla.test_extension.ErvillaCloseAfterSuite;
 import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.database.api.IdDatabaseConfiguration;
@@ -28,6 +28,7 @@ import com.io7m.idstore.database.api.IdDatabaseUpgrade;
 import com.io7m.idstore.database.postgres.IdDatabases;
 import com.io7m.idstore.model.IdVersion;
 import com.io7m.idstore.strings.IdStrings;
+import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.zelador.test_extension.ZeladorExtension;
 import io.opentelemetry.api.OpenTelemetry;
@@ -47,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith({ErvillaExtension.class, ZeladorExtension.class})
-@ErvillaConfiguration(disabledIfUnsupported = true)
+@ErvillaConfiguration(disabledIfUnsupported = true, projectName = "com.io7m.idstore")
 public final class IdDatabasesTest
 {
   private static final Logger LOG =
@@ -61,11 +62,11 @@ public final class IdDatabasesTest
 
   @BeforeAll
   public static void setupOnce(
-    final @ErvillaCloseAfterAll EContainerSupervisorType supervisor)
+    final @ErvillaCloseAfterSuite EContainerSupervisorType supervisor)
     throws Exception
   {
     DATABASE_FIXTURE =
-      IdTestDatabases.create(supervisor, 15432);
+      IdTestContainerInstances.database(supervisor);
   }
 
   @BeforeEach

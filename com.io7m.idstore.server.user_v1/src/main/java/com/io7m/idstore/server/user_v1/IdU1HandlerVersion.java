@@ -19,22 +19,23 @@ package com.io7m.idstore.server.user_v1;
 
 import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.model.IdVersion;
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
 
 /**
  * A servlet for showing the server version.
  */
 
-public final class IdU1ServletVersion
-  extends IdHTTPServletFunctional
+public final class IdU1HandlerVersion
+  extends IdHTTPHandlerFunctional
 {
   /**
    * A servlet for showing the server version.
@@ -42,13 +43,13 @@ public final class IdU1ServletVersion
    * @param services The services
    */
 
-  public IdU1ServletVersion(
+  public IdU1HandlerVersion(
     final RPServiceDirectoryType services)
   {
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     return (request, information) -> {
@@ -62,7 +63,7 @@ public final class IdU1ServletVersion
     };
   }
 
-  private static IdHTTPServletResponseType execute()
+  private static IdHTTPResponseType execute()
   {
     final var text =
       String.format(
@@ -71,8 +72,9 @@ public final class IdU1ServletVersion
         IdVersion.MAIN_BUILD
       );
 
-    return new IdHTTPServletResponseFixedSize(
+    return new IdHTTPResponseFixedSize(
       200,
+      Set.of(),
       "text/plain",
       text.getBytes(StandardCharsets.UTF_8)
     );

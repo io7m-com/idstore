@@ -17,10 +17,10 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.templating.IdFMPasswordResetData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
@@ -32,16 +32,17 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreMaintenanceAware.withMaintenanceAwareness;
 
 /**
  * The page that displays a password reset form.
  */
 
-public final class IdUVPasswordReset extends IdHTTPServletFunctional
+public final class IdUVPasswordReset extends IdHTTPHandlerFunctional
 {
   /**
    * The page that displays a password reset form.
@@ -55,7 +56,7 @@ public final class IdUVPasswordReset extends IdHTTPServletFunctional
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var branding =
@@ -64,14 +65,14 @@ public final class IdUVPasswordReset extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pagePasswordResetTemplate();
 
-    final IdHTTPServletFunctionalCoreType main =
+    final IdHTTPHandlerFunctionalCoreType main =
       (request, information) -> execute(branding, template);
     final var maintenanceAware =
       withMaintenanceAwareness(services, main);
     return withInstrumentation(services, USER, maintenanceAware);
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMPasswordResetData> template)
   {
@@ -85,8 +86,9 @@ public final class IdUVPasswordReset extends IdHTTPServletFunctional
       );
 
       writer.flush();
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         200,
+        Set.of(),
         IdUVContentTypes.xhtml(),
         writer.toString().getBytes(StandardCharsets.UTF_8)
       );

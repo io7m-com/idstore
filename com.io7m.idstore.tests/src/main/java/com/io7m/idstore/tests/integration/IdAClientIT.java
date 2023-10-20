@@ -17,7 +17,7 @@
 package com.io7m.idstore.tests.integration;
 
 import com.io7m.ervilla.api.EContainerSupervisorType;
-import com.io7m.ervilla.test_extension.ErvillaCloseAfterAll;
+import com.io7m.ervilla.test_extension.ErvillaCloseAfterSuite;
 import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.admin_client.IdAClients;
@@ -48,6 +48,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
+import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.idstore.tests.extensions.IdTestServers;
 import com.io7m.quixote.core.QWebServerType;
@@ -91,7 +92,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("integration")
 @Tag("admin-client")
 @ExtendWith({ErvillaExtension.class, ZeladorExtension.class})
-@ErvillaConfiguration(disabledIfUnsupported = true)
+@ErvillaConfiguration(disabledIfUnsupported = true, projectName = "com.io7m.idstore")
 public final class IdAClientIT
 {
   private static final Set<IdErrorCode> ALLOWED_SMOKE_CODES =
@@ -152,10 +153,10 @@ public final class IdAClientIT
 
   @BeforeAll
   public static void setupOnce(
-    final @ErvillaCloseAfterAll EContainerSupervisorType containers)
+    final @ErvillaCloseAfterSuite EContainerSupervisorType containers)
     throws Exception
   {
-    DATABASE_FIXTURE = IdTestDatabases.create(containers, 15432);
+    DATABASE_FIXTURE = IdTestContainerInstances.database(containers);
   }
 
   @BeforeEach

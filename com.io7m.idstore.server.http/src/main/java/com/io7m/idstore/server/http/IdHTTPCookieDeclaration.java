@@ -17,33 +17,34 @@
 
 package com.io7m.idstore.server.http;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.time.Duration;
+import java.util.Objects;
 
 /**
- * An authenticated functional servlet core. Consumes a request (and request
- * information) and returns a response.
+ * A cookie declaration.
  *
- * @param <S> The type of sessions
- * @param <U> The type of users
+ * @param name     The cookie name
+ * @param value    The cookie value
+ * @param validity The duration for which the cookie is valid
  */
 
-public interface IdHTTPServletFunctionalCoreAuthenticatedType<S, U>
+public record IdHTTPCookieDeclaration(
+  String name,
+  String value,
+  Duration validity)
 {
   /**
-   * Execute the core after authenticating.
+   * A cookie declaration.
    *
-   * @param request     The request
-   * @param information The request information
-   * @param session     The session
-   * @param user        The user
-   *
-   * @return The response
+   * @param name     The cookie name
+   * @param value    The cookie value
+   * @param validity The duration for which the cookie is valid
    */
 
-  IdHTTPServletResponseType executeAuthenticated(
-    HttpServletRequest request,
-    IdHTTPServletRequestInformation information,
-    S session,
-    U user
-  );
+  public IdHTTPCookieDeclaration
+  {
+    Objects.requireNonNull(name, "name");
+    Objects.requireNonNull(value, "value");
+    Objects.requireNonNull(validity, "validity");
+  }
 }

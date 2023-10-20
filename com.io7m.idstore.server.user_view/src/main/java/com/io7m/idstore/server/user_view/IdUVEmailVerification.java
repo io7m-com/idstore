@@ -17,9 +17,9 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
@@ -29,6 +29,7 @@ import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
+import java.util.Set;
 
 import static com.io7m.idstore.strings.IdStringConstants.EMAIL_VERIFICATION_SUCCESS;
 import static com.io7m.idstore.strings.IdStringConstants.EMAIL_VERIFICATION_SUCCESS_TITLE;
@@ -58,11 +59,11 @@ public final class IdUVEmailVerification
    * @return The formatted response
    */
 
-  static IdHTTPServletResponseType showSuccess(
+  static IdHTTPResponseType showSuccess(
     final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> msgTemplate,
-    final IdHTTPServletRequestInformation information)
+    final IdHTTPRequestInformation information)
   {
     try (var writer = new StringWriter()) {
       msgTemplate.process(
@@ -79,8 +80,9 @@ public final class IdUVEmailVerification
         writer
       );
       writer.flush();
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         200,
+        Set.of(),
         IdUVContentTypes.xhtml(),
         writer.toString().getBytes(UTF_8)
       );

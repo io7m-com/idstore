@@ -20,11 +20,12 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.database.api.IdDatabaseUsersQueriesType;
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.model.IdValidityException;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreAuthenticatedType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
@@ -36,14 +37,15 @@ import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import io.helidon.webserver.http.ServerRequest;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
@@ -54,10 +56,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * A core that executes the given core under authentication.
  */
 
-public final class IdUVServletCoreAuthenticated
-  implements IdHTTPServletFunctionalCoreType
+public final class IdUVHandlerCoreAuthenticated
+  implements IdHTTPHandlerFunctionalCoreType
 {
-  private final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> core;
+  private final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> core;
   private final IdDatabaseType database;
   private final IdSessionUserService userSessions;
   private final IdStrings strings;
@@ -65,9 +67,9 @@ public final class IdUVServletCoreAuthenticated
   private final IdServerBrandingServiceType branding;
   private final IdFMTemplateType<IdFMLoginData> loginTemplate;
 
-  private IdUVServletCoreAuthenticated(
+  private IdUVHandlerCoreAuthenticated(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> inCore)
+    final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> inCore)
   {
     Objects.requireNonNull(services, "services");
 
@@ -97,32 +99,46 @@ public final class IdUVServletCoreAuthenticated
    * @return A core that executes the given core under authentication
    */
 
-  public static IdHTTPServletFunctionalCoreType withAuthentication(
+  public static IdHTTPHandlerFunctionalCoreType withAuthentication(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> inCore)
+    final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> inCore)
   {
-    return new IdUVServletCoreAuthenticated(services, inCore);
+    return new IdUVHandlerCoreAuthenticated(services, inCore);
   }
 
   @Override
-  public IdHTTPServletResponseType execute(
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+  public IdHTTPResponseType execute(
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
-    final var httpSession =
-      request.getSession(true);
-    final var userSessionId =
-      (IdSessionSecretIdentifier) httpSession.getAttribute("ID");
+    final var headers =
+      request.headers();
+    final var cookies =
+      headers.cookies();
 
-    if (userSessionId == null) {
-      return this.notAuthenticated(httpSession);
+    final String cookie;
+    try {
+      cookie = cookies.get("IDSTORE_USER_VIEW_SESSION");
+    } catch (NoSuchElementException | UnsupportedOperationException e) {
+      return this.notAuthenticated();
+    }
+
+    if (cookie == null) {
+      return this.notAuthenticated();
+    }
+
+    final IdSessionSecretIdentifier userSessionId;
+    try {
+      userSessionId = new IdSessionSecretIdentifier(cookie);
+    } catch (final IdValidityException e) {
+      return this.notAuthenticated();
     }
 
     final var userSessionOpt =
       this.userSessions.findSession(userSessionId);
 
     if (userSessionOpt.isEmpty()) {
-      return this.notAuthenticated(httpSession);
+      return this.notAuthenticated();
     }
 
     final var userSession =
@@ -136,7 +152,7 @@ public final class IdUVServletCoreAuthenticated
     }
 
     if (userOpt.isEmpty()) {
-      return this.notAuthenticated(httpSession);
+      return this.notAuthenticated();
     }
 
     return this.core.executeAuthenticated(
@@ -147,8 +163,8 @@ public final class IdUVServletCoreAuthenticated
     );
   }
 
-  private IdHTTPServletResponseType errorOf(
-    final IdHTTPServletRequestInformation information,
+  private IdHTTPResponseType errorOf(
+    final IdHTTPRequestInformation information,
     final IdDatabaseException e)
   {
     try (var writer = new StringWriter()) {
@@ -165,8 +181,9 @@ public final class IdUVServletCoreAuthenticated
         ),
         writer
       );
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         500,
+        Set.of(),
         "application/xhtml+xml",
         writer.toString().getBytes(UTF_8)
       );
@@ -177,13 +194,12 @@ public final class IdUVServletCoreAuthenticated
     }
   }
 
-  private IdHTTPServletResponseType notAuthenticated(
-    final HttpSession session)
+  private IdHTTPResponseType notAuthenticated()
   {
     return IdUVLogin.showLoginForm(
       this.branding,
       this.loginTemplate,
-      session,
+      Optional.empty(),
       401
     );
   }

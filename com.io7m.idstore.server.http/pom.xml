@@ -54,22 +54,6 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.toolchain</groupId>
-      <artifactId>jetty-jakarta-servlet-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>io.opentelemetry</groupId>
       <artifactId>opentelemetry-semconv</artifactId>
     </dependency>
@@ -80,6 +64,22 @@
     <dependency>
       <groupId>io.opentelemetry</groupId>
       <artifactId>opentelemetry-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.helidon.common</groupId>
+      <artifactId>helidon-common-uri</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.helidon.common</groupId>
+      <artifactId>helidon-common-socket</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.helidon.http</groupId>
+      <artifactId>helidon-http</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.helidon.webserver</groupId>
+      <artifactId>helidon-webserver</artifactId>
     </dependency>
 
     <dependency>

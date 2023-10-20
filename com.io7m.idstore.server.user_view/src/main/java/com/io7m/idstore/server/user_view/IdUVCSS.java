@@ -17,28 +17,29 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A CSS servlet.
  */
 
-public final class IdUVCSS extends IdHTTPServletFunctional
+public final class IdUVCSS extends IdHTTPHandlerFunctional
 {
   private static final Pattern LEADING_SLASHES =
     Pattern.compile("^/+");
@@ -58,7 +59,7 @@ public final class IdUVCSS extends IdHTTPServletFunctional
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var branding =
@@ -73,50 +74,55 @@ public final class IdUVCSS extends IdHTTPServletFunctional
       throw new UncheckedIOException(e);
     }
 
-    final IdHTTPServletFunctionalCoreType main = (request, information) -> {
+    final IdHTTPHandlerFunctionalCoreType main = (request, information) -> {
       return execute(request, branding, resetCssData);
     };
 
     return withInstrumentation(services, USER, main);
   }
 
-  private static IdHTTPServletResponseType execute(
-    final HttpServletRequest request,
+  private static IdHTTPResponseType execute(
+    final ServerRequest request,
     final IdServerBrandingServiceType branding,
     final byte[] resetCssData)
   {
     final var path =
-      request.getPathInfo();
+      request.path()
+        .path();
     final var stripped =
       LEADING_SLASHES.matcher(path)
         .replaceFirst("");
 
-    if (Objects.equals(stripped, "reset.css")) {
-      return new IdHTTPServletResponseFixedSize(
+    if (Objects.equals(stripped, "css/reset.css")) {
+      return new IdHTTPResponseFixedSize(
         200,
+        Set.of(),
         "text/css; charset=utf-8",
         resetCssData
       );
     }
 
-    if (Objects.equals(stripped, "style.css")) {
-      return new IdHTTPServletResponseFixedSize(
+    if (Objects.equals(stripped, "css/style.css")) {
+      return new IdHTTPResponseFixedSize(
         200,
+        Set.of(),
         "text/css; charset=utf-8",
         branding.css().getBytes(UTF_8)
       );
     }
 
-    if (Objects.equals(stripped, "xbutton.css")) {
-      return new IdHTTPServletResponseFixedSize(
+    if (Objects.equals(stripped, "css/xbutton.css")) {
+      return new IdHTTPResponseFixedSize(
         200,
+        Set.of(),
         "text/css; charset=utf-8",
         branding.xButtonCSS().getBytes(UTF_8)
       );
     }
 
-    return new IdHTTPServletResponseFixedSize(
+    return new IdHTTPResponseFixedSize(
       404,
+      Set.of(),
       "text/plain",
       NOTHING
     );

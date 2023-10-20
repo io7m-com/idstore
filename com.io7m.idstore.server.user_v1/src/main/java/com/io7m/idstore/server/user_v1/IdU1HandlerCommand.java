@@ -29,42 +29,43 @@ import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
 import com.io7m.idstore.server.controller.user.IdUCommandExecutor;
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimitExceeded;
 import com.io7m.idstore.server.service.reqlimit.IdRequestLimits;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.model.IdUserDomain.USER;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_CLIENT;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
 import static com.io7m.idstore.server.user_v1.IdU1Errors.errorResponseOf;
-import static com.io7m.idstore.server.user_v1.IdU1ServletCoreAuthenticated.withAuthentication;
-import static com.io7m.idstore.server.user_v1.IdU1ServletCoreMaintenanceAware.withMaintenanceAwareness;
-import static com.io7m.idstore.server.user_v1.IdU1ServletCoreTransactional.withTransaction;
+import static com.io7m.idstore.server.user_v1.IdU1HandlerCoreAuthenticated.withAuthentication;
+import static com.io7m.idstore.server.user_v1.IdU1HandlerCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.server.user_v1.IdU1HandlerCoreTransactional.withTransaction;
 import static com.io7m.idstore.strings.IdStringConstants.COMMAND_NOT_HERE;
 
 /**
  * The v1 command servlet.
  */
 
-public final class IdU1ServletCommand extends IdHTTPServletFunctional
+public final class IdU1HandlerCommand extends IdHTTPHandlerFunctional
 {
   /**
    * The v1 command servlet.
@@ -72,13 +73,13 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
    * @param services The services
    */
 
-  public IdU1ServletCommand(
+  public IdU1HandlerCommand(
     final RPServiceDirectoryType services)
   {
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var limits =
@@ -114,10 +115,10 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
     return withInstrumentation(services, USER, maintenanceAware);
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final RPServiceDirectoryType services,
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information,
+    final ServerRequest request,
+    final IdHTTPRequestInformation information,
     final IdUCB1Messages messages,
     final IdServerTelemetryServiceType telemetry,
     final IdRequestLimits limits,
@@ -220,9 +221,9 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
     }
   }
 
-  private static IdHTTPServletResponseType executeCommand(
+  private static IdHTTPResponseType executeCommand(
     final RPServiceDirectoryType services,
-    final IdHTTPServletRequestInformation information,
+    final IdHTTPRequestInformation information,
     final IdUCB1Messages messages,
     final IdServerTelemetryServiceType telemetry,
     final IdSessionUser session,
@@ -255,19 +256,21 @@ public final class IdU1ServletCommand extends IdHTTPServletFunctional
 
     if (result instanceof final IdUResponseError error) {
       setSpanErrorCode(error.errorCode());
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         switch (error.blame()) {
           case BLAME_SERVER -> 500;
           case BLAME_CLIENT -> 400;
         },
+        Set.of(),
         IdUCB1Messages.contentType(),
         messages.serialize(error)
       );
     }
 
     commit(telemetry, transaction);
-    return new IdHTTPServletResponseFixedSize(
+    return new IdHTTPResponseFixedSize(
       200,
+      Set.of(),
       IdUCB1Messages.contentType(),
       messages.serialize(result)
     );

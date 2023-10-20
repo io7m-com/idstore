@@ -14,36 +14,33 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.server.http;
 
-import java.util.Objects;
-import java.util.UUID;
+import com.io7m.idstore.database.api.IdDatabaseTransactionType;
+import io.helidon.webserver.http.ServerRequest;
 
 /**
- * Information about a request.
- *
- * @param requestId     The unique request ID
- * @param userAgent     The user agent
- * @param remoteAddress The remote address
+ * A transactional functional handler core. Consumes a request (and request
+ * information) and returns a response.
  */
 
-public record IdHTTPServletRequestInformation(
-  UUID requestId,
-  String userAgent,
-  String remoteAddress)
+public interface IdHTTPHandlerFunctionalCoreTransactionalType
 {
   /**
-   * Information about a request.
+   * Execute the core in a transaction. Automatically roll back the transaction
+   * if nothing explicitly commits it.
    *
-   * @param requestId     The unique request ID
-   * @param userAgent     The user agent
-   * @param remoteAddress The remote address
+   * @param request     The request
+   * @param transaction The transaction
+   * @param information The request information
+   *
+   * @return The response
    */
 
-  public IdHTTPServletRequestInformation
-  {
-    Objects.requireNonNull(requestId, "requestId");
-    Objects.requireNonNull(userAgent, "userAgent");
-    Objects.requireNonNull(remoteAddress, "remoteAddress");
-  }
+  IdHTTPResponseType executeTransactional(
+    ServerRequest request,
+    IdHTTPRequestInformation information,
+    IdDatabaseTransactionType transaction
+  );
 }

@@ -16,45 +16,34 @@
 
 package com.io7m.idstore.server.http;
 
-import jakarta.servlet.Servlet;
-import org.eclipse.jetty.servlet.ServletHolder;
-
 import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.UUID;
 
 /**
- * A servlet holder used to inject dependencies into servlets.
+ * Information about a request.
  *
- * @param <T> The type of servlet
+ * @param requestId     The unique request ID
+ * @param userAgent     The user agent
+ * @param remoteAddress The remote address
  */
 
-public final class IdServletHolder<T extends Servlet>
-  extends ServletHolder
+public record IdHTTPRequestInformation(
+  UUID requestId,
+  String userAgent,
+  String remoteAddress)
 {
-  private final Supplier<T> constructor;
-
   /**
-   * Construct a holder.
+   * Information about a request.
    *
-   * @param inClazz       The servlet class
-   * @param inConstructor A constructor function to produce servlet instances
+   * @param requestId     The unique request ID
+   * @param userAgent     The user agent
+   * @param remoteAddress The remote address
    */
 
-  public IdServletHolder(
-    final Class<T> inClazz,
-    final Supplier<T> inConstructor)
+  public IdHTTPRequestInformation
   {
-    final Class<T> clazz =
-      Objects.requireNonNull(inClazz, "clazz");
-    this.constructor =
-      Objects.requireNonNull(inConstructor, "constructor");
-
-    this.setHeldClass(clazz);
-  }
-
-  @Override
-  protected Servlet newInstance()
-  {
-    return this.constructor.get();
+    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(userAgent, "userAgent");
+    Objects.requireNonNull(remoteAddress, "remoteAddress");
   }
 }

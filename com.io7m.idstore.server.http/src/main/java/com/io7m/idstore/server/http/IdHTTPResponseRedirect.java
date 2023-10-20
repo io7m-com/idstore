@@ -16,40 +16,46 @@
 
 package com.io7m.idstore.server.http;
 
+import io.helidon.http.Status;
+
 import java.util.Objects;
 import java.util.OptionalLong;
+import java.util.Set;
 
 /**
- * A fixed size servlet response.
+ * A redirect response.
  *
- * @param statusCode  The status code
- * @param contentType The content type
- * @param data        The data
+ * @param cookies The cookies
+ * @param path    The path
  */
 
-public record IdHTTPServletResponseFixedSize(
-  int statusCode,
-  String contentType,
-  byte[] data)
-  implements IdHTTPServletResponseType
+public record IdHTTPResponseRedirect(
+  Set<IdHTTPCookieDeclaration> cookies,
+  String path)
+  implements IdHTTPResponseType
 {
   /**
-   * A fixed size servlet response.
+   * A redirect response.
    *
-   * @param statusCode  The status code
-   * @param contentType The content type
-   * @param data        The data
+   * @param cookies The cookies
+   * @param path    The path
    */
 
-  public IdHTTPServletResponseFixedSize
+  public IdHTTPResponseRedirect
   {
-    Objects.requireNonNull(contentType, "contentType");
-    Objects.requireNonNull(data, "data");
+    Objects.requireNonNull(cookies, "cookies");
+    Objects.requireNonNull(path, "path");
+  }
+
+  @Override
+  public int statusCode()
+  {
+    return Status.MOVED_PERMANENTLY_301.code();
   }
 
   @Override
   public OptionalLong contentLengthOptional()
   {
-    return OptionalLong.of(Integer.toUnsignedLong(this.data.length));
+    return OptionalLong.empty();
   }
 }

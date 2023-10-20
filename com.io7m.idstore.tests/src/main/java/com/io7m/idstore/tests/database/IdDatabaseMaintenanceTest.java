@@ -17,7 +17,7 @@
 package com.io7m.idstore.tests.database;
 
 import com.io7m.ervilla.api.EContainerSupervisorType;
-import com.io7m.ervilla.test_extension.ErvillaCloseAfterAll;
+import com.io7m.ervilla.test_extension.ErvillaCloseAfterSuite;
 import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.database.api.IdDatabaseConnectionType;
@@ -31,6 +31,7 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdEmailVerificationOperation;
 import com.io7m.idstore.model.IdToken;
+import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.zelador.test_extension.CloseableResourcesType;
 import com.io7m.zelador.test_extension.ZeladorExtension;
@@ -46,7 +47,7 @@ import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith({ErvillaExtension.class, ZeladorExtension.class})
-@ErvillaConfiguration(disabledIfUnsupported = true)
+@ErvillaConfiguration(disabledIfUnsupported = true, projectName = "com.io7m.idstore")
 public final class IdDatabaseMaintenanceTest
 {
   private static IdTestDatabases.IdDatabaseFixture DATABASE_FIXTURE;
@@ -56,11 +57,11 @@ public final class IdDatabaseMaintenanceTest
 
   @BeforeAll
   public static void setupOnce(
-    final @ErvillaCloseAfterAll EContainerSupervisorType containers)
+    final @ErvillaCloseAfterSuite EContainerSupervisorType containers)
     throws Exception
   {
     DATABASE_FIXTURE =
-      IdTestDatabases.create(containers, 15432);
+      IdTestContainerInstances.database(containers);
   }
 
   @BeforeEach
