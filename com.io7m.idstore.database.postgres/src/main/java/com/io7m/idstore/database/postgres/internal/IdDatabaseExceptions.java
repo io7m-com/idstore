@@ -125,7 +125,7 @@ public final class IdDatabaseExceptions
             Objects.requireNonNullElse(serverError.getConstraint(), "");
 
           yield switch (constraint) {
-            case "users_id_name_key" -> {
+            case "users_id_name_index" -> {
               yield new IdDatabaseException(
                 "User ID name already exists",
                 USER_DUPLICATE_ID_NAME,

@@ -311,6 +311,21 @@ public final class IdDatabaseUsersTest
         assertThrows(IdDatabaseException.class, () -> {
           users.userCreate(
             randomUUID(),
+            user.idName(),
+            new IdRealName("SOMEONE"),
+            new IdEmail("someone2@example.com"),
+            now,
+            password
+          );
+        });
+      assertEquals(USER_DUPLICATE_ID_NAME, ex.errorCode());
+    }
+
+    {
+      final var ex =
+        assertThrows(IdDatabaseException.class, () -> {
+          users.userCreate(
+            randomUUID(),
             new IdName("someone2"),
             new IdRealName("someoneElse"),
             new IdEmail("someone@example.com"),

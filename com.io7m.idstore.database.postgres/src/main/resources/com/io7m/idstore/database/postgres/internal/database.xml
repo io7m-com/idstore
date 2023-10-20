@@ -9,10 +9,10 @@
     </Comment>
 
     <Statement><![CDATA[
-drop role if exists idstore;
+DROP ROLE IF EXISTS idstore;
 ]]></Statement>
     <Statement><![CDATA[
-create role idstore with nosuperuser nocreatedb nocreaterole noinherit nologin;
+CREATE ROLE idstore with nosuperuser nocreatedb nocreaterole noinherit nologin;
 ]]></Statement>
 
     <Comment>
@@ -21,10 +21,10 @@ create role idstore with nosuperuser nocreatedb nocreaterole noinherit nologin;
     </Comment>
 
     <Statement><![CDATA[
-drop role if exists idstore_none;
+DROP ROLE IF EXISTS idstore_none;
 ]]></Statement>
     <Statement><![CDATA[
-create role idstore_none with nosuperuser nocreatedb nocreaterole noinherit nologin;
+CREATE ROLE idstore_none WITH nosuperuser nocreatedb nocreaterole noinherit nologin;
 ]]></Statement>
 
     <Comment>
@@ -35,13 +35,16 @@ create role idstore_none with nosuperuser nocreatedb nocreaterole noinherit nolo
     </Comment>
 
     <Statement><![CDATA[
-create table schema_version (
-  version_lock            char(1) not null default 'X',
-  version_application_id  text    not null,
-  version_number          bigint  not null,
+CREATE TABLE schema_version (
+  version_lock            CHAR(1) NOT NULL DEFAULT 'X',
+  version_application_id  TEXT    NOT NULL,
+  version_number          BIGINT  NOT NULL,
 
-  constraint check_lock_primary primary key (version_lock),
-  constraint check_lock_locked check (version_lock = 'X')
+  CONSTRAINT check_lock_primary
+    PRIMARY KEY (version_lock),
+
+  CONSTRAINT check_lock_locked
+    CHECK (version_lock = 'X')
 )
 ]]></Statement>
   </Schema>
@@ -52,69 +55,72 @@ create table schema_version (
     </Comment>
 
     <Statement><![CDATA[
-create table user_ids (
-  id uuid not null primary key
+CREATE TABLE user_ids (
+  id uuid NOT NULL PRIMARY KEY
 )
 ]]></Statement>
 
-    <Statement>grant select, insert on user_ids to idstore</Statement>
+    <Statement>GRANT SELECT, INSERT, DELETE ON user_ids TO idstore</Statement>
 
     <Comment>
       The admins table stores the current set of admins.
     </Comment>
 
     <Statement><![CDATA[
-create table admins (
-  id               uuid                     not null primary key,
-  id_name          varchar(1000000)         not null unique,
-  real_name        varchar(1000000)         not null,
-  time_created     timestamp with time zone not null,
-  time_updated     timestamp with time zone not null,
-  password_algo    varchar(1000000)         not null,
-  password_hash    varchar(1000000)         not null,
-  password_salt    varchar(1000000)         not null,
-  password_expires timestamp with time zone,
-  permissions      varchar(1000000)         not null,
-  deleting         boolean                  not null,
-  initial          boolean                  not null,
+CREATE TABLE admins (
+  id               uuid                     NOT NULL PRIMARY KEY,
+  id_name          VARCHAR(1000000)         NOT NULL UNIQUE,
+  real_name        VARCHAR(1000000)         NOT NULL,
+  time_created     TIMESTAMP WITH TIME ZONE NOT NULL,
+  time_updated     TIMESTAMP WITH TIME ZONE NOT NULL,
+  password_algo    VARCHAR(1000000)         NOT NULL,
+  password_hash    VARCHAR(1000000)         NOT NULL,
+  password_salt    VARCHAR(1000000)         NOT NULL,
+  password_expires TIMESTAMP WITH TIME ZONE,
+  permissions      VARCHAR(1000000)         NOT NULL,
+  deleting         BOOLEAN                  NOT NULL,
+  initial          BOOLEAN                  NOT NULL,
 
-  foreign key (id) references user_ids (id)
+  FOREIGN KEY (id) REFERENCES user_ids (id)
 )
 ]]></Statement>
 
-    <Statement>grant select, insert, update, delete on admins to idstore
+    <Statement>
+      GRANT SELECT, INSERT, UPDATE, DELETE ON admins TO idstore
     </Statement>
-    <Statement>grant select (id) on admins to idstore_none</Statement>
+    <Statement>
+      GRANT SELECT (id) ON admins TO idstore_none
+    </Statement>
 
     <Statement><![CDATA[
-create function admin_initial_check() returns trigger as $$
+CREATE FUNCTION admin_initial_check() RETURNS TRIGGER AS $$
   declare
     count integer;
   begin
-    if old.initial = false and new.initial = true then
-      select count(*) into count from admins a where a.initial = true;
-      if count >= 1 then
-        raise sqlstate 'ID002' using message = 'Only one admin can be the initial admin.';
-        return null;
-      end if;
-    end if;
+    IF old.initial = false and new.initial = true THEN
+      SELECT count(*) into count FROM admins a WHERE a.initial = true;
+      IF count >= 1 THEN
+        RAISE sqlstate 'ID002' USING message = 'Only one admin can be the initial admin.';
+        RETURN NULL;
+      END IF;
+    END IF;
     return old;
   end;
 $$ language plpgsql;
 ]]></Statement>
 
     <Statement><![CDATA[
-create trigger admin_initial_check_insert
-  before insert on admins
-    for each statement
-      execute function admin_initial_check();
+CREATE TRIGGER admin_initial_check_insert
+  BEFORE INSERT ON admins
+    FOR EACH STATEMENT
+      EXECUTE FUNCTION admin_initial_check();
 ]]></Statement>
 
     <Statement><![CDATA[
-create trigger admin_initial_check_update
-  before update on admins
-    for each statement
-      execute function admin_initial_check();
+CREATE TRIGGER admin_initial_check_update
+  BEFORE UPDATE ON admins
+    FOR EACH STATEMENT
+      EXECUTE FUNCTION admin_initial_check();
 ]]></Statement>
 
     <Comment>
@@ -122,25 +128,34 @@ create trigger admin_initial_check_update
     </Comment>
 
     <Statement><![CDATA[
-create table users (
-  id               uuid                     not null primary key,
-  id_name          varchar(1000000)         not null unique,
-  real_name        varchar(1000000)         not null,
-  time_created     timestamp with time zone not null,
-  time_updated     timestamp with time zone not null,
-  password_algo    varchar(1000000)         not null,
-  password_hash    varchar(1000000)         not null,
-  password_salt    varchar(1000000)         not null,
-  password_expires timestamp with time zone,
-  deleting         boolean                  not null,
+CREATE TABLE users (
+  id               uuid                     NOT NULL PRIMARY KEY,
+  id_name          VARCHAR(1000000)         NOT NULL,
+  real_name        VARCHAR(1000000)         NOT NULL,
+  time_created     TIMESTAMP WITH TIME ZONE NOT NULL,
+  time_updated     TIMESTAMP WITH TIME ZONE NOT NULL,
+  password_algo    VARCHAR(1000000)         NOT NULL,
+  password_hash    VARCHAR(1000000)         NOT NULL,
+  password_salt    VARCHAR(1000000)         NOT NULL,
+  password_expires TIMESTAMP WITH TIME ZONE,
+  deleting         BOOLEAN                  NOT NULL,
 
-  foreign key (id) references user_ids (id)
+  FOREIGN KEY (id) REFERENCES user_ids (id)
 )
 ]]></Statement>
 
-    <Statement>grant select, insert, update, delete on users to idstore
+    <Statement>
+      GRANT SELECT, INSERT, UPDATE, DELETE ON users TO idstore
     </Statement>
-    <Statement>grant select (id) on users to idstore_none</Statement>
+    <Statement>
+      GRANT SELECT (id) ON users TO idstore_none
+    </Statement>
+
+    <Statement><![CDATA[
+-- [jooq ignore start]
+CREATE UNIQUE INDEX users_id_name_index ON users (UPPER(id_name));
+-- [jooq ignore stop]
+]]></Statement>
 
     <Comment>
       The emails table stores the set of email addresses used by users/admins.
@@ -150,66 +165,66 @@ create table users (
     </Comment>
 
     <Statement><![CDATA[
-create table emails (
+CREATE TABLE emails (
   user_id         uuid,
   admin_id        uuid,
-  email_address   varchar(1000000) not null,
+  email_address   VARCHAR(1000000) NOT NULL,
 
-  constraint check_user_or_admin check (
-    (user_id is not null) or (admin_id is not null)
+  CONSTRAINT check_user_or_admin check (
+    (user_id IS NOT NULL) or (admin_id IS NOT NULL)
   ),
 
-  foreign key (user_id) references users (id),
-  foreign key (admin_id) references admins (id)
+  FOREIGN KEY (user_id) REFERENCES users (id),
+  FOREIGN KEY (admin_id) REFERENCES admins (id)
 )
 ]]></Statement>
 
-    <Statement>grant select, insert, delete on emails to idstore</Statement>
+    <Statement>GRANT SELECT, INSERT, DELETE ON emails TO idstore</Statement>
 
     <Statement><![CDATA[
 -- [jooq ignore start]
-create unique index emails_unique_lower_email_idx on emails (lower(email_address));
+CREATE UNIQUE INDEX emails_unique_lower_email_idx ON emails (lower(email_address));
 -- [jooq ignore stop]
 ]]></Statement>
 
     <Comment>
-      The email_check_delete trigger enforces the constraint that users must
+      The email_check_delete trigger enforces the CONSTRAINT that users must
       have at least one email address at any time.
     </Comment>
 
     <Statement><![CDATA[
-create function email_check_delete() returns trigger as $$
-  declare
-    user_id uuid;
-    admin_id uuid;
-    count integer;
-    deleting boolean;
-  begin
-    if old.user_id is null then
-      select a.deleting into deleting from admins a where a.id = old.admin_id;
-      select count(email_address) into count from emails e where e.admin_id = old.admin_id;
-      if count = 1 and (not deleting) then
-        raise sqlstate 'ID001' using message = 'Cannot remove the last email address for the admin';
-        return null;
-      end if;
+CREATE FUNCTION email_check_delete() RETURNS TRIGGER AS $$
+  DECLARE
+    user_id UUID;
+    admin_id UUID;
+    count INTEGER;
+    deleting BOOLEAN;
+  BEGIN
+    IF old.user_id IS NULL THEN
+      SELECT a.deleting INTO deleting FROM admins a WHERE a.id = old.admin_id;
+      SELECT count(email_address) INTO count FROM emails e WHERE e.admin_id = old.admin_id;
+      IF count = 1 and (not deleting) THEN
+        RAISE sqlstate 'ID001' USING message = 'Cannot remove the last email address for the admin';
+        RETURN NULL;
+      END IF;
     else
-      select u.deleting into deleting from users u where u.id = old.user_id;
-      select count(email_address) into count from emails e where e.user_id = old.user_id;
-      if count = 1 and (not deleting) then
-        raise sqlstate 'ID001' using message = 'Cannot remove the last email address for the user';
-        return null;
-      end if;
-    end if;
+      SELECT u.deleting INTO deleting FROM users u WHERE u.id = old.user_id;
+      SELECT count(email_address) INTO count FROM emails e WHERE e.user_id = old.user_id;
+      IF count = 1 and (not deleting) THEN
+        RAISE sqlstate 'ID001' USING message = 'Cannot remove the last email address for the user';
+        RETURN NULL;
+      END IF;
+    END IF;
     return old;
-  end;
-$$ language plpgsql;
+  END;
+$$ LANGUAGE PLPGSQL;
 ]]></Statement>
 
     <Statement><![CDATA[
-create trigger email_check_delete_trigger
-  before delete on emails
-    for each row
-      execute function email_check_delete();
+CREATE TRIGGER email_check_delete_trigger
+  BEFORE DELETE ON emails
+    FOR EACH ROW
+      EXECUTE FUNCTION email_check_delete();
 ]]></Statement>
 
     <Comment>
@@ -218,37 +233,36 @@ create trigger email_check_delete_trigger
     </Comment>
 
     <Statement><![CDATA[
-create table audit (
-  id             bigint                   not null primary key generated always as identity,
-  user_id        uuid                     not null,
-  time           timestamp with time zone not null,
-  type           varchar(1000000)         not null,
-  message        varchar(1000000)         not null,
+CREATE TABLE audit (
+  id             BIGINT                   NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+  user_id        UUID                     NOT NULL,
+  time           TIMESTAMP WITH TIME ZONE NOT NULL,
+  type           VARCHAR(1000000)         NOT NULL,
+  message        VARCHAR(1000000)         NOT NULL,
 
-  foreign key (user_id) references user_ids (id)
+  FOREIGN KEY (user_id) REFERENCES user_ids (id)
 )
 ]]></Statement>
 
-    <Statement>grant insert, select on audit to idstore</Statement>
+    <Statement>GRANT INSERT, SELECT ON audit TO idstore</Statement>
 
     <Comment>
       The login_history table stores a history of user/admin logins.
     </Comment>
 
     <Statement><![CDATA[
-create table login_history (
-  user_id        uuid                     not null,
-  time           timestamp with time zone not null,
-  host           varchar(1000000)         not null,
-  proxied_host   varchar(1000000)         not null,
-  agent          varchar(1000000)         not null,
+CREATE TABLE login_history (
+  user_id        UUID                     NOT NULL,
+  time           TIMESTAMP WITH TIME ZONE NOT NULL,
+  host           VARCHAR(1000000)         NOT NULL,
+  proxied_host   VARCHAR(1000000)         NOT NULL,
+  agent          VARCHAR(1000000)         NOT NULL,
 
-  foreign key (user_id) references user_ids (id)
+  FOREIGN KEY (user_id) REFERENCES user_ids (id)
 )
 ]]></Statement>
 
-    <Statement>grant insert, select, delete on login_history to idstore
-    </Statement>
+    <Statement>GRANT INSERT, SELECT, DELETE ON login_history TO idstore</Statement>
 
     <Comment>
       The email_verifications table records the email verification operations in
@@ -258,20 +272,20 @@ create table login_history (
     </Comment>
 
     <Statement><![CDATA[
-create table email_verifications (
-  user_id       uuid                      not null,
-  email         varchar(1000000)          not null,
-  token_permit  varchar(1000000)          not null unique,
-  token_deny    varchar(1000000)          not null unique,
-  expires       timestamp with time zone  not null,
-  operation     varchar(1000000)          not null,
+CREATE TABLE email_verifications (
+  user_id       UUID                      NOT NULL,
+  email         VARCHAR(1000000)          NOT NULL,
+  token_permit  VARCHAR(1000000)          NOT NULL unique,
+  token_deny    VARCHAR(1000000)          NOT NULL unique,
+  expires       TIMESTAMP WITH TIME ZONE  NOT NULL,
+  operation     VARCHAR(1000000)          NOT NULL,
 
-  foreign key (user_id) references user_ids (id),
-  constraint tokens_not_equal check (token_permit <> token_deny)
+  FOREIGN KEY (user_id) REFERENCES user_ids (id),
+  CONSTRAINT tokens_not_equal CHECK (token_permit <> token_deny)
 )
 ]]></Statement>
 
-    <Statement>grant insert, select, delete on email_verifications to idstore
+    <Statement>GRANT INSERT, SELECT, DELETE ON email_verifications TO idstore
     </Statement>
 
     <Comment>
@@ -280,16 +294,16 @@ create table email_verifications (
     </Comment>
 
     <Statement><![CDATA[
-create table bans (
-  user_id     uuid                      not null primary key,
-  reason      varchar(1000000)          not null,
-  expires     timestamp with time zone,
+CREATE TABLE bans (
+  user_id     UUID                      NOT NULL PRIMARY KEY,
+  reason      VARCHAR(1000000)          NOT NULL,
+  expires     TIMESTAMP WITH TIME ZONE,
 
-  foreign key (user_id) references user_ids (id)
+  FOREIGN KEY (user_id) REFERENCES user_ids (id)
 )
 ]]></Statement>
 
-    <Statement>grant insert, select, update, delete on bans to idstore
+    <Statement>GRANT INSERT, SELECT, UPDATE, DELETE ON bans TO idstore
     </Statement>
 
     <Comment>
@@ -299,16 +313,16 @@ create table bans (
     </Comment>
 
     <Statement><![CDATA[
-create table user_password_resets (
-  user_id     uuid                      not null,
-  token       varchar(1000000)          not null unique,
-  expires     timestamp with time zone  not null,
+CREATE TABLE user_password_resets (
+  user_id     UUID                      NOT NULL,
+  token       VARCHAR(1000000)          NOT NULL UNIQUE,
+  expires     TIMESTAMP WITH TIME ZONE  NOT NULL,
 
-  foreign key (user_id) references users (id)
+  FOREIGN KEY (user_id) REFERENCES users (id)
 )
 ]]></Statement>
 
-    <Statement>grant insert, select, delete on user_password_resets to idstore
+    <Statement>GRANT INSERT, SELECT, DELETE ON user_password_resets TO idstore
     </Statement>
   </Schema>
 
@@ -320,25 +334,40 @@ create table user_password_resets (
     </Comment>
 
     <Statement><![CDATA[
-drop role if exists idstore_read_only;
+DROP ROLE IF EXISTS idstore_read_only;
 ]]></Statement>
     <Statement><![CDATA[
-create role idstore_read_only with nosuperuser nocreatedb nocreaterole noinherit nologin;
+CREATE ROLE idstore_read_only WITH nosuperuser nocreatedb nocreaterole noinherit nologin;
 ]]></Statement>
 
-    <Statement>grant select on admins to idstore_read_only</Statement>
-    <Statement>grant select on audit to idstore_read_only</Statement>
-    <Statement>grant select on bans to idstore_read_only</Statement>
     <Statement>
-      grant select on email_verifications to idstore_read_only
+      GRANT SELECT ON admins TO idstore_read_only
     </Statement>
-    <Statement>grant select on emails to idstore_read_only</Statement>
-    <Statement>grant select on login_history to idstore_read_only</Statement>
-    <Statement>grant select on schema_version to idstore_read_only</Statement>
-    <Statement>grant select on user_ids to idstore_read_only</Statement>
     <Statement>
-      grant select on user_password_resets to idstore_read_only
+      GRANT SELECT ON audit TO idstore_read_only
     </Statement>
-    <Statement>grant select on users to idstore_read_only</Statement>
+    <Statement>
+      GRANT SELECT ON bans TO idstore_read_only
+    </Statement>
+    <Statement>
+      GRANT SELECT ON email_verifications TO idstore_read_only
+    </Statement>
+    <Statement>
+      GRANT SELECT ON emails TO idstore_read_only
+    </Statement>
+    <Statement>
+      GRANT SELECT ON login_history TO idstore_read_only
+    </Statement>
+    <Statement>
+      GRANT SELECT ON schema_version TO idstore_read_only
+    </Statement>
+    <Statement>
+      GRANT SELECT ON user_ids TO idstore_read_only
+    </Statement>
+    <Statement>
+      GRANT SELECT ON user_password_resets TO idstore_read_only
+    </Statement>
+    <Statement>GRANT SELECT ON users TO idstore_read_only
+    </Statement>
   </Schema>
 </Schemas>
