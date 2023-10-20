@@ -119,22 +119,6 @@
       <artifactId>com.io7m.repetoir.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.ee10</groupId>
-      <artifactId>jetty-ee10-servlet</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-session</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.io7m.verdant</groupId>
       <artifactId>com.io7m.verdant.core</artifactId>
     </dependency>
@@ -149,6 +133,18 @@
     <dependency>
       <groupId>io.opentelemetry</groupId>
       <artifactId>opentelemetry-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.helidon.http</groupId>
+      <artifactId>helidon-http</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.helidon.webserver</groupId>
+      <artifactId>helidon-webserver</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.helidon.common</groupId>
+      <artifactId>helidon-common-parameters</artifactId>
     </dependency>
 
     <dependency>

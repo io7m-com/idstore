@@ -18,29 +18,22 @@ package com.io7m.idstore.server.user_v1;
 
 import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.server.http.IdHTTPRequestTimeFilter;
-import com.io7m.idstore.server.http.IdPlainErrorHandler;
-import com.io7m.idstore.server.http.IdServletHolders;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import org.eclipse.jetty.ee10.servlet.FilterHolder;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.SessionHandler;
-import org.eclipse.jetty.server.ForwardedRequestCustomizer;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.gzip.GzipHandler;
-import org.eclipse.jetty.session.DefaultSessionCache;
-import org.eclipse.jetty.session.DefaultSessionIdManager;
-import org.eclipse.jetty.session.NullSessionDataStore;
+import io.helidon.webserver.WebServer;
+import io.helidon.webserver.WebServerConfig;
+import io.helidon.webserver.http.HttpRouting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.EnumSet;
+import java.util.Map;
 
-import static jakarta.servlet.DispatcherType.REQUEST;
+import static java.net.StandardSocketOptions.SO_REUSEADDR;
+import static java.net.StandardSocketOptions.SO_REUSEPORT;
 
 /**
  * A user API v1 server.
@@ -66,7 +59,7 @@ public final class IdU1Server
    * @throws Exception On errors
    */
 
-  public static Server createUserAPIServer(
+  public static WebServer createUserAPIServer(
     final RPServiceDirectoryType services)
     throws Exception
   {
@@ -82,134 +75,33 @@ public final class IdU1Server
         httpConfig.listenPort()
       );
 
-    final var server =
-      new Server(address);
-
-    /*
-     * Add a request customizer that properly handles headers such as
-     * X-Forwarded-For and so on. Without this, running the idstore server
-     * behind a reverse proxy would result in rate-limiting decisions being
-     * applied to the address of the proxy rather than the address of the
-     * client making the request.
-     */
-
-    for (final var connector : server.getConnectors()) {
-      for (final var factory : connector.getConnectionFactories()) {
-        if (factory instanceof final HttpConfiguration.ConnectionFactory http) {
-          http.getHttpConfiguration()
-            .addCustomizer(new ForwardedRequestCustomizer());
-        }
-      }
-    }
-
-    /*
-     * Configure all the servlets.
-     */
-
-    final var servlets =
-      createServletHolders(services);
-
-    /*
-     * Add a handler that tracks request/response time.
-     */
-
-    final var filterHolder =
-      new FilterHolder(
-        new IdHTTPRequestTimeFilter(
+    final var routing =
+      HttpRouting.builder()
+        .addFilter(new IdHTTPRequestTimeFilter(
           services.requireService(IdMetricsServiceType.class),
-          IdUserDomain.USER,
+          IdUserDomain.ADMIN,
           services.requireService(IdServerClock.class)
-        )
-      );
+        ))
+        .get("/", new IdU1HandlerVersions(services))
+        .post("/user/1/0/login", new IdU1HandlerLogin(services))
+        .post("/user/1/0/command", new IdU1HandlerCommand(services))
+        .get("/version", new IdU1HandlerVersion(services))
+        .get("/health", new IdU1HandlerHealth(services))
+        .build();
 
-    servlets.addFilter(filterHolder, "*", EnumSet.of(REQUEST));
+    final var webServer =
+      WebServerConfig.builder()
+        .port(httpConfig.listenPort())
+        .address(InetAddress.getByName(httpConfig.listenAddress()))
+        .listenerSocketOptions(Map.ofEntries(
+          Map.entry(SO_REUSEADDR, Boolean.TRUE),
+          Map.entry(SO_REUSEPORT, Boolean.TRUE)
+        ))
+        .routing(routing)
+        .build();
 
-    /*
-     * Set up a session handler that allows for Servlets to have sessions
-     * that can survive server restarts.
-     */
-
-    final var sessionIds =
-      new DefaultSessionIdManager(server);
-
-    final var sessionHandler = new SessionHandler();
-    sessionHandler.setSessionCookie("IDSTORE_USER_API_SESSION");
-    sessionHandler.setMaxInactiveInterval(
-      Math.toIntExact(
-        configuration.sessions()
-          .userSessionExpiration()
-          .toSeconds())
-    );
-
-    final var sessionCache = new DefaultSessionCache(sessionHandler);
-    sessionCache.setSessionDataStore(new NullSessionDataStore());
-
-    sessionHandler.setSessionCache(sessionCache);
-    sessionHandler.setSessionIdManager(sessionIds);
-    sessionHandler.setHandler(servlets);
-
-    /*
-     * Enable gzip.
-     */
-
-    final var gzip = new GzipHandler();
-    gzip.setHandler(sessionHandler);
-
-    server.setErrorHandler(new IdPlainErrorHandler());
-    server.setRequestLog((request, response) -> {
-
-    });
-    server.setHandler(gzip);
-    server.start();
-    LOG.info("[{}] User API server started", address);
-    return server;
-  }
-
-  private static ServletContextHandler createServletHolders(
-    final RPServiceDirectoryType services)
-  {
-    final var servletHolders =
-      new IdServletHolders(services);
-    final var servlets =
-      new ServletContextHandler();
-
-    createUserViewServerServlets(servletHolders, servlets);
-    return servlets;
-  }
-
-  private static void createUserViewServerServlets(
-    final IdServletHolders servletHolders,
-    final ServletContextHandler servlets)
-  {
-    servlets.addServlet(
-      servletHolders.create(
-        IdU1ServletVersions.class,
-        IdU1ServletVersions::new),
-      "/"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdU1ServletHealth.class,
-        IdU1ServletHealth::new),
-      "/health"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdU1ServletVersion.class,
-        IdU1ServletVersion::new),
-      "/version"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdU1ServletLogin.class,
-        IdU1ServletLogin::new),
-      "/user/1/0/login"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdU1ServletCommand.class,
-        IdU1ServletCommand::new),
-      "/user/1/0/command"
-    );
+    webServer.start();
+    LOG.info("[{}] Admin API server started", address);
+    return webServer;
   }
 }

@@ -19,12 +19,12 @@ package com.io7m.idstore.server.user_v1;
 import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreTransactionalType;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreTransactionalType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import java.util.Objects;
 
@@ -36,16 +36,16 @@ import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetrySer
  * A servlet core that executes the given core with a database transaction.
  */
 
-public final class IdU1ServletCoreTransactional
-  implements IdHTTPServletFunctionalCoreType
+public final class IdU1HandlerCoreTransactional
+  implements IdHTTPHandlerFunctionalCoreType
 {
-  private final IdHTTPServletFunctionalCoreTransactionalType core;
+  private final IdHTTPHandlerFunctionalCoreTransactionalType core;
   private final IdDatabaseType database;
   private final IdUCB1Messages messages;
 
-  private IdU1ServletCoreTransactional(
+  private IdU1HandlerCoreTransactional(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreTransactionalType inCore)
+    final IdHTTPHandlerFunctionalCoreTransactionalType inCore)
   {
     Objects.requireNonNull(services, "services");
 
@@ -65,17 +65,17 @@ public final class IdU1ServletCoreTransactional
    * transaction
    */
 
-  public static IdHTTPServletFunctionalCoreType withTransaction(
+  public static IdHTTPHandlerFunctionalCoreType withTransaction(
     final RPServiceDirectoryType inServices,
-    final IdHTTPServletFunctionalCoreTransactionalType inCore)
+    final IdHTTPHandlerFunctionalCoreTransactionalType inCore)
   {
-    return new IdU1ServletCoreTransactional(inServices, inCore);
+    return new IdU1HandlerCoreTransactional(inServices, inCore);
   }
 
   @Override
-  public IdHTTPServletResponseType execute(
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+  public IdHTTPResponseType execute(
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
     try (var connection = this.database.openConnection(IDSTORE)) {
       try (var transaction = connection.openTransaction()) {

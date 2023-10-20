@@ -20,13 +20,9 @@ package com.io7m.idstore.server.http;
 import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import io.helidon.webserver.http.RoutingRequest;
+import io.helidon.webserver.http.RoutingResponse;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
 
@@ -34,7 +30,7 @@ import java.util.Objects;
  * A filter that tracks request times.
  */
 
-public final class IdHTTPRequestTimeFilter implements Filter
+public final class IdHTTPRequestTimeFilter implements io.helidon.webserver.http.Filter
 {
   private final IdUserDomain domain;
   private final IdServerClock clock;
@@ -62,15 +58,21 @@ public final class IdHTTPRequestTimeFilter implements Filter
   }
 
   @Override
-  public void doFilter(
-    final ServletRequest request,
-    final ServletResponse response,
-    final FilterChain chain)
-    throws IOException, ServletException
+  public String toString()
+  {
+    return "[IdHTTPRequestTimeFilter 0x%s]"
+      .formatted(Long.toUnsignedString(this.hashCode(), 16));
+  }
+
+  @Override
+  public void filter(
+    final io.helidon.webserver.http.FilterChain chain,
+    final RoutingRequest req,
+    final RoutingResponse res)
   {
     final var timeThen = this.clock.nowPrecise();
     try {
-      chain.doFilter(request, response);
+      chain.proceed();
     } finally {
       final var timeNow = this.clock.nowPrecise();
       this.metrics.onHttpResponseTime(
@@ -78,12 +80,5 @@ public final class IdHTTPRequestTimeFilter implements Filter
         Duration.between(timeThen, timeNow)
       );
     }
-  }
-
-  @Override
-  public String toString()
-  {
-    return "[IdHTTPRequestTimeFilter 0x%s]"
-      .formatted(Long.toUnsignedString(this.hashCode(), 16));
   }
 }

@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.io7m.primogenitor</groupId>
     <artifactId>com.io7m.primogenitor.full</artifactId>
-    <version>8.0.0-SNAPSHOT</version>
+    <version>8.0.0</version>
   </parent>
 
   <groupId>com.io7m.idstore</groupId>
@@ -75,7 +75,7 @@
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jbssio.version>2.0.0</com.io7m.jbssio.version>
     <com.io7m.jqpage.version>0.0.3</com.io7m.jqpage.version>
-    <com.io7m.jvindicator.version>0.0.1</com.io7m.jvindicator.version>
+    <com.io7m.jvindicator.version>0.0.2</com.io7m.jvindicator.version>
     <com.io7m.jxtrand.version>2.0.0</com.io7m.jxtrand.version>
     <com.io7m.quarrel.version>1.3.0</com.io7m.quarrel.version>
     <com.io7m.quixote.version>1.0.0</com.io7m.quixote.version>
@@ -85,6 +85,7 @@
     <com.io7m.verdant.version>1.0.0</com.io7m.verdant.version>
     <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
     <com.io7m.zelador.version>0.0.1</com.io7m.zelador.version>
+    <helidon.version>4.0.0-RC1</helidon.version>
     <io7m.api.previousVersion>1.0.0-SNAPSHOT</io7m.api.previousVersion>
     <jetty.version>12.0.2</jetty.version>
     <jooq.version>3.18.7</jooq.version>
@@ -252,46 +253,13 @@
         <version>${com.io7m.jxtrand.version}</version>
       </dependency>
 
-      <!-- Jetty -->
+      <!-- Web server. -->
       <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-server</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty.ee10</groupId>
-        <artifactId>jetty-ee10-servlet</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-jmx</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-util</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-http</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-io</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-session</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>jakarta.servlet</groupId>
-        <artifactId>jakarta.servlet-api</artifactId>
-        <version>6.0.0</version>
+        <groupId>io.helidon</groupId>
+        <artifactId>helidon-bom</artifactId>
+        <type>pom</type>
+        <version>${helidon.version}</version>
+        <scope>import</scope>
       </dependency>
 
       <dependency>
@@ -443,7 +411,7 @@
       <dependency>
         <groupId>com.io7m.primogenitor</groupId>
         <artifactId>com.io7m.primogenitor.support</artifactId>
-        <version>8.0.0-beta0001</version>
+        <version>8.0.0</version>
       </dependency>
 
       <dependency>

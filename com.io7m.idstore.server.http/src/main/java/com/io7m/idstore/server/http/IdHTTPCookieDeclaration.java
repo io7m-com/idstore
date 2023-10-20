@@ -14,42 +14,37 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.server.http;
 
+import java.time.Duration;
 import java.util.Objects;
-import java.util.OptionalLong;
 
 /**
- * A fixed size servlet response.
+ * A cookie declaration.
  *
- * @param statusCode  The status code
- * @param contentType The content type
- * @param data        The data
+ * @param name     The cookie name
+ * @param value    The cookie value
+ * @param validity The duration for which the cookie is valid
  */
 
-public record IdHTTPServletResponseFixedSize(
-  int statusCode,
-  String contentType,
-  byte[] data)
-  implements IdHTTPServletResponseType
+public record IdHTTPCookieDeclaration(
+  String name,
+  String value,
+  Duration validity)
 {
   /**
-   * A fixed size servlet response.
+   * A cookie declaration.
    *
-   * @param statusCode  The status code
-   * @param contentType The content type
-   * @param data        The data
+   * @param name     The cookie name
+   * @param value    The cookie value
+   * @param validity The duration for which the cookie is valid
    */
 
-  public IdHTTPServletResponseFixedSize
+  public IdHTTPCookieDeclaration
   {
-    Objects.requireNonNull(contentType, "contentType");
-    Objects.requireNonNull(data, "data");
-  }
-
-  @Override
-  public OptionalLong contentLengthOptional()
-  {
-    return OptionalLong.of(Integer.toUnsignedLong(this.data.length));
+    Objects.requireNonNull(name, "name");
+    Objects.requireNonNull(value, "value");
+    Objects.requireNonNull(validity, "validity");
   }
 }

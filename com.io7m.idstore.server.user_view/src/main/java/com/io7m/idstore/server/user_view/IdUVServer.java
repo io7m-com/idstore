@@ -17,23 +17,24 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.http.IdPlainErrorHandler;
-import com.io7m.idstore.server.http.IdServletHolders;
+import com.io7m.idstore.model.IdUserDomain;
+import com.io7m.idstore.server.http.IdHTTPRequestTimeFilter;
+import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
+import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.SessionHandler;
-import org.eclipse.jetty.server.ForwardedRequestCustomizer;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.gzip.GzipHandler;
-import org.eclipse.jetty.session.DefaultSessionCache;
-import org.eclipse.jetty.session.DefaultSessionIdManager;
-import org.eclipse.jetty.session.NullSessionDataStore;
+import io.helidon.webserver.WebServer;
+import io.helidon.webserver.WebServerConfig;
+import io.helidon.webserver.http.HttpRouting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Map;
+
+import static java.net.StandardSocketOptions.SO_REUSEADDR;
+import static java.net.StandardSocketOptions.SO_REUSEPORT;
 
 /**
  * A user view server.
@@ -59,7 +60,7 @@ public final class IdUVServer
    * @throws Exception On errors
    */
 
-  public static Server createUserViewServer(
+  public static WebServer createUserViewServer(
     final RPServiceDirectoryType services)
     throws Exception
   {
@@ -75,315 +76,168 @@ public final class IdUVServer
         httpConfig.listenPort()
       );
 
-    final var server =
-      new Server(address);
+    final var routing =
+      createRouting(services);
 
-    /*
-     * Add a request customizer that properly handles headers such as
-     * X-Forwarded-For and so on. Without this, running the idstore server
-     * behind a reverse proxy would result in rate-limiting decisions being
-     * applied to the address of the proxy rather than the address of the
-     * client making the request.
-     */
+    final var webServer =
+      WebServerConfig.builder()
+        .port(httpConfig.listenPort())
+        .address(InetAddress.getByName(httpConfig.listenAddress()))
+        .routing(routing)
+        .listenerSocketOptions(Map.ofEntries(
+          Map.entry(SO_REUSEADDR, Boolean.TRUE),
+          Map.entry(SO_REUSEPORT, Boolean.TRUE)
+        ))
+        .build();
 
-    for (final var connector : server.getConnectors()) {
-      for (final var factory : connector.getConnectionFactories()) {
-        if (factory instanceof final HttpConfiguration.ConnectionFactory http) {
-          http.getHttpConfiguration()
-            .addCustomizer(new ForwardedRequestCustomizer());
-        }
-      }
-    }
-
-    /*
-     * Configure all the servlets.
-     */
-
-    final var servlets =
-      createServletHolders(services);
-
-    /*
-     * Set up a session handler that allows for Servlets to have sessions
-     * that can survive server restarts.
-     */
-
-    final var sessionIds =
-      new DefaultSessionIdManager(server);
-
-    final var sessionHandler = new SessionHandler();
-    sessionHandler.setSessionCookie("IDSTORE_USER_VIEW_SESSION");
-    sessionHandler.setMaxInactiveInterval(
-      Math.toIntExact(
-        configuration.sessions()
-          .userSessionExpiration()
-          .toSeconds())
-    );
-
-    final var sessionCache = new DefaultSessionCache(sessionHandler);
-    sessionCache.setSessionDataStore(new NullSessionDataStore());
-
-    sessionHandler.setSessionCache(sessionCache);
-    sessionHandler.setSessionIdManager(sessionIds);
-    sessionHandler.setHandler(servlets);
-
-    /*
-     * Enable gzip.
-     */
-
-    final var gzip = new GzipHandler();
-    gzip.setHandler(sessionHandler);
-
-    server.setErrorHandler(new IdPlainErrorHandler());
-    server.setRequestLog((request, response) -> {
-
-    });
-    server.setHandler(gzip);
-    server.start();
-    LOG.info("[{}] User view server started", address);
-    return server;
+    webServer.start();
+    LOG.info("[{}] User View server started", address);
+    return webServer;
   }
 
-  private static ServletContextHandler createServletHolders(
+  private static HttpRouting createRouting(
     final RPServiceDirectoryType services)
   {
-    final var servletHolders =
-      new IdServletHolders(services);
-    final var servlets =
-      new ServletContextHandler();
+    final var router = HttpRouting.builder();
+    router.addFilter(new IdHTTPRequestTimeFilter(
+      services.requireService(IdMetricsServiceType.class),
+      IdUserDomain.USER,
+      services.requireService(IdServerClock.class)
+    ));
 
-    createUserViewServerServlets(servletHolders, servlets);
-    return servlets;
-  }
+    router.get("/", new IdUVMain(services));
 
-  private static void createUserViewServerServlets(
-    final IdServletHolders servletHolders,
-    final ServletContextHandler servlets)
-  {
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVMain.class,
-        IdUVMain::new),
-      "/"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVLogout.class,
-        IdUVLogout::new),
-      "/logout"
-    );
+    {
+      final var handler = new IdUVLogout(services);
+      router.get("/logout", handler);
+      router.post("/logout", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVLogin.class,
-        IdUVLogin::new),
-      "/login"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVLogin.class,
-        IdUVLogin::new),
-      "/login/*"
-    );
+    {
+      final var handler = new IdUVLogin(services);
+      router.get("/login", handler);
+      router.post("/login", handler);
+      router.get("/login/*", handler);
+      router.post("/login/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVCSS.class,
-        IdUVCSS::new),
-      "/css/*"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVCSS.class,
-        IdUVCSS::new),
-      "/css"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVLogo.class,
-        IdUVLogo::new),
-      "/logo/*"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVLogo.class,
-        IdUVLogo::new),
-      "/logo"
-    );
+    {
+      final var handler = new IdUVCSS(services);
+      router.get("/css", handler);
+      router.get("/css/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVLogo.class,
-        IdUVLogo::new),
-      "/favicon.ico"
-    );
+    {
+      final var handler = new IdUVLogo(services);
+      router.get("/logo", handler);
+      router.get("/logo/*", handler);
+      router.get("/favicon.ico", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVEmailAdd.class,
-        IdUVEmailAdd::new),
-      "/email-add"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVEmailAdd.class,
-        IdUVEmailAdd::new),
-      "/email-add/*"
-    );
+    {
+      final var handler = new IdUVEmailAdd(services);
+      router.get("/email-add", handler);
+      router.post("/email-add", handler);
+      router.get("/email-add/*", handler);
+      router.post("/email-add/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVEmailAddRun.class,
-        IdUVEmailAddRun::new),
-      "/email-add-run"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVEmailAddRun.class,
-        IdUVEmailAddRun::new),
-      "/email-add-run/*"
-    );
+    {
+      final var handler = new IdUVEmailAddRun(services);
+      router.get("/email-add-run", handler);
+      router.post("/email-add-run", handler);
+      router.get("/email-add-run/*", handler);
+      router.post("/email-add-run/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVEmailRemoveRun.class,
-        IdUVEmailRemoveRun::new),
-      "/email-remove-run"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVEmailRemoveRun.class,
-        IdUVEmailRemoveRun::new),
-      "/email-remove-run/*"
-    );
+    {
+      final var handler = new IdUVEmailRemoveRun(services);
+      router.get("/email-remove-run", handler);
+      router.post("/email-remove-run", handler);
+      router.get("/email-remove-run/*", handler);
+      router.post("/email-remove-run/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVEmailVerificationPermit.class,
-        IdUVEmailVerificationPermit::new),
-      "/email-verification-permit"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVEmailVerificationPermit.class,
-        IdUVEmailVerificationPermit::new),
-      "/email-verification-permit/*"
-    );
+    {
+      final var handler = new IdUVEmailVerificationPermit(services);
+      router.get("/email-verification-permit", handler);
+      router.post("/email-verification-permit", handler);
+      router.get("/email-verification-permit/*", handler);
+      router.post("/email-verification-permit/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVEmailVerificationDeny.class,
-        IdUVEmailVerificationDeny::new),
-      "/email-verification-deny"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVEmailVerificationDeny.class,
-        IdUVEmailVerificationDeny::new),
-      "/email-verification-deny/*"
-    );
+    {
+      final var handler = new IdUVEmailVerificationDeny(services);
+      router.get("/email-verification-deny", handler);
+      router.post("/email-verification-deny", handler);
+      router.get("/email-verification-deny/*", handler);
+      router.post("/email-verification-deny/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVRealnameUpdate.class,
-        IdUVRealnameUpdate::new),
-      "/realname-update"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVRealnameUpdate.class,
-        IdUVRealnameUpdate::new),
-      "/realname-update/*"
-    );
+    {
+      final var handler = new IdUVRealnameUpdate(services);
+      router.get("/realname-update", handler);
+      router.post("/realname-update", handler);
+      router.get("/realname-update/*", handler);
+      router.post("/realname-update/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVRealnameUpdateRun.class,
-        IdUVRealnameUpdateRun::new),
-      "/realname-update-run"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVRealnameUpdateRun.class,
-        IdUVRealnameUpdateRun::new),
-      "/realname-update-run/*"
-    );
+    {
+      final var handler = new IdUVRealnameUpdateRun(services);
+      router.get("/realname-update-run", handler);
+      router.post("/realname-update-run", handler);
+      router.get("/realname-update-run/*", handler);
+      router.post("/realname-update-run/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordReset.class,
-        IdUVPasswordReset::new),
-      "/password-reset"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordReset.class,
-        IdUVPasswordReset::new),
-      "/password-reset/*"
-    );
+    {
+      final var handler = new IdUVPasswordReset(services);
+      router.get("/password-reset", handler);
+      router.post("/password-reset", handler);
+      router.get("/password-reset/*", handler);
+      router.post("/password-reset/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordResetRun.class,
-        IdUVPasswordResetRun::new),
-      "/password-reset-run"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordResetRun.class,
-        IdUVPasswordResetRun::new),
-      "/password-reset-run/*"
-    );
+    {
+      final var handler = new IdUVPasswordResetRun(services);
+      router.get("/password-reset-run", handler);
+      router.post("/password-reset-run", handler);
+      router.get("/password-reset-run/*", handler);
+      router.post("/password-reset-run/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordResetConfirm.class,
-        IdUVPasswordResetConfirm::new),
-      "/password-reset-confirm"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordResetConfirm.class,
-        IdUVPasswordResetConfirm::new),
-      "/password-reset-confirm/*"
-    );
+    {
+      final var handler = new IdUVPasswordResetConfirm(services);
+      router.get("/password-reset-confirm", handler);
+      router.post("/password-reset-confirm", handler);
+      router.get("/password-reset-confirm/*", handler);
+      router.post("/password-reset-confirm/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordResetConfirmRun.class,
-        IdUVPasswordResetConfirmRun::new),
-      "/password-reset-confirm-run"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordResetConfirmRun.class,
-        IdUVPasswordResetConfirmRun::new),
-      "/password-reset-confirm-run/*"
-    );
+    {
+      final var handler = new IdUVPasswordResetConfirmRun(services);
+      router.get("/password-reset-confirm-run", handler);
+      router.post("/password-reset-confirm-run", handler);
+      router.get("/password-reset-confirm-run/*", handler);
+      router.post("/password-reset-confirm-run/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordUpdate.class,
-        IdUVPasswordUpdate::new),
-      "/password-update"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordUpdate.class,
-        IdUVPasswordUpdate::new),
-      "/password-update/*"
-    );
+    {
+      final var handler = new IdUVPasswordUpdate(services);
+      router.get("/password-update", handler);
+      router.post("/password-update", handler);
+      router.get("/password-update/*", handler);
+      router.post("/password-update/*", handler);
+    }
 
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordUpdateRun.class,
-        IdUVPasswordUpdateRun::new),
-      "/password-update-run"
-    );
-    servlets.addServlet(
-      servletHolders.create(
-        IdUVPasswordUpdateRun.class,
-        IdUVPasswordUpdateRun::new),
-      "/password-update-run/*"
-    );
+    {
+      final var handler = new IdUVPasswordUpdateRun(services);
+      router.get("/password-update-run", handler);
+      router.post("/password-update-run", handler);
+      router.get("/password-update-run/*", handler);
+      router.post("/password-update-run/*", handler);
+    }
+
+    return router.get();
   }
 }

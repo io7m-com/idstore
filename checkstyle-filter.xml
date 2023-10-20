@@ -194,4 +194,9 @@
   <suppress files="IdArbAMessageProvider\.java"
             checks="FileLength"/>
 
+  <suppress files="IdUVServer\.java"
+            checks="ExecutableStatementCount"/>
+  <suppress files="IdUVHandlerCoreAuthenticated\.java"
+            checks="NPathComplexity"/>
+
 </suppressions>

@@ -40,11 +40,8 @@ module com.io7m.idstore.server.user_view
 
   requires com.io7m.jvindicator.core;
   requires freemarker;
+  requires io.helidon.webserver;
   requires io.opentelemetry.api;
-  requires jakarta.servlet;
-  requires org.eclipse.jetty.ee10.servlet;
-  requires org.eclipse.jetty.http;
-  requires org.eclipse.jetty.server;
   requires org.slf4j;
 
   exports com.io7m.idstore.server.user_view;

@@ -17,27 +17,31 @@
 
 package com.io7m.idstore.server.http;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.OptionalLong;
+import java.util.Set;
 
 /**
- * A functional servlet core. Consumes a request (and request information) and
- * returns a response.
+ * The type of functional servlet responses.
  */
 
-@FunctionalInterface
-public interface IdHTTPServletFunctionalCoreType
+public sealed interface IdHTTPResponseType
+  permits IdHTTPResponseFixedSize, IdHTTPResponseRedirect
 {
   /**
-   * Execute the core.
-   *
-   * @param request     The request
-   * @param information The extra request information
-   *
-   * @return The response
+   * @return The response status code
    */
 
-  IdHTTPServletResponseType execute(
-    HttpServletRequest request,
-    IdHTTPServletRequestInformation information
-  );
+  int statusCode();
+
+  /**
+   * @return The length of the content, if one is known
+   */
+
+  OptionalLong contentLengthOptional();
+
+  /**
+   * @return The cookies to set
+   */
+
+  Set<IdHTTPCookieDeclaration> cookies();
 }

@@ -22,9 +22,11 @@ import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
+
+import java.util.Set;
 
 /**
  * Functions to transform exceptions.
@@ -48,7 +50,7 @@ public final class IdA1Errors
    */
 
   public static IdAResponseError errorOf(
-    final IdHTTPServletRequestInformation information,
+    final IdHTTPRequestInformation information,
     final IdAResponseBlame blame,
     final IdException exception)
   {
@@ -73,17 +75,18 @@ public final class IdA1Errors
    * @return An error response
    */
 
-  public static IdHTTPServletResponseType errorResponseOf(
+  public static IdHTTPResponseType errorResponseOf(
     final IdACB1Messages messages,
-    final IdHTTPServletRequestInformation information,
+    final IdHTTPRequestInformation information,
     final IdAResponseBlame blame,
     final IdException exception)
   {
-    return new IdHTTPServletResponseFixedSize(
+    return new IdHTTPResponseFixedSize(
       switch (blame) {
         case BLAME_CLIENT -> 400;
         case BLAME_SERVER -> 500;
       },
+      Set.of(),
       IdACB1Messages.contentType(),
       messages.serialize(errorOf(information, blame, exception))
     );
@@ -99,9 +102,9 @@ public final class IdA1Errors
    * @return An error response
    */
 
-  public static IdHTTPServletResponseType errorResponseOf(
+  public static IdHTTPResponseType errorResponseOf(
     final IdACB1Messages messages,
-    final IdHTTPServletRequestInformation information,
+    final IdHTTPRequestInformation information,
     final IdCommandExecutionFailure exception)
   {
     final IdAResponseBlame blame;
@@ -111,8 +114,9 @@ public final class IdA1Errors
       blame = IdAResponseBlame.BLAME_SERVER;
     }
 
-    return new IdHTTPServletResponseFixedSize(
+    return new IdHTTPResponseFixedSize(
       exception.httpStatusCode(),
+      Set.of(),
       IdACB1Messages.contentType(),
       messages.serialize(errorOf(information, blame, exception))
     );

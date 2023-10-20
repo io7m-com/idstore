@@ -16,45 +16,45 @@
 
 package com.io7m.idstore.server.http;
 
-import jakarta.servlet.Servlet;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
-
 import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.OptionalLong;
+import java.util.Set;
 
 /**
- * A servlet holder used to inject dependencies into servlets.
+ * A fixed size servlet response.
  *
- * @param <T> The type of servlet
+ * @param statusCode  The status code
+ * @param cookies     The cookies to set
+ * @param contentType The content type
+ * @param data        The data
  */
 
-public final class IdServletHolder<T extends Servlet>
-  extends ServletHolder
+public record IdHTTPResponseFixedSize(
+  int statusCode,
+  Set<IdHTTPCookieDeclaration> cookies,
+  String contentType,
+  byte[] data)
+  implements IdHTTPResponseType
 {
-  private final Supplier<T> constructor;
-
   /**
-   * Construct a holder.
+   * A fixed size servlet response.
    *
-   * @param inClazz       The servlet class
-   * @param inConstructor A constructor function to produce servlet instances
+   * @param statusCode  The status code
+   * @param cookies     The cookies to set
+   * @param contentType The content type
+   * @param data        The data
    */
 
-  public IdServletHolder(
-    final Class<T> inClazz,
-    final Supplier<T> inConstructor)
+  public IdHTTPResponseFixedSize
   {
-    final Class<T> clazz =
-      Objects.requireNonNull(inClazz, "clazz");
-    this.constructor =
-      Objects.requireNonNull(inConstructor, "constructor");
-
-    this.setHeldClass(clazz);
+    Objects.requireNonNull(contentType, "contentType");
+    Objects.requireNonNull(cookies, "cookies");
+    Objects.requireNonNull(data, "data");
   }
 
   @Override
-  protected Servlet newInstance()
+  public OptionalLong contentLengthOptional()
   {
-    return this.constructor.get();
+    return OptionalLong.of(Integer.toUnsignedLong(this.data.length));
   }
 }

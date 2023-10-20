@@ -17,21 +17,23 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
+import java.util.Set;
+
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
 
 /**
  * A logo servlet.
  */
 
-public final class IdUVLogo extends IdHTTPServletFunctional
+public final class IdUVLogo extends IdHTTPHandlerFunctional
 {
   /**
    * A logo servlet.
@@ -45,23 +47,24 @@ public final class IdUVLogo extends IdHTTPServletFunctional
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var branding =
       services.requireService(IdServerBrandingServiceType.class);
 
-    final IdHTTPServletFunctionalCoreType main =
+    final IdHTTPHandlerFunctionalCoreType main =
       (request, information) -> execute(branding);
 
     return withInstrumentation(services, USER, main);
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final IdServerBrandingServiceType branding)
   {
-    return new IdHTTPServletResponseFixedSize(
+    return new IdHTTPResponseFixedSize(
       200,
+      Set.of(),
       "image/svg+xml; charset=utf-8",
       branding.logoImage()
     );

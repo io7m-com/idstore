@@ -14,36 +14,33 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.server.http;
 
-import jakarta.servlet.http.HttpServletRequest;
-
-import java.util.Optional;
-
-import static org.eclipse.jetty.util.StringUtil.truncate;
+import com.io7m.idstore.database.api.IdDatabaseTransactionType;
+import io.helidon.webserver.http.ServerRequest;
 
 /**
- * Functions over HTTP requests.
+ * A transactional functional handler core. Consumes a request (and request
+ * information) and returns a response.
  */
 
-public final class IdRequestUserAgents
+public interface IdHTTPHandlerFunctionalCoreTransactionalType
 {
-  private IdRequestUserAgents()
-  {
-
-  }
-
   /**
-   * @param request The request
+   * Execute the core in a transaction. Automatically roll back the transaction
+   * if nothing explicitly commits it.
    *
-   * @return The user agent for the given request, or the empty string
+   * @param request     The request
+   * @param transaction The transaction
+   * @param information The request information
+   *
+   * @return The response
    */
 
-  public static String requestUserAgent(
-    final HttpServletRequest request)
-  {
-    return Optional.ofNullable(request.getHeader("User-Agent"))
-      .map(s -> truncate(s, 1024))
-      .orElse("");
-  }
+  IdHTTPResponseType executeTransactional(
+    ServerRequest request,
+    IdHTTPRequestInformation information,
+    IdDatabaseTransactionType transaction
+  );
 }

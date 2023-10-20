@@ -22,24 +22,27 @@ import com.io7m.idstore.database.api.IdDatabaseException;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.model.IdAdmin;
+import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreAuthenticatedType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
@@ -52,18 +55,18 @@ import static com.io7m.idstore.strings.IdStringConstants.UNAUTHORIZED;
  * A core that executes the given core under authentication.
  */
 
-public final class IdA1ServletCoreAuthenticated
-  implements IdHTTPServletFunctionalCoreType
+public final class IdA1HandlerCoreAuthenticated
+  implements IdHTTPHandlerFunctionalCoreType
 {
-  private final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionAdmin, IdAdmin> core;
+  private final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionAdmin, IdAdmin> core;
   private final IdDatabaseType database;
   private final IdSessionAdminService adminSessions;
   private final IdACB1Messages messages;
   private final IdStrings strings;
 
-  private IdA1ServletCoreAuthenticated(
+  private IdA1HandlerCoreAuthenticated(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionAdmin, IdAdmin> inCore)
+    final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionAdmin, IdAdmin> inCore)
   {
     Objects.requireNonNull(services, "services");
 
@@ -86,24 +89,34 @@ public final class IdA1ServletCoreAuthenticated
    * @return A core that executes the given core under authentication
    */
 
-  public static IdHTTPServletFunctionalCoreType withAuthentication(
+  public static IdHTTPHandlerFunctionalCoreType withAuthentication(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionAdmin, IdAdmin> inCore)
+    final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionAdmin, IdAdmin> inCore)
   {
-    return new IdA1ServletCoreAuthenticated(services, inCore);
+    return new IdA1HandlerCoreAuthenticated(services, inCore);
   }
 
   @Override
-  public IdHTTPServletResponseType execute(
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+  public IdHTTPResponseType execute(
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
-    final var httpSession =
-      request.getSession(true);
-    final var adminSessionId =
-      (IdSessionSecretIdentifier) httpSession.getAttribute("ID");
+    final var headers =
+      request.headers();
+    final var cookies =
+      headers.cookies();
 
-    if (adminSessionId == null) {
+    final String cookie;
+    try {
+      cookie = cookies.get("IDSTORE_ADMIN_API_SESSION");
+    } catch (final NoSuchElementException e) {
+      return this.notAuthenticated(information);
+    }
+
+    final IdSessionSecretIdentifier adminSessionId;
+    try {
+      adminSessionId = new IdSessionSecretIdentifier(cookie);
+    } catch (final IdValidityException e) {
       return this.notAuthenticated(information);
     }
 
@@ -137,11 +150,12 @@ public final class IdA1ServletCoreAuthenticated
     );
   }
 
-  private IdHTTPServletResponseType notAuthenticated(
-    final IdHTTPServletRequestInformation information)
+  private IdHTTPResponseType notAuthenticated(
+    final IdHTTPRequestInformation information)
   {
-    return new IdHTTPServletResponseFixedSize(
+    return new IdHTTPResponseFixedSize(
       401,
+      Set.of(),
       IdACB1Messages.contentType(),
       this.messages.serialize(
         new IdAResponseError(

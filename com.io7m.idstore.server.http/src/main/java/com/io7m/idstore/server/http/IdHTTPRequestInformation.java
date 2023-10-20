@@ -14,36 +14,36 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 package com.io7m.idstore.server.http;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
- * An authenticated functional servlet core. Consumes a request (and request
- * information) and returns a response.
+ * Information about a request.
  *
- * @param <S> The type of sessions
- * @param <U> The type of users
+ * @param requestId     The unique request ID
+ * @param userAgent     The user agent
+ * @param remoteAddress The remote address
  */
 
-public interface IdHTTPServletFunctionalCoreAuthenticatedType<S, U>
+public record IdHTTPRequestInformation(
+  UUID requestId,
+  String userAgent,
+  String remoteAddress)
 {
   /**
-   * Execute the core after authenticating.
+   * Information about a request.
    *
-   * @param request     The request
-   * @param information The request information
-   * @param session     The session
-   * @param user        The user
-   *
-   * @return The response
+   * @param requestId     The unique request ID
+   * @param userAgent     The user agent
+   * @param remoteAddress The remote address
    */
 
-  IdHTTPServletResponseType executeAuthenticated(
-    HttpServletRequest request,
-    IdHTTPServletRequestInformation information,
-    S session,
-    U user
-  );
+  public IdHTTPRequestInformation
+  {
+    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(userAgent, "userAgent");
+    Objects.requireNonNull(remoteAddress, "remoteAddress");
+  }
 }

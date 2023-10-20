@@ -19,10 +19,10 @@ package com.io7m.idstore.server.admin_v1;
 
 import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.verdant.IdVerdantMessages;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import com.io7m.verdant.core.VProtocolException;
@@ -30,16 +30,17 @@ import com.io7m.verdant.core.VProtocolSupported;
 import com.io7m.verdant.core.VProtocols;
 
 import java.util.List;
+import java.util.Set;
 
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * The v1 version servlet.
  */
 
-public final class IdA1ServletVersions
-  extends IdHTTPServletFunctional
+public final class IdA1HandlerVersions
+  extends IdHTTPHandlerFunctional
 {
   private static final VProtocols PROTOCOLS =
     createProtocols();
@@ -50,13 +51,13 @@ public final class IdA1ServletVersions
    * @param services The services
    */
 
-  public IdA1ServletVersions(
+  public IdA1HandlerVersions(
     final RPServiceDirectoryType services)
   {
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var messages =
@@ -73,18 +74,20 @@ public final class IdA1ServletVersions
     };
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final IdVerdantMessages messages)
   {
     try {
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         200,
+        Set.of(),
         IdVerdantMessages.contentType(),
         messages.serialize(PROTOCOLS, 1)
       );
     } catch (final VProtocolException e) {
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         500,
+        Set.of(),
         "text/plain",
         e.getMessage().getBytes(UTF_8)
       );

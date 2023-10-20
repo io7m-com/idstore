@@ -19,17 +19,18 @@ package com.io7m.idstore.server.user_v1;
 
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.maintenance.IdClosedForMaintenanceService;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.CLOSED_FOR_MAINTENANCE;
 import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
@@ -38,16 +39,16 @@ import static com.io7m.idstore.protocol.user.IdUResponseBlame.BLAME_SERVER;
  * A core that executes the given core if the server is not closed for maintenance.
  */
 
-public final class IdU1ServletCoreMaintenanceAware
-  implements IdHTTPServletFunctionalCoreType
+public final class IdU1HandlerCoreMaintenanceAware
+  implements IdHTTPHandlerFunctionalCoreType
 {
-  private final IdHTTPServletFunctionalCoreType core;
+  private final IdHTTPHandlerFunctionalCoreType core;
   private final IdUCB1Messages messages;
   private final IdClosedForMaintenanceService maintenance;
 
-  private IdU1ServletCoreMaintenanceAware(
+  private IdU1HandlerCoreMaintenanceAware(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreType inCore)
+    final IdHTTPHandlerFunctionalCoreType inCore)
   {
     Objects.requireNonNull(services, "services");
 
@@ -66,22 +67,23 @@ public final class IdU1ServletCoreMaintenanceAware
    * @return A core that executes the given core if the server is not closed for maintenance
    */
 
-  public static IdHTTPServletFunctionalCoreType withMaintenanceAwareness(
+  public static IdHTTPHandlerFunctionalCoreType withMaintenanceAwareness(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreType inCore)
+    final IdHTTPHandlerFunctionalCoreType inCore)
   {
-    return new IdU1ServletCoreMaintenanceAware(services, inCore);
+    return new IdU1HandlerCoreMaintenanceAware(services, inCore);
   }
 
   @Override
-  public IdHTTPServletResponseType execute(
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+  public IdHTTPResponseType execute(
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
     final var closed = this.maintenance.isClosed();
     if (closed.isPresent()) {
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         503,
+        Set.of(),
         IdUCB1Messages.contentType(),
         this.messages.serialize(
           new IdUResponseError(

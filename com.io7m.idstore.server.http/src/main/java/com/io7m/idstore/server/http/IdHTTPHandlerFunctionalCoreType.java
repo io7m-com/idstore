@@ -17,24 +17,26 @@
 
 package com.io7m.idstore.server.http;
 
-import java.util.OptionalLong;
+import io.helidon.webserver.http.ServerRequest;
 
 /**
- * The type of functional servlet responses.
+ * A functional handler core. Consumes a request and returns a response.
  */
 
-public sealed interface IdHTTPServletResponseType
-  permits IdHTTPServletResponseFixedSize, IdHTTPServletResponseRedirect
+@FunctionalInterface
+public interface IdHTTPHandlerFunctionalCoreType
 {
   /**
-   * @return The response status code
+   * Execute the core.
+   *
+   * @param request     The request
+   * @param information The request information
+   *
+   * @return The response
    */
 
-  int statusCode();
-
-  /**
-   * @return The length of the content, if one is known
-   */
-
-  OptionalLong contentLengthOptional();
+  IdHTTPResponseType execute(
+    ServerRequest request,
+    IdHTTPRequestInformation information
+  );
 }

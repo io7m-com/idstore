@@ -25,8 +25,10 @@ module com.io7m.idstore.server.service.reqlimit
 
   requires transitive com.io7m.idstore.error_codes;
 
+  requires com.io7m.idstore.server.http;
+
   requires com.io7m.repetoir.core;
-  requires jakarta.servlet;
+  requires io.helidon.webserver;
   requires org.apache.commons.io;
 
   exports com.io7m.idstore.server.service.reqlimit;

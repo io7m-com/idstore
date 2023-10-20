@@ -16,34 +16,46 @@
 
 package com.io7m.idstore.server.http;
 
+import io.helidon.http.Status;
+
 import java.util.Objects;
-import java.util.UUID;
+import java.util.OptionalLong;
+import java.util.Set;
 
 /**
- * Information about a request.
+ * A redirect response.
  *
- * @param requestId     The unique request ID
- * @param userAgent     The user agent
- * @param remoteAddress The remote address
+ * @param cookies The cookies
+ * @param path    The path
  */
 
-public record IdHTTPServletRequestInformation(
-  UUID requestId,
-  String userAgent,
-  String remoteAddress)
+public record IdHTTPResponseRedirect(
+  Set<IdHTTPCookieDeclaration> cookies,
+  String path)
+  implements IdHTTPResponseType
 {
   /**
-   * Information about a request.
+   * A redirect response.
    *
-   * @param requestId     The unique request ID
-   * @param userAgent     The user agent
-   * @param remoteAddress The remote address
+   * @param cookies The cookies
+   * @param path    The path
    */
 
-  public IdHTTPServletRequestInformation
+  public IdHTTPResponseRedirect
   {
-    Objects.requireNonNull(requestId, "requestId");
-    Objects.requireNonNull(userAgent, "userAgent");
-    Objects.requireNonNull(remoteAddress, "remoteAddress");
+    Objects.requireNonNull(cookies, "cookies");
+    Objects.requireNonNull(path, "path");
+  }
+
+  @Override
+  public int statusCode()
+  {
+    return Status.MOVED_PERMANENTLY_301.code();
+  }
+
+  @Override
+  public OptionalLong contentLengthOptional()
+  {
+    return OptionalLong.empty();
   }
 }

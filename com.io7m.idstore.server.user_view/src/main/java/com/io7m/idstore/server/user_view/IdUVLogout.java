@@ -16,24 +16,27 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletResponseRedirect;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.model.IdValidityException;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPResponseRedirect;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
+
+import java.util.Set;
 
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreMaintenanceAware.withMaintenanceAwareness;
 
 /**
  * The page that logs out.
  */
 
-public final class IdUVLogout extends IdHTTPServletFunctional
+public final class IdUVLogout extends IdHTTPHandlerFunctional
 {
   /**
    * The page that logs out.
@@ -47,34 +50,49 @@ public final class IdUVLogout extends IdHTTPServletFunctional
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var userSessions =
       services.requireService(IdSessionUserService.class);
 
-    final IdHTTPServletFunctionalCoreType main =
+    final IdHTTPHandlerFunctionalCoreType main =
       (request, information) -> execute(userSessions, request);
 
     final var maintenanceAware = withMaintenanceAwareness(services, main);
     return withInstrumentation(services, USER, maintenanceAware);
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final IdSessionUserService userSessions,
-    final HttpServletRequest request)
+    final ServerRequest request)
   {
-    final var httpSession =
-      request.getSession(true);
-    final var userSessionId =
-      (IdSessionSecretIdentifier) httpSession.getAttribute("ID");
+    final var headers =
+      request.headers();
+    final var cookies =
+      headers.cookies();
+    final var cookie =
+      cookies.get("IDSTORE_USER_VIEW_SESSION");
 
-    if (userSessionId != null) {
-      userSessions.deleteSession(userSessionId);
-      httpSession.invalidate();
+    if (cookie == null) {
+      return new IdHTTPResponseRedirect(Set.of(), "/");
     }
 
-    return new IdHTTPServletResponseRedirect("/");
-  }
+    final IdSessionSecretIdentifier userSessionId;
+    try {
+      userSessionId = new IdSessionSecretIdentifier(cookie);
+    } catch (final IdValidityException e) {
+      return new IdHTTPResponseRedirect(Set.of(), "/");
+    }
 
+    final var userSessionOpt =
+      userSessions.findSession(userSessionId);
+
+    if (userSessionOpt.isEmpty()) {
+      return new IdHTTPResponseRedirect(Set.of(), "/");
+    }
+
+    userSessions.deleteSession(userSessionId);
+    return new IdHTTPResponseRedirect(Set.of(), "/");
+  }
 }

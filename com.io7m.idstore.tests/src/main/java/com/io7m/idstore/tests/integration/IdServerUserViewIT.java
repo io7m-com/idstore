@@ -662,7 +662,7 @@ public final class IdServerUserViewIT
     this.serverFixture.createUser(admin, "someone");
 
     this.expectError(
-      HttpRequest.newBuilder(this.viewURL("/email-remove")),
+      HttpRequest.newBuilder(this.viewURL("/email-remove-run")),
       401,
       "idstore: Login");
   }

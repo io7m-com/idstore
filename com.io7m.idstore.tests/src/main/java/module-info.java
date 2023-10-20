@@ -59,9 +59,9 @@ open module com.io7m.idstore.tests
   requires com.io7m.verdant.core;
   requires com.io7m.zelador.test_extension;
   requires freemarker;
+  requires io.helidon.webserver;
   requires io.opentelemetry.api;
   requires jakarta.mail;
-  requires jakarta.servlet;
   requires java.net.http;
   requires java.sql;
   requires java.xml;

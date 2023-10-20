@@ -14,41 +14,36 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.server.http;
 
-import java.util.Objects;
-import java.util.OptionalLong;
+import io.helidon.webserver.http.ServerRequest;
 
 /**
- * A redirect response.
+ * An authenticated functional handler core. Consumes a request (and request
+ * information) and returns a response.
  *
- * @param path The path
+ * @param <S> The type of sessions
+ * @param <U> The type of users
  */
 
-public record IdHTTPServletResponseRedirect(
-  String path)
-  implements IdHTTPServletResponseType
+public interface IdHTTPHandlerFunctionalCoreAuthenticatedType<S, U>
 {
   /**
-   * A redirect response.
+   * Execute the core after authenticating.
    *
-   * @param path The path
+   * @param request     The request
+   * @param session     The session
+   * @param information The request information
+   * @param user        The user
+   *
+   * @return The response
    */
 
-  public IdHTTPServletResponseRedirect
-  {
-    Objects.requireNonNull(path, "path");
-  }
-
-  @Override
-  public int statusCode()
-  {
-    return 302;
-  }
-
-  @Override
-  public OptionalLong contentLengthOptional()
-  {
-    return OptionalLong.empty();
-  }
+  IdHTTPResponseType executeAuthenticated(
+    ServerRequest request,
+    IdHTTPRequestInformation information,
+    S session,
+    U user
+  );
 }

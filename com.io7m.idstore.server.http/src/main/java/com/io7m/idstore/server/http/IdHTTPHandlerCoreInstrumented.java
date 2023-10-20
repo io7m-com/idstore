@@ -21,9 +21,9 @@ import com.io7m.idstore.model.IdUserDomain;
 import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
+import io.helidon.webserver.http.ServerRequest;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.context.Context;
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -31,28 +31,26 @@ import java.util.Objects;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_CLIENT_IP;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_METHOD;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_STATUS_CODE;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_URL;
-import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_USER_AGENT;
 
 /**
  * A servlet core that executes the given core with instrumentation.
  */
 
-public final class IdHTTPServletCoreInstrumented
-  implements IdHTTPServletFunctionalCoreType
+public final class IdHTTPHandlerCoreInstrumented
+  implements IdHTTPHandlerFunctionalCoreType
 {
   private final IdUserDomain domain;
-  private final IdHTTPServletFunctionalCoreType core;
+  private final IdHTTPHandlerFunctionalCoreType core;
   private final IdServerTelemetryServiceType telemetry;
   private final IdMetricsServiceType metrics;
 
-  private IdHTTPServletCoreInstrumented(
+  private IdHTTPHandlerCoreInstrumented(
     final RPServiceDirectoryType inServices,
     final IdUserDomain inDomain,
-    final IdHTTPServletFunctionalCoreType inCore)
+    final IdHTTPHandlerFunctionalCoreType inCore)
   {
     this.telemetry =
       inServices.requireService(IdServerTelemetryServiceType.class);
@@ -73,51 +71,51 @@ public final class IdHTTPServletCoreInstrumented
    * @return A servlet core that executes the given core with instrumentation
    */
 
-  public static IdHTTPServletFunctionalCoreType withInstrumentation(
+  public static IdHTTPHandlerFunctionalCoreType withInstrumentation(
     final RPServiceDirectoryType inServices,
     final IdUserDomain inDomain,
-    final IdHTTPServletFunctionalCoreType inCore)
+    final IdHTTPHandlerFunctionalCoreType inCore)
   {
-    return new IdHTTPServletCoreInstrumented(inServices, inDomain, inCore);
+    return new IdHTTPHandlerCoreInstrumented(inServices, inDomain, inCore);
   }
 
   @Override
-  public IdHTTPServletResponseType execute(
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+  public IdHTTPResponseType execute(
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
     final var context =
       this.telemetry.textMapPropagator()
         .extract(
           Context.current(),
           request,
-          IdHTTPServletRequestContextExtractor.instance()
+          IdHTTPServerRequestContextExtractor.instance()
         );
 
     final var tracer =
       this.telemetry.tracer();
 
     final var span =
-      tracer.spanBuilder(request.getServletPath())
+      tracer.spanBuilder(request.path().path())
         .setParent(context)
         .setStartTimestamp(Instant.now())
         .setSpanKind(SpanKind.SERVER)
         .setAttribute(HTTP_CLIENT_IP, information.remoteAddress())
-        .setAttribute(HTTP_METHOD, request.getMethod())
-        .setAttribute(
-          HTTP_REQUEST_CONTENT_LENGTH,
-          request.getContentLengthLong()
-        )
-        .setAttribute(HTTP_USER_AGENT, information.userAgent())
-        .setAttribute(HTTP_URL, request.getRequestURI())
+        .setAttribute(HTTP_METHOD, request.prologue().method().text())
+        .setAttribute(HTTP_URL, request.path().path())
         .setAttribute("http.request_id", information.requestId().toString())
         .startSpan();
 
-    this.metrics.onHttpRequested(this.domain);
-    this.metrics.onHttpRequestSize(this.domain, request.getContentLengthLong());
+    this.metrics.onHttpRequested(
+      this.domain);
+    this.metrics.onHttpRequestSize(
+      this.domain,
+      IdHTTPServerRequests.contentLength(request)
+    );
 
     try (var ignored = span.makeCurrent()) {
-      final var response = this.core.execute(request, information);
+      final var response =
+        this.core.execute(request, information);
 
       final var code = response.statusCode();
       if (code >= 400) {
@@ -142,5 +140,15 @@ public final class IdHTTPServletCoreInstrumented
     } finally {
       span.end();
     }
+  }
+
+  private static String remoteAddressOf(
+    final ServerRequest request)
+  {
+    final var peer = request.remotePeer();
+    return "%s:%d".formatted(
+      peer.host(),
+      Integer.valueOf(peer.port())
+    );
   }
 }

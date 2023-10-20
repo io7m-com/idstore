@@ -17,8 +17,9 @@
 
 package com.io7m.idstore.server.http;
 
+import io.helidon.http.HeaderNames;
+import io.helidon.webserver.http.ServerRequest;
 import io.opentelemetry.context.propagation.TextMapGetter;
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
 
@@ -26,43 +27,49 @@ import java.util.ArrayList;
  * A propagator that can extract fields from a servlet request.
  */
 
-public final class IdHTTPServletRequestContextExtractor
-  implements TextMapGetter<HttpServletRequest>
+public final class IdHTTPServerRequestContextExtractor
+  implements TextMapGetter<ServerRequest>
 {
-  private static final TextMapGetter<HttpServletRequest> INSTANCE =
-    new IdHTTPServletRequestContextExtractor();
+  private static final TextMapGetter<ServerRequest> INSTANCE =
+    new IdHTTPServerRequestContextExtractor();
 
   /**
    * @return A propagator that can extract fields from a servlet request.
    */
 
-  public static TextMapGetter<HttpServletRequest> instance()
+  public static TextMapGetter<ServerRequest> instance()
   {
     return INSTANCE;
   }
 
-  private IdHTTPServletRequestContextExtractor()
+  private IdHTTPServerRequestContextExtractor()
   {
 
   }
 
   @Override
   public Iterable<String> keys(
-    final HttpServletRequest request)
+    final ServerRequest request)
   {
-    final var results = new ArrayList<String>();
-    final var names = request.getHeaderNames();
-    while (names.hasMoreElements()) {
-      results.add(names.nextElement());
+    final var results =
+      new ArrayList<String>();
+    final var headers =
+      request.headers();
+    final var iterator =
+      headers.iterator();
+
+    while (iterator.hasNext()) {
+      final var header = iterator.next();
+      results.add(header.name());
     }
     return results;
   }
 
   @Override
   public String get(
-    final HttpServletRequest request,
+    final ServerRequest request,
     final String name)
   {
-    return request.getHeader(name);
+    return request.headers().get(HeaderNames.create(name)).get();
   }
 }

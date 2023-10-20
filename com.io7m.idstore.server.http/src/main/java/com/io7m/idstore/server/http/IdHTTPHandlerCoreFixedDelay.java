@@ -19,25 +19,25 @@ package com.io7m.idstore.server.http;
 
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import java.time.Duration;
 import java.util.Objects;
 
 /**
- * A servlet core that executes with a fixed delay.
+ * A handler core that executes with a fixed delay.
  */
 
-public final class IdHTTPServletCoreFixedDelay
-  implements IdHTTPServletFunctionalCoreType
+public final class IdHTTPHandlerCoreFixedDelay
+  implements IdHTTPHandlerFunctionalCoreType
 {
-  private final IdHTTPServletFunctionalCoreType core;
+  private final IdHTTPHandlerFunctionalCoreType core;
   private final Duration delay;
   private final IdServerTelemetryServiceType telemetry;
 
-  private IdHTTPServletCoreFixedDelay(
+  private IdHTTPHandlerCoreFixedDelay(
     final IdServerTelemetryServiceType inTelemetry,
-    final IdHTTPServletFunctionalCoreType inCore,
+    final IdHTTPHandlerFunctionalCoreType inCore,
     final Duration inDelay)
   {
     this.telemetry =
@@ -53,15 +53,15 @@ public final class IdHTTPServletCoreFixedDelay
    * @param inCore   The core
    * @param delay    The fixed delay to apply to each execution
    *
-   * @return A servlet core that executes with a fixed delay
+   * @return A handler core that executes with a fixed delay
    */
 
-  public static IdHTTPServletFunctionalCoreType withFixedDelay(
+  public static IdHTTPHandlerFunctionalCoreType withFixedDelay(
     final RPServiceDirectoryType services,
     final Duration delay,
-    final IdHTTPServletFunctionalCoreType inCore)
+    final IdHTTPHandlerFunctionalCoreType inCore)
   {
-    return new IdHTTPServletCoreFixedDelay(
+    return new IdHTTPHandlerCoreFixedDelay(
       services.requireService(IdServerTelemetryServiceType.class),
       inCore,
       delay
@@ -69,16 +69,16 @@ public final class IdHTTPServletCoreFixedDelay
   }
 
   @Override
-  public IdHTTPServletResponseType execute(
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+  public IdHTTPResponseType execute(
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
     this.applyFixedDelay();
     return this.core.execute(request, information);
   }
 
   /**
-   * Apply a fixed delay for all login requests.
+   * Apply a fixed delay for all requests.
    */
 
   private void applyFixedDelay()
