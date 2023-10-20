@@ -365,11 +365,10 @@ public final class IdDatabases implements IdDatabaseFactoryType
               completionLatch.countDown();
               return;
             }
-            Thread.sleep(50L);
-          } catch (final InterruptedException e) {
-            return;
+            pauseBriefly();
           } catch (final Exception e) {
-            LOG.debug("database not ready: {}", e.getMessage());
+            LOG.debug("Database not ready: {}", e.getMessage());
+            pauseBriefly();
           }
         }
       });
@@ -399,6 +398,15 @@ public final class IdDatabases implements IdDatabaseFactoryType
       }
     } finally {
       span.end();
+    }
+  }
+
+  private static void pauseBriefly()
+  {
+    try {
+      Thread.sleep(100L);
+    } catch (final InterruptedException e) {
+      Thread.currentThread().interrupt();
     }
   }
 
@@ -493,23 +501,24 @@ public final class IdDatabases implements IdDatabaseFactoryType
     final Consumer<String> startupMessages,
     final TrEventType event)
   {
-    if (event instanceof final TrEventExecutingSQL sql) {
-      publishEvent(
-        startupMessages,
-        String.format("Executing SQL: %s", sql.statement())
-      );
-      return;
-    }
-
-    if (event instanceof final TrEventUpgrading upgrading) {
-      publishEvent(
-        startupMessages,
-        String.format(
-          "Upgrading database from version %s -> %s",
-          upgrading.fromVersion(),
-          upgrading.toVersion())
-      );
-      return;
+    switch (event) {
+      case final TrEventExecutingSQL sql -> {
+        publishEvent(
+          startupMessages,
+          String.format("Executing SQL: %s", sql.statement())
+        );
+        return;
+      }
+      case final TrEventUpgrading upgrading -> {
+        publishEvent(
+          startupMessages,
+          String.format(
+            "Upgrading database from version %s -> %s",
+            upgrading.fromVersion(),
+            upgrading.toVersion())
+        );
+        return;
+      }
     }
   }
 }

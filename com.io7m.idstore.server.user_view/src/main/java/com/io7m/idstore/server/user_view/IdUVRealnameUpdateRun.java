@@ -25,12 +25,12 @@ import com.io7m.idstore.protocol.user.IdUCommandRealnameUpdate;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUCmdRealNameUpdate;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseRedirect;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreAuthenticatedType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseRedirect;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionMessage;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
@@ -40,21 +40,23 @@ import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jvindicator.core.Vindication;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
+
+import java.util.Set;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreAuthenticated.withAuthentication;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreMaintenanceAware.withMaintenanceAwareness;
 import static com.io7m.idstore.strings.IdStringConstants.ERROR;
 
 /**
  * The page that executes a real name update.
  */
 
-public final class IdUVRealnameUpdateRun extends IdHTTPServletFunctional
+public final class IdUVRealnameUpdateRun extends IdHTTPHandlerFunctional
 {
   private static final String DESTINATION_ON_FAILURE = "/realname-update";
   private static final String DESTINATION_ON_SUCCESS = "/";
@@ -71,7 +73,7 @@ public final class IdUVRealnameUpdateRun extends IdHTTPServletFunctional
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var database =
@@ -84,7 +86,7 @@ public final class IdUVRealnameUpdateRun extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
+    final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
       (request, information, session, user) -> {
         return execute(
           services,
@@ -107,7 +109,7 @@ public final class IdUVRealnameUpdateRun extends IdHTTPServletFunctional
     return withInstrumentation(services, USER, maintenanceAware);
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final RPServiceDirectoryType services,
     final IdDatabaseType database,
     final IdStrings strings,
@@ -115,8 +117,8 @@ public final class IdUVRealnameUpdateRun extends IdHTTPServletFunctional
     final IdFMTemplateType<IdFMMessageData> template,
     final IdSessionUser session,
     final IdUser user,
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
     final var vindicator =
       Vindication.startWithExceptions(IdValidityException::new);
@@ -124,7 +126,7 @@ public final class IdUVRealnameUpdateRun extends IdHTTPServletFunctional
       vindicator.addRequiredParameter("realname", IdRealName::new);
 
     try {
-      vindicator.check(request.getParameterMap());
+      vindicator.check(request.query().toMap());
     } catch (final IdValidityException e) {
       session.messageCurrentSet(
         new IdSessionMessage(
@@ -158,7 +160,7 @@ public final class IdUVRealnameUpdateRun extends IdHTTPServletFunctional
           .execute(context, command);
 
         transaction.commit();
-        return new IdHTTPServletResponseRedirect(DESTINATION_ON_SUCCESS);
+        return new IdHTTPResponseRedirect(Set.of(), DESTINATION_ON_SUCCESS);
       }
     } catch (final IdDatabaseException e) {
       setSpanErrorCode(e.errorCode());

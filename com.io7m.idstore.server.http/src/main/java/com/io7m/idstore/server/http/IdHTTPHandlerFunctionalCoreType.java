@@ -17,27 +17,26 @@
 
 package com.io7m.idstore.server.http;
 
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 /**
- * A functional servlet core. Consumes a request (and request information) and
- * returns a response.
+ * A functional handler core. Consumes a request and returns a response.
  */
 
 @FunctionalInterface
-public interface IdHTTPServletFunctionalCoreType
+public interface IdHTTPHandlerFunctionalCoreType
 {
   /**
    * Execute the core.
    *
    * @param request     The request
-   * @param information The extra request information
+   * @param information The request information
    *
    * @return The response
    */
 
-  IdHTTPServletResponseType execute(
-    HttpServletRequest request,
-    IdHTTPServletRequestInformation information
+  IdHTTPResponseType execute(
+    ServerRequest request,
+    IdHTTPRequestInformation information
   );
 }

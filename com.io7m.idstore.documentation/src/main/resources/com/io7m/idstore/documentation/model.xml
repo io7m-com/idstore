@@ -45,11 +45,14 @@
     <Subsection title="Names">
       <Paragraph>
         <Term type="term">User</Term>
-        and <Term type="term">administrator</Term> accounts have names that are used for login operations. Names must
-        match the regular expression
-        <Term type="expression">\p{LC}[\p{LC}\p{N}_-]{0,255}</Term>. Names must be unique within a given
-        <Term type="package">idstore</Term>
-        server, but can be changed at the user/administrator's discretion at any time.
+        and <Term type="term">administrator</Term> accounts have names that are
+        used for login operations. Names must match the regular expression
+        <Term type="expression">\p{LC}[\p{LC}\p{N}_-]{0,255}</Term>. Names
+        are case-insensitive <LinkFootnote
+        target="c19fc056-ddcf-48bd-ab7d-f8773772c5e8"/>
+        and must be unique within a given
+        <Term type="package">idstore</Term> server, but can be changed at the
+        user/administrator's discretion at any time.
       </Paragraph>
     </Subsection>
     <Subsection title="Email Addresses">
@@ -324,5 +327,11 @@
       in the normal non-maintenance mode.
     </Paragraph>
   </Subsection>
+
+  <Footnote id="c19fc056-ddcf-48bd-ab7d-f8773772c5e8">
+    Names are case-insensitive in order to make it slightly more difficult for
+    a hostile user to impersonate another by picking a name that only varies
+    with case.
+  </Footnote>
 
 </Section>

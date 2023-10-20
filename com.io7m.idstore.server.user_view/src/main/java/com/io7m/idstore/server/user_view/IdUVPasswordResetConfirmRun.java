@@ -20,11 +20,11 @@ package com.io7m.idstore.server.user_view;
 import com.io7m.idstore.model.IdValidityException;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user_pwreset.IdUserPasswordResetServiceType;
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
@@ -33,17 +33,18 @@ import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jvindicator.core.Vindication;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreMaintenanceAware.withMaintenanceAwareness;
 import static com.io7m.idstore.strings.IdStringConstants.EMAIL_PASSWORD_RESET_SUCCESS;
 import static com.io7m.idstore.strings.IdStringConstants.EMAIL_PASSWORD_RESET_SUCCESS_TITLE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -53,7 +54,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 
 public final class IdUVPasswordResetConfirmRun
-  extends IdHTTPServletFunctional
+  extends IdHTTPHandlerFunctional 
 {
   private static final String DESTINATION_ON_FAILURE = "/";
 
@@ -69,7 +70,7 @@ public final class IdUVPasswordResetConfirmRun
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var userPasswordResets =
@@ -82,7 +83,7 @@ public final class IdUVPasswordResetConfirmRun
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    final IdHTTPServletFunctionalCoreType main =
+    final IdHTTPHandlerFunctionalCoreType main =
       (request, information) -> {
         return execute(
           userPasswordResets,
@@ -98,13 +99,13 @@ public final class IdUVPasswordResetConfirmRun
     return withInstrumentation(services, USER, maintenanceAware);
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final IdUserPasswordResetServiceType userPasswordResets,
     final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> messageTemplate,
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
     final var vindicator =
       Vindication.startWithExceptions(IdValidityException::new);
@@ -117,7 +118,7 @@ public final class IdUVPasswordResetConfirmRun
       vindicator.addRequiredParameter("token", x -> x);
 
     try {
-      vindicator.check(request.getParameterMap());
+      vindicator.check(request.query().toMap());
     } catch (final IdValidityException e) {
       return IdUVErrorPage.showError(
         strings,
@@ -155,11 +156,11 @@ public final class IdUVPasswordResetConfirmRun
     return showConfirmed(strings, branding, messageTemplate, information);
   }
 
-  private static IdHTTPServletResponseType showConfirmed(
+  private static IdHTTPResponseType showConfirmed(
     final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> messageTemplate,
-    final IdHTTPServletRequestInformation information)
+    final IdHTTPRequestInformation information)
   {
     try (var writer = new StringWriter()) {
       messageTemplate.process(
@@ -176,8 +177,9 @@ public final class IdUVPasswordResetConfirmRun
         writer
       );
       writer.flush();
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         200,
+        Set.of(),
         IdUVContentTypes.xhtml(),
         writer.toString().getBytes(UTF_8)
       );

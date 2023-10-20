@@ -16,45 +16,47 @@
 
 package com.io7m.idstore.server.http;
 
-import jakarta.servlet.Servlet;
-import org.eclipse.jetty.servlet.ServletHolder;
+import io.helidon.http.Status;
 
 import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.OptionalLong;
+import java.util.Set;
 
 /**
- * A servlet holder used to inject dependencies into servlets.
+ * A redirect response.
  *
- * @param <T> The type of servlet
+ * @param cookies The cookies
+ * @param path    The path
  */
 
-public final class IdServletHolder<T extends Servlet>
-  extends ServletHolder
+public record IdHTTPResponseRedirect(
+  Set<IdHTTPCookieDeclaration> cookies,
+  String path)
+  implements IdHTTPResponseType
 {
-  private final Supplier<T> constructor;
-
   /**
-   * Construct a holder.
+   * A redirect response.
    *
-   * @param inClazz       The servlet class
-   * @param inConstructor A constructor function to produce servlet instances
+   * @param cookies The cookies
+   * @param path    The path
    */
 
-  public IdServletHolder(
-    final Class<T> inClazz,
-    final Supplier<T> inConstructor)
+  public IdHTTPResponseRedirect
   {
-    final Class<T> clazz =
-      Objects.requireNonNull(inClazz, "clazz");
-    this.constructor =
-      Objects.requireNonNull(inConstructor, "constructor");
-
-    this.setHeldClass(clazz);
+    Objects.requireNonNull(cookies, "cookies");
+    Objects.requireNonNull(path, "path");
+    cookies = Set.copyOf(cookies);
   }
 
   @Override
-  protected Servlet newInstance()
+  public int statusCode()
   {
-    return this.constructor.get();
+    return Status.MOVED_PERMANENTLY_301.code();
+  }
+
+  @Override
+  public OptionalLong contentLengthOptional()
+  {
+    return OptionalLong.empty();
   }
 }

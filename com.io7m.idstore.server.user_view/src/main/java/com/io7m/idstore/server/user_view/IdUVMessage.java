@@ -18,13 +18,13 @@
 package com.io7m.idstore.server.user_view;
 
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseRedirect;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreAuthenticatedType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseRedirect;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
@@ -37,18 +37,19 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.Objects;
+import java.util.Set;
 
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreAuthenticated.withAuthentication;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreMaintenanceAware.withMaintenanceAwareness;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Display a message logged to the user's (authenticated) session.
  */
 
-public final class IdUVMessage extends IdHTTPServletFunctional
+public final class IdUVMessage extends IdHTTPHandlerFunctional
 {
   /**
    * Display a message logged to the user's (authenticated) session.
@@ -62,7 +63,7 @@ public final class IdUVMessage extends IdHTTPServletFunctional
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var branding =
@@ -71,7 +72,7 @@ public final class IdUVMessage extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
+    final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
       (request, information, session, user) -> {
         return showMessage(information, session, branding, template);
       };
@@ -95,8 +96,8 @@ public final class IdUVMessage extends IdHTTPServletFunctional
    * @return A formatted response
    */
 
-  public static IdHTTPServletResponseType showMessage(
-    final IdHTTPServletRequestInformation information,
+  public static IdHTTPResponseType showMessage(
+    final IdHTTPRequestInformation information,
     final IdSessionUser session,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> template)
@@ -108,7 +109,7 @@ public final class IdUVMessage extends IdHTTPServletFunctional
 
     final var messageOpt = session.messageCurrent();
     if (messageOpt.isEmpty()) {
-      return new IdHTTPServletResponseRedirect("/");
+      return new IdHTTPResponseRedirect(Set.of(), "/");
     }
 
     try (var writer = new StringWriter()) {
@@ -139,8 +140,9 @@ public final class IdUVMessage extends IdHTTPServletFunctional
         writer
       );
       writer.flush();
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         statusCode,
+        Set.of(),
         IdUVContentTypes.xhtml(),
         writer.toString().getBytes(UTF_8)
       );

@@ -14,36 +14,34 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.server.http;
 
-import jakarta.servlet.http.HttpServletRequest;
-
-import java.util.Optional;
-
-import static org.eclipse.jetty.util.StringUtil.truncate;
+import java.util.OptionalLong;
+import java.util.Set;
 
 /**
- * Functions over HTTP requests.
+ * The type of functional servlet responses.
  */
 
-public final class IdRequestUserAgents
+public sealed interface IdHTTPResponseType
+  permits IdHTTPResponseFixedSize, IdHTTPResponseRedirect
 {
-  private IdRequestUserAgents()
-  {
-
-  }
-
   /**
-   * @param request The request
-   *
-   * @return The user agent for the given request, or the empty string
+   * @return The response status code
    */
 
-  public static String requestUserAgent(
-    final HttpServletRequest request)
-  {
-    return Optional.ofNullable(request.getHeader("User-Agent"))
-      .map(s -> truncate(s, 1024))
-      .orElse("");
-  }
+  int statusCode();
+
+  /**
+   * @return The length of the content, if one is known
+   */
+
+  OptionalLong contentLengthOptional();
+
+  /**
+   * @return The cookies to set
+   */
+
+  Set<IdHTTPCookieDeclaration> cookies();
 }

@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0017</version>
+    <version>1.0.0-beta0018</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.service.reqlimit</artifactId>
@@ -24,6 +24,11 @@
       <artifactId>com.io7m.idstore.error_codes</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.server.http</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>com.io7m.repetoir</groupId>
@@ -34,8 +39,12 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty.toolchain</groupId>
-      <artifactId>jetty-jakarta-servlet-api</artifactId>
+      <groupId>io.helidon.webserver</groupId>
+      <artifactId>helidon-webserver</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.helidon.http.media</groupId>
+      <artifactId>helidon-http-media</artifactId>
     </dependency>
 
     <dependency>

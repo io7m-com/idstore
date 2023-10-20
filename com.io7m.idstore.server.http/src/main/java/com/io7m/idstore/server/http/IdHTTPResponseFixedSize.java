@@ -18,37 +18,44 @@ package com.io7m.idstore.server.http;
 
 import java.util.Objects;
 import java.util.OptionalLong;
+import java.util.Set;
 
 /**
- * A redirect response.
+ * A fixed size servlet response.
  *
- * @param path The path
+ * @param statusCode  The status code
+ * @param cookies     The cookies to set
+ * @param contentType The content type
+ * @param data        The data
  */
 
-public record IdHTTPServletResponseRedirect(
-  String path)
-  implements IdHTTPServletResponseType
+public record IdHTTPResponseFixedSize(
+  int statusCode,
+  Set<IdHTTPCookieDeclaration> cookies,
+  String contentType,
+  byte[] data)
+  implements IdHTTPResponseType
 {
   /**
-   * A redirect response.
+   * A fixed size servlet response.
    *
-   * @param path The path
+   * @param statusCode  The status code
+   * @param cookies     The cookies to set
+   * @param contentType The content type
+   * @param data        The data
    */
 
-  public IdHTTPServletResponseRedirect
+  public IdHTTPResponseFixedSize
   {
-    Objects.requireNonNull(path, "path");
-  }
-
-  @Override
-  public int statusCode()
-  {
-    return 302;
+    Objects.requireNonNull(contentType, "contentType");
+    Objects.requireNonNull(cookies, "cookies");
+    Objects.requireNonNull(data, "data");
+    cookies = Set.copyOf(cookies);
   }
 
   @Override
   public OptionalLong contentLengthOptional()
   {
-    return OptionalLong.empty();
+    return OptionalLong.of(Integer.toUnsignedLong(this.data.length));
   }
 }

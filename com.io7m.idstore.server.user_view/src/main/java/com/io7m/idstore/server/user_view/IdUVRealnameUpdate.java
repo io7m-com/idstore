@@ -17,12 +17,12 @@
 package com.io7m.idstore.server.user_view;
 
 import com.io7m.idstore.model.IdUser;
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreAuthenticatedType;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreAuthenticatedType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
 import com.io7m.idstore.server.service.templating.IdFMRealNameUpdateData;
@@ -35,17 +35,18 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated.withAuthentication;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreAuthenticated.withAuthentication;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreMaintenanceAware.withMaintenanceAwareness;
 
 /**
  * The page that displays a real name update form.
  */
 
-public final class IdUVRealnameUpdate extends IdHTTPServletFunctional
+public final class IdUVRealnameUpdate extends IdHTTPHandlerFunctional
 {
   /**
    * The page that displays a real name update form.
@@ -59,7 +60,7 @@ public final class IdUVRealnameUpdate extends IdHTTPServletFunctional
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var branding =
@@ -68,7 +69,7 @@ public final class IdUVRealnameUpdate extends IdHTTPServletFunctional
       services.requireService(IdFMTemplateServiceType.class)
         .pageRealnameUpdateTemplate();
 
-    final IdHTTPServletFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
+    final IdHTTPHandlerFunctionalCoreAuthenticatedType<IdSessionUser, IdUser> main =
       (request, information, session, user) -> {
         return execute(branding, template, user, information);
       };
@@ -81,11 +82,11 @@ public final class IdUVRealnameUpdate extends IdHTTPServletFunctional
     return withInstrumentation(services, USER, maintenanceAware);
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMRealNameUpdateData> template,
     final IdUser user,
-    final IdHTTPServletRequestInformation information)
+    final IdHTTPRequestInformation information)
   {
     try (var writer = new StringWriter()) {
       template.process(
@@ -99,8 +100,9 @@ public final class IdUVRealnameUpdate extends IdHTTPServletFunctional
       );
 
       writer.flush();
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         200,
+        Set.of(),
         IdUVContentTypes.xhtml(),
         writer.toString().getBytes(StandardCharsets.UTF_8)
       );

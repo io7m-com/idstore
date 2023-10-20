@@ -29,10 +29,10 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.controller.user.IdUCmdEmailAddPermit;
 import com.io7m.idstore.server.controller.user.IdUCmdEmailRemovePermit;
 import com.io7m.idstore.server.controller.user.IdUCommandContext;
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionSecretIdentifier;
 import com.io7m.idstore.server.service.sessions.IdSessionUser;
@@ -42,13 +42,13 @@ import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jvindicator.core.Vindication;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
 import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.setSpanErrorCode;
-import static com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware.withMaintenanceAwareness;
+import static com.io7m.idstore.server.user_view.IdUVHandlerCoreMaintenanceAware.withMaintenanceAwareness;
 import static com.io7m.idstore.strings.IdStringConstants.NOT_FOUND;
 
 /**
@@ -56,7 +56,7 @@ import static com.io7m.idstore.strings.IdStringConstants.NOT_FOUND;
  */
 
 public final class IdUVEmailVerificationPermit
-  extends IdHTTPServletFunctional
+  extends IdHTTPHandlerFunctional
 {
   private static final String DESTINATION_ON_FAILURE = "/";
 
@@ -72,7 +72,7 @@ public final class IdUVEmailVerificationPermit
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var database =
@@ -85,7 +85,7 @@ public final class IdUVEmailVerificationPermit
       services.requireService(IdFMTemplateServiceType.class)
         .pageMessage();
 
-    final IdHTTPServletFunctionalCoreType main =
+    final IdHTTPHandlerFunctionalCoreType main =
       (request, information) -> {
         return execute(
           services,
@@ -103,14 +103,14 @@ public final class IdUVEmailVerificationPermit
     return withInstrumentation(services, USER, maintenanceAware);
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final RPServiceDirectoryType services,
     final IdStrings strings,
     final IdDatabaseType database,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> errorTemplate,
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
     final var vindicator =
       Vindication.startWithExceptions(IdValidityException::new);
@@ -118,7 +118,7 @@ public final class IdUVEmailVerificationPermit
       vindicator.addRequiredParameter("token", IdToken::new);
 
     try {
-      vindicator.check(request.getParameterMap());
+      vindicator.check(request.query().toMap());
     } catch (final IdValidityException e) {
       return IdUVErrorPage.showError(
         strings,
@@ -166,13 +166,13 @@ public final class IdUVEmailVerificationPermit
     }
   }
 
-  private static IdHTTPServletResponseType runForToken(
+  private static IdHTTPResponseType runForToken(
     final RPServiceDirectoryType services,
     final IdDatabaseType database,
     final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> msgTemplate,
-    final IdHTTPServletRequestInformation information,
+    final IdHTTPRequestInformation information,
     final IdToken idToken)
     throws IdDatabaseException, IdCommandExecutionFailure
   {

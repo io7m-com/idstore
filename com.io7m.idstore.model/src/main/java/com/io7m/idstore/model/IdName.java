@@ -16,7 +16,7 @@
 
 package com.io7m.idstore.model;
 
-import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -55,6 +55,25 @@ public record IdName(String value)
   }
 
   @Override
+  public int hashCode()
+  {
+    return this.value.toUpperCase(Locale.ROOT).hashCode();
+  }
+
+  @Override
+  public boolean equals(
+    final Object obj)
+  {
+    if (obj == null) {
+      return false;
+    }
+    if (obj instanceof final IdName other) {
+      return this.value.equalsIgnoreCase(other.value);
+    }
+    return false;
+  }
+
+  @Override
   public String toString()
   {
     return this.value;
@@ -64,7 +83,11 @@ public record IdName(String value)
   public int compareTo(
     final IdName other)
   {
-    return Comparator.comparing(IdName::value)
-      .compare(this, other);
+    final var thisV =
+      this.value.toUpperCase(Locale.ROOT);
+    final var thatV =
+      other.value.toUpperCase(Locale.ROOT);
+
+    return thisV.compareTo(thatV);
   }
 }

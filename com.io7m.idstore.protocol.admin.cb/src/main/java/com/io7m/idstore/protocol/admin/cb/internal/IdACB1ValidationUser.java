@@ -513,7 +513,7 @@ public final class IdACB1ValidationUser
     final CBOptionType<IdA1User> fieldUser)
     throws IdProtocolException, IdPasswordException
   {
-    if (fieldUser instanceof CBSome<IdA1User> some) {
+    if (fieldUser instanceof final CBSome<IdA1User> some) {
       return Optional.of(fromWireUser(some.value()));
     }
     return Optional.empty();
@@ -746,21 +746,16 @@ public final class IdACB1ValidationUser
   private static IdUserColumn fromWireUserColumn(
     final IdA1UserColumn c)
   {
-    if (c instanceof ByID) {
-      return BY_ID;
-    } else if (c instanceof ByIDName) {
-      return BY_IDNAME;
-    } else if (c instanceof ByRealName) {
-      return BY_REALNAME;
-    } else if (c instanceof ByTimeCreated) {
-      return BY_TIME_CREATED;
-    } else if (c instanceof ByTimeUpdated) {
-      return BY_TIME_UPDATED;
-    }
-
-    throw new IllegalArgumentException(
-      "Unrecognized user column: %s".formatted(c)
-    );
+    return switch (c) {
+      case final ByID byID -> BY_ID;
+      case final ByIDName byIDName -> BY_IDNAME;
+      case final ByRealName byRealName -> BY_REALNAME;
+      case final ByTimeCreated byTimeCreated -> BY_TIME_CREATED;
+      case final ByTimeUpdated byTimeUpdated -> BY_TIME_UPDATED;
+      case null, default -> throw new IllegalArgumentException(
+        "Unrecognized user column: %s".formatted(c)
+      );
+    };
   }
 
   private static IdUserSummary fromWireUserSummary(

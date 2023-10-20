@@ -17,9 +17,9 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
 import com.io7m.idstore.server.service.templating.IdFMTemplateType;
@@ -29,6 +29,7 @@ import freemarker.template.TemplateException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
+import java.util.Set;
 
 import static com.io7m.idstore.strings.IdStringConstants.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -56,11 +57,11 @@ public final class IdUVErrorPage
    * @param strings       The string resources
    */
 
-  static IdHTTPServletResponseType showError(
+  static IdHTTPResponseType showError(
     final IdStrings strings,
     final IdServerBrandingServiceType branding,
     final IdFMTemplateType<IdFMMessageData> errorTemplate,
-    final IdHTTPServletRequestInformation information,
+    final IdHTTPRequestInformation information,
     final int statusCode,
     final String message,
     final String destination)
@@ -80,8 +81,9 @@ public final class IdUVErrorPage
         writer
       );
       writer.flush();
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         statusCode,
+        Set.of(),
         IdUVContentTypes.xhtml(),
         writer.toString().getBytes(UTF_8)
       );

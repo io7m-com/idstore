@@ -17,11 +17,12 @@
 package com.io7m.idstore.tests.integration;
 
 import com.io7m.ervilla.api.EContainerSupervisorType;
-import com.io7m.ervilla.test_extension.ErvillaCloseAfterAll;
+import com.io7m.ervilla.test_extension.ErvillaCloseAfterSuite;
 import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
+import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.idstore.tests.extensions.IdTestServers;
 import com.io7m.zelador.test_extension.CloseableResourcesType;
@@ -52,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("integration")
 @Tag("user-view")
 @ExtendWith({ErvillaExtension.class, ZeladorExtension.class})
-@ErvillaConfiguration(disabledIfUnsupported = true)
+@ErvillaConfiguration(disabledIfUnsupported = true, projectName = "com.io7m.idstore")
 public final class IdServerUserViewIT
 {
   private static IdTestDatabases.IdDatabaseFixture DATABASE_FIXTURE;
@@ -63,10 +64,10 @@ public final class IdServerUserViewIT
 
   @BeforeAll
   public static void setupOnce(
-    final @ErvillaCloseAfterAll EContainerSupervisorType containers)
+    final @ErvillaCloseAfterSuite EContainerSupervisorType containers)
     throws Exception
   {
-    DATABASE_FIXTURE = IdTestDatabases.create(containers, 15432);
+    DATABASE_FIXTURE = IdTestContainerInstances.database(containers);
   }
 
   @BeforeEach
@@ -661,7 +662,7 @@ public final class IdServerUserViewIT
     this.serverFixture.createUser(admin, "someone");
 
     this.expectError(
-      HttpRequest.newBuilder(this.viewURL("/email-remove")),
+      HttpRequest.newBuilder(this.viewURL("/email-remove-run")),
       401,
       "idstore: Login");
   }

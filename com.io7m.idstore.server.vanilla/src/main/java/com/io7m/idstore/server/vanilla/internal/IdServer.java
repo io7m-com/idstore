@@ -73,9 +73,9 @@ import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.repetoir.core.RPServiceDirectory;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
+import io.helidon.webserver.WebServer;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
-import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,13 +182,13 @@ public final class IdServer implements IdServerType
       final var services =
         this.resources.add(this.createServiceDirectory(this.database));
 
-      final Server userView = IdUVServer.createUserViewServer(services);
+      final WebServer userView = IdUVServer.createUserViewServer(services);
       this.resources.add(userView::stop);
 
-      final Server userAPI = IdU1Server.createUserAPIServer(services);
+      final WebServer userAPI = IdU1Server.createUserAPIServer(services);
       this.resources.add(userAPI::stop);
 
-      final Server adminAPI = IdA1Server.createAdminAPIServer(services);
+      final WebServer adminAPI = IdA1Server.createAdminAPIServer(services);
       this.resources.add(adminAPI::stop);
     } catch (final IdDatabaseException e) {
       recordSpanException(e);

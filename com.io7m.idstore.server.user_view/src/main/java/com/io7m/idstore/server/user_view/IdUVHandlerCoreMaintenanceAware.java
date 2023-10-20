@@ -17,10 +17,10 @@
 
 package com.io7m.idstore.server.user_view;
 
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletRequestInformation;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPRequestInformation;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.branding.IdServerBrandingServiceType;
 import com.io7m.idstore.server.service.maintenance.IdClosedForMaintenanceService;
 import com.io7m.idstore.server.service.templating.IdFMMessageData;
@@ -29,12 +29,13 @@ import com.io7m.idstore.server.service.templating.IdFMTemplateType;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 import freemarker.template.TemplateException;
-import jakarta.servlet.http.HttpServletRequest;
+import io.helidon.webserver.http.ServerRequest;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.util.Objects;
+import java.util.Set;
 
 import static com.io7m.idstore.strings.IdStringConstants.MAINTENANCE_MODE_TITLE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -43,18 +44,18 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * A core that executes the given core if the server is not closed for maintenance.
  */
 
-public final class IdUVServletCoreMaintenanceAware
-  implements IdHTTPServletFunctionalCoreType
+public final class IdUVHandlerCoreMaintenanceAware
+  implements IdHTTPHandlerFunctionalCoreType
 {
-  private final IdHTTPServletFunctionalCoreType core;
+  private final IdHTTPHandlerFunctionalCoreType core;
   private final IdClosedForMaintenanceService maintenance;
   private final IdStrings strings;
   private final IdServerBrandingServiceType branding;
   private final IdFMTemplateType<IdFMMessageData> errorTemplate;
 
-  private IdUVServletCoreMaintenanceAware(
+  private IdUVHandlerCoreMaintenanceAware(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreType inCore)
+    final IdHTTPHandlerFunctionalCoreType inCore)
   {
     Objects.requireNonNull(services, "services");
 
@@ -79,17 +80,17 @@ public final class IdUVServletCoreMaintenanceAware
    * @return A core that executes the given core if the server is not closed for maintenance
    */
 
-  public static IdHTTPServletFunctionalCoreType withMaintenanceAwareness(
+  public static IdHTTPHandlerFunctionalCoreType withMaintenanceAwareness(
     final RPServiceDirectoryType services,
-    final IdHTTPServletFunctionalCoreType inCore)
+    final IdHTTPHandlerFunctionalCoreType inCore)
   {
-    return new IdUVServletCoreMaintenanceAware(services, inCore);
+    return new IdUVHandlerCoreMaintenanceAware(services, inCore);
   }
 
   @Override
-  public IdHTTPServletResponseType execute(
-    final HttpServletRequest request,
-    final IdHTTPServletRequestInformation information)
+  public IdHTTPResponseType execute(
+    final ServerRequest request,
+    final IdHTTPRequestInformation information)
   {
     final var closed = this.maintenance.isClosed();
     if (closed.isPresent()) {
@@ -108,8 +109,9 @@ public final class IdUVServletCoreMaintenanceAware
           writer
         );
         writer.flush();
-        return new IdHTTPServletResponseFixedSize(
+        return new IdHTTPResponseFixedSize(
           503,
+          Set.of(),
           IdUVContentTypes.xhtml(),
           writer.toString().getBytes(UTF_8)
         );

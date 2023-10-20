@@ -146,13 +146,6 @@
     <Bug pattern="PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS"/>
   </Match>
 
-  <!-- We don't have pattern matching until JDK 21 -->
-  <Match>
-    <Class name="com.io7m.idstore.database.postgres.IdDatabases"/>
-    <Method name="publishTrEvent"/>
-    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
-  </Match>
-
   <!-- These classes are coupled as part of an API. -->
   <Match>
     <Or>
@@ -182,6 +175,14 @@
       <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE"/>
     </Or>
   </Match>
+
+  <!-- Seems to be an artifact of JDK 21 matching. -->
+  <Match>
+    <Class name="com.io7m.idstore.database.postgres.IdDatabases"/>
+    <Method name="createOrUpgrade"/>
+    <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
+  </Match>
+
   <Match>
     <Class name="com.io7m.idstore.database.postgres.IdDatabases"/>
     <Method name="updateReadOnlyRolePassword"/>
@@ -299,7 +300,6 @@
   <!-- com.io7m.idstore.protocol.admin.cb -->
   <!--                                    -->
 
-  <!-- We don't have pattern matching until JDK 21 -->
   <!-- Most code is generated. -->
   <Match>
     <Or>
@@ -307,12 +307,14 @@
       <Package name="com.io7m.idstore.protocol.admin.cb.internal"/>
     </Or>
     <Or>
+      <Bug pattern="BC_UNCONFIRMED_CAST"/>
       <Bug pattern="BED_BOGUS_EXCEPTION_DECLARATION"/>
       <Bug pattern="CC_CYCLOMATIC_COMPLEXITY"/>
       <Bug pattern="CE_CLASS_ENVY"/>
       <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
       <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
       <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+      <Bug pattern="REC_CATCH_EXCEPTION"/>
       <Bug pattern="RI_REDUNDANT_INTERFACES"/>
       <Bug pattern="UP_UNUSED_PARAMETER"/>
     </Or>
@@ -352,12 +354,14 @@
       <Package name="com.io7m.idstore.protocol.user.cb.internal"/>
     </Or>
     <Or>
+      <Bug pattern="BC_UNCONFIRMED_CAST"/>
       <Bug pattern="BED_BOGUS_EXCEPTION_DECLARATION"/>
       <Bug pattern="CC_CYCLOMATIC_COMPLEXITY"/>
       <Bug pattern="CE_CLASS_ENVY"/>
       <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
       <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
       <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+      <Bug pattern="REC_CATCH_EXCEPTION"/>
       <Bug pattern="RI_REDUNDANT_INTERFACES"/>
       <Bug pattern="UP_UNUSED_PARAMETER"/>
     </Or>
@@ -467,16 +471,10 @@
     </Or>
   </Match>
 
-  <!-- We don't have pattern matching until JDK 21 -->
-  <Match>
-    <Class name="com.io7m.idstore.server.controller.user.IdUCommandExecutor"/>
-    <Method name="executeCommand"/>
-    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
-  </Match>
   <Match>
     <Class name="com.io7m.idstore.server.controller.admin.IdACommandExecutor"/>
     <Method name="executeCommand"/>
-    <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+    <Bug pattern="CC_CYCLOMATIC_COMPLEXITY"/>
   </Match>
   <Match>
     <Class name="com.io7m.idstore.server.controller.admin.IdACmdAdminUpdatePasswordExpiration"/>
@@ -495,7 +493,10 @@
 
   <!-- Record type. -->
   <Match>
-    <Class name="com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize"/>
+    <Or>
+      <Class name="com.io7m.idstore.server.http.IdHTTPResponseFixedSize"/>
+      <Class name="com.io7m.idstore.server.http.IdHTTPResponseRedirect"/>
+    </Or>
     <Or>
       <Bug pattern="EI_EXPOSE_REP"/>
       <Bug pattern="EI_EXPOSE_REP2"/>
@@ -505,7 +506,7 @@
 
   <!-- A deliberate delay for rate limiting purposes. -->
   <Match>
-    <Class name="com.io7m.idstore.server.http.IdHTTPServletCoreFixedDelay"/>
+    <Class name="com.io7m.idstore.server.http.IdHTTPHandlerCoreFixedDelay"/>
     <Method name="applyFixedDelay"/>
     <Bug pattern="MDM_THREAD_YIELD"/>
   </Match>
@@ -516,31 +517,37 @@
     <Bug pattern="IMC_IMMATURE_CLASS_NO_EQUALS"/>
   </Match>
 
+  <!-- It's an API. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.http.IdHTTPServerRequests"/>
+    <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+  </Match>
+
   <!-- toString() isn't needed here. -->
   <Match>
     <Or>
-      <Class name="com.io7m.idstore.server.http.IdHTTPServletCoreFixedDelay"/>
-      <Class name="com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented"/>
-      <Class name="com.io7m.idstore.server.http.IdServletHolders"/>
+      <Class name="com.io7m.idstore.server.http.IdHTTPHandlerCoreFixedDelay"/>
+      <Class name="com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented"/>
+      <Class name="com.io7m.idstore.server.http.IdHandlerHolders"/>
     </Or>
     <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
   </Match>
 
   <!-- False positive. The code throws an unchecked exception, it doesn't convert one. -->
   <Match>
-    <Class name="com.io7m.idstore.server.http.IdHTTPServletFunctional"/>
+    <Class name="com.io7m.idstore.server.http.IdHTTPHandlerFunctional"/>
     <Bug pattern="EXS_EXCEPTION_SOFTENING_HAS_CHECKED"/>
   </Match>
 
   <!-- JDK 21 pattern matching required. -->
   <Match>
-    <Class name="com.io7m.idstore.server.http.IdHTTPServletFunctional"/>
+    <Class name="com.io7m.idstore.server.http.IdHTTPHandlerFunctional"/>
     <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
   </Match>
 
   <!-- equals() isn't needed here. -->
   <Match>
-    <Class name="com.io7m.idstore.server.http.IdServletHolder"/>
+    <Class name="com.io7m.idstore.server.http.IdHandlerHolder"/>
     <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
   </Match>
 
@@ -782,21 +789,21 @@
 
   <!-- This string specifically needs to write \r\n\r\n -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_v1.IdU1ServletVersion"/>
+    <Class name="com.io7m.idstore.server.user_v1.IdU1HandlerVersion"/>
     <Method name="execute"/>
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
   </Match>
 
   <!-- IOException -> UncheckedIOException -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_v1.IdU1ServletCommand"/>
+    <Class name="com.io7m.idstore.server.user_v1.IdU1HandlerCommand"/>
     <Method name="execute"/>
     <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
   </Match>
 
   <!-- IOException -> UncheckedIOException -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_v1.IdU1ServletLogin"/>
+    <Class name="com.io7m.idstore.server.user_v1.IdU1HandlerLogin"/>
     <Method name="execute"/>
     <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
   </Match>
@@ -815,8 +822,8 @@
   <!-- toString() isn't needed here. -->
   <Match>
     <Or>
-      <Class name="com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated"/>
-      <Class name="com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware"/>
+      <Class name="com.io7m.idstore.server.user_view.IdUVHandlerCoreAuthenticated"/>
+      <Class name="com.io7m.idstore.server.user_view.IdUVHandlerCoreMaintenanceAware"/>
     </Or>
     <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
   </Match>
@@ -828,13 +835,6 @@
       <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
       <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CHECKED"/>
     </Or>
-  </Match>
-
-  <!-- Specifically there to instantiate lots of other classes. -->
-  <Match>
-    <Class name="com.io7m.idstore.server.user_view.IdUVServer"/>
-    <Method name="createUserViewServerServlets"/>
-    <Bug pattern="CE_CLASS_ENVY"/>
   </Match>
 
   <!-- A deliberate delay for rate limiting purposes. -->

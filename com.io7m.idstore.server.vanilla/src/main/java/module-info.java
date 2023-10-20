@@ -53,9 +53,9 @@ module com.io7m.idstore.server.vanilla
   requires com.io7m.idstore.strings;
 
   requires com.io7m.jmulticlose.core;
+  requires io.helidon.webserver;
   requires io.opentelemetry.api;
-  requires org.eclipse.jetty.server;
-  requires org.eclipse.jetty.util;
+  requires org.slf4j;
 
   provides IdServerFactoryType
     with IdServers;

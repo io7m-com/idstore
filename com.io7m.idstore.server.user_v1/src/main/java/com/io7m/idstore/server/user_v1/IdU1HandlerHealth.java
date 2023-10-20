@@ -16,26 +16,27 @@
 
 package com.io7m.idstore.server.user_v1;
 
-import com.io7m.idstore.server.http.IdHTTPServletFunctional;
-import com.io7m.idstore.server.http.IdHTTPServletFunctionalCoreType;
-import com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize;
-import com.io7m.idstore.server.http.IdHTTPServletResponseType;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctional;
+import com.io7m.idstore.server.http.IdHTTPHandlerFunctionalCoreType;
+import com.io7m.idstore.server.http.IdHTTPResponseFixedSize;
+import com.io7m.idstore.server.http.IdHTTPResponseType;
 import com.io7m.idstore.server.service.health.IdServerHealth;
 import com.io7m.idstore.server.service.maintenance.IdClosedForMaintenanceService;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.Objects;
+import java.util.Set;
 
 import static com.io7m.idstore.model.IdUserDomain.USER;
-import static com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented.withInstrumentation;
+import static com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented.withInstrumentation;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * The v1 health servlet.
  */
 
-public final class IdU1ServletHealth
-  extends IdHTTPServletFunctional
+public final class IdU1HandlerHealth
+  extends IdHTTPHandlerFunctional
 {
   /**
    * The v1 health servlet.
@@ -43,13 +44,13 @@ public final class IdU1ServletHealth
    * @param services The services
    */
 
-  public IdU1ServletHealth(
+  public IdU1HandlerHealth(
     final RPServiceDirectoryType services)
   {
     super(createCore(services));
   }
 
-  private static IdHTTPServletFunctionalCoreType createCore(
+  private static IdHTTPHandlerFunctionalCoreType createCore(
     final RPServiceDirectoryType services)
   {
     final var health =
@@ -57,20 +58,21 @@ public final class IdU1ServletHealth
     final var maintenance =
       services.requireService(IdClosedForMaintenanceService.class);
 
-    final IdHTTPServletFunctionalCoreType main =
+    final IdHTTPHandlerFunctionalCoreType main =
       (request, information) -> execute(health, maintenance);
 
     return withInstrumentation(services, USER, main);
   }
 
-  private static IdHTTPServletResponseType execute(
+  private static IdHTTPResponseType execute(
     final IdServerHealth health,
     final IdClosedForMaintenanceService maintenance)
   {
     final var closed = maintenance.isClosed();
     if (closed.isPresent()) {
-      return new IdHTTPServletResponseFixedSize(
+      return new IdHTTPResponseFixedSize(
         503,
+        Set.of(),
         "text/plain",
         closed.get().getBytes(UTF_8)
       );
@@ -81,8 +83,9 @@ public final class IdU1ServletHealth
     final var statusCode =
       Objects.equals(status, IdServerHealth.statusOKText()) ? 200 : 500;
 
-    return new IdHTTPServletResponseFixedSize(
+    return new IdHTTPResponseFixedSize(
       statusCode,
+      Set.of(),
       "text/plain",
       status.getBytes(UTF_8)
     );
