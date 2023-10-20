@@ -50,6 +50,7 @@ public record IdHTTPResponseFixedSize(
     Objects.requireNonNull(contentType, "contentType");
     Objects.requireNonNull(cookies, "cookies");
     Objects.requireNonNull(data, "data");
+    cookies = Set.copyOf(cookies);
   }
 
   @Override

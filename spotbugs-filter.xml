@@ -493,7 +493,10 @@
 
   <!-- Record type. -->
   <Match>
-    <Class name="com.io7m.idstore.server.http.IdHTTPServletResponseFixedSize"/>
+    <Or>
+      <Class name="com.io7m.idstore.server.http.IdHTTPResponseFixedSize"/>
+      <Class name="com.io7m.idstore.server.http.IdHTTPResponseRedirect"/>
+    </Or>
     <Or>
       <Bug pattern="EI_EXPOSE_REP"/>
       <Bug pattern="EI_EXPOSE_REP2"/>
@@ -503,7 +506,7 @@
 
   <!-- A deliberate delay for rate limiting purposes. -->
   <Match>
-    <Class name="com.io7m.idstore.server.http.IdHTTPServletCoreFixedDelay"/>
+    <Class name="com.io7m.idstore.server.http.IdHTTPHandlerCoreFixedDelay"/>
     <Method name="applyFixedDelay"/>
     <Bug pattern="MDM_THREAD_YIELD"/>
   </Match>
@@ -514,31 +517,37 @@
     <Bug pattern="IMC_IMMATURE_CLASS_NO_EQUALS"/>
   </Match>
 
+  <!-- It's an API. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.http.IdHTTPServerRequests"/>
+    <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+  </Match>
+
   <!-- toString() isn't needed here. -->
   <Match>
     <Or>
-      <Class name="com.io7m.idstore.server.http.IdHTTPServletCoreFixedDelay"/>
-      <Class name="com.io7m.idstore.server.http.IdHTTPServletCoreInstrumented"/>
-      <Class name="com.io7m.idstore.server.http.IdServletHolders"/>
+      <Class name="com.io7m.idstore.server.http.IdHTTPHandlerCoreFixedDelay"/>
+      <Class name="com.io7m.idstore.server.http.IdHTTPHandlerCoreInstrumented"/>
+      <Class name="com.io7m.idstore.server.http.IdHandlerHolders"/>
     </Or>
     <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
   </Match>
 
   <!-- False positive. The code throws an unchecked exception, it doesn't convert one. -->
   <Match>
-    <Class name="com.io7m.idstore.server.http.IdHTTPServletFunctional"/>
+    <Class name="com.io7m.idstore.server.http.IdHTTPHandlerFunctional"/>
     <Bug pattern="EXS_EXCEPTION_SOFTENING_HAS_CHECKED"/>
   </Match>
 
   <!-- JDK 21 pattern matching required. -->
   <Match>
-    <Class name="com.io7m.idstore.server.http.IdHTTPServletFunctional"/>
+    <Class name="com.io7m.idstore.server.http.IdHTTPHandlerFunctional"/>
     <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
   </Match>
 
   <!-- equals() isn't needed here. -->
   <Match>
-    <Class name="com.io7m.idstore.server.http.IdServletHolder"/>
+    <Class name="com.io7m.idstore.server.http.IdHandlerHolder"/>
     <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
   </Match>
 
@@ -780,21 +789,21 @@
 
   <!-- This string specifically needs to write \r\n\r\n -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_v1.IdU1ServletVersion"/>
+    <Class name="com.io7m.idstore.server.user_v1.IdU1HandlerVersion"/>
     <Method name="execute"/>
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
   </Match>
 
   <!-- IOException -> UncheckedIOException -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_v1.IdU1ServletCommand"/>
+    <Class name="com.io7m.idstore.server.user_v1.IdU1HandlerCommand"/>
     <Method name="execute"/>
     <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
   </Match>
 
   <!-- IOException -> UncheckedIOException -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_v1.IdU1ServletLogin"/>
+    <Class name="com.io7m.idstore.server.user_v1.IdU1HandlerLogin"/>
     <Method name="execute"/>
     <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
   </Match>
@@ -813,8 +822,8 @@
   <!-- toString() isn't needed here. -->
   <Match>
     <Or>
-      <Class name="com.io7m.idstore.server.user_view.IdUVServletCoreAuthenticated"/>
-      <Class name="com.io7m.idstore.server.user_view.IdUVServletCoreMaintenanceAware"/>
+      <Class name="com.io7m.idstore.server.user_view.IdUVHandlerCoreAuthenticated"/>
+      <Class name="com.io7m.idstore.server.user_view.IdUVHandlerCoreMaintenanceAware"/>
     </Or>
     <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
   </Match>
@@ -826,13 +835,6 @@
       <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
       <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CHECKED"/>
     </Or>
-  </Match>
-
-  <!-- Specifically there to instantiate lots of other classes. -->
-  <Match>
-    <Class name="com.io7m.idstore.server.user_view.IdUVServer"/>
-    <Method name="createUserViewServerServlets"/>
-    <Bug pattern="CE_CLASS_ENVY"/>
   </Match>
 
   <!-- A deliberate delay for rate limiting purposes. -->

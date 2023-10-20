@@ -141,14 +141,4 @@ public final class IdHTTPHandlerCoreInstrumented
       span.end();
     }
   }
-
-  private static String remoteAddressOf(
-    final ServerRequest request)
-  {
-    final var peer = request.remotePeer();
-    return "%s:%d".formatted(
-      peer.host(),
-      Integer.valueOf(peer.port())
-    );
-  }
 }

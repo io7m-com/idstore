@@ -22,7 +22,6 @@ import com.io7m.repetoir.core.RPServiceType;
 import io.helidon.webserver.http.ServerRequest;
 import org.apache.commons.io.input.BoundedInputStream;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.function.Function;
@@ -58,14 +57,13 @@ public final class IdRequestLimits implements RPServiceType
    *
    * @return A bounded input stream
    *
-   * @throws IOException            On errors
    * @throws IdRequestLimitExceeded On errors
    */
 
   public InputStream boundedMaximumInput(
     final ServerRequest request,
     final long maximum)
-    throws IOException, IdRequestLimitExceeded
+    throws IdRequestLimitExceeded
   {
     final long size;
     final var specifiedLength =

@@ -45,6 +45,7 @@ public record IdHTTPResponseRedirect(
   {
     Objects.requireNonNull(cookies, "cookies");
     Objects.requireNonNull(path, "path");
+    cookies = Set.copyOf(cookies);
   }
 
   @Override
