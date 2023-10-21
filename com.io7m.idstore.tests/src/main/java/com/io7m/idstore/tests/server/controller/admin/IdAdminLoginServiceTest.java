@@ -34,7 +34,7 @@ import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.controller.admin.IdAdminLoginService;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.service.clock.IdServerClock;
-import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationParsers;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitAdminLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionAdminService;
@@ -140,8 +140,7 @@ public final class IdAdminLoginServiceTest extends IdServiceContract<IdAdminLogi
       );
 
     final var configFile =
-      new IdServerConfigurationFiles()
-        .parse(file);
+      new IdServerConfigurationParsers().parseFile(file);
 
     final var configuration =
       IdServerConfigurations.ofFile(

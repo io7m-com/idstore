@@ -16,34 +16,40 @@
 
 package com.io7m.idstore.server.api;
 
+import com.io7m.idstore.tls.IdTLSConfigurationType;
+
 import java.net.URI;
 import java.util.Objects;
 
 /**
  * Configuration for individual HTTP services.
  *
- * @param listenAddress     The listen address
- * @param listenPort        The listen port
- * @param externalAddress   The externally visible address
+ * @param listenAddress    The listen address
+ * @param listenPort       The listen port
+ * @param externalAddress  The externally visible address
+ * @param tlsConfiguration The TLS configuration
  */
 
 public record IdServerHTTPServiceConfiguration(
   String listenAddress,
   int listenPort,
-  URI externalAddress)
+  URI externalAddress,
+  IdTLSConfigurationType tlsConfiguration)
   implements IdServerJSONConfigurationElementType
 {
   /**
    * Configuration for the part of the server that serves over HTTP.
    *
-   * @param listenAddress     The listen address
-   * @param listenPort        The listen port
-   * @param externalAddress   The externally visible address
+   * @param listenAddress    The listen address
+   * @param listenPort       The listen port
+   * @param externalAddress  The externally visible address
+   * @param tlsConfiguration The TLS configuration
    */
 
   public IdServerHTTPServiceConfiguration
   {
     Objects.requireNonNull(listenAddress, "listenAddress");
     Objects.requireNonNull(externalAddress, "externalAddress");
+    Objects.requireNonNull(tlsConfiguration, "tlsConfiguration");
   }
 }

@@ -26,6 +26,7 @@ open module com.io7m.idstore.tests.extensions
   requires com.io7m.idstore.server.api;
   requires com.io7m.idstore.server.vanilla;
   requires com.io7m.idstore.strings;
+  requires com.io7m.idstore.tls;
 
   requires com.io7m.ervilla.api;
   requires com.io7m.ervilla.postgres;

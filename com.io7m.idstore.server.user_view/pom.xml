@@ -46,6 +46,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.server.service.tls</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.protocol.user</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -97,6 +102,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.error_codes</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.tls</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -151,6 +161,10 @@
     <dependency>
       <groupId>io.helidon.common</groupId>
       <artifactId>helidon-common-parameters</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.helidon.common</groupId>
+      <artifactId>helidon-common-tls</artifactId>
     </dependency>
 
     <dependency>

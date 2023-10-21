@@ -39,8 +39,10 @@ module com.io7m.idstore.server.admin_v1
   requires com.io7m.idstore.server.service.reqlimit;
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.telemetry.api;
+  requires com.io7m.idstore.server.service.tls;
   requires com.io7m.idstore.server.service.verdant;
   requires com.io7m.idstore.strings;
+  requires com.io7m.idstore.tls;
 
   requires com.io7m.verdant.core;
   requires io.helidon.webserver;

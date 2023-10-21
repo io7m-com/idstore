@@ -199,4 +199,7 @@
   <suppress files="IdUVHandlerCoreAuthenticated\.java"
             checks="NPathComplexity"/>
 
+  <suppress files="IdServer\.java"
+            checks="ExecutableStatementCount"/>
+
 </suppressions>

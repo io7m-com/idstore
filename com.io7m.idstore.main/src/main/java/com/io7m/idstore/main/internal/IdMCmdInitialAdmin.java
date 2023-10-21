@@ -16,12 +16,13 @@
 
 package com.io7m.idstore.main.internal;
 
+import com.io7m.anethum.slf4j.ParseStatusLogging;
 import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdName;
 import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.api.IdServerFactoryType;
-import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationParsers;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
@@ -30,6 +31,8 @@ import com.io7m.quarrel.core.QParameterNamed1;
 import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
 import com.io7m.quarrel.ext.logback.QLogback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.nio.file.Path;
@@ -49,6 +52,9 @@ import static com.io7m.quarrel.core.QCommandStatus.SUCCESS;
 
 public final class IdMCmdInitialAdmin implements QCommandType
 {
+  private static final Logger LOG =
+    LoggerFactory.getLogger(IdMCmdInitialAdmin.class);
+
   private static final QParameterNamed1<Path> CONFIGURATION_FILE =
     new QParameterNamed1<>(
       "--configuration",
@@ -157,9 +163,13 @@ public final class IdMCmdInitialAdmin implements QCommandType
     final var configurationFile =
       context.parameterValue(CONFIGURATION_FILE);
 
+    final var parsers =
+      new IdServerConfigurationParsers();
     final var configFile =
-      new IdServerConfigurationFiles()
-        .parse(configurationFile);
+      parsers.parseFile(
+        configurationFile,
+        status -> ParseStatusLogging.logWithAll(LOG, status)
+      );
 
     final var configuration =
       IdServerConfigurations.ofFile(

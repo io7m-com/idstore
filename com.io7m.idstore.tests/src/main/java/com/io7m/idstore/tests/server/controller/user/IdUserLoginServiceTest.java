@@ -33,7 +33,7 @@ import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure;
 import com.io7m.idstore.server.controller.user.IdUserLoginService;
 import com.io7m.idstore.server.service.clock.IdServerClock;
-import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationParsers;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.ratelimit.IdRateLimitUserLoginServiceType;
 import com.io7m.idstore.server.service.sessions.IdSessionUserService;
@@ -138,8 +138,8 @@ public final class IdUserLoginServiceTest extends IdServiceContract<IdUserLoginS
       );
 
     final var configFile =
-      new IdServerConfigurationFiles()
-        .parse(file);
+      new IdServerConfigurationParsers()
+        .parseFile(file);
 
     final var configuration =
       IdServerConfigurations.ofFile(

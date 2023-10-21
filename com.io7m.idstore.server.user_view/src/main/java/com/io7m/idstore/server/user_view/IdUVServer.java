@@ -22,7 +22,10 @@ import com.io7m.idstore.server.http.IdHTTPRequestTimeFilter;
 import com.io7m.idstore.server.service.clock.IdServerClock;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.telemetry.api.IdMetricsServiceType;
+import com.io7m.idstore.server.service.tls.IdTLSContextServiceType;
+import com.io7m.idstore.tls.IdTLSEnabled;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
+import io.helidon.common.tls.TlsConfig;
 import io.helidon.webserver.WebServer;
 import io.helidon.webserver.WebServerConfig;
 import io.helidon.webserver.http.HttpRouting;
@@ -66,6 +69,8 @@ public final class IdUVServer
   {
     final var configurationService =
       services.requireService(IdServerConfigurationService.class);
+    final var tlsService =
+      services.requireService(IdTLSContextServiceType.class);
     final var configuration =
       configurationService.configuration();
     final var httpConfig =
@@ -79,9 +84,27 @@ public final class IdUVServer
     final var routing =
       createRouting(services);
 
+    final var webServerBuilder =
+      WebServerConfig.builder();
+
+    if (httpConfig.tlsConfiguration() instanceof final IdTLSEnabled enabled) {
+      final var tlsContext =
+        tlsService.create(
+          "UserView",
+          enabled.keyStore(),
+          enabled.trustStore()
+        );
+
+      webServerBuilder.tls(
+        TlsConfig.builder()
+          .enabled(true)
+          .sslContext(tlsContext.context())
+          .build()
+      );
+    }
+
     final var webServer =
-      WebServerConfig.builder()
-        .port(httpConfig.listenPort())
+      webServerBuilder.port(httpConfig.listenPort())
         .address(InetAddress.getByName(httpConfig.listenAddress()))
         .routing(routing)
         .listenerSocketOptions(Map.ofEntries(

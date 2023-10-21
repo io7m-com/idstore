@@ -53,6 +53,7 @@
     <module>com.io7m.idstore.server.service.telemetry.api</module>
     <module>com.io7m.idstore.server.service.telemetry.otp</module>
     <module>com.io7m.idstore.server.service.templating</module>
+    <module>com.io7m.idstore.server.service.tls</module>
     <module>com.io7m.idstore.server.service.verdant</module>
     <module>com.io7m.idstore.server.user_v1</module>
     <module>com.io7m.idstore.server.user_view</module>
@@ -62,12 +63,14 @@
     <module>com.io7m.idstore.tests.arbitraries</module>
     <module>com.io7m.idstore.tests.extensions</module>
     <module>com.io7m.idstore.tests</module>
+    <module>com.io7m.idstore.tls</module>
     <module>com.io7m.idstore.user_client.api</module>
     <module>com.io7m.idstore.user_client</module>
   </modules>
 
   <properties>
     <com.io7m.anethum.version>1.1.0</com.io7m.anethum.version>
+    <com.io7m.blackthorne.version>2.0.0</com.io7m.blackthorne.version>
     <com.io7m.cedarbridge.version>1.2.0</com.io7m.cedarbridge.version>
     <com.io7m.cxbutton.version>0.0.5</com.io7m.cxbutton.version>
     <com.io7m.ervilla.version>0.0.5</com.io7m.ervilla.version>
@@ -316,6 +319,11 @@
         <version>${com.io7m.anethum.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.io7m.anethum</groupId>
+        <artifactId>com.io7m.anethum.slf4j</artifactId>
+        <version>${com.io7m.anethum.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>42.6.0</version>
@@ -507,21 +515,21 @@
         <version>1.0.0</version>
       </dependency>
 
-      <!-- Jakarta XML -->
+      <!-- Blackthorne XML -->
       <dependency>
-        <groupId>jakarta.xml.bind</groupId>
-        <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>4.0.1</version>
+        <groupId>com.io7m.blackthorne</groupId>
+        <artifactId>com.io7m.blackthorne.core</artifactId>
+        <version>${com.io7m.blackthorne.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>4.0.4</version>
+        <groupId>com.io7m.blackthorne</groupId>
+        <artifactId>com.io7m.blackthorne.jxe</artifactId>
+        <version>${com.io7m.blackthorne.version}</version>
       </dependency>
       <dependency>
-        <groupId>jakarta.activation</groupId>
-        <artifactId>jakarta.activation-api</artifactId>
-        <version>2.1.2</version>
+        <groupId>com.io7m.jxe</groupId>
+        <artifactId>com.io7m.jxe.core</artifactId>
+        <version>1.0.2</version>
       </dependency>
 
       <!-- Jakarta mail -->
@@ -531,15 +539,9 @@
         <version>1.6.0</version>
       </dependency>
       <dependency>
-        <groupId>com.sun.mail</groupId>
+        <groupId>org.eclipse.angus</groupId>
         <artifactId>jakarta.mail</artifactId>
-        <version>2.0.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.sun.activation</groupId>
-            <artifactId>jakarta.activation</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>2.0.2</version>
       </dependency>
       <dependency>
         <groupId>com.github.davidmoten</groupId>
@@ -550,7 +552,16 @@
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+          </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.activation</groupId>
+        <artifactId>jakarta.activation-api</artifactId>
+        <version>2.1.2</version>
       </dependency>
 
       <!-- Test suite -->
