@@ -118,7 +118,7 @@ public final class IdUVServer
     return webServer;
   }
 
-  private static HttpRouting createRouting(
+  private static HttpRouting.Builder createRouting(
     final RPServiceDirectoryType services)
   {
     final var router = HttpRouting.builder();
@@ -261,6 +261,6 @@ public final class IdUVServer
       router.post("/password-update-run/*", handler);
     }
 
-    return router.get();
+    return router;
   }
 }

@@ -91,8 +91,7 @@ public final class IdU1Server
         .post("/user/1/0/login", new IdU1HandlerLogin(services))
         .post("/user/1/0/command", new IdU1HandlerCommand(services))
         .get("/version", new IdU1HandlerVersion(services))
-        .get("/health", new IdU1HandlerHealth(services))
-        .build();
+        .get("/health", new IdU1HandlerHealth(services));
 
     final var webServerBuilder =
       WebServerConfig.builder();

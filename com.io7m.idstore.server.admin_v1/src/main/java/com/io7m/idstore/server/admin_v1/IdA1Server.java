@@ -96,8 +96,7 @@ public final class IdA1Server
         .post("/admin/1/0/command",
              new IdA1HandlerCommand(services))
         .get("/health",
-             new IdA1HandlerHealth(services))
-        .build();
+             new IdA1HandlerHealth(services));
 
     final var webServerBuilder =
       WebServerConfig.builder();
