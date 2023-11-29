@@ -92,7 +92,7 @@
     <io7m.api.previousVersion>1.0.0-SNAPSHOT</io7m.api.previousVersion>
     <jetty.version>12.0.2</jetty.version>
     <jooq.version>3.18.7</jooq.version>
-    <logback.version>1.4.11</logback.version>
+    <logback.version>1.4.12</logback.version>
     <opentelemetry.version>1.31.0</opentelemetry.version>
     <org.jline.version>3.24.0</org.jline.version>
     <slf4j.version>2.0.9</slf4j.version>
