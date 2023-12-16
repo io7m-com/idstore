@@ -18,6 +18,7 @@
 package com.io7m.idstore.tests.server.service.configuration;
 
 import com.io7m.anethum.slf4j.ParseStatusLogging;
+import com.io7m.idstore.server.api.IdServerConfiguration;
 import com.io7m.idstore.server.api.IdServerConfigurationFile;
 import com.io7m.idstore.server.api.IdServerConfigurations;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationParsers;
@@ -34,15 +35,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.util.Locale;
 
 import static com.io7m.blackthorne.core.BTPreserveLexical.DISCARD_LEXICAL_INFORMATION;
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.WRITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdServerConfigurationServiceTest
   extends IdServiceContract<IdServerConfigurationService>
@@ -77,10 +77,22 @@ public final class IdServerConfigurationServiceTest
   public void testConfig2()
     throws Exception
   {
-    this.roundTrip("server-config-2.xml");
+    final var c = this.roundTrip("server-config-2.xml");
+
+    final var ot = c.openTelemetry().orElseThrow();
+    assertTrue(ot.logs().isPresent());
+    assertTrue(ot.metrics().isPresent());
+    assertTrue(ot.traces().isPresent());
   }
 
-  private void roundTrip(
+  @Test
+  public void testConfig3()
+    throws Exception
+  {
+    this.roundTrip("server-config-3.xml");
+  }
+
+  private IdServerConfiguration roundTrip(
     final String name)
     throws Exception
   {
@@ -136,6 +148,8 @@ public final class IdServerConfigurationServiceTest
     assertEquals(parsed0.rateLimit(), parsed1.rateLimit());
     assertEquals(parsed0.sessionConfiguration(), parsed1.sessionConfiguration());
     assertEquals(parsed0, parsed1);
+
+    return parsedConfig0;
   }
 
   @Override
