@@ -49,6 +49,8 @@ open module com.io7m.idstore.tests
   requires com.io7m.idstore.user_client;
 
   requires com.helger.css;
+  requires com.io7m.anethum.api;
+  requires com.io7m.anethum.slf4j;
   requires com.io7m.ervilla.api;
   requires com.io7m.ervilla.test_extension;
   requires com.io7m.junreachable.core;
@@ -77,6 +79,7 @@ open module com.io7m.idstore.tests
   requires org.junit.jupiter.engine;
   requires org.junit.platform.commons;
   requires org.junit.platform.engine;
+  requires com.io7m.blackthorne.core;
 
   exports com.io7m.idstore.tests.database;
   exports com.io7m.idstore.tests.integration;

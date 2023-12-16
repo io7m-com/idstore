@@ -44,7 +44,7 @@
         Maven Central</LinkExternal>.
     </Paragraph>
     <Paragraph>
-      The <Term type="command">idstore</Term> command requires that a Java 17+ compatible JVM be accessible
+      The <Term type="command">idstore</Term> command requires that a Java 21+ compatible JVM be accessible
       via <Term type="command">/usr/bin/env java</Term>.
     </Paragraph>
     <Paragraph>

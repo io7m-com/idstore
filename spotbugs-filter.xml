@@ -605,9 +605,22 @@
   <!-- com.io7m.idstore.server.service.configuration -->
   <!--                                               -->
 
-  <!-- Generated code. -->
+  <!-- Mindless blackthorne code. -->
   <Match>
-    <Package name="com.io7m.idstore.server.service.configuration.jaxb"/>
+    <Package name="com.io7m.idstore.server.service.configuration.v1"/>
+  </Match>
+
+  <!-- Pattern matching. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.service.configuration.IdServerConfigurationSerializer"/>
+    <Method name="serializeTLS"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+
+  <!-- Unavoidable. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.service.configuration.IdServerConfigurationSerializer"/>
+    <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
   </Match>
 
   <!-- It's an API. -->
@@ -624,6 +637,12 @@
       <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
       <Bug pattern="REC_CATCH_EXCEPTION"/>
     </Or>
+  </Match>
+
+  <!-- Reading paths from a configuration file. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles"/>
+    <Bug pattern="PATH_TRAVERSAL_IN"/>
   </Match>
 
   <!--                                        -->
@@ -880,6 +899,24 @@
   <Match>
     <Class name="com.io7m.idstore.shell.admin.internal.IdAPasswordExpirationSetConverter"/>
     <Bug pattern="ITC_INHERITANCE_TYPE_CHECKING"/>
+  </Match>
+
+  <!--                      -->
+  <!-- com.io7m.idstore.tls -->
+  <!--                      -->
+
+  <Match>
+    <Class name="com.io7m.idstore.tls.IdTLSStoreConfiguration"/>
+    <Or>
+      <Bug pattern="EI_EXPOSE_REP"/>
+      <Bug pattern="EI_EXPOSE_REP2"/>
+      <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+    </Or>
+  </Match>
+
+  <!-- Generated code. -->
+  <Match>
+    <Package name="com.io7m.idstore.tls.jaxb"/>
   </Match>
 
   <!--                             -->

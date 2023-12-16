@@ -64,6 +64,25 @@ public record IdColor(
     );
   }
 
+  @Override
+  public boolean equals(final Object o)
+  {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || !this.getClass().equals(o.getClass())) {
+      return false;
+    }
+    final IdColor idColor = (IdColor) o;
+    return this.toString().equals(idColor.toString());
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return this.toString().hashCode();
+  }
+
   /**
    * Scale this color by the given factor. Factors less than 1.0 make the color
    * darker. Factors greater than 1.0 make the color lighter.

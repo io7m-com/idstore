@@ -36,7 +36,9 @@ module com.io7m.idstore.server.user_view
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.telemetry.api;
   requires com.io7m.idstore.server.service.templating;
+  requires com.io7m.idstore.server.service.tls;
   requires com.io7m.idstore.strings;
+  requires com.io7m.idstore.tls;
 
   requires com.io7m.jvindicator.core;
   requires freemarker;

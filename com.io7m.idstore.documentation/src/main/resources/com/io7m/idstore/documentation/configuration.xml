@@ -30,42 +30,60 @@
       <Verbatim><![CDATA[
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Configuration xmlns="urn:com.io7m.idstore:configuration:1">
-  <Branding ProductTitle="idstore"/>
+<i:Configuration xmlns:i="urn:com.io7m.idstore:configuration:1"
+                 xmlns:it="urn:com.io7m.idstore.tls:1">
 
-  <Database Name="idstore"
-            Kind="POSTGRESQL"
-            OwnerRoleName="idstore_install"
-            OwnerRolePassword="mydatabasewill"
-            WorkerRolePassword="probablybecompromised"
-            Address="db.example.com"
-            Port="5432"
-            Create="true"
-            Upgrade="true"/>
+  <i:Branding ProductTitle="idstore"/>
 
-  <HTTPServices>
-    <HTTPServiceAdminAPI ListenAddress="[::]"
-                         ListenPort="51000"
-                         ExternalURI="http://[::]:51000/"/>
-    <HTTPServiceUserAPI ListenAddress="[::]"
-                        ListenPort="50000"
-                        ExternalURI="http://[::]:50000/"/>
-    <HTTPServiceUserView ListenAddress="[::]"
-                         ListenPort="50001"
-                         ExternalURI="http://[::]:50001/"/>
-  </HTTPServices>
+  <i:Database Name="idstore"
+              Kind="POSTGRESQL"
+              OwnerRoleName="idstore_install"
+              OwnerRolePassword="mydatabasewill"
+              WorkerRolePassword="probablybecompromised"
+              Address="db.example.com"
+              Port="5432"
+              Create="true"
+              Upgrade="true"/>
 
-  <History UserLoginHistoryLimit="10" AdminLoginHistoryLimit="100"/>
+  <i:HTTPServices>
+    <i:HTTPServiceAdminAPI ListenAddress="[::]"
+                           ListenPort="51000"
+                           ExternalURI="https://[::]:51000/">
+      <it:TLSEnabled>
+        <it:KeyStore Type="CANONMILL"
+                     Provider="CANONMILL"
+                     Password="changeit"
+                     File="keystore.xml"/>
+        <it:TrustStore Type="CANONMILL"
+                     Provider="CANONMILL"
+                     Password="changeit"
+                     File="truststore.xml"/>
+      </it:TLSEnabled>
+    </i:HTTPServiceAdminAPI>
+    <i:HTTPServiceUserAPI ListenAddress="[::]"
+                          ListenPort="50000"
+                          ExternalURI="http://[::]:50000/">
+      <it:TLSDisabled/>
+    </i:HTTPServiceUserAPI>
+    <i:HTTPServiceUserView ListenAddress="[::]"
+                           ListenPort="50001"
+                           ExternalURI="http://[::]:50001/">
+      <it:TLSDisabled/>
+    </i:HTTPServiceUserView>
+  </i:HTTPServices>
 
-  <Mail SenderAddress="no-reply@example.com" VerificationExpiration="PT24H">
-    <SMTP Host="mail.example.com"
+  <i:History UserLoginHistoryLimit="10"
+             AdminLoginHistoryLimit="100"/>
+
+  <i:Mail SenderAddress="no-reply@example.com" VerificationExpiration="PT24H">
+    <i:SMTP Host="mail.example.com"
           Port="25"/>
-  </Mail>
+  </i:Mail>
 
-  <RateLimiting EmailVerificationRateLimit="PT10M" PasswordResetRateLimit="PT10M" />
+  <i:RateLimiting EmailVerificationRateLimit="PT10M" PasswordResetRateLimit="PT10M" />
 
-  <Sessions UserSessionExpiration="PT30M" AdminSessionExpiration="PT30M"/>
-</Configuration>
+  <i:Sessions UserSessionExpiration="PT30M" AdminSessionExpiration="PT30M"/>
+</i:Configuration>
 ]]></Verbatim>
     </FormalItem>
   </Subsection>
@@ -131,11 +149,7 @@
       <Paragraph>
         The <Term type="expression">ListenAddress</Term>
         and <Term type="expression">ListenPort</Term> attributes specify the address and port to which to the HTTP
-        service will bind. It is recommended that the service be bound to
-        <Term type="expression">localhost</Term>
-        and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
-        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>
-        <LinkFootnote target="dffb7f36-a515-46c7-9ae1-f476b2257ce2"/>.
+        service will bind.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
@@ -145,6 +159,15 @@
       <Paragraph>
         By convention, the Admin API should listen on TCP port <Term type="constant">51000</Term>.
       </Paragraph>
+      <Paragraph>
+        The <Term type="expression">HTTPServiceAdminAPI</Term> element must contain either a
+        <Term type="expression">TLSEnabled</Term> or <Term type="expression">TLSDisabled</Term> element specifying
+        whether TLS should be enabled or disabled, respectively. The <Term type="expression">TLSEnabled</Term>
+        element describes the key store and trust store. The <Term type="package">idstore</Term> server
+        automatically reloads certificates periodically in order to work well in environments using the
+        <LinkExternal target="https://datatracker.ietf.org/doc/html/rfc8555">ACME</LinkExternal> protocol to
+        issue certificates.
+      </Paragraph>
     </Subsection>
     <Subsection title="HTTPServiceUserAPI">
       <Paragraph>
@@ -153,11 +176,7 @@
       <Paragraph>
         The <Term type="expression">ListenAddress</Term>
         and <Term type="expression">ListenPort</Term> attributes specify the address and port to which to the HTTP
-        service will bind. It is recommended that the service be bound to
-        <Term type="expression">localhost</Term>
-        and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
-        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>
-        <LinkFootnote target="dffb7f36-a515-46c7-9ae1-f476b2257ce2"/>.
+        service will bind.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
@@ -167,6 +186,15 @@
       <Paragraph>
         By convention, the User API should listen on TCP port <Term type="constant">50000</Term>.
       </Paragraph>
+      <Paragraph>
+        The <Term type="expression">HTTPServiceUserAPI</Term> element must contain either a
+        <Term type="expression">TLSEnabled</Term> or <Term type="expression">TLSDisabled</Term> element specifying
+        whether TLS should be enabled or disabled, respectively. The <Term type="expression">TLSEnabled</Term>
+        element describes the key store and trust store. The <Term type="package">idstore</Term> server
+        automatically reloads certificates periodically in order to work well in environments using the
+        <LinkExternal target="https://datatracker.ietf.org/doc/html/rfc8555">ACME</LinkExternal> protocol to
+        issue certificates.
+      </Paragraph>
     </Subsection>
     <Subsection title="HTTPServiceUserView">
       <Paragraph>
@@ -175,11 +203,7 @@
       <Paragraph>
         The <Term type="expression">ListenAddress</Term>
         and <Term type="expression">ListenPort</Term> attributes specify the address and port to which to the HTTP
-        service will bind. It is recommended that the service be bound to
-        <Term type="expression">localhost</Term>
-        and a reverse proxy such as <LinkExternal target="https://www.nginx.org">nginx</LinkExternal> be used to
-        provide <LinkExternal target="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</LinkExternal>
-        <LinkFootnote target="dffb7f36-a515-46c7-9ae1-f476b2257ce2"/>.
+        service will bind.
       </Paragraph>
       <Paragraph>
         The <Term type="expression">ExternalAddress</Term> attribute specifies the external address that clients will
@@ -188,6 +212,15 @@
       </Paragraph>
       <Paragraph>
         By convention, the User API should listen on TCP port <Term type="constant">50001</Term>.
+      </Paragraph>
+      <Paragraph>
+        The <Term type="expression">HTTPServiceUserView</Term> element must contain either a
+        <Term type="expression">TLSEnabled</Term> or <Term type="expression">TLSDisabled</Term> element specifying
+        whether TLS should be enabled or disabled, respectively. The <Term type="expression">TLSEnabled</Term>
+        element describes the key store and trust store. The <Term type="package">idstore</Term> server
+        automatically reloads certificates periodically in order to work well in environments using the
+        <LinkExternal target="https://datatracker.ietf.org/doc/html/rfc8555">ACME</LinkExternal> protocol to
+        issue certificates.
       </Paragraph>
     </Subsection>
     <Subsection title="Example">
@@ -199,13 +232,28 @@
 <HTTPServices>
   <HTTPServiceAdminAPI ListenAddress="localhost"
                        ListenPort="51000"
-                       ExternalURI="http://localhost:51000/"/>
+                       ExternalURI="http://localhost:51000/">
+    <it:TLSEnabled>
+      <it:KeyStore Type="CANONMILL"
+                   Provider="CANONMILL"
+                   Password="changeit"
+                   File="keystore.xml"/>
+      <it:TrustStore Type="CANONMILL"
+                   Provider="CANONMILL"
+                   Password="changeit"
+                   File="truststore.xml"/>
+    </it:TLSEnabled>
+  </HTTPServiceAdminAPI>
   <HTTPServiceUserAPI ListenAddress="localhost"
                       ListenPort="50000"
-                      ExternalURI="http://localhost:50000/"/>
+                      ExternalURI="http://localhost:50000/">
+    <it:TLSDisabled/>
+  </HTTPServiceUserAPI>
   <HTTPServiceUserView ListenAddress="localhost"
                        ListenPort="50001"
-                       ExternalURI="http://localhost:50001/"/>
+                       ExternalURI="http://localhost:50001/">
+    <it:TLSDisabled/>
+  </HTTPServiceUserView>
 </HTTPServices>
 ]]></Verbatim>
       </FormalItem>
@@ -646,21 +694,18 @@
     <Paragraph>
       The XSD schema for the configuration file is as follows:
     </Paragraph>
-    <FormalItem title="Schema">
+    <FormalItem title="Configuration Schema">
       <Verbatim>
-        <xi:include href="com/io7m/idstore/server/service/configuration/configuration.xsd"
+        <xi:include href="com/io7m/idstore/server/service/configuration/configuration-1.xsd"
+                    parse="text"/>
+      </Verbatim>
+    </FormalItem>
+    <FormalItem title="TLS Schema">
+      <Verbatim>
+        <xi:include href="com/io7m/idstore/server/service/configuration/tls-1.xsd"
                     parse="text"/>
       </Verbatim>
     </FormalItem>
   </Subsection>
-
-  <Footnote id="dffb7f36-a515-46c7-9ae1-f476b2257ce2">
-    Note: It is extremely important that any reverse proxy used provides the correct 
-    <LinkExternal target="https://datatracker.ietf.org/doc/html/rfc7239">RFC 7239</LinkExternal>
-    headers in order to tell the <Term type="expression">idstore</Term> server that a reverse proxy is present.
-    Otherwise, the <Term type="expression">idstore</Term> server will apply
-    <Link target="1d55d366-5883-4418-a61a-eef7a88eaca7">rate-limiting decisions</Link> to the address of the proxy
-    as opposed to the address of the user connecting through the proxy, as intended.
-  </Footnote>
 
 </Section>

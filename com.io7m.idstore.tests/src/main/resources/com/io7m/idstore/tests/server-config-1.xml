@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Configuration xmlns="urn:com.io7m.idstore:configuration:1">
+<Configuration xmlns="urn:com.io7m.idstore:configuration:1" xmlns:tls="urn:com.io7m.idstore.tls:1">
 
   <Branding ProductTitle="idstore">
     <ColorScheme>
@@ -151,13 +151,19 @@
   <HTTPServices>
     <HTTPServiceAdminAPI ListenAddress="localhost"
                          ListenPort="51000"
-                         ExternalURI="http://localhost:51000/"/>
+                         ExternalURI="http://localhost:51000/">
+      <tls:TLSDisabled/>
+    </HTTPServiceAdminAPI>
     <HTTPServiceUserAPI ListenAddress="localhost"
                         ListenPort="51000"
-                        ExternalURI="http://localhost:51000/"/>
+                        ExternalURI="http://localhost:51000/">
+      <tls:TLSDisabled/>
+    </HTTPServiceUserAPI>
     <HTTPServiceUserView ListenAddress="localhost"
                          ListenPort="50001"
-                         ExternalURI="http://localhost:50001/"/>
+                         ExternalURI="http://localhost:50001/">
+      <tls:TLSDisabled/>
+    </HTTPServiceUserView>
   </HTTPServices>
 
   <History UserLoginHistoryLimit="100"

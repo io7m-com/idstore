@@ -47,6 +47,7 @@ module com.io7m.idstore.server.vanilla
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.telemetry.api;
   requires com.io7m.idstore.server.service.templating;
+  requires com.io7m.idstore.server.service.tls;
   requires com.io7m.idstore.server.service.verdant;
   requires com.io7m.idstore.server.user_v1;
   requires com.io7m.idstore.server.user_view;

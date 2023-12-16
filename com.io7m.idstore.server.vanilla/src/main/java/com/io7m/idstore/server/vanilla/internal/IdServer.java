@@ -65,6 +65,8 @@ import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceFac
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
 import com.io7m.idstore.server.service.templating.IdFMTemplateService;
 import com.io7m.idstore.server.service.templating.IdFMTemplateServiceType;
+import com.io7m.idstore.server.service.tls.IdTLSContextService;
+import com.io7m.idstore.server.service.tls.IdTLSContextServiceType;
 import com.io7m.idstore.server.service.verdant.IdVerdantMessages;
 import com.io7m.idstore.server.user_v1.IdU1Server;
 import com.io7m.idstore.server.user_view.IdUVServer;
@@ -231,6 +233,12 @@ public final class IdServer implements IdServerType
     services.register(IdServerTelemetryServiceType.class, this.telemetry);
     services.register(IdDatabaseType.class, newDatabase);
 
+    final var strings = IdStrings.create(this.configuration.locale());
+    services.register(IdStrings.class, strings);
+
+    final var tls = IdTLSContextService.createService(services);
+    services.register(IdTLSContextServiceType.class, tls);
+
     final var metrics = new IdMetricsService(this.telemetry);
     services.register(IdMetricsServiceType.class, metrics);
 
@@ -241,9 +249,6 @@ public final class IdServer implements IdServerType
 
     final var eventService = IdEventService.create(this.telemetry, metrics);
     services.register(IdEventServiceType.class, eventService);
-
-    final var strings = IdStrings.create(this.configuration.locale());
-    services.register(IdStrings.class, strings);
 
     final var mailService =
       IdServerMailService.create(

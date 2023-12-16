@@ -39,6 +39,7 @@ import com.io7m.idstore.server.api.IdServerSessionConfiguration;
 import com.io7m.idstore.server.api.IdServerType;
 import com.io7m.idstore.server.vanilla.IdServers;
 import com.io7m.idstore.tests.extensions.IdTestDatabases.IdDatabaseFixture;
+import com.io7m.idstore.tls.IdTLSDisabled;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
 import com.io7m.jmulticlose.core.ClosingResourceFailedException;
@@ -307,21 +308,24 @@ public final class IdTestServers
       new IdServerHTTPServiceConfiguration(
         "localhost",
         userAPIPort,
-        URI.create("http://localhost:%d/".formatted(userAPIPort))
+        URI.create("http://localhost:%d/".formatted(userAPIPort)),
+        IdTLSDisabled.TLS_DISABLED
       );
 
     final var userViewConfiguration =
       new IdServerHTTPServiceConfiguration(
         "localhost",
         userViewPort,
-        URI.create("http://localhost:%d/".formatted(userViewPort))
+        URI.create("http://localhost:%d/".formatted(userViewPort)),
+        IdTLSDisabled.TLS_DISABLED
       );
 
     final var adminApiConfiguration =
       new IdServerHTTPServiceConfiguration(
         "localhost",
         adminAPIPort,
-        URI.create("http://localhost:%d/".formatted(adminAPIPort))
+        URI.create("http://localhost:%d/".formatted(adminAPIPort)),
+        IdTLSDisabled.TLS_DISABLED
       );
 
     final var sessionConfiguration =

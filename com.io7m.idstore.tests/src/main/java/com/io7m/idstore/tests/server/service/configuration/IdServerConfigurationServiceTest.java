@@ -17,8 +17,11 @@
 
 package com.io7m.idstore.tests.server.service.configuration;
 
+import com.io7m.anethum.slf4j.ParseStatusLogging;
+import com.io7m.idstore.server.api.IdServerConfigurationFile;
 import com.io7m.idstore.server.api.IdServerConfigurations;
-import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationParsers;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationSerializers;
 import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.telemetry.api.IdMetricsService;
 import com.io7m.idstore.tests.IdTestDirectories;
@@ -27,14 +30,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.util.Locale;
 
+import static com.io7m.blackthorne.core.BTPreserveLexical.DISCARD_LEXICAL_INFORMATION;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +47,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public final class IdServerConfigurationServiceTest
   extends IdServiceContract<IdServerConfigurationService>
 {
+  private static final Logger LOG =
+    LoggerFactory.getLogger(IdServerConfigurationServiceTest.class);
+
   private Path directory;
 
   @BeforeEach
@@ -60,71 +68,92 @@ public final class IdServerConfigurationServiceTest
 
   @Test
   public void testConfig0()
+    throws Exception
   {
     this.roundTrip("server-config-0.xml");
   }
 
   @Test
   public void testConfig2()
+    throws Exception
   {
     this.roundTrip("server-config-2.xml");
   }
 
   private void roundTrip(
     final String name)
+    throws Exception
   {
-    try {
-      final var files =
-        new IdServerConfigurationFiles();
+    final var parsers =
+      new IdServerConfigurationParsers();
+    final var serializers =
+      new IdServerConfigurationSerializers();
 
-      final var file =
-        IdTestDirectories.resourceOf(
-          IdServerConfigurationServiceTest.class,
-          this.directory,
-          name
-        );
+    final var file =
+      IdTestDirectories.resourceOf(
+        IdServerConfigurationServiceTest.class,
+        this.directory,
+        name
+      );
 
-      final var parsed0 =
-        files.parse(file);
-
-      final var parsedConfig0 =
-        IdServerConfigurations.ofFile(
-          Locale.getDefault(),
-          Clock.systemUTC(),
-          parsed0
-        );
-
-      final var outputFile =
-        this.directory.resolve("output.xml");
-
-      try (var output = Files.newOutputStream(outputFile, CREATE, WRITE)) {
-        files.serialize(output, parsedConfig0);
-      }
-
-      final var parsed1 =
-        files.parse(outputFile);
-
-      assertEquals(parsed0, parsed1);
-    } catch (final IOException e) {
-      throw new UncheckedIOException(e);
+    final IdServerConfigurationFile parsed0;
+    try (var parser =
+           parsers.createParserForFileWithContext(
+             DISCARD_LEXICAL_INFORMATION,
+             file,
+             x -> ParseStatusLogging.logWithAll(LOG, x))) {
+      parsed0 = parser.execute();
     }
+
+    final var parsedConfig0 =
+      IdServerConfigurations.ofFile(
+        Locale.getDefault(),
+        Clock.systemUTC(),
+        parsed0
+      );
+
+    final var outputFile =
+      this.directory.resolve("output.xml");
+
+    serializers.serializeFile(outputFile, parsed0);
+
+    final IdServerConfigurationFile parsed1;
+    try (var parser =
+           parsers.createParserForFileWithContext(
+             DISCARD_LEXICAL_INFORMATION,
+             outputFile,
+             x -> ParseStatusLogging.logWithAll(LOG, x))) {
+      parsed1 = parser.execute();
+    }
+
+    assertEquals(parsed0.brandingConfiguration(), parsed1.brandingConfiguration());
+    assertEquals(parsed0.databaseConfiguration(), parsed1.databaseConfiguration());
+    assertEquals(parsed0.historyConfiguration(), parsed1.historyConfiguration());
+    assertEquals(parsed0.httpConfiguration(), parsed1.httpConfiguration());
+    assertEquals(parsed0.mailConfiguration(), parsed1.mailConfiguration());
+    assertEquals(parsed0.openTelemetry(), parsed1.openTelemetry());
+    assertEquals(parsed0.passwordExpiration(), parsed1.passwordExpiration());
+    assertEquals(parsed0.rateLimit(), parsed1.rateLimit());
+    assertEquals(parsed0.sessionConfiguration(), parsed1.sessionConfiguration());
+    assertEquals(parsed0, parsed1);
   }
 
   @Override
   protected IdServerConfigurationService createInstanceA()
   {
     try {
-      final var files =
-        new IdServerConfigurationFiles();
+      final var parsers =
+        new IdServerConfigurationParsers();
+
       final var file =
         IdTestDirectories.resourceOf(
-        IdServerConfigurationServiceTest.class,
-        this.directory,
-        "server-config-0.xml"
-      );
+          IdServerConfigurationServiceTest.class,
+          this.directory,
+          "server-config-0.xml"
+        );
 
       final var configFile =
-        files.parse(file);
+        parsers.parseFile(file);
 
       final var configuration =
         IdServerConfigurations.ofFile(
@@ -137,8 +166,8 @@ public final class IdServerConfigurationServiceTest
         Mockito.mock(IdMetricsService.class),
         configuration
       );
-    } catch (final IOException e) {
-      throw new UncheckedIOException(e);
+    } catch (final Exception e) {
+      throw new IllegalStateException(e);
     }
   }
 
@@ -146,8 +175,9 @@ public final class IdServerConfigurationServiceTest
   protected IdServerConfigurationService createInstanceB()
   {
     try {
-      final var files =
-        new IdServerConfigurationFiles();
+      final var parsers =
+        new IdServerConfigurationParsers();
+
       final var file =
         IdTestDirectories.resourceOf(
           IdServerConfigurationServiceTest.class,
@@ -156,7 +186,7 @@ public final class IdServerConfigurationServiceTest
         );
 
       final var configFile =
-        files.parse(file);
+        parsers.parseFile(file);
 
       final var configuration =
         IdServerConfigurations.ofFile(
@@ -169,8 +199,8 @@ public final class IdServerConfigurationServiceTest
         Mockito.mock(IdMetricsService.class),
         configuration
       );
-    } catch (final IOException e) {
-      throw new UncheckedIOException(e);
+    } catch (final Exception e) {
+      throw new IllegalStateException(e);
     }
   }
 }

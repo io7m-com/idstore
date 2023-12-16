@@ -28,6 +28,7 @@
   <entry key="error">Error</entry>
   <entry key="error_delete_self">You cannot delete your own account.</entry>
   <entry key="error_invalid_username_password">Invalid username or password.</entry>
+  <entry key="error_io">I/O error</entry>
   <entry key="error_login_not_here">The login command cannot be used with this method.</entry>
   <entry key="error_malformed_parameter">Malformed parameter: {0}</entry>
   <entry key="error_reason_content_type">The server sent an unexpected content type.</entry>

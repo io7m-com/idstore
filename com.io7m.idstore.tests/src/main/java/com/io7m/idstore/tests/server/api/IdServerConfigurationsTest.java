@@ -17,8 +17,9 @@
 
 package com.io7m.idstore.tests.server.api;
 
+import com.io7m.anethum.api.ParsingException;
 import com.io7m.idstore.server.api.IdServerConfigurations;
-import com.io7m.idstore.server.service.configuration.IdServerConfigurationFiles;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationParsers;
 import com.io7m.idstore.tests.IdTestDirectories;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,6 +55,9 @@ public final class IdServerConfigurationsTest
   public void testLoad()
     throws Exception
   {
+    final var parsers =
+      new IdServerConfigurationParsers();
+
     final var file =
       IdTestDirectories.resourceOf(
         IdServerConfigurationsTest.class,
@@ -62,8 +66,7 @@ public final class IdServerConfigurationsTest
       );
 
     final var configFile =
-      new IdServerConfigurationFiles()
-        .parse(file);
+      parsers.parseFile(file);
 
     final var configuration =
       IdServerConfigurations.ofFile(
@@ -77,6 +80,9 @@ public final class IdServerConfigurationsTest
   public void testPortOverlap()
     throws Exception
   {
+    final var parsers =
+      new IdServerConfigurationParsers();
+
     final var file =
       IdTestDirectories.resourceOf(
         IdServerConfigurationsTest.class,
@@ -85,11 +91,10 @@ public final class IdServerConfigurationsTest
       );
 
     final var ex =
-      assertThrows(IllegalArgumentException.class, () -> {
-        new IdServerConfigurationFiles()
-          .parse(file);
+      assertThrows(ParsingException.class, () -> {
+        parsers.parseFile(file);
       });
 
-    assertTrue(ex.getMessage().contains("51000"));
+    assertTrue(ex.statusValues().get(0).message().contains("51000"));
   }
 }

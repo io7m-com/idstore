@@ -11,7 +11,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.0.0-beta0018</version>
+    <version>1.0.0-rc0001</version>
   </parent>
 
   <artifactId>com.io7m.idstore.server.admin_v1</artifactId>
@@ -88,6 +88,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.server.service.tls</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.model</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -109,6 +114,11 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>com.io7m.idstore.strings</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.idstore.tls</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -135,6 +145,10 @@
     <dependency>
       <groupId>io.helidon.common</groupId>
       <artifactId>helidon-common-parameters</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.helidon.common</groupId>
+      <artifactId>helidon-common-tls</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

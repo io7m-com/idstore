@@ -56,6 +56,8 @@ open module com.io7m.idstore.main
   requires com.io7m.idstore.shell.admin;
   requires com.io7m.idstore.strings;
 
+  requires com.io7m.anethum.api;
+  requires com.io7m.anethum.slf4j;
   requires com.io7m.quarrel.core;
   requires com.io7m.quarrel.ext.logback;
   requires com.io7m.repetoir.core;

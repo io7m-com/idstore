@@ -38,6 +38,7 @@ module com.io7m.idstore.server.user_v1
   requires com.io7m.idstore.server.service.reqlimit;
   requires com.io7m.idstore.server.service.sessions;
   requires com.io7m.idstore.server.service.telemetry.api;
+  requires com.io7m.idstore.server.service.tls;
   requires com.io7m.idstore.server.service.verdant;
   requires com.io7m.idstore.strings;
 
@@ -45,6 +46,7 @@ module com.io7m.idstore.server.user_v1
   requires io.helidon.webserver;
   requires io.opentelemetry.api;
   requires org.slf4j;
+  requires com.io7m.idstore.tls;
 
   exports com.io7m.idstore.server.user_v1;
 }
