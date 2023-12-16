@@ -22,6 +22,9 @@ import com.io7m.blackthorne.core.BTElementHandlerType;
 import com.io7m.blackthorne.core.BTElementParsingContextType;
 import com.io7m.blackthorne.core.BTQualifiedName;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration;
+import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdLogs;
+import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdMetrics;
+import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration.IdTraces;
 import org.xml.sax.Attributes;
 
 import java.util.Map;
@@ -34,9 +37,9 @@ final class IdC1Telemetry
   implements BTElementHandlerType<Object, IdServerOpenTelemetryConfiguration>
 {
   private String serviceName;
-  private Optional<IdServerOpenTelemetryConfiguration.IdLogs> logs;
-  private Optional<IdServerOpenTelemetryConfiguration.IdMetrics> metrics;
-  private Optional<IdServerOpenTelemetryConfiguration.IdTraces> traces;
+  private Optional<IdLogs> logs;
+  private Optional<IdMetrics> metrics;
+  private Optional<IdTraces> traces;
 
   IdC1Telemetry(
     final BTElementParsingContextType context)
@@ -53,6 +56,30 @@ final class IdC1Telemetry
   {
     this.serviceName =
       attributes.getValue("LogicalServiceName");
+  }
+
+  @Override
+  public void onChildValueProduced(
+    final BTElementParsingContextType context,
+    final Object result)
+    throws Exception
+  {
+    switch (result) {
+      case final IdLogs l -> {
+        this.logs = Optional.of(l);
+      }
+      case final IdMetrics m -> {
+        this.metrics = Optional.of(m);
+      }
+      case final IdTraces t -> {
+        this.traces = Optional.of(t);
+      }
+      default -> {
+        throw new IllegalStateException(
+          "Unexpected value: %s".formatted(result)
+        );
+      }
+    }
   }
 
   @Override
