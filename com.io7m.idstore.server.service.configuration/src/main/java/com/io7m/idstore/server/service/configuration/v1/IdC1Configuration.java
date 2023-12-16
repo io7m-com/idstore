@@ -65,6 +65,10 @@ public final class IdC1Configuration
     final BTElementParsingContextType context)
   {
     this.telemetry = Optional.empty();
+    this.passwords = new IdServerPasswordExpirationConfiguration(
+      Optional.empty(),
+      Optional.empty()
+    );
   }
 
   @Override

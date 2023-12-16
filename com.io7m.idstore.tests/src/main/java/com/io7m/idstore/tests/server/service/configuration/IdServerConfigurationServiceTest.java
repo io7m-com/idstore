@@ -85,6 +85,13 @@ public final class IdServerConfigurationServiceTest
     assertTrue(ot.traces().isPresent());
   }
 
+  @Test
+  public void testConfig3()
+    throws Exception
+  {
+    this.roundTrip("server-config-3.xml");
+  }
+
   private IdServerConfiguration roundTrip(
     final String name)
     throws Exception

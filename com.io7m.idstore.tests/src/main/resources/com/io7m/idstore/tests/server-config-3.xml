@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Configuration xmlns="urn:com.io7m.idstore:configuration:1" xmlns:tls="urn:com.io7m.idstore.tls:1">
+
+  <Branding ProductTitle="idstore"/>
+
+  <Database Kind="POSTGRESQL"
+            Name="postgres"
+            OwnerRoleName="postgres"
+            OwnerRolePassword="12345678"
+            WorkerRolePassword="1234abcd"
+            Address="localhost"
+            Port="54322"
+            Create="true"
+            Upgrade="true"/>
+
+  <HTTPServices>
+    <HTTPServiceAdminAPI ListenAddress="localhost"
+                         ListenPort="51000"
+                         ExternalURI="http://localhost:51000/">
+      <tls:TLSDisabled/>
+    </HTTPServiceAdminAPI>
+    <HTTPServiceUserAPI ListenAddress="localhost"
+                        ListenPort="50000"
+                        ExternalURI="http://localhost:50000/">
+      <tls:TLSDisabled/>
+    </HTTPServiceUserAPI>
+    <HTTPServiceUserView ListenAddress="localhost"
+                         ListenPort="50001"
+                         ExternalURI="http://localhost:50001/">
+      <tls:TLSDisabled/>
+    </HTTPServiceUserView>
+  </HTTPServices>
+
+  <History UserLoginHistoryLimit="100"
+           AdminLoginHistoryLimit="10000"/>
+
+  <Mail SenderAddress="no-reply@example.com"
+        VerificationExpiration="PT24H">
+    <SMTP Host="mail.example.com"
+          Port="25"/>
+  </Mail>
+
+  <OpenTelemetry LogicalServiceName="idstore">
+    <Metrics Endpoint="http://metrics.example.com:4317"
+            Protocol="GRPC"/>
+    <Traces Endpoint="http://traces.example.com:4317"
+            Protocol="GRPC"/>
+  </OpenTelemetry>
+
+  <RateLimiting EmailVerificationRateLimit="PT10M"
+                PasswordResetRateLimit="PT10M"/>
+
+  <Sessions UserSessionExpiration="PT30M"
+            AdminSessionExpiration="PT30M"/>
+
+</Configuration>
