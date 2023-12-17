@@ -17,24 +17,23 @@
 
 package com.io7m.idstore.server.service.maintenance;
 
-import com.io7m.idstore.database.api.IdDatabaseMaintenanceQueriesType;
+import com.io7m.idstore.database.api.IdDatabaseRole;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
+import com.io7m.idstore.server.service.configuration.IdServerConfigurationService;
 import com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType;
+import com.io7m.idstore.server.service.tls.IdTLSContextServiceType;
 import com.io7m.repetoir.core.RPServiceType;
-import io.opentelemetry.api.trace.SpanKind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
-import static com.io7m.idstore.server.service.telemetry.api.IdServerTelemetryServiceType.recordSpanException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A service that performs nightly database maintenance.
@@ -46,29 +45,52 @@ public final class IdMaintenanceService
   private static final Logger LOG =
     LoggerFactory.getLogger(IdMaintenanceService.class);
 
-  private final ScheduledExecutorService executor;
+  private final ExecutorService executor;
+  private final IdServerClock clock;
   private final IdServerTelemetryServiceType telemetry;
   private final IdDatabaseType database;
+  private final IdTLSContextServiceType tlsContexts;
+  private final IdServerConfigurationService configuration;
+  private final AtomicBoolean closed;
+  private final CompletableFuture<Void> waitTLS;
+  private final CompletableFuture<Void> waitMaintenance;
 
   private IdMaintenanceService(
-    final ScheduledExecutorService inExecutor,
+    final ExecutorService inExecutor,
+    final IdServerClock inClock,
     final IdServerTelemetryServiceType inTelemetry,
-    final IdDatabaseType inDatabase)
+    final IdDatabaseType inDatabase,
+    final IdTLSContextServiceType inTlsContexts,
+    final IdServerConfigurationService inConfiguration)
   {
     this.executor =
       Objects.requireNonNull(inExecutor, "executor");
+    this.clock =
+      Objects.requireNonNull(inClock, "clock");
     this.telemetry =
       Objects.requireNonNull(inTelemetry, "telemetry");
     this.database =
       Objects.requireNonNull(inDatabase, "database");
+    this.tlsContexts =
+      Objects.requireNonNull(inTlsContexts, "tlsContexts");
+    this.configuration =
+      Objects.requireNonNull(inConfiguration, "configuration");
+    this.closed =
+      new AtomicBoolean(false);
+    this.waitTLS =
+      new CompletableFuture<Void>();
+    this.waitMaintenance =
+      new CompletableFuture<Void>();
   }
 
   /**
-   * A service that performs nightly database maintenance.
+   * A service that performs nightly maintenance.
    *
-   * @param clock     The clock
-   * @param telemetry The telemetry service
-   * @param database  The database
+   * @param clock         The clock
+   * @param telemetry     The telemetry service
+   * @param database      The database
+   * @param configuration The configuration service
+   * @param tlsContexts   The TLS contexts
    *
    * @return The service
    */
@@ -76,85 +98,129 @@ public final class IdMaintenanceService
   public static IdMaintenanceService create(
     final IdServerClock clock,
     final IdServerTelemetryServiceType telemetry,
+    final IdServerConfigurationService configuration,
+    final IdTLSContextServiceType tlsContexts,
     final IdDatabaseType database)
   {
     Objects.requireNonNull(clock, "clock");
-    Objects.requireNonNull(telemetry, "telemetry");
+    Objects.requireNonNull(configuration, "configuration");
     Objects.requireNonNull(database, "database");
+    Objects.requireNonNull(telemetry, "telemetry");
+    Objects.requireNonNull(tlsContexts, "tlsContexts");
 
     final var executor =
-      Executors.newSingleThreadScheduledExecutor(r -> {
-        final var thread = new Thread(r);
-        thread.setDaemon(true);
-        thread.setName(
-          "com.io7m.idstore.server.service.maintenance.IdMaintenanceService[%d]".formatted(
-            thread.getId()));
-        return thread;
-      });
+      Executors.newThreadPerTaskExecutor(
+        Thread.ofVirtual()
+          .name("com.io7m.cardant.maintenance-", 0L)
+          .factory()
+      );
 
     final var maintenanceService =
-      new IdMaintenanceService(executor, telemetry, database);
+      new IdMaintenanceService(
+        executor,
+        clock,
+        telemetry,
+        database,
+        tlsContexts,
+        configuration
+      );
 
-    final var timeNow =
-      clock.now();
-    final var timeNextMidnight =
-      timeNow.withHour(0)
-        .withMinute(0)
-        .withSecond(0)
-        .plusDays(1L);
-
-    final var initialDelay =
-      Duration.between(timeNow, timeNextMidnight).toSeconds();
-
-    final var period =
-      Duration.of(1L, ChronoUnit.DAYS)
-        .toSeconds();
-
-    /*
-     * Run maintenance as soon as the service starts.
-     */
-
-    executor.submit(maintenanceService::runMaintenance);
-
-    /*
-     * Schedule maintenance to run at each midnight.
-     */
-
-    executor.scheduleAtFixedRate(
-      maintenanceService::runMaintenance,
-      initialDelay,
-      period,
-      TimeUnit.SECONDS
-    );
-
+    executor.execute(maintenanceService::runTLSReloadTask);
+    executor.execute(maintenanceService::runMaintenanceTask);
     return maintenanceService;
+  }
+
+  /**
+   * A task that executes maintenance once when the service starts, and then
+   * again at every subsequent midnight.
+   */
+
+  private void runMaintenanceTask()
+  {
+    while (!this.closed.get()) {
+      try {
+        this.runMaintenance();
+      } catch (final Exception e) {
+        // Not important.
+      }
+
+      final var timeNow =
+        this.clock.now();
+      final var timeNextMidnight =
+        timeNow.withHour(0)
+          .withMinute(0)
+          .withSecond(0)
+          .plusDays(1L);
+
+      final var untilNext =
+        Duration.between(timeNow, timeNextMidnight);
+
+      try {
+        this.waitMaintenance.get(untilNext.toSeconds(), TimeUnit.SECONDS);
+      } catch (final Exception e) {
+        break;
+      }
+    }
+  }
+
+  /**
+   * A task that reloads TLS contexts at the specified reload interval.
+   */
+
+  private void runTLSReloadTask()
+  {
+    final var reloadIntervalOpt =
+      this.configuration.configuration()
+        .maintenanceConfiguration()
+        .tlsReloadInterval();
+
+    if (reloadIntervalOpt.isEmpty()) {
+      return;
+    }
+
+    final var reloadInterval =
+      reloadIntervalOpt.get();
+
+    while (!this.closed.get()) {
+      try {
+        this.runTLSReload();
+      } catch (final Exception e) {
+        // Not important.
+      }
+
+      try {
+        this.waitTLS.get(reloadInterval.toSeconds(), TimeUnit.SECONDS);
+      } catch (final Exception e) {
+        break;
+      }
+    }
+  }
+
+  private void runTLSReload()
+  {
+    LOG.info("Reloading TLS contexts");
+    this.tlsContexts.reload();
   }
 
   private void runMaintenance()
   {
-    LOG.info("maintenance task starting");
+    LOG.info("Maintenance task starting");
 
     final var span =
       this.telemetry.tracer()
         .spanBuilder("Maintenance")
-        .setSpanKind(SpanKind.INTERNAL)
         .startSpan();
 
     try (var ignored = span.makeCurrent()) {
       try (var connection =
-             this.database.openConnection(IDSTORE)) {
-        try (var transaction =
-               connection.openTransaction()) {
-          final var queries =
-            transaction.queries(IdDatabaseMaintenanceQueriesType.class);
-          queries.runMaintenance();
-          transaction.commit();
-          LOG.info("maintenance task completed successfully");
+             this.database.openConnection(IdDatabaseRole.IDSTORE)) {
+        try (var transaction = connection.openTransaction()) {
+          LOG.info("Maintenance task completed.");
         }
       }
     } catch (final Exception e) {
-      LOG.error("maintenance task failed: ", e);
-      recordSpanException(e);
+      LOG.error("Maintenance task failed: ", e);
+      span.recordException(e);
     } finally {
       span.end();
     }
@@ -168,9 +234,12 @@ public final class IdMaintenanceService
 
   @Override
   public void close()
-    throws Exception
   {
-    this.executor.shutdown();
+    if (this.closed.compareAndSet(false, true)) {
+      this.waitTLS.complete(null);
+      this.waitMaintenance.complete(null);
+      this.executor.close();
+    }
   }
 
   @Override

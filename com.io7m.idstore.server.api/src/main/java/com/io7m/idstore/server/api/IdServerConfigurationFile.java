@@ -22,15 +22,16 @@ import java.util.Optional;
 /**
  * The server configuration file.
  *
- * @param brandingConfiguration The branding configuration
- * @param databaseConfiguration The database configuration
- * @param historyConfiguration  The history configuration
- * @param httpConfiguration     The HTTP configuration
- * @param mailConfiguration     The mail configuration
- * @param openTelemetry         The OpenTelemetry configuration
- * @param rateLimit             The rate limiting configuration
- * @param passwordExpiration    The password expiration configuration
- * @param sessionConfiguration  The session configuration
+ * @param brandingConfiguration    The branding configuration
+ * @param databaseConfiguration    The database configuration
+ * @param historyConfiguration     The history configuration
+ * @param httpConfiguration        The HTTP configuration
+ * @param mailConfiguration        The mail configuration
+ * @param openTelemetry            The OpenTelemetry configuration
+ * @param rateLimit                The rate limiting configuration
+ * @param passwordExpiration       The password expiration configuration
+ * @param sessionConfiguration     The session configuration
+ * @param maintenanceConfiguration The maintenance configuration
  */
 
 public record IdServerConfigurationFile(
@@ -42,21 +43,23 @@ public record IdServerConfigurationFile(
   IdServerSessionConfiguration sessionConfiguration,
   IdServerRateLimitConfiguration rateLimit,
   IdServerPasswordExpirationConfiguration passwordExpiration,
+  IdServerMaintenanceConfiguration maintenanceConfiguration,
   Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
   implements IdServerJSONConfigurationElementType
 {
   /**
    * The server configuration file.
    *
-   * @param brandingConfiguration The branding configuration
-   * @param databaseConfiguration The database configuration
-   * @param historyConfiguration  The history configuration
-   * @param httpConfiguration     The HTTP configuration
-   * @param mailConfiguration     The mail configuration
-   * @param openTelemetry         The OpenTelemetry configuration
-   * @param rateLimit             The rate limiting configuration
-   * @param passwordExpiration    The password expiration configuration
-   * @param sessionConfiguration  The session configuration
+   * @param brandingConfiguration    The branding configuration
+   * @param databaseConfiguration    The database configuration
+   * @param historyConfiguration     The history configuration
+   * @param httpConfiguration        The HTTP configuration
+   * @param mailConfiguration        The mail configuration
+   * @param openTelemetry            The OpenTelemetry configuration
+   * @param rateLimit                The rate limiting configuration
+   * @param maintenanceConfiguration The maintenance configuration
+   * @param passwordExpiration       The password expiration configuration
+   * @param sessionConfiguration     The session configuration
    */
 
   public IdServerConfigurationFile
@@ -68,6 +71,9 @@ public record IdServerConfigurationFile(
     Objects.requireNonNull(sessionConfiguration, "sessionConfiguration");
     Objects.requireNonNull(historyConfiguration, "historyConfiguration");
     Objects.requireNonNull(rateLimit, "rateLimit");
+    Objects.requireNonNull(
+      maintenanceConfiguration,
+      "maintenanceConfiguration");
     Objects.requireNonNull(passwordExpiration, "passwordExpiration");
     Objects.requireNonNull(openTelemetry, "openTelemetry");
   }

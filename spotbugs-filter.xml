@@ -713,6 +713,23 @@
   <!-- com.io7m.idstore.server.service.maintenance -->
   <!--                                             -->
 
+  <!-- Catching any exception. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.service.maintenance.IdMaintenanceService"/>
+    <Bug pattern="REC_CATCH_EXCEPTION"/>
+  </Match>
+
+  <!-- False positive; executor is closed and is a virtual thread executor anyway. -->
+  <Match>
+    <Class name="com.io7m.idstore.server.service.maintenance.IdMaintenanceService"/>
+    <Bug pattern="HES_EXECUTOR_NEVER_SHUTDOWN"/>
+  </Match>
+
+  <!-- It's an API. -->
+  <Match>
+    <Bug pattern="OPM_OVERLY_PERMISSIVE_METHOD"/>
+  </Match>
+
   <!--                                           -->
   <!-- com.io7m.idstore.server.service.ratelimit -->
   <!--                                           -->

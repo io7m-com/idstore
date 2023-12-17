@@ -28,20 +28,21 @@ import java.util.Optional;
 /**
  * The configuration for a server.
  *
- * @param adminApiAddress       The admin API address
- * @param branding              The branding configuration
- * @param clock                 The clock
- * @param databaseConfiguration The database configuration for the server
- * @param databases             The factory of databases that will be used for the server
- * @param history               The history configuration
- * @param locale                The locale
- * @param mailConfiguration     The mail server configuration
- * @param openTelemetry         The OpenTelemetry configuration
- * @param rateLimit             The rate limiting configuration
- * @param passwordExpiration    The password expiration configuration
- * @param sessions              The session configuration
- * @param userApiAddress        The user API address
- * @param userViewAddress       The user view address
+ * @param adminApiAddress          The admin API address
+ * @param branding                 The branding configuration
+ * @param clock                    The clock
+ * @param databaseConfiguration    The database configuration for the server
+ * @param databases                The factory of databases that will be used for the server
+ * @param history                  The history configuration
+ * @param locale                   The locale
+ * @param mailConfiguration        The mail server configuration
+ * @param openTelemetry            The OpenTelemetry configuration
+ * @param rateLimit                The rate limiting configuration
+ * @param passwordExpiration       The password expiration configuration
+ * @param sessions                 The session configuration
+ * @param userApiAddress           The user API address
+ * @param userViewAddress          The user view address
+ * @param maintenanceConfiguration The maintenance configuration
  */
 
 public record IdServerConfiguration(
@@ -57,26 +58,28 @@ public record IdServerConfiguration(
   IdServerBrandingConfiguration branding,
   IdServerHistoryConfiguration history,
   IdServerRateLimitConfiguration rateLimit,
+  IdServerMaintenanceConfiguration maintenanceConfiguration,
   IdServerPasswordExpirationConfiguration passwordExpiration,
   Optional<IdServerOpenTelemetryConfiguration> openTelemetry)
 {
   /**
    * The configuration for a server.
    *
-   * @param adminApiAddress       The admin API address
-   * @param branding              The branding configuration
-   * @param clock                 The clock
-   * @param databaseConfiguration The database configuration for the server
-   * @param databases             The factory of databases that will be used for the server
-   * @param history               The history configuration
-   * @param locale                The locale
-   * @param mailConfiguration     The mail server configuration
-   * @param openTelemetry         The OpenTelemetry configuration
-   * @param rateLimit             The rate limiting configuration
-   * @param passwordExpiration    The password expiration configuration
-   * @param sessions              The session configuration
-   * @param userApiAddress        The user API address
-   * @param userViewAddress       The user view address
+   * @param adminApiAddress          The admin API address
+   * @param branding                 The branding configuration
+   * @param clock                    The clock
+   * @param databaseConfiguration    The database configuration for the server
+   * @param databases                The factory of databases that will be used for the server
+   * @param history                  The history configuration
+   * @param locale                   The locale
+   * @param mailConfiguration        The mail server configuration
+   * @param openTelemetry            The OpenTelemetry configuration
+   * @param rateLimit                The rate limiting configuration
+   * @param passwordExpiration       The password expiration configuration
+   * @param sessions                 The session configuration
+   * @param userApiAddress           The user API address
+   * @param userViewAddress          The user view address
+   * @param maintenanceConfiguration The maintenance configuration
    */
 
   public IdServerConfiguration
@@ -95,6 +98,9 @@ public record IdServerConfiguration(
     Objects.requireNonNull(sessions, "sessions");
     Objects.requireNonNull(userApiAddress, "userApiAddress");
     Objects.requireNonNull(userViewAddress, "userViewAddress");
+    Objects.requireNonNull(
+      maintenanceConfiguration,
+      "maintenanceConfiguration");
   }
 
   /**

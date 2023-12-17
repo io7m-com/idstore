@@ -27,64 +27,7 @@
       <Term type="expression">mail.example.com</Term>:
     </Paragraph>
     <FormalItem title="Example">
-      <Verbatim><![CDATA[
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<i:Configuration xmlns:i="urn:com.io7m.idstore:configuration:1"
-                 xmlns:it="urn:com.io7m.idstore.tls:1">
-
-  <i:Branding ProductTitle="idstore"/>
-
-  <i:Database Name="idstore"
-              Kind="POSTGRESQL"
-              OwnerRoleName="idstore_install"
-              OwnerRolePassword="mydatabasewill"
-              WorkerRolePassword="probablybecompromised"
-              Address="db.example.com"
-              Port="5432"
-              Create="true"
-              Upgrade="true"/>
-
-  <i:HTTPServices>
-    <i:HTTPServiceAdminAPI ListenAddress="[::]"
-                           ListenPort="51000"
-                           ExternalURI="https://[::]:51000/">
-      <it:TLSEnabled>
-        <it:KeyStore Type="CANONMILL"
-                     Provider="CANONMILL"
-                     Password="changeit"
-                     File="keystore.xml"/>
-        <it:TrustStore Type="CANONMILL"
-                     Provider="CANONMILL"
-                     Password="changeit"
-                     File="truststore.xml"/>
-      </it:TLSEnabled>
-    </i:HTTPServiceAdminAPI>
-    <i:HTTPServiceUserAPI ListenAddress="[::]"
-                          ListenPort="50000"
-                          ExternalURI="http://[::]:50000/">
-      <it:TLSDisabled/>
-    </i:HTTPServiceUserAPI>
-    <i:HTTPServiceUserView ListenAddress="[::]"
-                           ListenPort="50001"
-                           ExternalURI="http://[::]:50001/">
-      <it:TLSDisabled/>
-    </i:HTTPServiceUserView>
-  </i:HTTPServices>
-
-  <i:History UserLoginHistoryLimit="10"
-             AdminLoginHistoryLimit="100"/>
-
-  <i:Mail SenderAddress="no-reply@example.com" VerificationExpiration="PT24H">
-    <i:SMTP Host="mail.example.com"
-          Port="25"/>
-  </i:Mail>
-
-  <i:RateLimiting EmailVerificationRateLimit="PT10M" PasswordResetRateLimit="PT10M" />
-
-  <i:Sessions UserSessionExpiration="PT30M" AdminSessionExpiration="PT30M"/>
-</i:Configuration>
-]]></Verbatim>
+      <Verbatim><xi:include href="config_smallest.xml" parse="text"/></Verbatim>
     </FormalItem>
   </Subsection>
 
@@ -131,6 +74,31 @@
   <SMTP Host="mail.example.com"
         Port="25"/>
 </Mail>
+]]></Verbatim>
+      </FormalItem>
+    </Subsection>
+  </Subsection>
+
+  <Subsection title="Maintenance">
+    <Subsection title="Overview">
+      <Paragraph>
+        The <Term type="expression">Maintenance</Term> section of the configuration file configures the maintenance
+        service.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="TLSReloadInterval">
+      <Paragraph>
+        The <Term type="expression">TLSReloadInterval</Term> attribute specifies how frequently the server will reload
+        the TLS certificates for the HTTP services.
+      </Paragraph>
+    </Subsection>
+    <Subsection title="Example">
+      <Paragraph>
+        An example maintenance configuration:
+      </Paragraph>
+      <FormalItem title="Example">
+        <Verbatim><![CDATA[
+<Maintenance TLSReloadInterval="PT30M"/>
 ]]></Verbatim>
       </FormalItem>
     </Subsection>

@@ -44,6 +44,8 @@
                         Password="12345678"/>
   </Mail>
 
+  <Maintenance />
+
   <OpenTelemetry LogicalServiceName="idstore">
     <Logs Endpoint="http://logs.example.com:4317"
           Protocol="GRPC"/>

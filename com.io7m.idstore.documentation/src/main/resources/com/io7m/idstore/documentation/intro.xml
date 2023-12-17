@@ -56,6 +56,9 @@
         <LinkExternal target="https://en.wikipedia.org/wiki/Java_Platform_Module_System">JPMS</LinkExternal>-ready
       </Item>
       <Item>
+        Support for <LinkExternal target="https://www.io7m.com/software/canonmill">Canonmill</LinkExternal> keystores.
+      </Item>
+      <Item>
         ISC license.
       </Item>
     </ListUnordered>
