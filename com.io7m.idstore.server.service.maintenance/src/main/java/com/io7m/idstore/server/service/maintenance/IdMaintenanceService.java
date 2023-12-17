@@ -218,6 +218,8 @@ public final class IdMaintenanceService
         try (var transaction = connection.openTransaction()) {
           transaction.queries(IdDatabaseMaintenanceQueriesType.class)
               .runMaintenance();
+
+          transaction.commit();
           LOG.info("Maintenance task completed.");
         }
       }
