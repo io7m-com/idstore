@@ -22,6 +22,8 @@ import io.helidon.webserver.http.ServerRequest;
 import io.opentelemetry.context.propagation.TextMapGetter;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * A propagator that can extract fields from a servlet request.
@@ -51,6 +53,8 @@ public final class IdHTTPServerRequestContextExtractor
   public Iterable<String> keys(
     final ServerRequest request)
   {
+    Objects.requireNonNull(request, "request");
+
     final var results =
       new ArrayList<String>();
     final var headers =
@@ -70,6 +74,18 @@ public final class IdHTTPServerRequestContextExtractor
     final ServerRequest request,
     final String name)
   {
-    return request.headers().get(HeaderNames.create(name)).get();
+    Objects.requireNonNull(request, "request");
+    Objects.requireNonNull(name, "name");
+
+    final var headerName =
+      HeaderNames.create(name);
+    final var headers =
+      request.headers();
+
+    try {
+      return headers.get(headerName).get();
+    } catch (final NoSuchElementException e) {
+      return null;
+    }
   }
 }
