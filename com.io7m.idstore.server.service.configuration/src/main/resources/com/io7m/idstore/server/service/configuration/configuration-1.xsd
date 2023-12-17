@@ -450,6 +450,27 @@
     </complexType>
   </element>
 
+  <element name="Maintenance">
+    <annotation>
+      <documentation>
+        Configuration for the server's periodic maintenance tasks.
+      </documentation>
+    </annotation>
+
+    <complexType>
+      <attribute name="TLSReloadInterval"
+                 type="duration"
+                 use="optional">
+        <annotation>
+          <documentation>
+            The interval at which TLS contexts will be reloaded. If not
+            specified, TLS contexts will not be reloaded.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
+
   <element name="History">
     <annotation>
       <documentation>
@@ -954,6 +975,7 @@
         <element ref="c:HTTPServices"/>
         <element ref="c:History"/>
         <element ref="c:Mail"/>
+        <element ref="c:Maintenance"/>
         <element ref="c:OpenTelemetry"
                  minOccurs="0"
                  maxOccurs="1"/>

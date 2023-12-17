@@ -175,6 +175,8 @@
           Port="25"/>
   </Mail>
 
+  <Maintenance />
+
   <PasswordExpiration AdminPasswordValidityDuration="PT30M"
                       UserPasswordValidityDuration="PT30M"/>
 

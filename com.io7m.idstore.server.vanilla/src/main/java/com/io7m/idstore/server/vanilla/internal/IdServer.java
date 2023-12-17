@@ -396,7 +396,13 @@ public final class IdServer implements IdServerType
     services.register(IdServerHealth.class, health);
 
     final var maintenance =
-      IdMaintenanceService.create(clock, this.telemetry, newDatabase);
+      IdMaintenanceService.create(
+        clock,
+        this.telemetry,
+        config,
+        tls,
+        newDatabase
+      );
     services.register(IdMaintenanceService.class, maintenance);
 
     services.register(IdRequestLimits.class, new IdRequestLimits(size -> {

@@ -27,6 +27,7 @@ import com.io7m.idstore.server.api.IdServerDatabaseConfiguration;
 import com.io7m.idstore.server.api.IdServerHTTPConfiguration;
 import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
+import com.io7m.idstore.server.api.IdServerMaintenanceConfiguration;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration;
 import com.io7m.idstore.server.api.IdServerPasswordExpirationConfiguration;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
@@ -50,6 +51,7 @@ public final class IdC1Configuration
   private IdServerHTTPConfiguration http;
   private IdServerHistoryConfiguration history;
   private IdServerMailConfiguration mail;
+  private IdServerMaintenanceConfiguration maintenance;
   private IdServerPasswordExpirationConfiguration passwords;
   private IdServerRateLimitConfiguration rateLimit;
   private IdServerSessionConfiguration sessions;
@@ -82,6 +84,7 @@ public final class IdC1Configuration
       entry(qName("HTTPServices"), IdC1HTTPServices::new),
       entry(qName("History"), IdC1History::new),
       entry(qName("Mail"), IdC1Mail::new),
+      entry(qName("Maintenance"), IdC1Maintenance::new),
       entry(qName("OpenTelemetry"), IdC1Telemetry::new),
       entry(qName("PasswordExpiration"), IdC1PasswordExpiration::new),
       entry(qName("RateLimiting"), IdC1RateLimit::new),
@@ -122,6 +125,9 @@ public final class IdC1Configuration
       case final IdServerOpenTelemetryConfiguration c -> {
         this.telemetry = Optional.of(c);
       }
+      case final IdServerMaintenanceConfiguration c -> {
+        this.maintenance = c;
+      }
       default -> {
         throw new IllegalArgumentException(
           "Unrecognized element: %s".formatted(result)
@@ -143,6 +149,7 @@ public final class IdC1Configuration
       this.sessions,
       this.rateLimit,
       this.passwords,
+      this.maintenance,
       this.telemetry
     );
   }

@@ -33,6 +33,7 @@ import com.io7m.idstore.server.api.IdServerHTTPServiceConfiguration;
 import com.io7m.idstore.server.api.IdServerHistoryConfiguration;
 import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
+import com.io7m.idstore.server.api.IdServerMaintenanceConfiguration;
 import com.io7m.idstore.server.api.IdServerPasswordExpirationConfiguration;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
 import com.io7m.idstore.server.api.IdServerSessionConfiguration;
@@ -362,6 +363,9 @@ public final class IdTestServers
         brandingConfiguration,
         historyConfiguration,
         rateLimitConfiguration,
+        new IdServerMaintenanceConfiguration(
+          Optional.empty()
+        ),
         new IdServerPasswordExpirationConfiguration(
           Optional.empty(),
           Optional.empty()

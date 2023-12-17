@@ -14,25 +14,30 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+package com.io7m.idstore.server.api;
+
+import java.time.Duration;
+import java.util.Objects;
+import java.util.Optional;
+
 /**
- * Identity server (Server maintenance service)
+ * Configuration information for the server's maintenance service.
+ *
+ * @param tlsReloadInterval The interval at which to reload TLS contexts
  */
 
-module com.io7m.idstore.server.service.maintenance
+public record IdServerMaintenanceConfiguration(
+  Optional<Duration> tlsReloadInterval)
 {
-  requires static org.osgi.annotation.bundle;
-  requires static org.osgi.annotation.versioning;
+  /**
+   * Configuration information for the server's maintenance service.
+   *
+   * @param tlsReloadInterval The interval at which to reload TLS contexts
+   */
 
-  requires com.io7m.idstore.database.api;
-  requires com.io7m.idstore.server.api;
-  requires com.io7m.idstore.server.service.clock;
-  requires com.io7m.idstore.server.service.configuration;
-  requires com.io7m.idstore.server.service.telemetry.api;
-  requires com.io7m.idstore.server.service.tls;
-
-  requires com.io7m.repetoir.core;
-  requires io.opentelemetry.api;
-  requires org.slf4j;
-
-  exports com.io7m.idstore.server.service.maintenance;
+  public IdServerMaintenanceConfiguration
+  {
+    Objects.requireNonNull(
+      tlsReloadInterval, "tlsReloadInterval");
+  }
 }

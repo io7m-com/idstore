@@ -34,6 +34,7 @@ import com.io7m.idstore.server.api.IdServerMailConfiguration;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTPS;
 import com.io7m.idstore.server.api.IdServerMailTransportSMTP_TLS;
+import com.io7m.idstore.server.api.IdServerMaintenanceConfiguration;
 import com.io7m.idstore.server.api.IdServerOpenTelemetryConfiguration;
 import com.io7m.idstore.server.api.IdServerPasswordExpirationConfiguration;
 import com.io7m.idstore.server.api.IdServerRateLimitConfiguration;
@@ -116,11 +117,24 @@ final class IdServerConfigurationSerializer
     this.serializeHTTP(value.httpConfiguration());
     this.serializeHistory(value.historyConfiguration());
     this.serializeMail(value.mailConfiguration());
+    this.serializeMaintenance(value.maintenanceConfiguration());
     this.serializeOpenTelemetryOpt(value.openTelemetry());
     this.serializePasswordExpiration(value.passwordExpiration());
     this.serializeRateLimit(value.rateLimit());
     this.serializeSessions(value.sessionConfiguration());
 
+    this.output.writeEndElement();
+  }
+
+  private void serializeMaintenance(
+    final IdServerMaintenanceConfiguration c)
+    throws XMLStreamException
+  {
+    this.output.writeStartElement("Maintenance");
+    if (c.tlsReloadInterval().isPresent()) {
+      final var r = c.tlsReloadInterval().get();
+      this.output.writeAttribute("TLSReloadInterval", r.toString());
+    }
     this.output.writeEndElement();
   }
 

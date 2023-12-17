@@ -28,6 +28,8 @@ module com.io7m.idstore.server.service.tls
   requires com.io7m.idstore.strings;
   requires com.io7m.idstore.tls;
 
+  requires io.opentelemetry.api;
+
   requires com.io7m.repetoir.core;
 
   exports com.io7m.idstore.server.service.tls;
