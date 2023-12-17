@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.server.service.maintenance;
 
+import com.io7m.idstore.database.api.IdDatabaseMaintenanceQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseRole;
 import com.io7m.idstore.database.api.IdDatabaseType;
 import com.io7m.idstore.server.service.clock.IdServerClock;
@@ -215,6 +216,8 @@ public final class IdMaintenanceService
       try (var connection =
              this.database.openConnection(IdDatabaseRole.IDSTORE)) {
         try (var transaction = connection.openTransaction()) {
+          transaction.queries(IdDatabaseMaintenanceQueriesType.class)
+              .runMaintenance();
           LOG.info("Maintenance task completed.");
         }
       }
