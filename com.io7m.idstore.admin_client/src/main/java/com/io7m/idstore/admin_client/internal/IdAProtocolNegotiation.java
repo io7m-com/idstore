@@ -25,6 +25,7 @@ import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
+import com.io7m.idstore.strings.IdStringConstants;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.verdant.core.VProtocolException;
 import com.io7m.verdant.core.VProtocols;
@@ -97,7 +98,7 @@ public final class IdAProtocolNegotiation
 
     if (response.statusCode() >= 400) {
       final var msg =
-        strings.format("httpError", Integer.valueOf(response.statusCode()));
+        strings.format(IdStringConstants.HTTP_ERROR, Integer.valueOf(response.statusCode()));
 
       throw new IdAClientException(
         msg,
@@ -130,7 +131,7 @@ public final class IdAProtocolNegotiation
       throw new IdAClientException(
         requireNonNullElse(
           e.getMessage(),
-          strings.format("connectFailure")
+          strings.format(CONNECT_FAILURE)
         ),
         e,
         IO_ERROR,
