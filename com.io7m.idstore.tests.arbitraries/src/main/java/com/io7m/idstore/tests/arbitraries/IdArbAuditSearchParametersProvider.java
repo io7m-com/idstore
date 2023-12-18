@@ -71,7 +71,6 @@ public final class IdArbAuditSearchParametersProvider
           t0,
           Optional.of(ss0),
           Optional.of(ss1),
-          Optional.of(ss2),
           size
         );
       });

@@ -74,7 +74,6 @@ public final class IdACmdAuditSearchBeginTest
               IdTimeRange.largest(),
               Optional.empty(),
               Optional.empty(),
-              Optional.empty(),
               100
             )
           )
@@ -123,7 +122,6 @@ public final class IdACmdAuditSearchBeginTest
     final var parameters =
       new IdAuditSearchParameters(
         IdTimeRange.largest(),
-        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         100
@@ -203,14 +201,12 @@ public final class IdACmdAuditSearchBeginTest
         IdTimeRange.largest(),
         Optional.empty(),
         Optional.empty(),
-        Optional.empty(),
         2000
       );
 
     final var parametersLimited =
       new IdAuditSearchParameters(
         IdTimeRange.largest(),
-        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         1000

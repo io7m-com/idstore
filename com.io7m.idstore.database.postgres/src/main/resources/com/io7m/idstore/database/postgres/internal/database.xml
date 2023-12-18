@@ -51,6 +51,44 @@ CREATE TABLE schema_version (
 
   <Schema versionCurrent="1">
     <Comment>
+      Some tables use the hstore type to store unstructured key/value maps.
+    </Comment>
+
+    <Statement><![CDATA[
+CREATE EXTENSION hstore;
+]]></Statement>
+
+    <Comment>
+      The database makes extensive use of Lanark dotted names. It's necessary to tokenize those names in order to use
+      them with full text searching. Essentially, anything that isn't a letter or a number is converted to a space. This
+      translated string can then be given to the various full-text search functions for indexing.
+    </Comment>
+
+    <Statement><![CDATA[
+-- [jooq ignore start]
+
+CREATE FUNCTION tokenize_dotted_name(x text) RETURNS text
+  LANGUAGE SQL
+  IMMUTABLE
+  RETURNS NULL ON NULL INPUT
+    RETURN TRANSLATE (x, '-_.', '   ')
+
+-- [jooq ignore stop]
+]]></Statement>
+
+    <Statement><![CDATA[
+-- [jooq ignore start]
+
+CREATE OR REPLACE FUNCTION text_array_to_text(TEXT[])
+  RETURNS TEXT AS
+$$
+  SELECT array_to_string($1, ' ');
+$$ LANGUAGE SQL IMMUTABLE;
+
+-- [jooq ignore stop]
+]]></Statement>
+
+    <Comment>
       The user_ids table stores the ids for users and admins.
     </Comment>
 
@@ -234,11 +272,14 @@ CREATE TRIGGER email_check_delete_trigger
 
     <Statement><![CDATA[
 CREATE TABLE audit (
-  id             BIGINT                   NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  user_id        UUID                     NOT NULL,
-  time           TIMESTAMP WITH TIME ZONE NOT NULL,
-  type           VARCHAR(1000000)         NOT NULL,
-  message        VARCHAR(1000000)         NOT NULL,
+  id         BIGINT                   NOT NULL GENERATED ALWAYS AS IDENTITY,
+  user_id    UUID                     NOT NULL,
+  time       TIMESTAMP WITH TIME ZONE NOT NULL,
+  type       TEXT                     NOT NULL,
+
+  -- [jooq ignore start]
+  data       HSTORE                   NOT NULL,
+  -- [jooq ignore stop]
 
   FOREIGN KEY (user_id) REFERENCES user_ids (id)
 )

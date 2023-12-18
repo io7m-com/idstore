@@ -124,7 +124,7 @@ public final class IdAFormatterRaw implements IdAFormatterType
         audit.time(),
         audit.owner(),
         audit.type(),
-        audit.message()
+        audit.data()
       );
     }
     out.flush();

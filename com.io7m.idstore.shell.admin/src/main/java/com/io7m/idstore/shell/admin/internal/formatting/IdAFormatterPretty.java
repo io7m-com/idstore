@@ -185,7 +185,7 @@ public final class IdAFormatterPretty implements IdAFormatterType
         .addCell(audit.time().toString())
         .addCell(audit.owner().toString())
         .addCell(audit.type())
-        .addCell(audit.message());
+        .addCell(audit.data().toString());
     }
 
     this.renderTable(builder.build());

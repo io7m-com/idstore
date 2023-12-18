@@ -26,11 +26,13 @@ import com.io7m.idstore.model.IdEmailVerificationOperation;
 import com.io7m.idstore.model.IdEmailVerificationResolution;
 import com.io7m.idstore.model.IdToken;
 import org.jooq.exception.DataAccessException;
+import org.jooq.postgres.extensions.types.Hstore;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.io7m.idstore.database.postgres.internal.IdDatabaseAuditQueries.AU_DATA;
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseUsersQueries.userDoesNotExist;
 import static com.io7m.idstore.database.postgres.internal.Tables.AUDIT;
@@ -179,14 +181,16 @@ final class IdDatabaseEmailsQueries
         .set(EMAIL_VERIFICATIONS.USER_ID, verification.user())
         .execute();
 
+      final var auditData =
+        Map.ofEntries(
+          Map.entry("TokenPermit", verification.tokenPermit().value()),
+          Map.entry("TokenDeny", verification.tokenDeny().value()),
+          Map.entry("Email", verification.email().value())
+        );
+
       context.insertInto(AUDIT)
         .set(AUDIT.USER_ID, executor)
-        .set(
-          AUDIT.MESSAGE,
-          "%s|%s|%s".formatted(
-            verification.tokenPermit(),
-            verification.tokenDeny(),
-            verification.email()))
+        .set(AU_DATA, Hstore.hstore(auditData))
         .set(AUDIT.TYPE, "EMAIL_VERIFICATION_CREATED")
         .set(AUDIT.TIME, this.currentTime())
         .execute();
@@ -322,9 +326,15 @@ final class IdDatabaseEmailsQueries
         .where(condition)
         .execute();
 
+      final var auditData =
+        Map.ofEntries(
+          Map.entry("Token", token.value()),
+          Map.entry("Resolution", resolution.name())
+        );
+
       context.insertInto(AUDIT)
         .set(AUDIT.USER_ID, executor)
-        .set(AUDIT.MESSAGE, "%s|%s".formatted(token, resolution))
+        .set(AU_DATA, Hstore.hstore(auditData))
         .set(AUDIT.TYPE, "EMAIL_VERIFICATION_DELETED")
         .set(AUDIT.TIME, this.currentTime())
         .execute();

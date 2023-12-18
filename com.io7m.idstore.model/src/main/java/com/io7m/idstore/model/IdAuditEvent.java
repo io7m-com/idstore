@@ -17,17 +17,18 @@
 package com.io7m.idstore.model;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
  * An audit event.
  *
- * @param id           The unique event ID
- * @param owner        The event owner
- * @param time         The event time
- * @param message      The event message
- * @param type         The event type
+ * @param id    The unique event ID
+ * @param owner The event owner
+ * @param time  The event time
+ * @param data  The event data
+ * @param type  The event type
  */
 
 public record IdAuditEvent(
@@ -35,16 +36,16 @@ public record IdAuditEvent(
   UUID owner,
   OffsetDateTime time,
   String type,
-  String message)
+  Map<String, String> data)
 {
   /**
    * An audit event.
    *
-   * @param id           The unique event ID
-   * @param owner        The event owner
-   * @param time         The event time
-   * @param message      The event message
-   * @param type         The event type
+   * @param id    The unique event ID
+   * @param owner The event owner
+   * @param time  The event time
+   * @param data  The event data
+   * @param type  The event type
    */
 
   public IdAuditEvent
@@ -52,6 +53,7 @@ public record IdAuditEvent(
     Objects.requireNonNull(owner, "owner");
     Objects.requireNonNull(time, "time");
     Objects.requireNonNull(type, "type");
-    Objects.requireNonNull(message, "message");
+    Objects.requireNonNull(data, "data");
+    data = Map.copyOf(data);
   }
 }

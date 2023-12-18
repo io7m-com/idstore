@@ -66,7 +66,9 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIR
 import static com.io7m.idstore.model.IdAdminColumn.BY_IDNAME;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.userAgent;
+import static com.io7m.idstore.tests.extensions.IdTestDatabases.ExpectedEvent.eventOf;
 import static java.time.OffsetDateTime.now;
+import static java.util.Map.entry;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -191,8 +193,8 @@ public final class IdDatabaseAdminsTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("ADMIN_CREATED", reqId.toString())
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId)),
+      eventOf("ADMIN_CREATED", entry("AdminID", reqId))
     );
   }
 
@@ -241,8 +243,8 @@ public final class IdDatabaseAdminsTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("ADMIN_CREATED", admin.id().toString())
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId)),
+      eventOf("ADMIN_CREATED", entry("AdminID", admin.id()))
     );
   }
 
@@ -518,16 +520,16 @@ public final class IdDatabaseAdminsTest
     admins.adminLogin(
       admin.id(),
       Map.ofEntries(
-        Map.entry(remoteHost(), "127.0.0.1"),
-        Map.entry(userAgent(), "Mozilla/5.0 (X11; Linux x86_64)")
+        entry(remoteHost(), "127.0.0.1"),
+        entry(userAgent(), "Mozilla/5.0 (X11; Linux x86_64)")
       )
     );
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("ADMIN_CREATED", id.toString()),
-      new ExpectedEvent("ADMIN_LOGGED_IN", "127.0.0.1")
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId)),
+      eventOf("ADMIN_CREATED", entry("AdminID", id)),
+      eventOf("ADMIN_LOGGED_IN", entry("Host", "127.0.0.1"))
     );
   }
 
@@ -551,8 +553,8 @@ public final class IdDatabaseAdminsTest
         admins.adminLogin(
           randomUUID(),
           Map.ofEntries(
-            Map.entry(remoteHost(), "127.0.0.1"),
-            Map.entry(userAgent(), "Mozilla/5.0 (X11; Linux x86_64)")
+            entry(remoteHost(), "127.0.0.1"),
+            entry(userAgent(), "Mozilla/5.0 (X11; Linux x86_64)")
           )
         );
       });
@@ -648,8 +650,8 @@ public final class IdDatabaseAdminsTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("ADMIN_CREATED", admin.id().toString())
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId)),
+      eventOf("ADMIN_CREATED", entry("AdminID", admin.id()))
     );
   }
 
@@ -835,10 +837,13 @@ public final class IdDatabaseAdminsTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("ADMIN_CREATED", admin.id().toString()),
-      new ExpectedEvent("ADMIN_EMAIL_REMOVED", reqId + "|someone@example.com"),
-      new ExpectedEvent("ADMIN_DELETED", admin.id().toString())
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId)),
+      eventOf("ADMIN_CREATED", entry("AdminID", admin.id())),
+      eventOf(
+        "ADMIN_EMAIL_REMOVED",
+        entry("AdminID", admin.id()),
+        entry("Email", "someone@example.com")),
+      eventOf("ADMIN_DELETED", entry("AdminID", admin.id()))
     );
   }
 
@@ -873,9 +878,16 @@ public final class IdDatabaseAdminsTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("ADMIN_BANNED", adminId.toString()),
-      new ExpectedEvent("ADMIN_BAN_REMOVED", adminId.toString())
+      eventOf(
+        "ADMIN_CREATED",
+        entry("AdminID", adminId)),
+      eventOf(
+        "ADMIN_BANNED",
+        entry("AdminID", adminId),
+        entry("BanReason", "No reason.")),
+      eventOf(
+        "ADMIN_BAN_REMOVED",
+        entry("AdminID", adminId))
     );
   }
 

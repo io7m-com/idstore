@@ -23,6 +23,7 @@ import com.io7m.genevan.core.GenProtocolSolved;
 import com.io7m.genevan.core.GenProtocolSolver;
 import com.io7m.genevan.core.GenProtocolVersion;
 import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
+import com.io7m.idstore.strings.IdStringConstants;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 import com.io7m.idstore.user_client.api.IdUClientException;
@@ -97,7 +98,7 @@ public final class IdUProtocolNegotiation
 
     if (response.statusCode() >= 400) {
       final var msg =
-        strings.format("httpError", Integer.valueOf(response.statusCode()));
+        strings.format(IdStringConstants.HTTP_ERROR, Integer.valueOf(response.statusCode()));
 
       throw new IdUClientException(
         msg,
@@ -130,7 +131,7 @@ public final class IdUProtocolNegotiation
       throw new IdUClientException(
         requireNonNullElse(
           e.getMessage(),
-          strings.format("connectFailure")
+          strings.format(CONNECT_FAILURE)
         ),
         e,
         IO_ERROR,

@@ -19,6 +19,7 @@ package com.io7m.idstore.database.api;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -45,10 +46,10 @@ public non-sealed interface IdDatabaseAuditQueriesType
   /**
    * Create an audit event.
    *
-   * @param userId  The user ID of the event
-   * @param time    The event time
-   * @param type    The event type
-   * @param message The event message
+   * @param userId The user ID of the event
+   * @param time   The event time
+   * @param type   The event type
+   * @param data   The event data
    *
    * @throws IdDatabaseException On errors
    */
@@ -57,7 +58,7 @@ public non-sealed interface IdDatabaseAuditQueriesType
     UUID userId,
     OffsetDateTime time,
     String type,
-    String message)
+    Map<String, String> data)
     throws IdDatabaseException;
 
 }
