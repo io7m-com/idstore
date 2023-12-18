@@ -1,27 +1,16 @@
 <configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.16.0.xsd">
   <generator>
+    <generate>
+      <records>true</records>
+    </generate>
+
     <database>
       <name>org.jooq.meta.extensions.ddl.DDLDatabase</name>
-
-      <forcedTypes>
-        <forcedType>
-          <userType>java.lang.String</userType>
-          <binding>org.jooq.postgres.extensions.bindings.CitextBinding</binding>
-          <includeTypes>citext</includeTypes>
-          <priority>100</priority>
-        </forcedType>
-        <forcedType>
-          <userType>java.lang.String[]</userType>
-          <binding>org.jooq.postgres.extensions.bindings.CitextArrayBinding</binding>
-          <includeTypes>_citext</includeTypes>
-          <priority>100</priority>
-        </forcedType>
-      </forcedTypes>
 
       <properties>
 
         <!-- Specify the location of your SQL script.
-             You may use ant-style file matching, e.g. /path/**/to/*.sql
+             You may use ant-style file comparisons, e.g. /path/**/to/*.sql
 
              Where:
              - ** matches any directory subtree

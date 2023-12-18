@@ -63,16 +63,18 @@ public final class IdArbAuditEventProvider extends IdArbAbstractProvider
       Arbitraries.strings();
     final var s1 =
       Arbitraries.strings();
+    final var m0 =
+      Arbitraries.maps(s0, s1);
 
     return Set.of(
-      Combinators.combine(l, u, t, s0, s1)
-        .as((ul, ui, ut, us0, us1) -> {
+      Combinators.combine(l, u, t, s0, s1, m0)
+        .as((ul, ui, ut, us0, us1, um0) -> {
           return new IdAuditEvent(
             ul.longValue(),
             ui,
             ut,
             us0,
-            us1
+            um0
           );
         }));
   }

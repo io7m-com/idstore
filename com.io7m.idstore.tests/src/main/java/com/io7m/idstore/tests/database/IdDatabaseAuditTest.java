@@ -38,6 +38,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.io7m.idstore.database.api.IdDatabaseRole.IDSTORE;
@@ -90,22 +91,21 @@ public final class IdDatabaseAuditTest
       this.transaction.queries(IdDatabaseAuditQueriesType.class);
 
     final var then = now();
-    audit.auditPut(adminId, then.plusSeconds(1), "ET_0", "E0");
-    audit.auditPut(adminId, then.plusSeconds(2), "ET_0", "E1");
-    audit.auditPut(adminId, then.plusSeconds(3), "ET_0", "E2");
-    audit.auditPut(adminId, then.plusSeconds(4), "ET_1", "F3");
-    audit.auditPut(adminId, then.plusSeconds(5), "ET_1", "F4");
-    audit.auditPut(adminId, then.plusSeconds(6), "ET_1", "F5");
-    audit.auditPut(adminId, then.plusSeconds(7), "ET_2", "G6");
-    audit.auditPut(adminId, then.plusSeconds(8), "ET_2", "G7");
-    audit.auditPut(adminId, then.plusSeconds(9), "ET_2", "G8");
+    audit.auditPut(adminId, then.plusSeconds(1), "ET_0", Map.of("x","E0"));
+    audit.auditPut(adminId, then.plusSeconds(2), "ET_0", Map.of("x","E1"));
+    audit.auditPut(adminId, then.plusSeconds(3), "ET_0", Map.of("x","E2"));
+    audit.auditPut(adminId, then.plusSeconds(4), "ET_1", Map.of("x","F3"));
+    audit.auditPut(adminId, then.plusSeconds(5), "ET_1", Map.of("x","F4"));
+    audit.auditPut(adminId, then.plusSeconds(6), "ET_1", Map.of("x","F5"));
+    audit.auditPut(adminId, then.plusSeconds(7), "ET_2", Map.of("x","G6"));
+    audit.auditPut(adminId, then.plusSeconds(8), "ET_2", Map.of("x","G7"));
+    audit.auditPut(adminId, then.plusSeconds(9), "ET_2", Map.of("x","G8"));
 
     this.transaction.commit();
 
     final var parameters =
       new IdAuditSearchParameters(
         new IdTimeRange(then, then.plusDays(1L)),
-        empty(),
         empty(),
         empty(),
         4
@@ -119,10 +119,10 @@ public final class IdDatabaseAuditTest
       assertEquals(4, items.size());
       assertEquals(1, page.pageIndex());
       assertEquals(3, page.pageCount());
-      assertEquals("E0", items.get(0).message());
-      assertEquals("E1", items.get(1).message());
-      assertEquals("E2", items.get(2).message());
-      assertEquals("F3", items.get(3).message());
+      assertEquals("E0", items.get(0).data().get("x"));
+      assertEquals("E1", items.get(1).data().get("x"));
+      assertEquals("E2", items.get(2).data().get("x"));
+      assertEquals("F3", items.get(3).data().get("x"));
     }
 
     {
@@ -131,10 +131,10 @@ public final class IdDatabaseAuditTest
       assertEquals(4, items.size());
       assertEquals(2, page.pageIndex());
       assertEquals(3, page.pageCount());
-      assertEquals("F4", items.get(0).message());
-      assertEquals("F5", items.get(1).message());
-      assertEquals("G6", items.get(2).message());
-      assertEquals("G7", items.get(3).message());
+      assertEquals("F4", items.get(0).data().get("x"));
+      assertEquals("F5", items.get(1).data().get("x"));
+      assertEquals("G6", items.get(2).data().get("x"));
+      assertEquals("G7", items.get(3).data().get("x"));
     }
 
     {
@@ -143,7 +143,7 @@ public final class IdDatabaseAuditTest
       assertEquals(1, items.size());
       assertEquals(3, page.pageIndex());
       assertEquals(3, page.pageCount());
-      assertEquals("G8", items.get(0).message());
+      assertEquals("G8", items.get(0).data().get("x"));
     }
   }
 
@@ -159,15 +159,15 @@ public final class IdDatabaseAuditTest
       this.transaction.queries(IdDatabaseAuditQueriesType.class);
 
     final var then = now();
-    audit.auditPut(adminId, then.plusSeconds(1), "ET_0", "E0");
-    audit.auditPut(adminId, then.plusSeconds(2), "ET_0", "E1");
-    audit.auditPut(adminId, then.plusSeconds(3), "ET_0", "E2");
-    audit.auditPut(adminId, then.plusSeconds(4), "ET_1", "F3");
-    audit.auditPut(adminId, then.plusSeconds(5), "ET_1", "F4");
-    audit.auditPut(adminId, then.plusSeconds(6), "ET_1", "F5");
-    audit.auditPut(adminId, then.plusSeconds(7), "ET_2", "G6");
-    audit.auditPut(adminId, then.plusSeconds(8), "ET_2", "G7");
-    audit.auditPut(adminId, then.plusSeconds(9), "ET_2", "G8");
+    audit.auditPut(adminId, then.plusSeconds(1), "ET_0", Map.of("x","E0"));
+    audit.auditPut(adminId, then.plusSeconds(2), "ET_0", Map.of("x","E1"));
+    audit.auditPut(adminId, then.plusSeconds(3), "ET_0", Map.of("x","E2"));
+    audit.auditPut(adminId, then.plusSeconds(4), "ET_1", Map.of("x","F3"));
+    audit.auditPut(adminId, then.plusSeconds(5), "ET_1", Map.of("x","F4"));
+    audit.auditPut(adminId, then.plusSeconds(6), "ET_1", Map.of("x","F5"));
+    audit.auditPut(adminId, then.plusSeconds(7), "ET_2", Map.of("x","G6"));
+    audit.auditPut(adminId, then.plusSeconds(8), "ET_2", Map.of("x","G7"));
+    audit.auditPut(adminId, then.plusSeconds(9), "ET_2", Map.of("x","G8"));
 
     this.transaction.commit();
 
@@ -176,7 +176,6 @@ public final class IdDatabaseAuditTest
         new IdTimeRange(then, then.plusDays(1L)),
         empty(),
         Optional.of("ET_0"),
-        empty(),
         1
       );
 
@@ -189,7 +188,7 @@ public final class IdDatabaseAuditTest
       assertEquals(1, items.size());
       assertEquals(1, page.pageIndex());
       assertEquals(4, page.pageCount());
-      assertEquals("E0", items.get(0).message());
+      assertEquals("E0", items.get(0).data().get("x"));
     }
 
     {
@@ -198,7 +197,7 @@ public final class IdDatabaseAuditTest
       assertEquals(1, items.size());
       assertEquals(2, page.pageIndex());
       assertEquals(4, page.pageCount());
-      assertEquals("E1", items.get(0).message());
+      assertEquals("E1", items.get(0).data().get("x"));
     }
 
     {
@@ -207,79 +206,7 @@ public final class IdDatabaseAuditTest
       assertEquals(1, items.size());
       assertEquals(3, page.pageIndex());
       assertEquals(4, page.pageCount());
-      assertEquals("E2", items.get(0).message());
-    }
-
-    {
-      final var page = events.pageNext(audit);
-      final var items = page.items();
-      assertEquals(0, items.size());
-      assertEquals(4, page.pageIndex());
-      assertEquals(4, page.pageCount());
-    }
-  }
-
-  @Test
-  public void testAuditQuery2()
-    throws Exception
-  {
-    final var adminId =
-      IdTestDatabases.createAdminInitial(
-        this.transaction, "admin", "12345678");
-
-    final var audit =
-      this.transaction.queries(IdDatabaseAuditQueriesType.class);
-
-    final var then = now();
-    audit.auditPut(adminId, then.plusSeconds(1), "ET_0", "E0");
-    audit.auditPut(adminId, then.plusSeconds(2), "ET_0", "E1");
-    audit.auditPut(adminId, then.plusSeconds(3), "ET_0", "E2");
-    audit.auditPut(adminId, then.plusSeconds(4), "ET_1", "F3");
-    audit.auditPut(adminId, then.plusSeconds(5), "ET_1", "F4");
-    audit.auditPut(adminId, then.plusSeconds(6), "ET_1", "F5");
-    audit.auditPut(adminId, then.plusSeconds(7), "ET_2", "G6");
-    audit.auditPut(adminId, then.plusSeconds(8), "ET_2", "G7");
-    audit.auditPut(adminId, then.plusSeconds(9), "ET_2", "G8");
-
-    this.transaction.commit();
-
-    final var parameters =
-      new IdAuditSearchParameters(
-        new IdTimeRange(then, then.plusDays(1L)),
-        empty(),
-        empty(),
-        Optional.of("F"),
-        1
-      );
-
-    final var events =
-      audit.auditEventsSearch(parameters);
-
-    {
-      final var page = events.pageCurrent(audit);
-      final var items = page.items();
-      assertEquals(1, items.size());
-      assertEquals(1, page.pageIndex());
-      assertEquals(4, page.pageCount());
-      assertEquals("F3", items.get(0).message());
-    }
-
-    {
-      final var page = events.pageNext(audit);
-      final var items = page.items();
-      assertEquals(1, items.size());
-      assertEquals(2, page.pageIndex());
-      assertEquals(4, page.pageCount());
-      assertEquals("F4", items.get(0).message());
-    }
-
-    {
-      final var page = events.pageNext(audit);
-      final var items = page.items();
-      assertEquals(1, items.size());
-      assertEquals(3, page.pageIndex());
-      assertEquals(4, page.pageCount());
-      assertEquals("F5", items.get(0).message());
+      assertEquals("E2", items.get(0).data().get("x"));
     }
 
     {
@@ -308,7 +235,7 @@ public final class IdDatabaseAuditTest
         adminId,
         then.plusSeconds(index),
         String.format("ET_%04d", Integer.valueOf(index)),
-        String.format("E_%04d", Integer.valueOf(index))
+        Map.of("x", String.format("E_%04d", Integer.valueOf(index)))
       );
     }
 
@@ -317,7 +244,6 @@ public final class IdDatabaseAuditTest
     final var parameters =
       new IdAuditSearchParameters(
         new IdTimeRange(then, then.plusDays(1L)),
-        empty(),
         empty(),
         empty(),
         100
@@ -437,7 +363,7 @@ public final class IdDatabaseAuditTest
         item.type());
       assertEquals(
         String.format("E_%04d", Integer.valueOf(index)),
-        item.message());
+        item.data().get("x"));
       ++index;
     }
   }

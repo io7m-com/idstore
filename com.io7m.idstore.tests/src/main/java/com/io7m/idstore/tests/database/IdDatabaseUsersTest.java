@@ -61,7 +61,9 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHost;
 import static com.io7m.idstore.model.IdLoginMetadataStandard.remoteHostProxied;
 import static com.io7m.idstore.model.IdUserColumn.BY_IDNAME;
+import static com.io7m.idstore.tests.extensions.IdTestDatabases.ExpectedEvent.eventOf;
 import static java.time.OffsetDateTime.now;
+import static java.util.Map.entry;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -182,8 +184,8 @@ public final class IdDatabaseUsersTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("USER_CREATED", user.id().toString())
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId.toString())),
+      eventOf("USER_CREATED", entry("UserID", user.id()))
     );
   }
 
@@ -233,8 +235,8 @@ public final class IdDatabaseUsersTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("USER_CREATED", user.id().toString())
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId.toString())),
+      eventOf("USER_CREATED", entry("UserID", user.id()))
     );
   }
 
@@ -432,9 +434,9 @@ public final class IdDatabaseUsersTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("USER_CREATED", id.toString()),
-      new ExpectedEvent("USER_LOGGED_IN", "127.0.0.1")
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId.toString())),
+      eventOf("USER_CREATED", entry("UserID", user.id())),
+      eventOf("USER_LOGGED_IN", entry("Host", "127.0.0.1"))
     );
   }
 
@@ -477,19 +479,17 @@ public final class IdDatabaseUsersTest
     users.userLogin(
       user.id(),
       Map.ofEntries(
-        Map.entry(remoteHost(), "127.0.0.1"),
-        Map.entry(remoteHostProxied(), "fe80:0:0:0:18c6:61ff:fedb:dfed")
+        entry(remoteHost(), "127.0.0.1"),
+        entry(remoteHostProxied(), "fe80:0:0:0:18c6:61ff:fedb:dfed")
       ),
       100
     );
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("USER_CREATED", id.toString()),
-      new ExpectedEvent(
-        "USER_LOGGED_IN",
-        "127.0.0.1 (fe80:0:0:0:18c6:61ff:fedb:dfed)")
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId.toString())),
+      eventOf("USER_CREATED", entry("UserID", user.id())),
+      eventOf("USER_LOGGED_IN", entry("Host", "127.0.0.1 (fe80:0:0:0:18c6:61ff:fedb:dfed)"))
     );
   }
 
@@ -923,8 +923,8 @@ public final class IdDatabaseUsersTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("USER_CREATED", user.id().toString())
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId.toString())),
+      eventOf("USER_CREATED", entry("UserID", user.id()))
     );
   }
 
@@ -1135,12 +1135,10 @@ public final class IdDatabaseUsersTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("USER_CREATED", user.id().toString()),
-      new ExpectedEvent(
-        "USER_EMAIL_REMOVED",
-        user.id() + "|someone@example.com"),
-      new ExpectedEvent("USER_DELETED", user.id().toString())
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId)),
+      eventOf("USER_CREATED", entry("UserID", user.id())),
+      eventOf("USER_EMAIL_REMOVED", entry("Email", "someone@example.com")),
+      eventOf("USER_DELETED", entry("UserID", user.id()))
     );
   }
 
@@ -1182,10 +1180,10 @@ public final class IdDatabaseUsersTest
 
     IdTestDatabases.checkAuditLog(
       this.transaction,
-      new ExpectedEvent("ADMIN_CREATED", adminId.toString()),
-      new ExpectedEvent("USER_CREATED", user.toString()),
-      new ExpectedEvent("USER_BANNED", user.toString()),
-      new ExpectedEvent("USER_BAN_REMOVED", user.toString())
+      eventOf("ADMIN_CREATED", entry("AdminID", adminId.toString())),
+      eventOf("USER_CREATED", entry("UserID", user)),
+      eventOf("USER_BANNED", entry("UserID", user)),
+      eventOf("USER_BAN_REMOVED", entry("UserID", user))
     );
   }
 

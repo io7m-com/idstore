@@ -42,6 +42,7 @@ module com.io7m.idstore.database.postgres
   requires io.opentelemetry.api;
   requires io.opentelemetry.context;
   requires io.opentelemetry.semconv;
+  requires org.jooq.postgres.extensions;
   requires org.jooq;
   requires org.postgresql.jdbc;
   requires org.slf4j;

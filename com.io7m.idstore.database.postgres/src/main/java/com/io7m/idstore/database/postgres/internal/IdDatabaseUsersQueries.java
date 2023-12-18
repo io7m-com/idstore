@@ -52,6 +52,7 @@ import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
+import org.jooq.postgres.extensions.types.Hstore;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -61,6 +62,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.io7m.idstore.database.postgres.internal.IdDatabaseAuditQueries.AU_DATA;
 import static com.io7m.idstore.database.postgres.internal.IdDatabaseExceptions.handleDatabaseException;
 import static com.io7m.idstore.database.postgres.internal.Tables.AUDIT;
 import static com.io7m.idstore.database.postgres.internal.Tables.BANS;
@@ -211,11 +213,16 @@ final class IdDatabaseUsersQueries
         .set(EMAILS.USER_ID, id)
         .execute();
 
+      final var auditData =
+        Map.ofEntries(
+          Map.entry("UserID", id.toString())
+        );
+
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "USER_CREATED")
         .set(AUDIT.USER_ID, adminId)
-        .set(AUDIT.MESSAGE, id.toString())
+        .set(AU_DATA, Hstore.hstore(auditData))
         .execute();
 
       return this.userGet(id).orElseThrow();
@@ -478,12 +485,17 @@ final class IdDatabaseUsersQueries
        * are tentatively considered confidential.
        */
 
+      final var auditData =
+        Map.ofEntries(
+          Map.entry("Host", formatHosts(metadata))
+        );
+
       final var audit =
         context.insertInto(AUDIT)
           .set(AUDIT.TIME, time)
           .set(AUDIT.TYPE, "USER_LOGGED_IN")
           .set(AUDIT.USER_ID, id)
-          .set(AUDIT.MESSAGE, formatHosts(metadata));
+          .set(AU_DATA, Hstore.hstore(auditData));
 
       audit.execute();
     } catch (final DataAccessException e) {
@@ -591,11 +603,17 @@ final class IdDatabaseUsersQueries
         final var name = withIdName.get();
         record.setIdName(name.value());
 
+        final var auditData =
+          Map.ofEntries(
+            Map.entry("UserID", id.toString()),
+            Map.entry("IdName", name.value())
+          );
+
         context.insertInto(AUDIT)
           .set(AUDIT.TIME, this.currentTime())
           .set(AUDIT.TYPE, "USER_CHANGED_ID_NAME")
           .set(AUDIT.USER_ID, owner)
-          .set(AUDIT.MESSAGE, "%s|%s".formatted(id.toString(), name.value()))
+          .set(AU_DATA, Hstore.hstore(auditData))
           .execute();
       }
 
@@ -603,11 +621,17 @@ final class IdDatabaseUsersQueries
         final var name = withRealName.get();
         record.setRealName(name.value());
 
+        final var auditData =
+          Map.ofEntries(
+            Map.entry("UserID", id.toString()),
+            Map.entry("RealName", name.value())
+          );
+
         context.insertInto(AUDIT)
           .set(AUDIT.TIME, this.currentTime())
           .set(AUDIT.TYPE, "USER_CHANGED_REAL_NAME")
           .set(AUDIT.USER_ID, owner)
-          .set(AUDIT.MESSAGE, "%s|%s".formatted(id.toString(), name.value()))
+          .set(AU_DATA, Hstore.hstore(auditData))
           .execute();
       }
 
@@ -618,11 +642,16 @@ final class IdDatabaseUsersQueries
         record.setPasswordSalt(pass.salt());
         record.setPasswordExpires(pass.expires().orElse(null));
 
+        final var auditData =
+          Map.ofEntries(
+            Map.entry("UserID", id.toString())
+          );
+
         context.insertInto(AUDIT)
           .set(AUDIT.TIME, this.currentTime())
           .set(AUDIT.TYPE, "USER_CHANGED_PASSWORD")
           .set(AUDIT.USER_ID, owner)
-          .set(AUDIT.MESSAGE, id.toString())
+          .set(AU_DATA, Hstore.hstore(auditData))
           .execute();
       }
 
@@ -665,11 +694,16 @@ final class IdDatabaseUsersQueries
         .set(EMAILS.EMAIL_ADDRESS, email.value())
         .execute();
 
+      final var auditData =
+        Map.ofEntries(
+          Map.entry("Email", email.value())
+        );
+
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "USER_EMAIL_ADDED")
         .set(AUDIT.USER_ID, executor)
-        .set(AUDIT.MESSAGE, "%s|%s".formatted(id, email.value()))
+        .set(AU_DATA, Hstore.hstore(auditData))
         .execute();
 
     } catch (final DataAccessException e) {
@@ -729,11 +763,16 @@ final class IdDatabaseUsersQueries
                  .and(EMAILS.EMAIL_ADDRESS.equalIgnoreCase(email.value())))
         .execute();
 
+      final var auditData =
+        Map.ofEntries(
+          Map.entry("Email", email.value())
+        );
+
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "USER_EMAIL_REMOVED")
         .set(AUDIT.USER_ID, executor)
-        .set(AUDIT.MESSAGE, "%s|%s".formatted(id, email.value()))
+        .set(AU_DATA, Hstore.hstore(auditData))
         .execute();
 
     } catch (final DataAccessException e) {
@@ -819,11 +858,16 @@ final class IdDatabaseUsersQueries
         .where(USERS.ID.eq(id))
         .execute();
 
+      final var auditData =
+        Map.ofEntries(
+          Map.entry("UserID", user.id().toString())
+        );
+
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "USER_DELETED")
         .set(AUDIT.USER_ID, executor)
-        .set(AUDIT.MESSAGE, id.toString())
+        .set(AU_DATA, Hstore.hstore(auditData))
         .execute();
 
     } catch (final DataAccessException e) {
@@ -871,11 +915,16 @@ final class IdDatabaseUsersQueries
       banRecord.set(BANS.REASON, ban.reason());
       banRecord.store();
 
+      final var auditData =
+        Map.ofEntries(
+          Map.entry("UserID", user.id().toString())
+        );
+
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "USER_BANNED")
         .set(AUDIT.USER_ID, executor)
-        .set(AUDIT.MESSAGE, user.id().toString())
+        .set(AU_DATA, Hstore.hstore(auditData))
         .execute();
 
     } catch (final DataAccessException e) {
@@ -964,11 +1013,16 @@ final class IdDatabaseUsersQueries
 
       banRecord.delete();
 
+      final var auditData =
+        Map.ofEntries(
+          Map.entry("UserID", user.id().toString())
+        );
+
       context.insertInto(AUDIT)
         .set(AUDIT.TIME, this.currentTime())
         .set(AUDIT.TYPE, "USER_BAN_REMOVED")
         .set(AUDIT.USER_ID, executor)
-        .set(AUDIT.MESSAGE, user.id().toString())
+        .set(AU_DATA, Hstore.hstore(auditData))
         .execute();
 
     } catch (final DataAccessException e) {
@@ -1009,9 +1063,15 @@ final class IdDatabaseUsersQueries
         .set(USER_PASSWORD_RESETS.TOKEN, reset.token().value())
         .execute();
 
+      final var auditData =
+        Map.ofEntries(
+          Map.entry("Token", reset.token().value()),
+          Map.entry("Expires", reset.expires().toString())
+        );
+
       context.insertInto(AUDIT)
         .set(AUDIT.USER_ID, user.id())
-        .set(AUDIT.MESSAGE, "%s|%s".formatted(reset.token(), reset.expires()))
+        .set(AU_DATA, Hstore.hstore(auditData))
         .set(AUDIT.TYPE, "USER_PASSWORD_RESET_CREATED")
         .set(AUDIT.TIME, this.currentTime())
         .execute();

@@ -26,6 +26,7 @@ import com.io7m.cedarbridge.runtime.api.CBSerializableType;
 import com.io7m.cedarbridge.runtime.api.CBSome;
 import com.io7m.cedarbridge.runtime.api.CBString;
 import com.io7m.cedarbridge.runtime.api.CBUUID;
+import com.io7m.cedarbridge.runtime.convenience.CBMaps;
 import com.io7m.cedarbridge.runtime.time.CBOffsetDateTime;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdBan;
@@ -229,7 +230,7 @@ public final class IdACB1ValidationGeneral
       new CBUUID(e.owner()),
       toWireTimestamp(e.time()),
       new CBString(e.type()),
-      new CBString(e.message())
+      CBMaps.ofMapString(e.data())
     );
   }
 
@@ -252,7 +253,7 @@ public final class IdACB1ValidationGeneral
       i.fieldOwner().value(),
       fromWireTimestamp(i.fieldTime()),
       i.fieldType().value(),
-      i.fieldMessage().value()
+      CBMaps.toMapString(i.fieldData())
     );
   }
 

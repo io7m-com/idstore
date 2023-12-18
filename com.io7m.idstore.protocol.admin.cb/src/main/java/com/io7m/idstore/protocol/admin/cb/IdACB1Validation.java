@@ -608,7 +608,6 @@ public final class IdACB1Validation
     return new IdA1AuditSearchParameters(
       toWireTimeRange(parameters.timeRange()),
       fromOptional(parameters.owner().map(CBString::new)),
-      fromOptional(parameters.message().map(CBString::new)),
       fromOptional(parameters.type().map(CBString::new)),
       new CBIntegerUnsigned16(parameters.limit())
     );
@@ -1013,7 +1012,6 @@ public final class IdACB1Validation
       fromWireTimeRange(p.fieldTimeRange()),
       p.fieldOwner().asOptional().map(CBString::value),
       p.fieldType().asOptional().map(CBString::value),
-      p.fieldMessage().asOptional().map(CBString::value),
       p.fieldLimit().value()
     );
   }

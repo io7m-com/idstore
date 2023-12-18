@@ -19,7 +19,6 @@ package com.io7m.idstore.database.postgres.internal;
 import com.io7m.idstore.database.api.IdDatabaseAuditEventsSearchType;
 import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseException;
-import com.io7m.idstore.database.postgres.internal.tables.records.AuditRecord;
 import com.io7m.idstore.model.IdAuditEvent;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 import com.io7m.idstore.model.IdPage;
@@ -29,10 +28,13 @@ import com.io7m.jqpage.core.JQKeysetRandomAccessPagination;
 import com.io7m.jqpage.core.JQKeysetRandomAccessPaginationParameters;
 import com.io7m.jqpage.core.JQOrder;
 import org.jooq.Condition;
-import org.jooq.Select;
-import org.jooq.Table;
+import org.jooq.DataType;
+import org.jooq.Field;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
+import org.jooq.postgres.extensions.bindings.HstoreBinding;
+import org.jooq.postgres.extensions.types.Hstore;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -48,6 +50,12 @@ final class IdDatabaseAuditQueries
   extends IdBaseQueries
   implements IdDatabaseAuditQueriesType
 {
+  private static final DataType<Hstore> AU_DATA_TYPE =
+    SQLDataType.OTHER.asConvertedDataType(new HstoreBinding());
+
+  static final Field<Hstore> AU_DATA =
+    DSL.field("DATA", AU_DATA_TYPE);
+
   IdDatabaseAuditQueries(
     final IdDatabaseTransaction inTransaction)
   {
@@ -100,13 +108,6 @@ final class IdDatabaseAuditQueries
           searchCondition.and(DSL.condition(AUDIT.USER_ID.likeIgnoreCase(q)));
       }
 
-      final var msgOpt = parameters.message();
-      if (msgOpt.isPresent()) {
-        final var q = "%%%s%%".formatted(msgOpt.get());
-        searchCondition =
-          searchCondition.and(DSL.condition(AUDIT.MESSAGE.likeIgnoreCase(q)));
-      }
-
       final var allConditions =
         timeCreatedCondition.and(searchCondition);
 
@@ -126,7 +127,7 @@ final class IdDatabaseAuditQueries
             .build()
         );
 
-      return new AuditEventsSearch(baseTable, pages);
+      return new AuditEventsSearch(pages);
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
       throw handleDatabaseException(this.transaction(), e, Map.of());
@@ -140,13 +141,13 @@ final class IdDatabaseAuditQueries
     final UUID userId,
     final OffsetDateTime time,
     final String type,
-    final String message)
+    final Map<String, String> data)
     throws IdDatabaseException
   {
     Objects.requireNonNull(userId, "userId");
     Objects.requireNonNull(time, "time");
     Objects.requireNonNull(type, "type");
-    Objects.requireNonNull(message, "message");
+    Objects.requireNonNull(data, "data");
 
     final var transaction = this.transaction();
     final var context = transaction.createContext();
@@ -159,7 +160,7 @@ final class IdDatabaseAuditQueries
         .set(AUDIT.TIME, time)
         .set(AUDIT.TYPE, type)
         .set(AUDIT.USER_ID, userId)
-        .set(AUDIT.MESSAGE, message)
+        .set(AU_DATA, Hstore.hstore(data))
         .execute();
     } catch (final DataAccessException e) {
       querySpan.recordException(e);
@@ -173,14 +174,10 @@ final class IdDatabaseAuditQueries
     extends IdAbstractSearch<IdDatabaseAuditQueries, IdDatabaseAuditQueriesType, IdAuditEvent>
     implements IdDatabaseAuditEventsSearchType
   {
-    private final Table<AuditRecord> table;
-
     AuditEventsSearch(
-      final Table<AuditRecord> inTable,
       final List<JQKeysetRandomAccessPageDefinition> inPages)
     {
       super(inPages);
-      this.table = Objects.requireNonNull(inTable, "inTable");
     }
 
     @Override
@@ -200,27 +197,27 @@ final class IdDatabaseAuditQueries
 
       try {
         final var query =
-          context.selectFrom(this.table)
-            .orderBy(page.orderBy());
-
-        final var seek = page.seek();
-        final Select<AuditRecord> select;
-        if (seek.length != 0) {
-          select = query.seek(seek).limit(Long.valueOf(page.limit()));
-        } else {
-          select = query.limit(Long.valueOf(page.limit()));
-        }
+          page.queryFields(
+            context,
+            List.of(
+              AUDIT.ID,
+              AUDIT.USER_ID,
+              AUDIT.TIME,
+              AUDIT.TYPE,
+              AU_DATA
+            )
+          );
 
         querySpan.setAttribute(DB_STATEMENT, query.toString());
 
         final var items =
-          select.fetch().map(record -> {
+          query.fetch().map(record -> {
             return new IdAuditEvent(
               record.getValue(AUDIT.ID).longValue(),
               record.getValue(AUDIT.USER_ID),
               record.getValue(AUDIT.TIME),
               record.getValue(AUDIT.TYPE),
-              record.getValue(AUDIT.MESSAGE)
+              record.getValue(AU_DATA).data()
             );
           });
 

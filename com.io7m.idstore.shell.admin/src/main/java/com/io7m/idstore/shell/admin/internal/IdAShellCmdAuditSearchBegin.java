@@ -75,15 +75,6 @@ public final class IdAShellCmdAuditSearchBegin
       String.class
     );
 
-  private static final QParameterNamed01<String> MESSAGE =
-    new QParameterNamed01<>(
-      "--message",
-      List.of(),
-      new QConstant("Filter events by message."),
-      Optional.empty(),
-      String.class
-    );
-
   private static final QParameterNamed1<Integer> LIMIT =
     new QParameterNamed1<>(
       "--limit",
@@ -119,7 +110,6 @@ public final class IdAShellCmdAuditSearchBegin
   {
     return List.of(
       LIMIT,
-      MESSAGE,
       OWNER,
       TIME_FROM,
       TIME_TO,
@@ -139,7 +129,6 @@ public final class IdAShellCmdAuditSearchBegin
         ),
         context.parameterValue(OWNER),
         context.parameterValue(TYPE),
-        context.parameterValue(MESSAGE),
         context.parameterValue(LIMIT).intValue()
       );
 

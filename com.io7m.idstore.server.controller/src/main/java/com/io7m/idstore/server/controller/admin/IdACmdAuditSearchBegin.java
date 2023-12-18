@@ -79,7 +79,6 @@ public final class IdACmdAuditSearchBegin
         model.timeRange(),
         model.owner(),
         model.type(),
-        model.message(),
         1000
       );
     }

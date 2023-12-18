@@ -47,8 +47,10 @@ import org.junit.jupiter.api.Assertions;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -337,9 +339,30 @@ public final class IdTestDatabases
 
   public record ExpectedEvent(
     String type,
-    String message)
+    Map<String, String> message)
   {
+    /**
+     * An expected audit event.
+     *
+     * @param type    The event type
+     * @param entries The event entries
+     *
+     * @return A new event
+     */
 
+    public static ExpectedEvent eventOf(
+      final String type,
+      final Map.Entry<?, ?>... entries)
+    {
+      final var map = new HashMap<String, String>(entries.length);
+      for (final var e : entries) {
+        map.put(e.getKey().toString(), e.getValue().toString());
+      }
+      return new ExpectedEvent(
+        type,
+        Map.copyOf(map)
+      );
+    }
   }
 
   /**
@@ -362,7 +385,6 @@ public final class IdTestDatabases
       audit.auditEventsSearch(
         new IdAuditSearchParameters(
           new IdTimeRange(timeNow().minusYears(1L), timeNow().plusYears(1L)),
-          Optional.empty(),
           Optional.empty(),
           Optional.empty(),
           MAX_VALUE
@@ -400,7 +422,7 @@ public final class IdTestDatabases
       if (expect.message != null) {
         assertEquals(
           expect.message,
-          event.message(),
+          event.data(),
           String.format(
             "Event [%d] %s message must be %s",
             Integer.valueOf(index),

@@ -26,7 +26,6 @@ import java.util.Optional;
  * @param timeRange Only events created within this time range are returned
  * @param limit     The limit on the number of returned events
  * @param owner     Only include events with this owner
- * @param message   Only include events with this message
  * @param type      Only include events with this type
  */
 
@@ -34,7 +33,6 @@ public record IdAuditSearchParameters(
   IdTimeRange timeRange,
   Optional<String> owner,
   Optional<String> type,
-  Optional<String> message,
   int limit)
 {
   /**
@@ -43,7 +41,6 @@ public record IdAuditSearchParameters(
    * @param timeRange Only events created within this time range are returned
    * @param limit     The limit on the number of returned events
    * @param owner     Only include events with this owner
-   * @param message   Only include events with this message
    * @param type      Only include events with this type
    */
 
@@ -52,7 +49,6 @@ public record IdAuditSearchParameters(
     Objects.requireNonNull(timeRange, "timeRange");
     Objects.requireNonNull(owner, "owner");
     Objects.requireNonNull(type, "type");
-    Objects.requireNonNull(message, "message");
   }
 
   /**
@@ -63,7 +59,6 @@ public record IdAuditSearchParameters(
   {
     return new IdAuditSearchParameters(
       IdTimeRange.largest(),
-      Optional.empty(),
       Optional.empty(),
       Optional.empty(),
       100
