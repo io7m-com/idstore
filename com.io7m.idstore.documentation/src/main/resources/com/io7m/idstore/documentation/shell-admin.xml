@@ -17,6 +17,7 @@
         command. The shell supports basic tab-completion and history accessed with the up and down arrows.
       </Paragraph>
     </Subsection>
+
     <Subsection title="Tab Completion">
       <Paragraph>
         When running on an appropriate terminal, the shell supports tab completion for command and most
@@ -30,6 +31,7 @@
         <Image source="term1.png" width="509" height="360">Argument completion.</Image>
       </FormalItem>
     </Subsection>
+
     <Subsection title="History">
       <Paragraph>
         When running on an appropriate terminal, the command shell stores the history of command in memory (the
@@ -37,6 +39,7 @@
         executed commands.
       </Paragraph>
     </Subsection>
+
     <Subsection title="Quoting">
       <Paragraph>
         Arguments to shell commands may be quoted using the <Term type="constant">"</Term> or
@@ -47,6 +50,7 @@
         <Image source="term2.png" width="509" height="360">Quoting.</Image>
       </FormalItem>
     </Subsection>
+
     <Subsection title="Newlines">
       <Paragraph>
         Typically, the <Term type="expression">ENTER</Term> key ends the current line. This will cause the shell to
@@ -62,6 +66,95 @@
         Pressing the <Term type="expression">ENTER</Term> key ends the multiline editing mode and executes the
         command.
       </Paragraph>
+    </Subsection>
+
+    <Subsection title="Search Pagination" id="a14610db-3fbe-46b2-91a6-23d861f8d454">
+      <Paragraph>
+        All <Term type="term">search</Term> commands in the <Term type="package">idstore</Term> package
+        provide automatic <Term type="term">pagination</Term>. Searches are performed by beginning a search
+        with a <Term type="term">begin</Term> command which will yield the first page of results. Searches
+        are then continued with <Term type="term">next</Term> and <Term type="term">previous</Term> commands which
+        will return the next and previous pages of results, respectively. It is an error to try to execute a
+        <Term type="term">next</Term> or <Term type="term">previous</Term> command without first having executed
+        a <Term type="term">begin</Term> command.
+      </Paragraph>
+      <Paragraph>
+        Each page of search results includes the number of the current page, and the number of pages of search
+        results available. Attempting to seek beyond the end of the set of pages with a <Term type="term">next</Term>
+        command is not an error; the server will simply repeatedly return the last page in the set. Similarly,
+        attempting to seek before the first page of results with a <Term type="term">previous</Term> command
+        will simply return the first page of results, repeatedly.
+      </Paragraph>
+    </Subsection>
+
+    <Subsection title="Formatter" id="6974cc74-2016-4e55-8c86-001c8af61ca1">
+      <Paragraph>
+        The shell provides different formatting options for tabular data.
+      </Paragraph>
+      <FormalItem title="Formatters">
+        <Table type="genericTable">
+          <Columns>
+            <Column>Name</Column>
+            <Column>Description</Column>
+          </Columns>
+          <Row>
+            <Cell>PRETTY</Cell>
+            <Cell>Provides pretty Unicode tables.</Cell>
+          </Row>
+          <Row>
+            <Cell>RAW</Cell>
+            <Cell>Provides raw tables.</Cell>
+          </Row>
+        </Table>
+      </FormalItem>
+      <Paragraph>
+        The formatter can be set using the <Link target="ebf203c1-a05b-3a42-86ca-682d1d88842f">set</Link> command.
+      </Paragraph>
+      <FormalItem title="Example">
+        <Verbatim><![CDATA[
+[idstore]# set --formatter PRETTY
+[idstore]# audit-search-begin
+ Page 1 of 2, offset 0
+┌────┬──────────────────────┬──────────────────────────────────────┬─────────────────┬──────────────────────────────────────────────────────────────────────────────────────┐
+│ ID │ Time                 │ Owner                                │ Type            │ Message                                                                              │
+├────┼──────────────────────┼──────────────────────────────────────┼─────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ 9  │ 2023-12-20T10:56:39Z │ 5b238548-cf55-44c1-89d2-de3c7c6950a8 │ ADMIN_LOGGED_IN │ {Host=10.0.2.100:33514}                                                              │
+├────┼──────────────────────┼──────────────────────────────────────┼─────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ 10 │ 2023-12-20T11:07:12Z │ 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 │ USER_LOGGED_IN  │ {Host=10.0.2.100:51752}                                                              │
+├────┼──────────────────────┼──────────────────────────────────────┼─────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ 11 │ 2023-12-20T11:09:04Z │ 5b238548-cf55-44c1-89d2-de3c7c6950a8 │ ADMIN_LOGGED_IN │ {Host=10.0.2.100:36410}                                                              │
+├────┼──────────────────────┼──────────────────────────────────────┼─────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ 12 │ 2023-12-20T16:55:33Z │ 5b238548-cf55-44c1-89d2-de3c7c6950a8 │ ADMIN_LOGGED_IN │ {Host=10.0.2.100:32848}                                                              │
+├────┼──────────────────────┼──────────────────────────────────────┼─────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ 13 │ 2023-12-21T11:20:09Z │ 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 │ USER_LOGGED_IN  │ {Host=10.0.2.100:42982 (10.2.4.1:42990)}                                             │
+├────┼──────────────────────┼──────────────────────────────────────┼─────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ 14 │ 2023-12-21T11:21:12Z │ 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 │ USER_LOGGED_IN  │ {Host=10.0.2.100:37490 (10.2.4.1:58114)}                                             │
+├────┼──────────────────────┼──────────────────────────────────────┼─────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ 15 │ 2023-12-21T11:30:10Z │ 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 │ USER_LOGGED_IN  │ {Host=10.0.2.100:60566 (10.2.4.1:53236)}                                             │
+├────┼──────────────────────┼──────────────────────────────────────┼─────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ 16 │ 2023-12-21T11:56:03Z │ 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 │ USER_LOGGED_IN  │ {Host=10.0.2.100:56994 (10.2.4.1:48326)}                                             │
+├────┼──────────────────────┼──────────────────────────────────────┼─────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ 17 │ 2023-12-21T11:56:53Z │ 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 │ USER_LOGGED_IN  │ {Host=10.0.2.100:56268 (10.2.4.1:39182)}                                             │
+├────┼──────────────────────┼──────────────────────────────────────┼─────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ 18 │ 2023-12-21T14:09:40Z │ 5b238548-cf55-44c1-89d2-de3c7c6950a8 │ ADMIN_LOGGED_IN │ {Host=10.0.2.100:36966}                                                              │
+└────┴──────────────────────┴──────────────────────────────────────┴─────────────────┴──────────────────────────────────────────────────────────────────────────────────────┘
+[idstore]# set --formatter RAW
+[idstore]# audit-search-begin
+# Page 1 of 2, offset 0
+# ID | Time | Owner | Type | Message
+9            | 2023-12-20T10:56:39Z     | 5b238548-cf55-44c1-89d2-de3c7c6950a8 | ADMIN_LOGGED_IN          | {Host=10.0.2.100:33514}
+10           | 2023-12-20T11:07:12Z     | 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 | USER_LOGGED_IN           | {Host=10.0.2.100:51752}
+11           | 2023-12-20T11:09:04Z     | 5b238548-cf55-44c1-89d2-de3c7c6950a8 | ADMIN_LOGGED_IN          | {Host=10.0.2.100:36410}
+12           | 2023-12-20T16:55:33Z     | 5b238548-cf55-44c1-89d2-de3c7c6950a8 | ADMIN_LOGGED_IN          | {Host=10.0.2.100:32848}
+13           | 2023-12-21T11:20:09Z     | 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 | USER_LOGGED_IN           | {Host=10.0.2.100:42982 (10.1.6.1:42990)}
+14           | 2023-12-21T11:21:12Z     | 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 | USER_LOGGED_IN           | {Host=10.0.2.100:37490 (10.1.6.1:58114)}
+15           | 2023-12-21T11:30:10Z     | 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 | USER_LOGGED_IN           | {Host=10.0.2.100:60566 (10.1.6.1:53236)}
+16           | 2023-12-21T11:56:03Z     | 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 | USER_LOGGED_IN           | {Host=10.0.2.100:56994 (10.1.6.1:48326)}
+17           | 2023-12-21T11:56:53Z     | 3cd252a7-5d9f-44a9-87d1-cb60bdd608b3 | USER_LOGGED_IN           | {Host=10.0.2.100:56268 (10.1.6.1:39182)}
+18           | 2023-12-21T14:09:40Z     | 5b238548-cf55-44c1-89d2-de3c7c6950a8 | ADMIN_LOGGED_IN          | {Host=10.0.2.100:36966}
+]]>
+        </Verbatim>
+      </FormalItem>
     </Subsection>
   </Section>
 

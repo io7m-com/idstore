@@ -10,7 +10,7 @@
     <Paragraph>
       The 
       <Term type="command">admin-search-by-email-previous</Term>
-       command moves to the previous page of search results.
+       command moves to the previous page of <Link target="a14610db-3fbe-46b2-91a6-23d861f8d454">search</Link> results.
     </Paragraph>
   </Subsection>
 </Section>
