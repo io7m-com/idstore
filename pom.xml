@@ -88,10 +88,10 @@
     <com.io7m.verdant.version>1.0.0</com.io7m.verdant.version>
     <com.io7m.xstructural.version>1.8.0</com.io7m.xstructural.version>
     <com.io7m.zelador.version>0.0.1</com.io7m.zelador.version>
-    <helidon.version>4.0.1</helidon.version>
+    <helidon.version>4.0.2</helidon.version>
     <io7m.api.previousVersion>1.0.0-SNAPSHOT</io7m.api.previousVersion>
     <jetty.version>12.0.2</jetty.version>
-    <jooq.version>3.19.0</jooq.version>
+    <jooq.version>3.19.1</jooq.version>
     <logback.version>1.4.14</logback.version>
     <opentelemetry.version>1.33.0</opentelemetry.version>
     <org.jline.version>3.24.1</org.jline.version>
@@ -471,12 +471,12 @@
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
-        <version>1.9.21</version>
+        <version>1.9.22</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okio</groupId>
         <artifactId>okio-jvm</artifactId>
-        <version>3.6.0</version>
+        <version>3.7.0</version>
       </dependency>
 
       <dependency>
@@ -632,12 +632,12 @@
       <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy-agent</artifactId>
-        <version>1.14.10</version>
+        <version>1.14.11</version>
       </dependency>
       <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy</artifactId>
-        <version>1.14.10</version>
+        <version>1.14.11</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
