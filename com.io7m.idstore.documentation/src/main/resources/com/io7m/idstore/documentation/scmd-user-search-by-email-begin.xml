@@ -10,7 +10,7 @@
     <Paragraph>
       The 
       <Term type="command">user-search-by-email-begin</Term>
-       command starts searching for users by email address.
+       command starts <Link target="a14610db-3fbe-46b2-91a6-23d861f8d454">searching</Link> for users by email address.
     </Paragraph>
     <FormalItem title="Parameters">
       <Table type="parameterTable">
