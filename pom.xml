@@ -93,8 +93,8 @@
     <jooq.version>3.19.1</jooq.version>
     <logback.version>1.4.14</logback.version>
     <opentelemetry.version>1.33.0</opentelemetry.version>
-    <org.jline.version>3.24.1</org.jline.version>
-    <slf4j.version>2.0.9</slf4j.version>
+    <org.jline.version>3.25.0</org.jline.version>
+    <slf4j.version>2.0.10</slf4j.version>
     <testcontainers.version>1.18.3</testcontainers.version>
   </properties>
 
