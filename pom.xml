@@ -90,6 +90,7 @@
     <com.io7m.zelador.version>0.0.1</com.io7m.zelador.version>
     <helidon.version>4.0.2</helidon.version>
     <io7m.api.previousVersion>1.0.0</io7m.api.previousVersion>
+    <io7m.java.targetJavaVersion>21</io7m.java.targetJavaVersion>
     <jooq.version>3.19.1</jooq.version>
     <logback.version>1.4.14</logback.version>
     <opentelemetry.version>1.33.0</opentelemetry.version>
