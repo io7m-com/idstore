@@ -19,7 +19,7 @@
  */
 
 @Export
-@Version("1.0.1")
+@Version("1.0.2")
 package com.io7m.idstore.model;
 
 import org.osgi.annotation.bundle.Export;
