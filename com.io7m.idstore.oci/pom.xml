@@ -19,8 +19,8 @@
   <url>https://www.io7m.com/software/idstore</url>
 
   <properties>
-    <com.io7m.oci.versionAlpine>3.18.2</com.io7m.oci.versionAlpine>
-    <com.io7m.oci.versionTemurin>21_35-jre-alpine</com.io7m.oci.versionTemurin>
+    <com.io7m.oci.versionAlpine>3.18.6</com.io7m.oci.versionAlpine>
+    <com.io7m.oci.versionTemurin>21.0.2_13-jre-alpine</com.io7m.oci.versionTemurin>
     <spotbugs.skip>true</spotbugs.skip>
   </properties>
 
