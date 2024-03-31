@@ -19,6 +19,7 @@ package com.io7m.idstore.tests.extensions;
 
 import com.io7m.ervilla.api.EContainerSupervisorType;
 import com.io7m.ervilla.api.EContainerType;
+import com.io7m.ervilla.api.EPortAddressType;
 import com.io7m.ervilla.postgres.EPgSpecs;
 import com.io7m.idstore.database.api.IdDatabaseAdminsQueriesType;
 import com.io7m.idstore.database.api.IdDatabaseAuditQueriesType;
@@ -172,7 +173,7 @@ public final class IdTestDatabases
       supervisor.start(
         EPgSpecs.builderFromDockerIO(
           POSTGRESQL_VERSION,
-          Optional.empty(),
+          new EPortAddressType.All(),
           port,
           "idstore",
           "idstore_install",
@@ -223,7 +224,7 @@ public final class IdTestDatabases
       supervisor.start(
         EPgSpecs.builderFromDockerIO(
           POSTGRESQL_VERSION,
-          Optional.empty(),
+          new EPortAddressType.All(),
           port,
           "idstore",
           "idstore_install",
