@@ -15,11 +15,13 @@
         <c:change date="2024-03-16T00:00:00+00:00" summary="Update org.slf4j:slf4j-api 2.0.9 → 2.0.10."/>
       </c:changes>
     </c:release>
-    <c:release date="2024-04-07T12:46:02+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="1.1.1">
+    <c:release date="2024-04-07T13:00:49+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="1.1.1">
       <c:changes>
         <c:change date="2024-03-31T00:00:00+00:00" summary="Update com.io7m.ervilla:com.io7m.ervilla 0.0.5 → 1.0.0-beta0001."/>
         <c:change date="2024-04-07T00:00:00+00:00" summary="Update ch.qos.logback:logback-classic:1.4.14 → 1.5.3"/>
-        <c:change date="2024-04-07T12:46:02+00:00" summary="Update ch.qos.logback:logback-core:1.4.14 → 1.5.3"/>
+        <c:change date="2024-04-07T00:00:00+00:00" summary="Update ch.qos.logback:logback-core:1.4.14 → 1.5.3"/>
+        <c:change date="2024-04-07T00:00:00+00:00" summary="Update org.slf4j:jul-to-slf4j:2.0.10 → 2.0.12"/>
+        <c:change date="2024-04-07T13:00:49+00:00" summary="Update org.slf4j:slf4j-api:2.0.10 → 2.0.12"/>
       </c:changes>
     </c:release>
   </c:releases>
