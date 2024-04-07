@@ -107,6 +107,7 @@
     <org.jooq.version>3.19.7</org.jooq.version>
     <org.junit.version>5.10.2</org.junit.version>
     <org.mockito.version>5.11.0</org.mockito.version>
+    <org.postgresql.version>42.7.3</org.postgresql.version>
     <slf4j.version>2.0.12</slf4j.version>
     <testcontainers.version>1.18.3</testcontainers.version>
   </properties>
@@ -345,7 +346,7 @@
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.7.2</version>
+        <version>${org.postgresql.version}</version>
       </dependency>
       <dependency>
         <groupId>com.zaxxer</groupId>
