@@ -15,7 +15,7 @@
         <c:change date="2024-03-16T00:00:00+00:00" summary="Update org.slf4j:slf4j-api 2.0.9 → 2.0.10."/>
       </c:changes>
     </c:release>
-    <c:release date="2024-04-07T13:34:15+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="1.1.1">
+    <c:release date="2024-04-07T13:39:14+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="1.1.1">
       <c:changes>
         <c:change date="2024-03-31T00:00:00+00:00" summary="Update com.io7m.ervilla:com.io7m.ervilla 0.0.5 → 1.0.0-beta0001."/>
         <c:change date="2024-04-07T00:00:00+00:00" summary="Update ch.qos.logback:logback-classic:1.4.14 → 1.5.3"/>
@@ -32,7 +32,8 @@
         <c:change date="2024-04-07T00:00:00+00:00" summary="Update org.postgresql:postgresql:42.7.2 → 42.7.3"/>
         <c:change date="2024-04-07T00:00:00+00:00" summary="Update io.opentelemetry:opentelemetry-sdk-logs:1.33.0 → 1.36.0"/>
         <c:change date="2024-04-07T00:00:00+00:00" summary="Update org.jetbrains.kotlin:kotlin-stdlib:1.9.22 → 1.9.23"/>
-        <c:change date="2024-04-07T13:34:15+00:00" summary="Update io.opentelemetry:opentelemetry-bom:1.33.0 → 1.36.0"/>
+        <c:change date="2024-04-07T00:00:00+00:00" summary="Update io.opentelemetry:opentelemetry-bom:1.33.0 → 1.36.0"/>
+        <c:change date="2024-04-07T13:39:14+00:00" summary="Update io.helidon:helidon-bom:4.0.2 → 4.0.7"/>
       </c:changes>
     </c:release>
   </c:releases>
