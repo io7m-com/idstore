@@ -169,7 +169,7 @@
       <plugin>
         <groupId>org.jooq</groupId>
         <artifactId>jooq-codegen-maven</artifactId>
-        <version>${jooq.version}</version>
+        <version>${org.jooq.version}</version>
         <configuration>
           <configurationFile>src/main/jooq/configuration.xml</configurationFile>
         </configuration>
@@ -186,12 +186,12 @@
           <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-meta-extensions</artifactId>
-            <version>${jooq.version}</version>
+            <version>${org.jooq.version}</version>
           </dependency>
           <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-postgres-extensions</artifactId>
-            <version>${jooq.version}</version>
+            <version>${org.jooq.version}</version>
           </dependency>
         </dependencies>
       </plugin>
