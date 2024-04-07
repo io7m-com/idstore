@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
   </parent>
   <artifactId>com.io7m.idstore.tls</artifactId>
 
