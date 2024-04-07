@@ -106,7 +106,7 @@
     <org.apache.commons.io.version>2.16.0</org.apache.commons.io.version>
     <org.apache.commons.text.version>1.11.0</org.apache.commons.text.version>
     <org.jetbrains.version>1.9.23</org.jetbrains.version>
-    <org.jline.version>3.25.0</org.jline.version>
+    <org.jline.version>3.25.1</org.jline.version>
     <org.jooq.version>3.19.7</org.jooq.version>
     <org.junit.version>5.10.2</org.junit.version>
     <org.mockito.version>5.11.0</org.mockito.version>
