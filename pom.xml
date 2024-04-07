@@ -100,6 +100,9 @@
     <com.helger.ph-css.version>7.0.2</com.helger.ph-css.version>
     <com.squareup.okio.version>3.9.0</com.squareup.okio.version>
     <io.helidon.version>4.0.2</io.helidon.version>
+    <io.opentelemetry.api.logs.version>1.26.0-alpha</io.opentelemetry.api.logs.version>
+    <io.opentelemetry.sdk.logs.version>1.36.0</io.opentelemetry.sdk.logs.version>
+    <io.opentelemetry.semconv.version>1.27.0-alpha</io.opentelemetry.semconv.version>
     <io.opentelemetry.version>1.36.0</io.opentelemetry.version>
     <net.bytebuddy.version>1.14.13</net.bytebuddy.version>
     <net.jqwik.version>1.8.4</net.jqwik.version>
@@ -471,17 +474,17 @@
       <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-semconv</artifactId>
-        <version>1.27.0-alpha</version>
+        <version>${io.opentelemetry.semconv.version}</version>
       </dependency>
       <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-api-logs</artifactId>
-        <version>1.26.0-alpha</version>
+        <version>${io.opentelemetry.api.logs.version}</version>
       </dependency>
       <dependency>
         <groupId>io.opentelemetry</groupId>
         <artifactId>opentelemetry-sdk-logs</artifactId>
-        <version>1.36.0</version>
+        <version>${io.opentelemetry.sdk.logs.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
