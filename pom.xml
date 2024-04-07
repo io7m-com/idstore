@@ -78,7 +78,7 @@
     <com.io7m.blackthorne.version>2.0.0</com.io7m.blackthorne.version>
     <com.io7m.cedarbridge.version>1.2.0</com.io7m.cedarbridge.version>
     <com.io7m.cxbutton.version>0.0.5</com.io7m.cxbutton.version>
-    <com.io7m.ervilla.version>1.0.0-beta0001</com.io7m.ervilla.version>
+    <com.io7m.ervilla.version>1.0.0-beta0002</com.io7m.ervilla.version>
     <com.io7m.hibiscus.version>0.0.8</com.io7m.hibiscus.version>
     <com.io7m.jade.version>1.0.2</com.io7m.jade.version>
     <com.io7m.jbssio.version>2.0.0</com.io7m.jbssio.version>
@@ -98,8 +98,12 @@
     <helidon.version>4.0.2</helidon.version>
     <jooq.version>3.19.1</jooq.version>
     <logback.version>1.4.14</logback.version>
+    <net.bytebuddy.version>1.14.13</net.bytebuddy.version>
+    <net.jqwik.version>1.8.4</net.jqwik.version>
     <opentelemetry.version>1.33.0</opentelemetry.version>
     <org.jline.version>3.25.0</org.jline.version>
+    <org.junit.version>5.10.2</org.junit.version>
+    <org.mockito.version>5.11.0</org.mockito.version>
     <slf4j.version>2.0.10</slf4j.version>
     <testcontainers.version>1.18.3</testcontainers.version>
   </properties>
@@ -580,22 +584,22 @@
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
-        <version>5.10.1</version>
+        <version>${org.junit.version}</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-engine</artifactId>
-        <version>5.10.1</version>
+        <version>${org.junit.version}</version>
       </dependency>
       <dependency>
         <groupId>net.jqwik</groupId>
         <artifactId>jqwik-api</artifactId>
-        <version>1.8.2</version>
+        <version>${net.jqwik.version}</version>
       </dependency>
       <dependency>
         <groupId>net.jqwik</groupId>
         <artifactId>jqwik-engine</artifactId>
-        <version>1.8.2</version>
+        <version>${net.jqwik.version}</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.quixote</groupId>
@@ -632,17 +636,17 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.8.0</version>
+        <version>${org.mockito.version}</version>
       </dependency>
       <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy-agent</artifactId>
-        <version>1.14.11</version>
+        <version>${net.bytebuddy.version}</version>
       </dependency>
       <dependency>
         <groupId>net.bytebuddy</groupId>
         <artifactId>byte-buddy</artifactId>
-        <version>1.14.11</version>
+        <version>${net.bytebuddy.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
