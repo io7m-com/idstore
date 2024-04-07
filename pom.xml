@@ -98,12 +98,14 @@
     <!-- Third-party dependencies. -->
     <ch.qos.logback.version>1.5.3</ch.qos.logback.version>
     <com.helger.ph-css.version>7.0.2</com.helger.ph-css.version>
+    <com.squareup.okio.version>3.9.0</com.squareup.okio.version>
     <io.helidon.version>4.0.2</io.helidon.version>
     <io.opentelemetry.version>1.36.0</io.opentelemetry.version>
     <net.bytebuddy.version>1.14.13</net.bytebuddy.version>
     <net.jqwik.version>1.8.4</net.jqwik.version>
     <org.apache.commons.io.version>2.16.0</org.apache.commons.io.version>
     <org.apache.commons.text.version>1.11.0</org.apache.commons.text.version>
+    <org.jetbrains.version>1.9.23</org.jetbrains.version>
     <org.jline.version>3.25.0</org.jline.version>
     <org.jooq.version>3.19.7</org.jooq.version>
     <org.junit.version>5.10.2</org.junit.version>
@@ -484,12 +486,12 @@
       <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
-        <version>1.9.23</version>
+        <version>${org.jetbrains.version}</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okio</groupId>
         <artifactId>okio-jvm</artifactId>
-        <version>3.7.0</version>
+        <version>${com.squareup.okio.version}</version>
       </dependency>
 
       <dependency>
