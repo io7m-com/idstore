@@ -16,12 +16,11 @@
 
 package com.io7m.idstore.admin_client;
 
-import com.io7m.idstore.admin_client.api.IdAClientAsynchronousType;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
+import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.admin_client.api.IdAClientFactoryType;
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
-import com.io7m.idstore.admin_client.internal.IdAClientAsynchronous;
-import com.io7m.idstore.admin_client.internal.IdAClientSynchronous;
+import com.io7m.idstore.admin_client.api.IdAClientType;
+import com.io7m.idstore.admin_client.internal.IdAClient;
 import com.io7m.idstore.strings.IdStrings;
 
 import java.net.CookieManager;
@@ -43,8 +42,9 @@ public final class IdAClients implements IdAClientFactoryType
   }
 
   @Override
-  public IdAClientAsynchronousType openAsynchronousClient(
+  public IdAClientType create(
     final IdAClientConfiguration configuration)
+    throws IdAClientException
   {
     final var cookieJar =
       new CookieManager();
@@ -58,25 +58,6 @@ public final class IdAClients implements IdAClientFactoryType
         .cookieHandler(cookieJar)
         .build();
 
-    return new IdAClientAsynchronous(configuration, strings, httpClient);
-  }
-
-  @Override
-  public IdAClientSynchronousType openSynchronousClient(
-    final IdAClientConfiguration configuration)
-  {
-    final var cookieJar =
-      new CookieManager();
-    final var locale =
-      configuration.locale();
-    final var strings =
-      IdStrings.create(locale);
-
-    final var httpClient =
-      HttpClient.newBuilder()
-        .cookieHandler(cookieJar)
-        .build();
-
-    return new IdAClientSynchronous(configuration, strings, httpClient);
+    return new IdAClient(configuration, strings, httpClient);
   }
 }

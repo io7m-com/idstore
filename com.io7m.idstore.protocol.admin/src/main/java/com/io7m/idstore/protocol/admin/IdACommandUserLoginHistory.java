@@ -22,10 +22,12 @@ import java.util.UUID;
 /**
  * Get the given user's login history.
  *
- * @param user The user ID
+ * @param messageId The message ID
+ * @param user      The user ID
  */
 
 public record IdACommandUserLoginHistory(
+  UUID messageId,
   UUID user)
   implements IdACommandType<IdAResponseUserLoginHistory>
 {
@@ -35,6 +37,7 @@ public record IdACommandUserLoginHistory(
 
   public IdACommandUserLoginHistory
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(user, "id");
   }
 

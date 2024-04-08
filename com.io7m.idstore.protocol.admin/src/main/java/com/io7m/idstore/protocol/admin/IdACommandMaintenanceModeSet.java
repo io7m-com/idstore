@@ -18,16 +18,19 @@ package com.io7m.idstore.protocol.admin;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Move the server to/from maintenance mode. If a message is specified, the
  * server is moved into maintenance mode. If no message is specified, the
  * server is moved out of maintenance mode.
  *
- * @param message The message
+ * @param messageId The message ID
+ * @param message   The message
  */
 
 public record IdACommandMaintenanceModeSet(
+  UUID messageId,
   Optional<String> message)
   implements IdACommandType<IdAResponseMaintenanceModeSet>
 {
@@ -41,6 +44,7 @@ public record IdACommandMaintenanceModeSet(
 
   public IdACommandMaintenanceModeSet
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(message, "message");
   }
 

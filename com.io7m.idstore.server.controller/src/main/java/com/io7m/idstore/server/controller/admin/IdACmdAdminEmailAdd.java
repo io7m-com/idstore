@@ -27,6 +27,7 @@ import com.io7m.idstore.server.security.IdSecAdminActionAdminEmailAdd;
 import com.io7m.idstore.strings.IdStrings;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
 import static com.io7m.idstore.strings.IdStringConstants.EMAIL_DUPLICATE;
@@ -90,6 +91,10 @@ public final class IdACmdAdminEmailAdd
       admins.adminGetRequire(newAdmin)
         .withRedactedPassword();
 
-    return new IdAResponseAdminUpdate(context.requestId(), afterAdmin);
+    return new IdAResponseAdminUpdate(
+      UUID.randomUUID(),
+      command.messageId(),
+      afterAdmin
+    );
   }
 }

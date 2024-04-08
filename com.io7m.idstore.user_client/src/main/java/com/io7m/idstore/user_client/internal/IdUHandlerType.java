@@ -14,29 +14,23 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.user_client.internal;
 
 import com.io7m.hibiscus.basic.HBClientHandlerType;
-import com.io7m.idstore.protocol.user.IdUCommandType;
-import com.io7m.idstore.protocol.user.IdUResponseError;
-import com.io7m.idstore.protocol.user.IdUResponseType;
-import com.io7m.idstore.user_client.api.IdUClientCredentials;
-import com.io7m.idstore.user_client.api.IdUClientEventType;
+import com.io7m.idstore.user_client.api.IdUClientConnectionParameters;
 import com.io7m.idstore.user_client.api.IdUClientException;
+import com.io7m.idstore.protocol.user.IdUMessageType;
 
 /**
- * A versioned protocol handler.
+ * The client handler type.
  */
 
 public interface IdUHandlerType
   extends HBClientHandlerType<
-  IdUClientException,
-  IdUCommandType<?>,
-  IdUResponseType,
-  IdUResponseType,
-  IdUResponseError,
-  IdUClientEventType,
-  IdUClientCredentials>
+  IdUMessageType,
+  IdUClientConnectionParameters,
+  IdUClientException>
 {
 
 }

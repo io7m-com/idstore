@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  * Information about a request.
  *
- * @param requestId     The unique request ID
+ * @param requestId     The request ID
  * @param userAgent     The user agent
  * @param remoteAddress The remote address
  */
@@ -35,7 +35,7 @@ public record IdHTTPRequestInformation(
   /**
    * Information about a request.
    *
-   * @param requestId     The unique request ID
+   * @param requestId     The request ID
    * @param userAgent     The user agent
    * @param remoteAddress The remote address
    */

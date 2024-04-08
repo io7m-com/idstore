@@ -19,14 +19,17 @@ package com.io7m.idstore.protocol.admin;
 import com.io7m.idstore.model.IdBan;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Ban a user.
  *
- * @param ban The ban
+ * @param messageId The message ID
+ * @param ban       The ban
  */
 
 public record IdACommandUserBanCreate(
+  UUID messageId,
   IdBan ban)
   implements IdACommandType<IdAResponseUserBanCreate>
 {
@@ -36,6 +39,7 @@ public record IdACommandUserBanCreate(
 
   public IdACommandUserBanCreate
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(ban, "ban");
   }
 

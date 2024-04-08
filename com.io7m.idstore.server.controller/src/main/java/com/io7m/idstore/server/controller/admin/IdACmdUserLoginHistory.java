@@ -24,6 +24,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserLoginHistory;
 import com.io7m.idstore.server.security.IdSecAdminActionUserRead;
 
+import java.util.UUID;
+
 import static java.lang.Integer.MAX_VALUE;
 
 /**
@@ -61,6 +63,10 @@ public final class IdACmdUserLoginHistory
     final var history =
       users.userLoginHistory(command.user(), MAX_VALUE);
 
-    return new IdAResponseUserLoginHistory(context.requestId(), history);
+    return new IdAResponseUserLoginHistory(
+      UUID.randomUUID(),
+      command.messageId(),
+      history
+    );
   }
 }

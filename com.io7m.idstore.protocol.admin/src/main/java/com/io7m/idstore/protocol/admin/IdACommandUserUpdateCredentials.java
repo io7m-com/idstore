@@ -27,13 +27,15 @@ import java.util.UUID;
 /**
  * Update the given user.
  *
- * @param user     The user to be updated
- * @param idName   The user's ID name
- * @param realName The user's realname
- * @param password The user's password
+ * @param messageId The message ID
+ * @param user      The user to be updated
+ * @param idName    The user's ID name
+ * @param realName  The user's realname
+ * @param password  The user's password
  */
 
 public record IdACommandUserUpdateCredentials(
+  UUID messageId,
   UUID user,
   Optional<IdName> idName,
   Optional<IdRealName> realName,
@@ -46,6 +48,7 @@ public record IdACommandUserUpdateCredentials(
 
   public IdACommandUserUpdateCredentials
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(user, "user");
     Objects.requireNonNull(idName, "idName");
     Objects.requireNonNull(realName, "realName");

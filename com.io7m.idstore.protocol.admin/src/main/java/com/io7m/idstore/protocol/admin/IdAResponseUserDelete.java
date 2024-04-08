@@ -22,11 +22,13 @@ import java.util.UUID;
 /**
  * A response to {@link IdACommandUserDelete}.
  *
- * @param requestId The request ID
+ * @param messageId     The message ID
+ * @param correlationId The message correlation ID
  */
 
 public record IdAResponseUserDelete(
-  UUID requestId)
+  UUID messageId,
+  UUID correlationId)
   implements IdAResponseType
 {
   /**
@@ -35,6 +37,7 @@ public record IdAResponseUserDelete(
 
   public IdAResponseUserDelete
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
+    Objects.requireNonNull(correlationId, "correlationId");
   }
 }

@@ -16,19 +16,19 @@
 
 package com.io7m.idstore.user_client.internal;
 
-
-import com.io7m.idstore.strings.IdStringConstantType;
-import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
+import com.io7m.idstore.user_client.api.IdUClientException;
+import com.io7m.idstore.strings.IdStrings;
 
 import java.net.http.HttpClient;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * The abstract base class for handlers.
  */
 
-public abstract class IdUHandlerAbstract
+abstract class IdUHandlerAbstract
   implements IdUHandlerType
 {
   private final IdStrings strings;
@@ -48,11 +48,15 @@ public abstract class IdUHandlerAbstract
       Objects.requireNonNull(inHttpClient, "httpClient");
   }
 
-  protected final String local(
-    final IdStringConstantType s,
-    final Object... arguments)
+  @Override
+  public final Function<Throwable, IdUClientException> exceptionTransformer()
   {
-    return this.strings.format(s, arguments);
+    return IdUClientException::ofException;
+  }
+
+  protected final IdStrings strings()
+  {
+    return this.strings;
   }
 
   protected final HttpClient httpClient()
@@ -63,10 +67,5 @@ public abstract class IdUHandlerAbstract
   protected final IdUClientConfiguration configuration()
   {
     return this.configuration;
-  }
-
-  protected final IdStrings strings()
-  {
-    return this.strings;
   }
 }

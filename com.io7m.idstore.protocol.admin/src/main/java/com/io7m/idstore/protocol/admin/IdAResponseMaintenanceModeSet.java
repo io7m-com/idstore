@@ -22,25 +22,29 @@ import java.util.UUID;
 /**
  * A response to {@link IdACommandMaintenanceModeSet}.
  *
- * @param requestId The request ID
- * @param message   The response message
+ * @param messageId     The message ID
+ * @param correlationId The message correlation ID
+ * @param message       The response message
  */
 
 public record IdAResponseMaintenanceModeSet(
-  UUID requestId,
+  UUID messageId,
+  UUID correlationId,
   String message)
   implements IdAResponseType
 {
   /**
    * A response to {@link IdACommandMaintenanceModeSet}.
    *
-   * @param requestId The request ID
-   * @param message   The response message
+   * @param messageId     The message ID
+   * @param correlationId The message correlation ID
+   * @param message       The response message
    */
 
   public IdAResponseMaintenanceModeSet
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
+    Objects.requireNonNull(correlationId, "correlationId");
     Objects.requireNonNull(message, "message");
   }
 }

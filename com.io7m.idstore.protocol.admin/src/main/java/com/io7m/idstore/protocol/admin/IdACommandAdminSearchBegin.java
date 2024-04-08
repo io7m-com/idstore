@@ -19,14 +19,17 @@ package com.io7m.idstore.protocol.admin;
 import com.io7m.idstore.model.IdAdminSearchParameters;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Start searching/listing admins.
  *
+ * @param messageId  The message ID
  * @param parameters The admin list parameters
  */
 
 public record IdACommandAdminSearchBegin(
+  UUID messageId,
   IdAdminSearchParameters parameters)
   implements IdACommandType<IdAResponseAdminSearchBegin>
 {
@@ -36,6 +39,7 @@ public record IdACommandAdminSearchBegin(
 
   public IdACommandAdminSearchBegin
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(parameters, "parameters");
   }
 

@@ -146,7 +146,6 @@ public final class IdUVEmailRemoveRun extends IdHTTPHandlerFunctional
         final var context =
           new IdUCommandContext(
             services,
-            information.requestId(),
             transaction,
             session,
             user,
@@ -157,7 +156,7 @@ public final class IdUVEmailRemoveRun extends IdHTTPHandlerFunctional
         final var email =
           emailParameter.get();
         final var command =
-          new IdUCommandEmailRemoveBegin(email);
+          new IdUCommandEmailRemoveBegin(information.requestId(), email);
         new IdUCmdEmailRemoveBegin()
           .execute(context, command);
 

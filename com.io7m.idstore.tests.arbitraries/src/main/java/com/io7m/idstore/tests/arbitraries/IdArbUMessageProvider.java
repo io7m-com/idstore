@@ -110,8 +110,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUCommandEmailAddBegin> commandEmailAddBegin()
   {
-    return Arbitraries.defaultFor(IdEmail.class)
-      .map(IdUCommandEmailAddBegin::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var a =
+      Arbitraries.defaultFor(IdEmail.class);
+
+    return Combinators.combine(msgId, a)
+      .as(IdUCommandEmailAddBegin::new);
   }
 
   /**
@@ -120,8 +125,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUCommandEmailRemoveBegin> commandEmailRemoveBegin()
   {
-    return Arbitraries.defaultFor(IdEmail.class)
-      .map(IdUCommandEmailRemoveBegin::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var a =
+      Arbitraries.defaultFor(IdEmail.class);
+
+    return Combinators.combine(msgId, a)
+      .as(IdUCommandEmailRemoveBegin::new);
   }
 
   /**
@@ -130,8 +140,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUCommandEmailAddPermit> commandEmailAddPermit()
   {
-    return Arbitraries.defaultFor(IdToken.class)
-      .map(IdUCommandEmailAddPermit::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var a =
+      Arbitraries.defaultFor(IdToken.class);
+
+    return Combinators.combine(msgId, a)
+      .as(IdUCommandEmailAddPermit::new);
   }
 
   /**
@@ -140,8 +155,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUCommandEmailRemovePermit> commandEmailRemovePermit()
   {
-    return Arbitraries.defaultFor(IdToken.class)
-      .map(IdUCommandEmailRemovePermit::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var a =
+      Arbitraries.defaultFor(IdToken.class);
+
+    return Combinators.combine(msgId, a)
+      .as(IdUCommandEmailRemovePermit::new);
   }
 
   /**
@@ -150,8 +170,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUCommandEmailAddDeny> commandEmailAddDeny()
   {
-    return Arbitraries.defaultFor(IdToken.class)
-      .map(IdUCommandEmailAddDeny::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var a =
+      Arbitraries.defaultFor(IdToken.class);
+
+    return Combinators.combine(msgId, a)
+      .as(IdUCommandEmailAddDeny::new);
   }
 
   /**
@@ -160,8 +185,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUCommandEmailRemoveDeny> commandEmailRemoveDeny()
   {
-    return Arbitraries.defaultFor(IdToken.class)
-      .map(IdUCommandEmailRemoveDeny::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var a =
+      Arbitraries.defaultFor(IdToken.class);
+
+    return Combinators.combine(msgId, a)
+      .as(IdUCommandEmailRemoveDeny::new);
   }
 
   /**
@@ -170,8 +200,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUCommandRealnameUpdate> commandUserRealnameUpdate()
   {
-    return Arbitraries.defaultFor(IdRealName.class)
-      .map(IdUCommandRealnameUpdate::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var a =
+      Arbitraries.defaultFor(IdRealName.class);
+
+    return Combinators.combine(msgId, a)
+      .as(IdUCommandRealnameUpdate::new);
   }
 
   /**
@@ -180,7 +215,14 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUCommandPasswordUpdate> commandUserPasswordUpdate()
   {
-    return Combinators.combine(Arbitraries.strings(), Arbitraries.strings())
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var a =
+      Arbitraries.strings();
+    final var b =
+      Arbitraries.strings();
+
+    return Combinators.combine(msgId, a, b)
       .as(IdUCommandPasswordUpdate::new);
   }
 
@@ -190,8 +232,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUResponseEmailAddBegin> responseEmailAddBegin()
   {
-    return Arbitraries.defaultFor(UUID.class)
-      .map(IdUResponseEmailAddBegin::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, corId)
+      .as(IdUResponseEmailAddBegin::new);
   }
 
   /**
@@ -200,8 +247,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUResponseEmailAddPermit> responseEmailAddPermit()
   {
-    return Arbitraries.defaultFor(UUID.class)
-      .map(IdUResponseEmailAddPermit::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, corId)
+      .as(IdUResponseEmailAddPermit::new);
   }
 
   /**
@@ -210,8 +262,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUResponseEmailAddDeny> responseEmailAddDeny()
   {
-    return Arbitraries.defaultFor(UUID.class)
-      .map(IdUResponseEmailAddDeny::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, corId)
+      .as(IdUResponseEmailAddDeny::new);
   }
 
   /**
@@ -220,8 +277,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUResponseEmailRemoveBegin> responseEmailRemoveBegin()
   {
-    return Arbitraries.defaultFor(UUID.class)
-      .map(IdUResponseEmailRemoveBegin::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, corId)
+      .as(IdUResponseEmailRemoveBegin::new);
   }
 
   /**
@@ -230,8 +292,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUResponseEmailRemovePermit> responseEmailRemovePermit()
   {
-    return Arbitraries.defaultFor(UUID.class)
-      .map(IdUResponseEmailRemovePermit::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, corId)
+      .as(IdUResponseEmailRemovePermit::new);
   }
 
   /**
@@ -240,8 +307,13 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUResponseEmailRemoveDeny> responseEmailRemoveDeny()
   {
-    return Arbitraries.defaultFor(UUID.class)
-      .map(IdUResponseEmailRemoveDeny::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, corId)
+      .as(IdUResponseEmailRemoveDeny::new);
   }
 
   /**
@@ -250,12 +322,15 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUResponseUserSelf> responseUserSelf()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var a =
       Arbitraries.defaultFor(IdUser.class);
 
-    return Combinators.combine(id, a).as(IdUResponseUserSelf::new);
+    return Combinators.combine(msgId, corId, a)
+      .as(IdUResponseUserSelf::new);
   }
 
   /**
@@ -264,12 +339,15 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUResponseUserUpdate> responseUserUpdate()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var a =
       Arbitraries.defaultFor(IdUser.class);
 
-    return Combinators.combine(id, a).as(IdUResponseUserUpdate::new);
+    return Combinators.combine(msgId, corId, a)
+      .as(IdUResponseUserUpdate::new);
   }
 
   /**
@@ -278,8 +356,11 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUResponseError> responseError()
   {
-    final var id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var s0 =
       Arbitraries.strings();
     final var s1 =
@@ -298,7 +379,8 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
       Arbitraries.strings()
         .optional();
 
-    return Combinators.combine(id, s0, s1, ms, os, b).as(IdUResponseError::new);
+    return Combinators.combine(msgId, corId, s0, s1, ms, os, b)
+      .as(IdUResponseError::new);
   }
 
   /**
@@ -307,12 +389,15 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUResponseLogin> responseLogin()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdUser.class);
 
-    return Combinators.combine(id, users).as(IdUResponseLogin::new);
+    return Combinators.combine(msgId, corId, users)
+      .as(IdUResponseLogin::new);
   }
 
   /**
@@ -321,7 +406,10 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUCommandUserSelf> commandUserSelf()
   {
-    return Arbitraries.integers().map(i -> new IdUCommandUserSelf());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdUCommandUserSelf::new);
   }
 
   /**
@@ -330,6 +418,8 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdUCommandLogin> commandLogin()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var s0 =
       Arbitraries.defaultFor(IdName.class);
     final var s1 =
@@ -346,6 +436,7 @@ public final class IdArbUMessageProvider extends IdArbAbstractProvider
           return map;
         });
 
-    return Combinators.combine(s0, s1, s2).as(IdUCommandLogin::new);
+    return Combinators.combine(msgId, s0, s1, s2)
+      .as(IdUCommandLogin::new);
   }
 }

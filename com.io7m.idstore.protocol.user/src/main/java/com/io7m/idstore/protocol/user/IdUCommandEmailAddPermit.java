@@ -19,15 +19,18 @@ package com.io7m.idstore.protocol.user;
 import com.io7m.idstore.model.IdToken;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A request to complete an email address challenge.
  *
- * @param token The token
+ * @param messageId The message ID
+ * @param token     The token
  */
 
 
 public record IdUCommandEmailAddPermit(
+  UUID messageId,
   IdToken token)
   implements IdUCommandType<IdUResponseEmailAddPermit>
 {
@@ -39,6 +42,7 @@ public record IdUCommandEmailAddPermit(
 
   public IdUCommandEmailAddPermit
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(token, "email");
   }
 

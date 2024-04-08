@@ -22,21 +22,24 @@ import java.util.UUID;
 /**
  * A response to {@link IdUCommandEmailAddBegin}.
  *
- * @param requestId The request ID
+ * @param messageId     The message ID
+ * @param correlationId The message correlation ID
  */
 
 public record IdUResponseEmailAddBegin(
-  UUID requestId)
+  UUID messageId,
+  UUID correlationId)
   implements IdUResponseType
 {
   /**
    * A response to {@link IdUCommandEmailAddBegin}.
    *
-   * @param requestId The request ID
+   * @param messageId The message ID
    */
 
   public IdUResponseEmailAddBegin
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
+    Objects.requireNonNull(correlationId, "correlationId");
   }
 }

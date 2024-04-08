@@ -19,14 +19,17 @@ package com.io7m.idstore.protocol.admin;
 import com.io7m.idstore.model.IdAuditSearchParameters;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Start searching/listing audit records.
  *
+ * @param messageId  The message ID
  * @param parameters The audit list parameters
  */
 
 public record IdACommandAuditSearchBegin(
+  UUID messageId,
   IdAuditSearchParameters parameters)
   implements IdACommandType<IdAResponseAuditSearchBegin>
 {
@@ -36,6 +39,7 @@ public record IdACommandAuditSearchBegin(
 
   public IdACommandAuditSearchBegin
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(parameters, "parameters");
   }
 

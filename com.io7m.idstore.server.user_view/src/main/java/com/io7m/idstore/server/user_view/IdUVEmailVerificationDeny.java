@@ -219,7 +219,6 @@ public final class IdUVEmailVerificationDeny
         final var commandContext =
           new IdUCommandContext(
             services,
-            information.requestId(),
             transaction,
             fakeSession,
             user,
@@ -230,13 +229,13 @@ public final class IdUVEmailVerificationDeny
         switch (verification.operation()) {
           case EMAIL_ADD -> {
             final var command =
-              new IdUCommandEmailAddDeny(idToken);
+              new IdUCommandEmailAddDeny(information.requestId(), idToken);
             new IdUCmdEmailAddDeny()
               .execute(commandContext, command);
           }
           case EMAIL_REMOVE -> {
             final var command =
-              new IdUCommandEmailRemoveDeny(idToken);
+              new IdUCommandEmailRemoveDeny(information.requestId(), idToken);
             new IdUCmdEmailRemoveDeny()
               .execute(commandContext, command);
           }

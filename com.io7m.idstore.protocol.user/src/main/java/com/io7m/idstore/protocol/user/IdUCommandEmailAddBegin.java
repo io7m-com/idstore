@@ -19,15 +19,18 @@ package com.io7m.idstore.protocol.user;
 import com.io7m.idstore.model.IdEmail;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A request to add an email address.
  *
- * @param email The email address
+ * @param messageId The message ID
+ * @param email     The email address
  */
 
 
 public record IdUCommandEmailAddBegin(
+  UUID messageId,
   IdEmail email)
   implements IdUCommandType<IdUResponseEmailAddBegin>
 {
@@ -39,6 +42,7 @@ public record IdUCommandEmailAddBegin(
 
   public IdUCommandEmailAddBegin
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(email, "email");
   }
 

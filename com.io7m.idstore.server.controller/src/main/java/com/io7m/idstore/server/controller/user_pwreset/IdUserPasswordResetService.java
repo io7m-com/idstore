@@ -69,6 +69,7 @@ import static com.io7m.idstore.strings.IdStringConstants.PASSWORD_RESET_REQUIRE_
 import static io.opentelemetry.api.trace.SpanKind.CLIENT;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_CLIENT_IP;
 import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.HTTP_USER_AGENT;
+import static io.opentelemetry.semconv.trace.attributes.SemanticAttributes.USER_AGENT_ORIGINAL;
 
 /**
  * The user password reset service.
@@ -169,14 +170,14 @@ public final class IdUserPasswordResetService
   public void resetBegin(
     final String sourceHost,
     final String userAgent,
-    final UUID requestId,
+    final UUID messageId,
     final Optional<String> email,
     final Optional<String> userName)
     throws IdCommandExecutionFailure
   {
     Objects.requireNonNull(sourceHost, "sourceHost");
     Objects.requireNonNull(userAgent, "userAgent");
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(email, "email");
     Objects.requireNonNull(userName, "userName");
 
@@ -184,9 +185,9 @@ public final class IdUserPasswordResetService
       this.telemetry.tracer()
         .spanBuilder("IdUserPasswordResetService.resetBegin")
         .setSpanKind(CLIENT)
-        .setAttribute(HTTP_USER_AGENT, userAgent)
+        .setAttribute(USER_AGENT_ORIGINAL, userAgent)
         .setAttribute(HTTP_CLIENT_IP, sourceHost)
-        .setAttribute("http.request_id", requestId.toString())
+        .setAttribute("MessageID", messageId.toString())
         .setParent(Context.current().with(Span.current()))
         .startSpan();
 
@@ -195,7 +196,7 @@ public final class IdUserPasswordResetService
         this,
         sourceHost,
         userAgent,
-        requestId,
+        messageId,
         email,
         userName
       ).run();
@@ -217,29 +218,29 @@ public final class IdUserPasswordResetService
   public IdToken resetCheck(
     final String sourceHost,
     final String userAgent,
-    final UUID requestId,
+    final UUID messageId,
     final Optional<String> token)
     throws IdCommandExecutionFailure
   {
     Objects.requireNonNull(sourceHost, "sourceHost");
     Objects.requireNonNull(userAgent, "userAgent");
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(token, "token");
 
     final var span =
       this.telemetry.tracer()
         .spanBuilder("IdUserPasswordResetService.resetCheck")
         .setSpanKind(CLIENT)
-        .setAttribute(HTTP_USER_AGENT, userAgent)
+        .setAttribute(USER_AGENT_ORIGINAL, userAgent)
         .setAttribute(HTTP_CLIENT_IP, sourceHost)
-        .setAttribute("http.request_id", requestId.toString())
+        .setAttribute("MessageID", messageId.toString())
         .setParent(Context.current().with(Span.current()))
         .startSpan();
 
     try (var ignored = span.makeCurrent()) {
       return new OpResetCheck(
         this,
-        requestId,
+        messageId,
         token
       ).run();
     } catch (final Exception e) {
@@ -254,7 +255,7 @@ public final class IdUserPasswordResetService
   public void resetConfirm(
     final String sourceHost,
     final String userAgent,
-    final UUID requestId,
+    final UUID messageId,
     final Optional<String> password0Opt,
     final Optional<String> password1Opt,
     final Optional<String> tokenOpt)
@@ -262,7 +263,7 @@ public final class IdUserPasswordResetService
   {
     Objects.requireNonNull(sourceHost, "sourceHost");
     Objects.requireNonNull(userAgent, "userAgent");
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(password0Opt, "password0Opt");
     Objects.requireNonNull(password1Opt, "password1Opt");
     Objects.requireNonNull(tokenOpt, "tokenOpt");
@@ -271,16 +272,16 @@ public final class IdUserPasswordResetService
       this.telemetry.tracer()
         .spanBuilder("IdUserPasswordResetService.resetConfirm")
         .setSpanKind(CLIENT)
-        .setAttribute(HTTP_USER_AGENT, userAgent)
+        .setAttribute(USER_AGENT_ORIGINAL, userAgent)
         .setAttribute(HTTP_CLIENT_IP, sourceHost)
-        .setAttribute("http.request_id", requestId.toString())
+        .setAttribute("MessageID", messageId.toString())
         .setParent(Context.current().with(Span.current()))
         .startSpan();
 
     try (var ignored = span.makeCurrent()) {
       new OpResetConfirm(
         this,
-        requestId,
+        messageId,
         password0Opt,
         password1Opt,
         tokenOpt

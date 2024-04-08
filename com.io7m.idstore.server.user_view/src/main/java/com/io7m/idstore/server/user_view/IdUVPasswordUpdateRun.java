@@ -154,7 +154,6 @@ public final class IdUVPasswordUpdateRun extends IdHTTPHandlerFunctional
         final var context =
           new IdUCommandContext(
             services,
-            information.requestId(),
             transaction,
             session,
             user,
@@ -164,6 +163,7 @@ public final class IdUVPasswordUpdateRun extends IdHTTPHandlerFunctional
 
         final var command =
           new IdUCommandPasswordUpdate(
+            information.requestId(),
             password0Parameter.get(),
             password1Parameter.get()
           );

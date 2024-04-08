@@ -24,6 +24,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserGet;
 import com.io7m.idstore.server.security.IdSecAdminActionUserRead;
 
+import java.util.UUID;
+
 /**
  * IdACmdUserGet
  */
@@ -59,6 +61,10 @@ public final class IdACmdUserGet
     final var user =
       users.userGet(command.user());
 
-    return new IdAResponseUserGet(context.requestId(), user);
+    return new IdAResponseUserGet(
+      UUID.randomUUID(),
+      command.messageId(),
+      user
+    );
   }
 }

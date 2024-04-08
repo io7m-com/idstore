@@ -26,6 +26,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminBanDelete;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * IdACmdAdminBanDelete
@@ -63,6 +64,10 @@ public final class IdACmdAdminBanDelete
       transaction.queries(IdDatabaseAdminsQueriesType.class);
 
     admins.adminBanDelete(new IdBan(command.admin(), "", Optional.empty()));
-    return new IdAResponseAdminBanDelete(context.requestId());
+
+    return new IdAResponseAdminBanDelete(
+      UUID.randomUUID(),
+      command.messageId()
+    );
   }
 }

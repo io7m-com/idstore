@@ -25,12 +25,14 @@ import java.util.UUID;
 /**
  * A response to {@link IdACommandUserLoginHistory}.
  *
- * @param requestId The request ID
- * @param history   The history
+ * @param messageId     The message ID
+ * @param correlationId The message correlation ID
+ * @param history       The history
  */
 
 public record IdAResponseUserLoginHistory(
-  UUID requestId,
+  UUID messageId,
+  UUID correlationId,
   List<IdLogin> history)
   implements IdAResponseType
 {
@@ -40,7 +42,8 @@ public record IdAResponseUserLoginHistory(
 
   public IdAResponseUserLoginHistory
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
+    Objects.requireNonNull(correlationId, "correlationId");
     Objects.requireNonNull(history, "history");
   }
 }

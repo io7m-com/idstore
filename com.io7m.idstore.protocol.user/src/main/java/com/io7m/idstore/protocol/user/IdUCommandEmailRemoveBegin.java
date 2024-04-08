@@ -19,14 +19,17 @@ package com.io7m.idstore.protocol.user;
 import com.io7m.idstore.model.IdEmail;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A request to remove an email address.
  *
- * @param email The email address
+ * @param messageId The message ID
+ * @param email     The email address
  */
 
 public record IdUCommandEmailRemoveBegin(
+  UUID messageId,
   IdEmail email)
   implements IdUCommandType<IdUResponseEmailRemoveBegin>
 {
@@ -38,6 +41,7 @@ public record IdUCommandEmailRemoveBegin(
 
   public IdUCommandEmailRemoveBegin
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(email, "email");
   }
 

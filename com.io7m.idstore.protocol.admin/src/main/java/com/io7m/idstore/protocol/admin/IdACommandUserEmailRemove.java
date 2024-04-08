@@ -24,11 +24,13 @@ import java.util.UUID;
 /**
  * Remove an email address from the given user.
  *
- * @param user The user ID
- * @param email The email
+ * @param messageId The message ID
+ * @param user      The user ID
+ * @param email     The email
  */
 
 public record IdACommandUserEmailRemove(
+  UUID messageId,
   UUID user,
   IdEmail email)
   implements IdACommandType<IdAResponseUserUpdate>
@@ -39,6 +41,7 @@ public record IdACommandUserEmailRemove(
 
   public IdACommandUserEmailRemove
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(user, "id");
     Objects.requireNonNull(email, "email");
   }

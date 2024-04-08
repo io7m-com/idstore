@@ -24,6 +24,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchNext;
 import com.io7m.idstore.server.security.IdSecAdminActionUserRead;
 
+import java.util.UUID;
+
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.strings.IdStringConstants.ERROR_SEARCH_START;
 
@@ -66,11 +68,16 @@ public final class IdACmdUserSearchNext
 
     if (searchOpt.isEmpty()) {
       throw context.failFormatted(
-        400, API_MISUSE_ERROR, ERROR_SEARCH_START);
+        command,
+        400,
+        API_MISUSE_ERROR,
+        ERROR_SEARCH_START
+      );
     }
 
     return new IdAResponseUserSearchNext(
-      context.requestId(),
+      UUID.randomUUID(),
+      command.messageId(),
       searchOpt.get().pageNext(users)
     );
   }

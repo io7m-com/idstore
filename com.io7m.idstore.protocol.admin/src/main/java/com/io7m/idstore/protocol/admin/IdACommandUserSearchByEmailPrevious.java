@@ -16,13 +16,30 @@
 
 package com.io7m.idstore.protocol.admin;
 
+import java.util.Objects;
+import java.util.UUID;
+
 /**
  * Get the previous page of the user listing.
+ *
+ * @param messageId The message ID
  */
 
-public record IdACommandUserSearchByEmailPrevious()
+public record IdACommandUserSearchByEmailPrevious(
+  UUID messageId)
   implements IdACommandType<IdAResponseUserSearchByEmailPrevious>
 {
+  /**
+   * Get the previous page of the user listing.
+   *
+   * @param messageId The message ID
+   */
+
+  public IdACommandUserSearchByEmailPrevious
+  {
+    Objects.requireNonNull(messageId, "messageId");
+  }
+
   @Override
   public Class<IdAResponseUserSearchByEmailPrevious> responseClass()
   {

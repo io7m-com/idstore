@@ -24,11 +24,13 @@ import java.util.UUID;
 /**
  * Revoke a permission from the given admin.
  *
+ * @param messageId  The message ID
  * @param admin      The admin ID
  * @param permission The permission
  */
 
 public record IdACommandAdminPermissionRevoke(
+  UUID messageId,
   UUID admin,
   IdAdminPermission permission)
   implements IdACommandType<IdAResponseAdminUpdate>
@@ -39,6 +41,7 @@ public record IdACommandAdminPermissionRevoke(
 
   public IdACommandAdminPermissionRevoke
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(admin, "id");
     Objects.requireNonNull(permission, "permission");
   }

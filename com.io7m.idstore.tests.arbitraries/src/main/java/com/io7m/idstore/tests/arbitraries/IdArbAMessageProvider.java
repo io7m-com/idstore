@@ -247,12 +247,14 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseMaintenanceModeSet> responseMaintenanceModeSet()
   {
-    final var a_id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var a_s =
       Arbitraries.strings();
 
-    return Combinators.combine(a_id, a_s)
+    return Combinators.combine(msgId, corId, a_s)
       .as(IdAResponseMaintenanceModeSet::new);
   }
 
@@ -262,9 +264,14 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandMaintenanceModeSet> commandMaintenanceModeSet()
   {
-    return Arbitraries.strings()
-      .optional()
-      .map(IdACommandMaintenanceModeSet::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var msg =
+      Arbitraries.strings()
+        .optional();
+
+    return Combinators.combine(msgId, msg)
+      .as(IdACommandMaintenanceModeSet::new);
   }
 
   /**
@@ -296,10 +303,12 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserUpdatePasswordExpiration> commandUserUpdatePasswordExpiration()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var a_id =
       Arbitraries.defaultFor(UUID.class);
 
-    return Combinators.combine(a_id, passwordExpirationSet())
+    return Combinators.combine(msgId, a_id, passwordExpirationSet())
       .as(IdACommandUserUpdatePasswordExpiration::new);
   }
 
@@ -309,10 +318,12 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminUpdatePasswordExpiration> commandAdminUpdatePasswordExpiration()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var a_id =
       Arbitraries.defaultFor(UUID.class);
 
-    return Combinators.combine(a_id, passwordExpirationSet())
+    return Combinators.combine(msgId, a_id, passwordExpirationSet())
       .as(IdACommandAdminUpdatePasswordExpiration::new);
   }
 
@@ -322,7 +333,9 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserSearchBegin> responseUserSearchBegin()
   {
-    final var a_id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var a_s =
       Arbitraries.defaultFor(IdUserSummary.class)
@@ -330,10 +343,11 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseUserSearchBegin(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -350,7 +364,9 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserSearchPrevious> responseUserSearchPrevious()
   {
-    final var a_id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var a_s =
       Arbitraries.defaultFor(IdUserSummary.class)
@@ -358,10 +374,11 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseUserSearchPrevious(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -378,7 +395,9 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserSearchNext> responseUserSearchNext()
   {
-    final var a_id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var a_s =
       Arbitraries.defaultFor(IdUserSummary.class)
@@ -386,10 +405,11 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseUserSearchNext(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -406,12 +426,15 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminSelf> responseAdminSelf()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var a =
       Arbitraries.defaultFor(IdAdmin.class);
 
-    return Combinators.combine(id, a).as(IdAResponseAdminSelf::new);
+    return Combinators.combine(msgId, corId, a)
+      .as(IdAResponseAdminSelf::new);
   }
 
   /**
@@ -420,8 +443,11 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseError> responseError()
   {
-    final var id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var s0 =
       Arbitraries.strings();
     final var s1 =
@@ -440,7 +466,8 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
       Arbitraries.strings()
         .optional();
 
-    return Combinators.combine(id, s0, s1, ms, os, b).as(IdAResponseError::new);
+    return Combinators.combine(msgId, corId, s0, s1, ms, os, b)
+      .as(IdAResponseError::new);
   }
 
   /**
@@ -449,12 +476,15 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseLogin> responseLogin()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var admins =
       Arbitraries.defaultFor(IdAdmin.class);
 
-    return Combinators.combine(id, admins).as(IdAResponseLogin::new);
+    return Combinators.combine(msgId, corId, admins)
+      .as(IdAResponseLogin::new);
   }
 
   /**
@@ -463,17 +493,21 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserGet> responseUserGet()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdUser.class);
 
-    return Combinators.combine(id, users).as((req, user) -> {
-      return new IdAResponseUserGet(
-        req,
-        Optional.of(user)
-      );
-    });
+    return Combinators.combine(msgId, corId, users)
+      .as((m0, c0, user) -> {
+        return new IdAResponseUserGet(
+          m0,
+          c0,
+          Optional.of(user)
+        );
+      });
   }
 
   /**
@@ -482,12 +516,15 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserCreate> responseUserCreate()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdUser.class);
 
-    return Combinators.combine(id, users).as(IdAResponseUserCreate::new);
+    return Combinators.combine(msgId, corId, users)
+      .as(IdAResponseUserCreate::new);
   }
 
   /**
@@ -496,12 +533,15 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserUpdate> responseUserUpdate()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdUser.class);
 
-    return Combinators.combine(id, users).as(IdAResponseUserUpdate::new);
+    return Combinators.combine(msgId, corId, users)
+      .as(IdAResponseUserUpdate::new);
   }
 
   /**
@@ -510,7 +550,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminSelf> commandAdminSelf()
   {
-    return Arbitraries.integers().map(i -> new IdACommandAdminSelf());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandAdminSelf::new);
   }
 
   /**
@@ -519,8 +562,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserGet> commandUserGet()
   {
-    final var id = Arbitraries.defaultFor(UUID.class);
-    return id.map(IdACommandUserGet::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandUserGet::new);
   }
 
   /**
@@ -529,8 +577,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserGetByEmail> commandUserGetByEmail()
   {
-    final var id = Arbitraries.defaultFor(IdEmail.class);
-    return id.map(IdACommandUserGetByEmail::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(IdEmail.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandUserGetByEmail::new);
   }
 
   /**
@@ -539,6 +592,8 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandLogin> commandLogin()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var s0 =
       Arbitraries.defaultFor(IdName.class);
     final var s1 =
@@ -555,7 +610,8 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
           return map;
         });
 
-    return Combinators.combine(s0, s1, s2).as(IdACommandLogin::new);
+    return Combinators.combine(msgId, s0, s1, s2)
+      .as(IdACommandLogin::new);
   }
 
   /**
@@ -564,8 +620,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserSearchBegin> commandUserSearchBegin()
   {
-    return Arbitraries.defaultFor(IdUserSearchParameters.class)
-      .map(IdACommandUserSearchBegin::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var p =
+      Arbitraries.defaultFor(IdUserSearchParameters.class);
+
+    return Combinators.combine(msgId, p)
+      .as(IdACommandUserSearchBegin::new);
   }
 
   /**
@@ -574,7 +635,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserSearchNext> commandUserSearchNext()
   {
-    return Arbitraries.of(new IdACommandUserSearchNext());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandUserSearchNext::new);
   }
 
   /**
@@ -583,7 +647,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserSearchPrevious> commandUserSearchPrevious()
   {
-    return Arbitraries.of(new IdACommandUserSearchPrevious());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandUserSearchPrevious::new);
   }
 
   /**
@@ -592,8 +659,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserSearchByEmailBegin> commandUserSearchByEmailBegin()
   {
-    return Arbitraries.defaultFor(IdUserSearchByEmailParameters.class)
-      .map(IdACommandUserSearchByEmailBegin::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var p =
+      Arbitraries.defaultFor(IdUserSearchByEmailParameters.class);
+
+    return Combinators.combine(msgId, p)
+      .as(IdACommandUserSearchByEmailBegin::new);
   }
 
   /**
@@ -602,7 +674,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserSearchByEmailNext> commandUserSearchByEmailNext()
   {
-    return Arbitraries.of(new IdACommandUserSearchByEmailNext());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandUserSearchByEmailNext::new);
   }
 
   /**
@@ -611,7 +686,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserSearchByEmailPrevious> commandUserSearchByEmailPrevious()
   {
-    return Arbitraries.of(new IdACommandUserSearchByEmailPrevious());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandUserSearchByEmailPrevious::new);
   }
 
   /**
@@ -620,18 +698,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserCreate> commandUserCreate()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdUser.class);
 
-    return users.map(user -> {
-      return new IdACommandUserCreate(
-        Optional.of(user.id()),
-        user.idName(),
-        user.realName(),
-        user.emails().first(),
-        user.password()
-      );
-    });
+    return Combinators.combine(msgId, users)
+      .as((id, user) -> {
+        return new IdACommandUserCreate(
+          id,
+          Optional.of(user.id()),
+          user.idName(),
+          user.realName(),
+          user.emails().first(),
+          user.password()
+        );
+      });
   }
 
   /**
@@ -640,11 +722,15 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserUpdateCredentials> commandUserUpdate()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdUser.class);
 
-    return users.map((user) -> {
+    return Combinators.combine(msgId, users)
+      .as((id, user) -> {
       return new IdACommandUserUpdateCredentials(
+        id,
         user.id(),
         Optional.of(user.idName()),
         Optional.of(user.realName()),
@@ -659,8 +745,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAuditSearchBegin> commandAuditSearchBegin()
   {
-    return Arbitraries.defaultFor(IdAuditSearchParameters.class)
-      .map(IdACommandAuditSearchBegin::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var p =
+      Arbitraries.defaultFor(IdAuditSearchParameters.class);
+
+    return Combinators.combine(msgId, p)
+      .as(IdACommandAuditSearchBegin::new);
   }
 
   /**
@@ -669,7 +760,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAuditSearchNext> commandAuditSearchNext()
   {
-    return Arbitraries.of(new IdACommandAuditSearchNext());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandAuditSearchNext::new);
   }
 
   /**
@@ -678,7 +772,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAuditSearchPrevious> commandAuditSearchPrevious()
   {
-    return Arbitraries.of(new IdACommandAuditSearchPrevious());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandAuditSearchPrevious::new);
   }
 
   /**
@@ -687,12 +784,14 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandMailTest> commandMailTest()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var e =
       Arbitraries.defaultFor(IdEmail.class);
     final var t =
       Arbitraries.defaultFor(IdShortHumanToken.class);
 
-    return Combinators.combine(e, t).as(IdACommandMailTest::new);
+    return Combinators.combine(msgId, e, t).as(IdACommandMailTest::new);
   }
 
   /**
@@ -701,12 +800,15 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseMailTest> responseMailTest()
   {
-    final var e =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var t =
       Arbitraries.defaultFor(IdShortHumanToken.class);
 
-    return Combinators.combine(e, t)
+    return Combinators.combine(msgId, corId, t)
       .as(IdAResponseMailTest::new);
   }
 
@@ -716,18 +818,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAuditSearchBegin> responseAuditSearchBegin()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdAuditEvent.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseAuditSearchBegin(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -744,18 +850,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAuditSearchPrevious> responseAuditSearchPrevious()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdAuditEvent.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseAuditSearchPrevious(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -772,18 +882,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAuditSearchNext> responseAuditSearchNext()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdAuditEvent.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseAuditSearchNext(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -800,18 +914,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserSearchByEmailBegin> responseUserSearchByEmailBegin()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdUserSummary.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseUserSearchByEmailBegin(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -828,18 +946,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserSearchByEmailPrevious> responseUserSearchByEmailPrevious()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdUserSummary.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseUserSearchByEmailPrevious(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -856,18 +978,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserSearchByEmailNext> responseUserSearchByEmailNext()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdUserSummary.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseUserSearchByEmailNext(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -885,8 +1011,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminSearchBegin> commandAdminSearchBegin()
   {
-    return Arbitraries.defaultFor(IdAdminSearchParameters.class)
-      .map(IdACommandAdminSearchBegin::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var p =
+      Arbitraries.defaultFor(IdAdminSearchParameters.class);
+
+    return Combinators.combine(msgId, p)
+      .as(IdACommandAdminSearchBegin::new);
   }
 
   /**
@@ -895,7 +1026,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminSearchNext> commandAdminSearchNext()
   {
-    return Arbitraries.of(new IdACommandAdminSearchNext());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandAdminSearchNext::new);
   }
 
   /**
@@ -904,7 +1038,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminSearchPrevious> commandAdminSearchPrevious()
   {
-    return Arbitraries.of(new IdACommandAdminSearchPrevious());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandAdminSearchPrevious::new);
   }
 
   /**
@@ -913,8 +1050,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminSearchByEmailBegin> commandAdminSearchByEmailBegin()
   {
-    return Arbitraries.defaultFor(IdAdminSearchByEmailParameters.class)
-      .map(IdACommandAdminSearchByEmailBegin::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var p =
+      Arbitraries.defaultFor(IdAdminSearchByEmailParameters.class);
+
+    return Combinators.combine(msgId, p)
+      .as(IdACommandAdminSearchByEmailBegin::new);
   }
 
   /**
@@ -923,7 +1065,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminSearchByEmailNext> commandAdminSearchByEmailNext()
   {
-    return Arbitraries.of(new IdACommandAdminSearchByEmailNext());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandAdminSearchByEmailNext::new);
   }
 
   /**
@@ -932,7 +1077,10 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminSearchByEmailPrevious> commandAdminSearchByEmailPrevious()
   {
-    return Arbitraries.of(new IdACommandAdminSearchByEmailPrevious());
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return msgId.map(IdACommandAdminSearchByEmailPrevious::new);
   }
 
 
@@ -942,18 +1090,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminSearchByEmailBegin> responseAdminSearchByEmailBegin()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdAdminSummary.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseAdminSearchByEmailBegin(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -970,18 +1122,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminSearchByEmailPrevious> responseAdminSearchByEmailPrevious()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdAdminSummary.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseAdminSearchByEmailPrevious(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -998,18 +1154,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminSearchByEmailNext> responseAdminSearchByEmailNext()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdAdminSummary.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseAdminSearchByEmailNext(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -1026,18 +1186,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminSearchBegin> responseAdminSearchBegin()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdAdminSummary.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseAdminSearchBegin(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -1054,7 +1218,9 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminSearchPrevious> responseAdminSearchPrevious()
   {
-    final var a_id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var a_s =
       Arbitraries.defaultFor(IdAdminSummary.class)
@@ -1062,10 +1228,11 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseAdminSearchPrevious(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -1082,18 +1249,22 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminSearchNext> responseAdminSearchNext()
   {
-    final var a_id =
+    final var msgId =
       Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
     final var a_s =
       Arbitraries.defaultFor(IdAdminSummary.class)
         .list();
     final var a_i =
       Arbitraries.integers();
 
-    return Combinators.combine(a_id, a_s, a_i, a_i, a_i)
-      .as((id, summaries, x0, x1, x2) -> {
+    return Combinators.combine(msgId, corId, a_s, a_i, a_i, a_i)
+      .as((m0, c0, summaries, x0, x1, x2) -> {
         return new IdAResponseAdminSearchNext(
-          id,
+          m0,
+          c0,
           new IdPage<>(
             summaries,
             x0.intValue(),
@@ -1110,22 +1281,26 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminCreate> commandAdminCreate()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdAdmin.class);
 
-    return users.map(user -> {
-      return new IdACommandAdminCreate(
-        Optional.of(user.id()),
-        user.idName(),
-        user.realName(),
-        user.emails().first(),
-        user.password(),
-        user.permissions()
-          .impliedPermissions()
-          .stream()
-          .collect(Collectors.toUnmodifiableSet())
-      );
-    });
+    return Combinators.combine(msgId, users)
+      .as((id, user) -> {
+        return new IdACommandAdminCreate(
+          id,
+          Optional.of(user.id()),
+          user.idName(),
+          user.realName(),
+          user.emails().first(),
+          user.password(),
+          user.permissions()
+            .impliedPermissions()
+            .stream()
+            .collect(Collectors.toUnmodifiableSet())
+        );
+      });
   }
 
   /**
@@ -1134,12 +1309,14 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminCreate> responseAdminCreate()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdAdmin.class);
 
-    return Combinators.combine(id, users).as(IdAResponseAdminCreate::new);
+    return Combinators.combine(msgId, corId, users).as(IdAResponseAdminCreate::new);
   }
 
   /**
@@ -1148,14 +1325,17 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminGet> responseAdminGet()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdAdmin.class);
 
-    return Combinators.combine(id, users).as((req, user) -> {
+    return Combinators.combine(msgId, corId, users).as((m0, c0, user) -> {
       return new IdAResponseAdminGet(
-        req,
+        m0,
+        c0,
         Optional.of(user)
       );
     });
@@ -1167,8 +1347,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminGet> commandAdminGet()
   {
-    final var id = Arbitraries.defaultFor(UUID.class);
-    return id.map(IdACommandAdminGet::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandAdminGet::new);
   }
 
   /**
@@ -1177,8 +1362,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminGetByEmail> commandAdminGetByEmail()
   {
-    final var id = Arbitraries.defaultFor(IdEmail.class);
-    return id.map(IdACommandAdminGetByEmail::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(IdEmail.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandAdminGetByEmail::new);
   }
 
   /**
@@ -1187,17 +1377,21 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminUpdateCredentials> commandAdminUpdate()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdAdmin.class);
 
-    return users.map((admin) -> {
-      return new IdACommandAdminUpdateCredentials(
-        admin.id(),
-        Optional.of(admin.idName()),
-        Optional.of(admin.realName()),
-        Optional.of(admin.password())
-      );
-    });
+    return Combinators.combine(msgId, users)
+      .as((m0, admin) -> {
+        return new IdACommandAdminUpdateCredentials(
+          m0,
+          admin.id(),
+          Optional.of(admin.idName()),
+          Optional.of(admin.realName()),
+          Optional.of(admin.password())
+        );
+      });
   }
 
   /**
@@ -1206,12 +1400,14 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminPermissionGrant> commandAdminPermissionGrant()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var id =
       Arbitraries.defaultFor(UUID.class);
     final var permissions =
       Arbitraries.defaultFor(IdAdminPermission.class);
 
-    return Combinators.combine(id, permissions)
+    return Combinators.combine(msgId, id, permissions)
       .as(IdACommandAdminPermissionGrant::new);
   }
 
@@ -1221,12 +1417,14 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminPermissionRevoke> commandAdminPermissionRevoke()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var id =
       Arbitraries.defaultFor(UUID.class);
     final var permissions =
       Arbitraries.defaultFor(IdAdminPermission.class);
 
-    return Combinators.combine(id, permissions)
+    return Combinators.combine(msgId, id, permissions)
       .as(IdACommandAdminPermissionRevoke::new);
   }
 
@@ -1236,12 +1434,14 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminEmailAdd> commandAdminEmailAdd()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var id =
       Arbitraries.defaultFor(UUID.class);
     final var mails =
       Arbitraries.defaultFor(IdEmail.class);
 
-    return Combinators.combine(id, mails)
+    return Combinators.combine(msgId, id, mails)
       .as(IdACommandAdminEmailAdd::new);
   }
 
@@ -1251,12 +1451,14 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminEmailRemove> commandAdminEmailRemove()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var id =
       Arbitraries.defaultFor(UUID.class);
     final var mails =
       Arbitraries.defaultFor(IdEmail.class);
 
-    return Combinators.combine(id, mails)
+    return Combinators.combine(msgId, id, mails)
       .as(IdACommandAdminEmailRemove::new);
   }
 
@@ -1267,12 +1469,14 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserEmailAdd> commandUserEmailAdd()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var id =
       Arbitraries.defaultFor(UUID.class);
     final var mails =
       Arbitraries.defaultFor(IdEmail.class);
 
-    return Combinators.combine(id, mails)
+    return Combinators.combine(msgId, id, mails)
       .as(IdACommandUserEmailAdd::new);
   }
 
@@ -1282,12 +1486,14 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserEmailRemove> commandUserEmailRemove()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var id =
       Arbitraries.defaultFor(UUID.class);
     final var mails =
       Arbitraries.defaultFor(IdEmail.class);
 
-    return Combinators.combine(id, mails)
+    return Combinators.combine(msgId, id, mails)
       .as(IdACommandUserEmailRemove::new);
   }
 
@@ -1297,12 +1503,15 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminUpdate> responseAdminUpdate()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var users =
       Arbitraries.defaultFor(IdAdmin.class);
 
-    return Combinators.combine(id, users).as(IdAResponseAdminUpdate::new);
+    return Combinators.combine(msgId, corId, users)
+      .as(IdAResponseAdminUpdate::new);
   }
 
   /**
@@ -1311,8 +1520,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserDelete> commandUserDelete()
   {
-    final var id = Arbitraries.defaultFor(UUID.class);
-    return id.map(IdACommandUserDelete::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandUserDelete::new);
   }
 
   /**
@@ -1321,8 +1535,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminDelete> commandAdminDelete()
   {
-    final var id = Arbitraries.defaultFor(UUID.class);
-    return id.map(IdACommandAdminDelete::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandAdminDelete::new);
   }
 
   /**
@@ -1331,8 +1550,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserDelete> responseUserDelete()
   {
-    final var id = Arbitraries.defaultFor(UUID.class);
-    return id.map(IdAResponseUserDelete::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, corId)
+      .as(IdAResponseUserDelete::new);
   }
 
   /**
@@ -1341,8 +1565,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminDelete> responseAdminDelete()
   {
-    final var id = Arbitraries.defaultFor(UUID.class);
-    return id.map(IdAResponseAdminDelete::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, corId)
+      .as(IdAResponseAdminDelete::new);
   }
 
   /**
@@ -1351,8 +1580,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminBanCreate> commandAdminBanCreate()
   {
-    final var id = Arbitraries.defaultFor(IdBan.class);
-    return id.map(IdACommandAdminBanCreate::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(IdBan.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandAdminBanCreate::new);
   }
 
   /**
@@ -1361,8 +1595,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminBanDelete> commandAdminBanDelete()
   {
-    final var id = Arbitraries.defaultFor(UUID.class);
-    return id.map(IdACommandAdminBanDelete::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandAdminBanDelete::new);
   }
 
   /**
@@ -1371,8 +1610,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandAdminBanGet> commandAdminBanGet()
   {
-    final var id = Arbitraries.defaultFor(UUID.class);
-    return id.map(IdACommandAdminBanGet::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandAdminBanGet::new);
   }
 
   /**
@@ -1381,8 +1625,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserBanCreate> commandUserBanCreate()
   {
-    final var id = Arbitraries.defaultFor(IdBan.class);
-    return id.map(IdACommandUserBanCreate::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(IdBan.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandUserBanCreate::new);
   }
 
   /**
@@ -1391,8 +1640,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserBanDelete> commandUserBanDelete()
   {
-    final var id = Arbitraries.defaultFor(UUID.class);
-    return id.map(IdACommandUserBanDelete::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandUserBanDelete::new);
   }
 
   /**
@@ -1401,8 +1655,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserBanGet> commandUserBanGet()
   {
-    final var id = Arbitraries.defaultFor(UUID.class);
-    return id.map(IdACommandUserBanGet::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var id =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandUserBanGet::new);
   }
 
   /**
@@ -1411,11 +1670,15 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminBanCreate> responseAdminBanCreate()
   {
-    final var i =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var b =
       Arbitraries.defaultFor(IdBan.class);
-    return Combinators.combine(i, b).as(IdAResponseAdminBanCreate::new);
+
+    return Combinators.combine(msgId, corId, b)
+      .as(IdAResponseAdminBanCreate::new);
   }
 
   /**
@@ -1424,8 +1687,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminBanDelete> responseAdminBanDelete()
   {
-    final var i = Arbitraries.defaultFor(UUID.class);
-    return i.map(IdAResponseAdminBanDelete::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, corId)
+      .as(IdAResponseAdminBanDelete::new);
   }
 
   /**
@@ -1434,12 +1702,16 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseAdminBanGet> responseAdminBanGet()
   {
-    final var i =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var b =
       Arbitraries.defaultFor(IdBan.class)
         .optional();
-    return Combinators.combine(i, b).as(IdAResponseAdminBanGet::new);
+
+    return Combinators.combine(msgId, corId, b)
+      .as(IdAResponseAdminBanGet::new);
   }
 
   /**
@@ -1448,11 +1720,15 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserBanCreate> responseUserBanCreate()
   {
-    final var i =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var b =
       Arbitraries.defaultFor(IdBan.class);
-    return Combinators.combine(i, b).as(IdAResponseUserBanCreate::new);
+
+    return Combinators.combine(msgId, corId, b)
+      .as(IdAResponseUserBanCreate::new);
   }
 
   /**
@@ -1461,8 +1737,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserBanDelete> responseUserBanDelete()
   {
-    final var i = Arbitraries.defaultFor(UUID.class);
-    return i.map(IdAResponseUserBanDelete::new);
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
+      Arbitraries.defaultFor(UUID.class);
+
+    return Combinators.combine(msgId, corId)
+      .as(IdAResponseUserBanDelete::new);
   }
 
   /**
@@ -1471,12 +1752,16 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserBanGet> responseUserBanGet()
   {
-    final var i =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var b =
       Arbitraries.defaultFor(IdBan.class)
         .optional();
-    return Combinators.combine(i, b).as(IdAResponseUserBanGet::new);
+
+    return Combinators.combine(msgId, corId, b)
+      .as(IdAResponseUserBanGet::new);
   }
 
   /**
@@ -1485,9 +1770,13 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdACommandUserLoginHistory> commandUserLoginHistory()
   {
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
     final var id =
       Arbitraries.defaultFor(UUID.class);
-    return id.map(IdACommandUserLoginHistory::new);
+
+    return Combinators.combine(msgId, id)
+      .as(IdACommandUserLoginHistory::new);
   }
 
   /**
@@ -1496,12 +1785,15 @@ public final class IdArbAMessageProvider extends IdArbAbstractProvider
 
   public static Arbitrary<IdAResponseUserLoginHistory> responseUserLoginHistory()
   {
-    final var id =
+    final var msgId =
+      Arbitraries.defaultFor(UUID.class);
+    final var corId =
       Arbitraries.defaultFor(UUID.class);
     final var hist =
       Arbitraries.defaultFor(IdLogin.class)
         .list();
 
-    return Combinators.combine(id, hist).as(IdAResponseUserLoginHistory::new);
+    return Combinators.combine(msgId, corId, hist)
+      .as(IdAResponseUserLoginHistory::new);
   }
 }

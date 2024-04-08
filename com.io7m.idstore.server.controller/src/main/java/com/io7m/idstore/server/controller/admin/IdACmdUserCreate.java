@@ -89,6 +89,10 @@ public final class IdACmdUserCreate
     final var user =
       users.userCreate(id, idName, realName, email, context.now(), password);
 
-    return new IdAResponseUserCreate(context.requestId(), user);
+    return new IdAResponseUserCreate(
+      UUID.randomUUID(),
+      command.messageId(),
+      user
+    );
   }
 }

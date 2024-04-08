@@ -16,13 +16,30 @@
 
 package com.io7m.idstore.protocol.admin;
 
+import java.util.Objects;
+import java.util.UUID;
+
 /**
  * Get the next page of the admin listing.
+ *
+ * @param messageId The message ID
  */
 
-public record IdACommandAdminSearchByEmailNext()
+public record IdACommandAdminSearchByEmailNext(
+  UUID messageId)
   implements IdACommandType<IdAResponseAdminSearchByEmailNext>
 {
+  /**
+   * Get the next page of the admin listing.
+   *
+   * @param messageId The message ID
+   */
+
+  public IdACommandAdminSearchByEmailNext
+  {
+    Objects.requireNonNull(messageId, "messageId");
+  }
+
   @Override
   public Class<IdAResponseAdminSearchByEmailNext> responseClass()
   {

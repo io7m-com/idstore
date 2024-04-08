@@ -16,8 +16,10 @@
 
 package com.io7m.idstore.protocol.admin;
 
-import com.io7m.hibiscus.api.HBResponseType;
+import com.io7m.hibiscus.api.HBMessageType;
+import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -25,7 +27,7 @@ import java.util.UUID;
  */
 
 public sealed interface IdAResponseType
-  extends IdAMessageType, HBResponseType
+  extends IdAMessageType
   permits IdAResponseAdminBanCreate,
   IdAResponseAdminBanDelete,
   IdAResponseAdminBanGet,
@@ -63,8 +65,18 @@ public sealed interface IdAResponseType
   IdAResponseUserUpdate
 {
   /**
-   * @return The ID of the request that yielded this response
+   * @return The ID of the message to which this message is a response
    */
 
-  UUID requestId();
+  UUID correlationId();
+
+  @Override
+  default boolean isResponseFor(
+    final HBMessageType message)
+  {
+    if (message instanceof final IdProtocolMessageType m) {
+      return Objects.equals(m.messageId(), this.correlationId());
+    }
+    return false;
+  }
 }

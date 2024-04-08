@@ -25,6 +25,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseAuditSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.security.IdSecAdminActionAuditRead;
 
+import java.util.UUID;
+
 /**
  * IdACmdAuditSearchBegin
  */
@@ -67,7 +69,11 @@ public final class IdACmdAuditSearchBegin
     session.setAuditSearch(search);
 
     final var page = search.pageCurrent(audit);
-    return new IdAResponseAuditSearchBegin(context.requestId(), page);
+    return new IdAResponseAuditSearchBegin(
+      UUID.randomUUID(),
+      command.messageId(),
+      page
+    );
   }
 
   private static IdAuditSearchParameters obtainListParameters(

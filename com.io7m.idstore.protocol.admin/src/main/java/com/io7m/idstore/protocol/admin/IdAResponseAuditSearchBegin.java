@@ -25,12 +25,14 @@ import java.util.UUID;
 /**
  * A response to {@link IdACommandAuditSearchBegin}.
  *
- * @param requestId The request ID
- * @param page      The first page of results
+ * @param messageId     The message ID
+ * @param correlationId The message correlation ID
+ * @param page          The first page of results
  */
 
 public record IdAResponseAuditSearchBegin(
-  UUID requestId,
+  UUID messageId,
+  UUID correlationId,
   IdPage<IdAuditEvent> page)
   implements IdAResponseType
 {
@@ -40,7 +42,8 @@ public record IdAResponseAuditSearchBegin(
 
   public IdAResponseAuditSearchBegin
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
+    Objects.requireNonNull(correlationId, "correlationId");
     Objects.requireNonNull(page, "page");
   }
 }

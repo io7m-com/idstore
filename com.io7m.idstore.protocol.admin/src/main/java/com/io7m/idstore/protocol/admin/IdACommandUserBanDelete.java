@@ -22,10 +22,12 @@ import java.util.UUID;
 /**
  * Remove a ban on a user.
  *
- * @param user The user
+ * @param messageId The message ID
+ * @param user      The user
  */
 
 public record IdACommandUserBanDelete(
+  UUID messageId,
   UUID user)
   implements IdACommandType<IdAResponseUserBanDelete>
 {
@@ -35,6 +37,7 @@ public record IdACommandUserBanDelete(
 
   public IdACommandUserBanDelete
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(user, "user");
   }
 

@@ -99,7 +99,11 @@ public final class IdACmdAdminCreate
         permissions
       ).withRedactedPassword();
 
-    return new IdAResponseAdminCreate(context.requestId(), newAdmin);
+    return new IdAResponseAdminCreate(
+      UUID.randomUUID(),
+      command.messageId(),
+      newAdmin
+    );
   }
 
 }

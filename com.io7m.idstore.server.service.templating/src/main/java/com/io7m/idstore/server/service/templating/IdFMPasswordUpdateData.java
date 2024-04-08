@@ -26,13 +26,13 @@ import java.util.UUID;
  *
  * @param htmlTitle       The HTML title
  * @param pageHeaderTitle The page header title
- * @param requestId       The request ID
+ * @param messageId       The request ID
  */
 
 public record IdFMPasswordUpdateData(
   String htmlTitle,
   String pageHeaderTitle,
-  UUID requestId)
+  UUID messageId)
   implements IdFMDataModelType
 {
   /**
@@ -40,14 +40,14 @@ public record IdFMPasswordUpdateData(
    *
    * @param htmlTitle       The HTML title
    * @param pageHeaderTitle The page header title
-   * @param requestId       The request ID
+   * @param messageId       The request ID
    */
 
   public IdFMPasswordUpdateData
   {
     Objects.requireNonNull(htmlTitle, "htmlTitle");
     Objects.requireNonNull(pageHeaderTitle, "pageHeaderTitle");
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
   }
 
   @Override
@@ -56,7 +56,7 @@ public record IdFMPasswordUpdateData(
     final var m = new HashMap<String, Object>();
     m.put("htmlTitle", this.htmlTitle);
     m.put("pageHeaderTitle", this.pageHeaderTitle);
-    m.put("requestId", this.requestId);
+    m.put("requestId", this.messageId);
     return m;
   }
 }

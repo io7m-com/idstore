@@ -344,24 +344,32 @@
 
 [documentation IdA1CommandAdminBanCreate "Ban an admin."]
 [record IdA1CommandAdminBanCreate
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation ban "The ban."]
   [field ban IdA1Ban]
 ]
 
 [documentation IdA1CommandAdminBanDelete "Remove a ban on an admin."]
 [record IdA1CommandAdminBanDelete
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation adminId "The admin."]
   [field adminId cb:UUID]
 ]
 
 [documentation IdA1CommandAdminBanGet "Get a ban on an admin."]
 [record IdA1CommandAdminBanGet
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation adminId "The admin."]
   [field adminId cb:UUID]
 ]
 
 [documentation IdA1CommandAdminCreate "Create an admin."]
 [record IdA1CommandAdminCreate
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation adminId "The admin."]
   [field adminId [cb:Option cb:UUID]]
   [documentation idName "The admin ID name."]
@@ -378,12 +386,16 @@
 
 [documentation IdA1CommandAdminDelete "Delete an admin."]
 [record IdA1CommandAdminDelete
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation adminId "The admin."]
   [field adminId cb:UUID]
 ]
 
 [documentation IdA1CommandAdminEmailAdd "Add an email address to the given admin."]
 [record IdA1CommandAdminEmailAdd
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation adminId "The admin."]
   [field adminId cb:UUID]
   [documentation email "The email address."]
@@ -392,6 +404,8 @@
 
 [documentation IdA1CommandAdminEmailRemove "Remove an email address from the given admin."]
 [record IdA1CommandAdminEmailRemove
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation adminId "The admin."]
   [field adminId cb:UUID]
   [documentation email "The email address."]
@@ -400,18 +414,24 @@
 
 [documentation IdA1CommandAdminGet "Get the given admin."]
 [record IdA1CommandAdminGet
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation adminId "The admin."]
   [field adminId cb:UUID]
 ]
 
 [documentation IdA1CommandAdminGetByEmail "Get the admin with the given email address."]
 [record IdA1CommandAdminGetByEmail
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation email "The email address."]
   [field email cb:String]
 ]
 
 [documentation IdA1CommandAdminPermissionGrant "Grant a permission to the given admin."]
 [record IdA1CommandAdminPermissionGrant
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation adminId "The admin."]
   [field adminId cb:UUID]
   [documentation permission "The permission."]
@@ -420,6 +440,8 @@
 
 [documentation IdA1CommandAdminPermissionRevoke "Revoke a permission from the given admin."]
 [record IdA1CommandAdminPermissionRevoke
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation adminId "The admin."]
   [field adminId cb:UUID]
   [documentation permission "The permission."]
@@ -428,33 +450,54 @@
 
 [documentation IdA1CommandAdminSearchBegin "Start searching for admins."]
 [record IdA1CommandAdminSearchBegin
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation parameters "The search parameters."]
   [field parameters IdA1AdminSearchParameters]
 ]
 
 [documentation IdA1CommandAdminSearchByEmailBegin "Start searching for admins (by email)."]
 [record IdA1CommandAdminSearchByEmailBegin
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation parameters "The search parameters."]
   [field parameters IdA1AdminSearchByEmailParameters]
 ]
 
 [documentation IdA1CommandAdminSearchByEmailNext "Get the next page of admin search results."]
-[record IdA1CommandAdminSearchByEmailNext]
+[record IdA1CommandAdminSearchByEmailNext
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandAdminSearchByEmailPrevious "Get the previous page of admin search results."]
-[record IdA1CommandAdminSearchByEmailPrevious]
+[record IdA1CommandAdminSearchByEmailPrevious
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandAdminSearchNext "Get the next page of admin search results."]
-[record IdA1CommandAdminSearchNext]
+[record IdA1CommandAdminSearchNext
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandAdminSearchPrevious "Get the previous page of admin search results."]
-[record IdA1CommandAdminSearchPrevious]
+[record IdA1CommandAdminSearchPrevious
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandAdminSelf "A request to fetch the admin's own profile."]
-[record IdA1CommandAdminSelf]
+[record IdA1CommandAdminSelf
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandAdminUpdateCredentials "A request to edit an admin's credentials."]
 [record IdA1CommandAdminUpdateCredentials
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation adminId "The admin."]
   [field adminId cb:UUID]
   [documentation idName "The admin's new ID name."]
@@ -467,6 +510,8 @@
 
 [documentation IdA1CommandAdminUpdatePasswordExpiration "A request to update the admin's password expiration."]
 [record IdA1CommandAdminUpdatePasswordExpiration
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The admin."]
   [field userId cb:UUID]
   [documentation set "The set behaviour."]
@@ -475,18 +520,28 @@
 
 [documentation IdA1CommandAuditSearchBegin "Start searching/listing audit records."]
 [record IdA1CommandAuditSearchBegin
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation parameters "The search parameters."]
   [field parameters IdA1AuditSearchParameters]
 ]
 
 [documentation IdA1CommandAuditSearchNext "Get the next page of audit search results."]
-[record IdA1CommandAuditSearchNext]
+[record IdA1CommandAuditSearchNext
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandAuditSearchPrevious "Get the previous page of audit search results."]
-[record IdA1CommandAuditSearchPrevious]
+[record IdA1CommandAuditSearchPrevious
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandMailTest "Send a test email to a given address."]
 [record IdA1CommandMailTest
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation address "The target email address."]
   [field address cb:String]
   [documentation token "The email token."]
@@ -495,12 +550,16 @@
 
 [documentation IdA1CommandMaintenanceModeSet "Move the server to/from maintenance mode."]
 [record IdA1CommandMaintenanceModeSet
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation message "The message (if maintenance mode is to be turned on)."]
   [field message [cb:Option cb:String]]
 ]
 
 [documentation IdA1CommandLogin "A request to log in."]
 [record IdA1CommandLogin
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userName "The username."]
   [field userName cb:String]
   [documentation password "The password."]
@@ -515,24 +574,32 @@
 
 [documentation IdA1CommandUserBanCreate "Ban a user."]
 [record IdA1CommandUserBanCreate
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation ban "The ban."]
   [field ban IdA1Ban]
 ]
 
 [documentation IdA1CommandUserBanDelete "Remove a ban on a user."]
 [record IdA1CommandUserBanDelete
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The user."]
   [field userId cb:UUID]
 ]
 
 [documentation IdA1CommandUserBanGet "Get a ban on a user."]
 [record IdA1CommandUserBanGet
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The user."]
   [field userId cb:UUID]
 ]
 
 [documentation IdA1CommandUserCreate "Create a user."]
 [record IdA1CommandUserCreate
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The user."]
   [field userId [cb:Option cb:UUID]]
   [documentation idName "The user ID name."]
@@ -547,12 +614,16 @@
 
 [documentation IdA1CommandUserDelete "Delete a user."]
 [record IdA1CommandUserDelete
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The user."]
   [field userId cb:UUID]
 ]
 
 [documentation IdA1CommandUserEmailAdd "Add an email address to the given user."]
 [record IdA1CommandUserEmailAdd
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The user."]
   [field userId cb:UUID]
   [documentation email "The email address."]
@@ -561,6 +632,8 @@
 
 [documentation IdA1CommandUserEmailRemove "Remove an email address from the given user."]
 [record IdA1CommandUserEmailRemove
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The user."]
   [field userId cb:UUID]
   [documentation email "The email address."]
@@ -569,48 +642,72 @@
 
 [documentation IdA1CommandUserGet "Get the given user."]
 [record IdA1CommandUserGet
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The user."]
   [field userId cb:UUID]
 ]
 
 [documentation IdA1CommandUserGetByEmail "Get the user with the given email address."]
 [record IdA1CommandUserGetByEmail
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation email "The email address."]
   [field email cb:String]
 ]
 
 [documentation IdA1CommandUserLoginHistory "Get the given user's login history."]
 [record IdA1CommandUserLoginHistory
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The user."]
   [field userId cb:UUID]
 ]
 
 [documentation IdA1CommandUserSearchBegin "Start searching for users."]
 [record IdA1CommandUserSearchBegin
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation parameters "The search parameters."]
   [field parameters IdA1UserSearchParameters]
 ]
 
 [documentation IdA1CommandUserSearchByEmailBegin "Start searching for users (by email)."]
 [record IdA1CommandUserSearchByEmailBegin
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation parameters "The search parameters."]
   [field parameters IdA1UserSearchByEmailParameters]
 ]
 
 [documentation IdA1CommandUserSearchByEmailNext "Get the next page of user search results."]
-[record IdA1CommandUserSearchByEmailNext]
+[record IdA1CommandUserSearchByEmailNext
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandUserSearchByEmailPrevious "Get the previous page of user search results."]
-[record IdA1CommandUserSearchByEmailPrevious]
+[record IdA1CommandUserSearchByEmailPrevious
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandUserSearchNext "Get the next page of user search results."]
-[record IdA1CommandUserSearchNext]
+[record IdA1CommandUserSearchNext
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandUserSearchPrevious "Get the previous page of user search results."]
-[record IdA1CommandUserSearchPrevious]
+[record IdA1CommandUserSearchPrevious
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdA1CommandUserUpdateCredentials "A request to fetch the user's own profile."]
 [record IdA1CommandUserUpdateCredentials
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The user."]
   [field userId cb:UUID]
   [documentation idName "The user's new ID name."]
@@ -623,6 +720,8 @@
 
 [documentation IdA1CommandUserUpdatePasswordExpiration "A request to update the user's password expiration."]
 [record IdA1CommandUserUpdatePasswordExpiration
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userId "The user."]
   [field userId cb:UUID]
   [documentation set "The set behaviour."]
@@ -643,148 +742,186 @@
 
 [documentation IdA1ResponseAdminBanCreate "A response to IdA1CommandAdminBanCreate."]
 [record IdA1ResponseAdminBanCreate
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation ban "The ban."]
   [field ban IdA1Ban]
 ]
 
 [documentation IdA1ResponseAdminBanDelete "A response to IdA1CommandAdminBanDelete."]
 [record IdA1ResponseAdminBanDelete
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
 ]
 
 [documentation IdA1ResponseAdminBanGet "A response to IdA1CommandAdminBanGet."]
 [record IdA1ResponseAdminBanGet
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation ban "The ban."]
   [field ban [cb:Option IdA1Ban]]
 ]
 
 [documentation IdA1ResponseAdminCreate "A response to IdA1CommandAdminCreate."]
 [record IdA1ResponseAdminCreate
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation admin "The admin."]
   [field admin IdA1Admin]
 ]
 
 [documentation IdA1ResponseAdminDelete "A response to IdA1CommandAdminDelete."]
 [record IdA1ResponseAdminDelete
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
 ]
 
 [documentation IdA1ResponseAdminGet "A response to IdA1CommandAdminGet."]
 [record IdA1ResponseAdminGet
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation admin "The admin."]
   [field admin [cb:Option IdA1Admin]]
 ]
 
 [documentation IdA1ResponseAdminSearchBegin "A response to IdA1CommandAdminSearchBegin."]
 [record IdA1ResponseAdminSearchBegin
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The first page of results."]
   [field page [IdA1Page IdA1AdminSummary]]
 ]
 
 [documentation IdA1ResponseAdminSearchNext "A response to IdA1CommandAdminSearchNext."]
 [record IdA1ResponseAdminSearchNext
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The next page of results."]
   [field page [IdA1Page IdA1AdminSummary]]
 ]
 
 [documentation IdA1ResponseAdminSearchPrevious "A response to IdA1CommandAdminSearchPrevious."]
 [record IdA1ResponseAdminSearchPrevious
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The previous page of results."]
   [field page [IdA1Page IdA1AdminSummary]]
 ]
 
 [documentation IdA1ResponseAdminSearchByEmailBegin "A response to IdA1CommandAdminSearchByEmailBegin."]
 [record IdA1ResponseAdminSearchByEmailBegin
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The first page of results."]
   [field page [IdA1Page IdA1AdminSummary]]
 ]
 
 [documentation IdA1ResponseAdminSearchByEmailNext "A response to IdA1CommandAdminSearchByEmailNext."]
 [record IdA1ResponseAdminSearchByEmailNext
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The next page of results."]
   [field page [IdA1Page IdA1AdminSummary]]
 ]
 
 [documentation IdA1ResponseAdminSearchByEmailPrevious "A response to IdA1CommandAdminSearchByEmailPrevious."]
 [record IdA1ResponseAdminSearchByEmailPrevious
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The previous page of results."]
   [field page [IdA1Page IdA1AdminSummary]]
 ]
 
 [documentation IdA1ResponseAdminSelf "A response to IdA1CommandAdminSelf."]
 [record IdA1ResponseAdminSelf
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation admin "The admin."]
   [field admin IdA1Admin]
 ]
 
 [documentation IdA1ResponseAdminUpdate "A response to IdA1CommandAdminUpdateCredentials."]
 [record IdA1ResponseAdminUpdate
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation admin "The admin."]
   [field admin IdA1Admin]
 ]
 
 [documentation IdA1ResponseAuditSearchBegin "A response to IdA1CommandAuditSearchBegin."]
 [record IdA1ResponseAuditSearchBegin
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The first page of results."]
   [field page [IdA1Page IdA1AuditEvent]]
 ]
 
 [documentation IdA1ResponseAuditSearchNext "A response to IdA1CommandAuditSearchNext."]
 [record IdA1ResponseAuditSearchNext
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The next page of results."]
   [field page [IdA1Page IdA1AuditEvent]]
 ]
 
 [documentation IdA1ResponseAuditSearchPrevious "A response to IdA1CommandAuditSearchPrevious."]
 [record IdA1ResponseAuditSearchPrevious
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The previous page of results."]
   [field page [IdA1Page IdA1AuditEvent]]
 ]
 
 [documentation IdA1ResponseMaintenanceModeSet "A response to IdA1CommandMaintenanceModeSet."]
 [record IdA1ResponseMaintenanceModeSet
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation message "The response message."]
   [field message cb:String]
 ]
 
 [documentation IdA1ResponseMailTest "A response to IdA1CommandMailTest."]
 [record IdA1ResponseMailTest
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation token "The unique token that was placed into the test email."]
   [field token cb:String]
 ]
@@ -795,109 +932,137 @@
 
 [documentation IdA1ResponseUserBanCreate "A response to IdA1CommandUserBanCreate."]
 [record IdA1ResponseUserBanCreate
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation ban "The ban."]
   [field ban IdA1Ban]
 ]
 
 [documentation IdA1ResponseUserBanDelete "A response to IdA1CommandUserBanDelete."]
 [record IdA1ResponseUserBanDelete
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
 ]
 
 [documentation IdA1ResponseUserBanGet "A response to IdA1CommandUserBanGet."]
 [record IdA1ResponseUserBanGet
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation ban "The ban."]
   [field ban [cb:Option IdA1Ban]]
 ]
 
 [documentation IdA1ResponseUserCreate "A response to IdA1CommandUserCreate."]
 [record IdA1ResponseUserCreate
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation user "The user."]
   [field user IdA1User]
 ]
 
 [documentation IdA1ResponseUserDelete "A response to IdA1CommandUserDelete."]
 [record IdA1ResponseUserDelete
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
 ]
 
 [documentation IdA1ResponseUserGet "A response to IdA1CommandUserGet."]
 [record IdA1ResponseUserGet
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation user "The user."]
   [field user [cb:Option IdA1User]]
 ]
 
 [documentation IdA1ResponseUserSearchBegin "A response to IdA1CommandUserSearchBegin."]
 [record IdA1ResponseUserSearchBegin
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The first page of results."]
   [field page [IdA1Page IdA1UserSummary]]
 ]
 
 [documentation IdA1ResponseUserSearchNext "A response to IdA1CommandUserSearchNext."]
 [record IdA1ResponseUserSearchNext
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The next page of results."]
   [field page [IdA1Page IdA1UserSummary]]
 ]
 
 [documentation IdA1ResponseUserSearchPrevious "A response to IdA1CommandUserSearchPrevious."]
 [record IdA1ResponseUserSearchPrevious
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The previous page of results."]
   [field page [IdA1Page IdA1UserSummary]]
 ]
 
 [documentation IdA1ResponseUserSearchByEmailBegin "A response to IdA1CommandUserSearchByEmailBegin."]
 [record IdA1ResponseUserSearchByEmailBegin
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The first page of results."]
   [field page [IdA1Page IdA1UserSummary]]
 ]
 
 [documentation IdA1ResponseUserSearchByEmailNext "A response to IdA1CommandUserSearchByEmailNext."]
 [record IdA1ResponseUserSearchByEmailNext
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The next page of results."]
   [field page [IdA1Page IdA1UserSummary]]
 ]
 
 [documentation IdA1ResponseUserSearchByEmailPrevious "A response to IdA1CommandUserSearchByEmailPrevious."]
 [record IdA1ResponseUserSearchByEmailPrevious
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation page "The previous page of results."]
   [field page [IdA1Page IdA1UserSummary]]
 ]
 
 [documentation IdA1ResponseUserUpdate "A response to IdA1CommandUserUpdateCredentials."]
 [record IdA1ResponseUserUpdate
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation user "The user."]
   [field user IdA1User]
 ]
 
 [documentation IdA1ResponseUserLoginHistory "A response to IdA1CommandUserLoginHistory."]
 [record IdA1ResponseUserLoginHistory
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
-  [documentation requestId "The user's login history."]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
+  [documentation history "The user's login history."]
   [field history [cb:List IdA1Login]]
 ]
 
@@ -907,8 +1072,10 @@
 
 [documentation IdA1ResponseError "An error response."]
 [record IdA1ResponseError
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation errorCode "The error code."]
   [field errorCode cb:String]
   [documentation message "The error message."]
@@ -923,15 +1090,17 @@
 
 [documentation IdA1ResponseLogin "A response to IdA1CommandLogin."]
 [record IdA1ResponseLogin
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation admin "The admin."]
   [field admin IdA1Admin]
 ]
 
 [documentation IdA "The Admin protocol."]
 [protocol IdA
-  [version 1
+  [version 2
     [types-added
       IdA1CommandAdminBanCreate
       IdA1CommandAdminBanDelete

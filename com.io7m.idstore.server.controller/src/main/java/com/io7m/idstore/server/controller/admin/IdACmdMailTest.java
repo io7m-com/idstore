@@ -33,6 +33,7 @@ import io.opentelemetry.api.trace.Span;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 
@@ -77,11 +78,14 @@ public final class IdACmdMailTest
       templates,
       mail,
       branding,
-      command.address(),
-      command.token()
+      command
     );
 
-    return new IdAResponseMailTest(context.requestId(), command.token());
+    return new IdAResponseMailTest(
+      UUID.randomUUID(),
+      command.messageId(),
+      command.token()
+    );
   }
 
   private static void sendTestEmail(
@@ -89,10 +93,13 @@ public final class IdACmdMailTest
     final IdFMTemplateServiceType templateService,
     final IdServerMailServiceType mailService,
     final IdServerBrandingServiceType brandingService,
-    final IdEmail email,
-    final IdShortHumanToken token)
+    final IdACommandMailTest command)
     throws IdCommandExecutionFailure
   {
+    final var token =
+      command.token();
+    final var email =
+      command.address();
     final var template =
       templateService.emailTestTemplate();
 
@@ -109,7 +116,7 @@ public final class IdACmdMailTest
         IO_ERROR,
         Map.of(),
         Optional.empty(),
-        context.requestId(),
+        command.messageId(),
         500
       );
     }
@@ -124,14 +131,14 @@ public final class IdACmdMailTest
     try {
       mailService.sendMail(
         Span.current(),
-        context.requestId(),
+        command.messageId(),
         email,
         mailHeaders,
         brandingService.emailSubject("Email test"),
         writer.toString()
       ).get();
     } catch (final Exception e) {
-      throw context.failMail(email, e);
+      throw context.failMail(command, email, e);
     }
   }
 }

@@ -29,14 +29,14 @@ import java.util.UUID;
  * @param htmlTitle       The HTML title
  * @param pageHeaderTitle The page header title
  * @param existingName    The existing realname
- * @param requestId       The request ID
+ * @param messageId       The request ID
  */
 
 public record IdFMRealNameUpdateData(
   String htmlTitle,
   String pageHeaderTitle,
   IdRealName existingName,
-  UUID requestId)
+  UUID messageId)
   implements IdFMDataModelType
 {
   /**
@@ -45,7 +45,7 @@ public record IdFMRealNameUpdateData(
    * @param htmlTitle       The HTML title
    * @param pageHeaderTitle The page header title
    * @param existingName    The existing realname
-   * @param requestId       The request ID
+   * @param messageId       The messageId ID
    */
 
   public IdFMRealNameUpdateData
@@ -53,7 +53,7 @@ public record IdFMRealNameUpdateData(
     Objects.requireNonNull(htmlTitle, "htmlTitle");
     Objects.requireNonNull(pageHeaderTitle, "pageHeaderTitle");
     Objects.requireNonNull(existingName, "existingName");
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
   }
 
   @Override
@@ -63,7 +63,7 @@ public record IdFMRealNameUpdateData(
     m.put("htmlTitle", this.htmlTitle);
     m.put("pageHeaderTitle", this.pageHeaderTitle);
     m.put("existingName", this.existingName.value());
-    m.put("requestId", this.requestId);
+    m.put("requestId", this.messageId);
     return m;
   }
 }

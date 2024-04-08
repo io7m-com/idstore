@@ -28,6 +28,7 @@ import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.security.IdSecUserActionEmailRemovePermit;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_NONEXISTENT;
@@ -74,6 +75,7 @@ public final class IdUCmdEmailAddPermit
 
     if (verificationOpt.isEmpty()) {
       throw context.failFormatted(
+        command,
         404,
         EMAIL_VERIFICATION_NONEXISTENT,
         NOT_FOUND
@@ -83,6 +85,7 @@ public final class IdUCmdEmailAddPermit
     final var verification = verificationOpt.get();
     if (!checkVerification(context, verification, user)) {
       throw context.failFormatted(
+        command,
         400,
         EMAIL_VERIFICATION_FAILED,
         OPERATION_NOT_PERMITTED
@@ -93,7 +96,10 @@ public final class IdUCmdEmailAddPermit
     users.userEmailAdd(user.id(), verification.email());
     emails.emailVerificationDelete(token, PERMITTED);
 
-    return new IdUResponseEmailAddPermit(context.requestId());
+    return new IdUResponseEmailAddPermit(
+      UUID.randomUUID(),
+      command.messageId()
+    );
   }
 
   private static boolean checkVerification(

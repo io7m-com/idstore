@@ -24,6 +24,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserDelete;
 import com.io7m.idstore.server.security.IdSecAdminActionUserDelete;
 
+import java.util.UUID;
+
 /**
  * IdACmdUserDelete
  */
@@ -60,6 +62,9 @@ public final class IdACmdUserDelete
     transaction.adminIdSet(admin.id());
     users.userDelete(command.userId());
 
-    return new IdAResponseUserDelete(context.requestId());
+    return new IdAResponseUserDelete(
+      UUID.randomUUID(),
+      command.messageId()
+    );
   }
 }

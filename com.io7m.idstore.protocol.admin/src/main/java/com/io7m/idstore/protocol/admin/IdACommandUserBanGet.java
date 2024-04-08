@@ -22,10 +22,12 @@ import java.util.UUID;
 /**
  * Get a ban on a user.
  *
- * @param user The user
+ * @param messageId The message ID
+ * @param user      The user
  */
 
 public record IdACommandUserBanGet(
+  UUID messageId,
   UUID user)
   implements IdACommandType<IdAResponseUserBanGet>
 {
@@ -35,6 +37,7 @@ public record IdACommandUserBanGet(
 
   public IdACommandUserBanGet
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(user, "user");
   }
 

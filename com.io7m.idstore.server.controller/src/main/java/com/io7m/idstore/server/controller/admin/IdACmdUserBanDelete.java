@@ -26,6 +26,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
 import com.io7m.idstore.server.security.IdSecAdminActionUserBanDelete;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * IdACmdUserBanDelete
@@ -65,7 +66,8 @@ public final class IdACmdUserBanDelete
     users.userBanDelete(new IdBan(command.user(), "", Optional.empty()));
 
     return new IdAResponseUserBanDelete(
-      context.requestId()
+      UUID.randomUUID(),
+      command.messageId()
     );
   }
 }

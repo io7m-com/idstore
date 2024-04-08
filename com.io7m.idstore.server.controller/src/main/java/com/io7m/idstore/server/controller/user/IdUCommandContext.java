@@ -51,7 +51,6 @@ public final class IdUCommandContext
 
   public IdUCommandContext(
     final RPServiceDirectoryType inServices,
-    final UUID inRequestId,
     final IdDatabaseTransactionType inTransaction,
     final IdSessionUser inSession,
     final IdUser inUser,
@@ -60,7 +59,6 @@ public final class IdUCommandContext
   {
     super(
       inServices,
-      inRequestId,
       inTransaction,
       inSession,
       inRemoteHost,

@@ -19,14 +19,17 @@ package com.io7m.idstore.protocol.admin;
 import com.io7m.idstore.model.IdEmail;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Get the given user by email address.
  *
- * @param email The email address
+ * @param messageId The message ID
+ * @param email     The email address
  */
 
 public record IdACommandUserGetByEmail(
+  UUID messageId,
   IdEmail email)
   implements IdACommandType<IdAResponseUserGet>
 {
@@ -36,6 +39,7 @@ public record IdACommandUserGetByEmail(
 
   public IdACommandUserGetByEmail
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(email, "email");
   }
 

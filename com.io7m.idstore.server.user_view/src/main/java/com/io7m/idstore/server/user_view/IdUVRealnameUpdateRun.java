@@ -146,7 +146,6 @@ public final class IdUVRealnameUpdateRun extends IdHTTPHandlerFunctional
         final var context =
           new IdUCommandContext(
             services,
-            information.requestId(),
             transaction,
             session,
             user,
@@ -155,7 +154,11 @@ public final class IdUVRealnameUpdateRun extends IdHTTPHandlerFunctional
           );
 
         final var command =
-          new IdUCommandRealnameUpdate(realnameParameter.get());
+          new IdUCommandRealnameUpdate(
+            information.requestId(),
+            realnameParameter.get()
+          );
+
         new IdUCmdRealNameUpdate()
           .execute(context, command);
 

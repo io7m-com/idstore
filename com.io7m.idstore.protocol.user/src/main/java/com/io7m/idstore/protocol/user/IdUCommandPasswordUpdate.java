@@ -17,15 +17,18 @@
 package com.io7m.idstore.protocol.user;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A request to change the user's password.
  *
+ * @param messageId       The message ID
  * @param password        The password
  * @param passwordConfirm The password confirmation
  */
 
 public record IdUCommandPasswordUpdate(
+  UUID messageId,
   String password,
   String passwordConfirm)
   implements IdUCommandType<IdUResponseUserUpdate>
@@ -39,6 +42,7 @@ public record IdUCommandPasswordUpdate(
 
   public IdUCommandPasswordUpdate
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(password, "password");
     Objects.requireNonNull(passwordConfirm, "passwordConfirm");
   }

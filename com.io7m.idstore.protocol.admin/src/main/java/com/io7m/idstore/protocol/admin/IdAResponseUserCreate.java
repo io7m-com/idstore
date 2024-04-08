@@ -24,12 +24,14 @@ import java.util.UUID;
 /**
  * A response to {@link IdACommandUserCreate}.
  *
- * @param requestId The request ID
- * @param user     The user
+ * @param messageId     The message ID
+ * @param correlationId The message correlation ID
+ * @param user          The user
  */
 
 public record IdAResponseUserCreate(
-  UUID requestId,
+  UUID messageId,
+  UUID correlationId,
   IdUser user)
   implements IdAResponseType
 {
@@ -39,7 +41,8 @@ public record IdAResponseUserCreate(
 
   public IdAResponseUserCreate
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
+    Objects.requireNonNull(correlationId, "correlationId");
     Objects.requireNonNull(user, "user");
   }
 }

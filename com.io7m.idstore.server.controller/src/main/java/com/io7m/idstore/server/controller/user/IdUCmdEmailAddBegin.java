@@ -24,6 +24,7 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdEmailVerification;
 import com.io7m.idstore.model.IdToken;
 import com.io7m.idstore.model.IdUser;
+import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 import com.io7m.idstore.protocol.user.IdUCommandEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUResponseEmailAddBegin;
 import com.io7m.idstore.protocol.user.IdUResponseType;
@@ -46,6 +47,7 @@ import io.opentelemetry.api.trace.Span;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.IO_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
@@ -112,6 +114,7 @@ public final class IdUCmdEmailAddBegin
       );
 
       throw context.fail(
+        command,
         400,
         RATE_LIMIT_EXCEEDED,
         strings.format(EMAIL_VERIFICATION_RATE_LIMITED)
@@ -123,7 +126,7 @@ public final class IdUCmdEmailAddBegin
     );
 
 
-    checkPreconditions(context, emails, strings, email);
+    checkPreconditions(emails, command, strings, email);
 
     transaction.userIdSet(user.id());
 
@@ -144,6 +147,7 @@ public final class IdUCmdEmailAddBegin
         configuration,
         mailService,
         brandingService,
+        command,
         emailExisting,
         verification
       );
@@ -160,11 +164,15 @@ public final class IdUCmdEmailAddBegin
       configuration,
       mailService,
       brandingService,
+      command,
       email,
       verification
     );
 
-    return new IdUResponseEmailAddBegin(context.requestId());
+    return new IdUResponseEmailAddBegin(
+      UUID.randomUUID(),
+      command.messageId()
+    );
   }
 
   private static void sendVerificationMailWithoutPermitLink(
@@ -173,6 +181,7 @@ public final class IdUCmdEmailAddBegin
     final IdServerConfiguration configuration,
     final IdServerMailServiceType mailService,
     final IdServerBrandingServiceType brandingService,
+    final IdProtocolMessageType message,
     final IdEmail email,
     final IdEmailVerification verification)
     throws IdCommandExecutionFailure
@@ -207,7 +216,7 @@ public final class IdUCmdEmailAddBegin
         IO_ERROR,
         Map.of(),
         Optional.empty(),
-        context.requestId(),
+        message.messageId(),
         500
       );
     }
@@ -219,7 +228,7 @@ public final class IdUCmdEmailAddBegin
           verification.tokenDeny().value()),
         Map.entry(
           "X-IDStore-Verification-From-Request",
-          context.requestId().toString()),
+          message.messageId().toString()),
         Map.entry(
           "X-IDStore-Verification-Deny",
           linkDeny.toString())
@@ -228,14 +237,14 @@ public final class IdUCmdEmailAddBegin
     try {
       mailService.sendMail(
         Span.current(),
-        context.requestId(),
+        message.messageId(),
         email,
         mailHeaders,
         brandingService.emailSubject("Email verification request"),
         writer.toString()
       ).get();
     } catch (final Exception e) {
-      throw context.failMail(email, e);
+      throw context.failMail(message, email, e);
     }
   }
 
@@ -245,6 +254,7 @@ public final class IdUCmdEmailAddBegin
     final IdServerConfiguration configuration,
     final IdServerMailServiceType mailService,
     final IdServerBrandingServiceType brandingService,
+    final IdProtocolMessageType message,
     final IdEmail email,
     final IdEmailVerification verification)
     throws IdCommandExecutionFailure
@@ -286,7 +296,7 @@ public final class IdUCmdEmailAddBegin
         IO_ERROR,
         Map.of(),
         Optional.empty(),
-        context.requestId(),
+        message.messageId(),
         500
       );
     }
@@ -301,7 +311,7 @@ public final class IdUCmdEmailAddBegin
           verification.tokenDeny().value()),
         Map.entry(
           "X-IDStore-Verification-From-Request",
-          context.requestId().toString()),
+          message.messageId().toString()),
         Map.entry(
           "X-IDStore-Verification-Permit",
           linkPermit.toString()),
@@ -313,14 +323,14 @@ public final class IdUCmdEmailAddBegin
     try {
       mailService.sendMail(
         Span.current(),
-        context.requestId(),
+        message.messageId(),
         email,
         mailHeaders,
         brandingService.emailSubject("Email verification request"),
         writer.toString()
       ).get();
     } catch (final Exception e) {
-      throw context.failMail(email, e);
+      throw context.failMail(message, email, e);
     }
   }
 
@@ -353,8 +363,8 @@ public final class IdUCmdEmailAddBegin
   }
 
   private static void checkPreconditions(
-    final IdUCommandContext context,
     final IdDatabaseEmailsQueriesType emails,
+    final IdProtocolMessageType message,
     final IdStrings strings,
     final IdEmail email)
     throws IdDatabaseException, IdCommandExecutionFailure
@@ -366,7 +376,7 @@ public final class IdUCmdEmailAddBegin
         IdStandardErrorCodes.EMAIL_DUPLICATE,
         Map.of(),
         Optional.empty(),
-        context.requestId(),
+        message.messageId(),
         400
       );
     }

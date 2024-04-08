@@ -34,6 +34,7 @@ import com.io7m.idstore.server.service.configuration.IdServerConfigurationServic
 
 import java.time.Clock;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * IdACmdAdminUpdatePasswordExpiration
@@ -104,7 +105,11 @@ public final class IdACmdAdminUpdatePasswordExpiration
       admins.adminGetRequire(targetAdminId)
         .withRedactedPassword();
 
-    return new IdAResponseAdminUpdate(context.requestId(), afterAdmin);
+    return new IdAResponseAdminUpdate(
+      UUID.randomUUID(),
+      command.messageId(),
+      afterAdmin
+    );
   }
 
   private static IdPassword handlePasswordExpirationSet(

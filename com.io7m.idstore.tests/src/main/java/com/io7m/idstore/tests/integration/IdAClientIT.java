@@ -22,9 +22,9 @@ import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
-import com.io7m.idstore.admin_client.api.IdAClientCredentials;
+import com.io7m.idstore.admin_client.api.IdAClientConnectionParameters;
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
+import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminColumn;
@@ -47,7 +47,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
-import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
+import com.io7m.idstore.protocol.admin.cb.IdACB2Messages;
 import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.idstore.tests.extensions.IdTestServers;
@@ -93,7 +93,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Tag("admin-client")
 @ExtendWith({ErvillaExtension.class, ZeladorExtension.class})
 @ErvillaConfiguration(disabledIfUnsupported = true, projectName = "com.io7m.idstore")
-public final class IdAClientIT
+public final class IdUClientIT
 {
   private static final Set<IdErrorCode> ALLOWED_SMOKE_CODES =
     Set.of(
@@ -105,13 +105,13 @@ public final class IdAClientIT
       API_MISUSE_ERROR
     );
 
-  private static final IdACB1Messages MESSAGES = new IdACB1Messages();
+  private static final IdACB2Messages MESSAGES = new IdACB2Messages();
   private static final IdAdmin ADMIN;
   private static final IdAClients CLIENTS = new IdAClients();
 
   private static final VProtocolSupported V1 =
     new VProtocolSupported(
-      IdACB1Messages.protocolId(),
+      IdACB2Messages.protocolId(),
       1L,
       0L,
       "/v1/"
@@ -147,7 +147,7 @@ public final class IdAClientIT
   }
 
   private static IdTestDatabases.IdDatabaseFixture DATABASE_FIXTURE;
-  private IdAClientSynchronousType client;
+  private IdAClientType client;
   private QWebServerType webServer;
   private IdTestServers.IdTestServerFixture serverFixture;
 
@@ -207,14 +207,14 @@ public final class IdAClientIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdAResponseLogin(UUID.randomUUID(), ADMIN)));
 
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(401)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(
         MESSAGES.serialize(
           new IdAResponseError(
@@ -230,21 +230,21 @@ public final class IdAClientIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdAResponseLogin(UUID.randomUUID(), ADMIN)));
 
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(
         MESSAGES.serialize(
           new IdAResponseAdminSelf(UUID.randomUUID(), ADMIN))
       );
 
     this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
@@ -278,18 +278,18 @@ public final class IdAClientIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdAResponseLogin(UUID.randomUUID(), ADMIN)));
 
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(new IdACommandAdminSelf()));
 
     this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
@@ -331,19 +331,19 @@ public final class IdAClientIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdAResponseLogin(UUID.randomUUID(), ADMIN)));
 
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdAResponseUserBanDelete(UUID.randomUUID())));
 
     this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
@@ -377,7 +377,7 @@ public final class IdAClientIT
       this.serverFixture.createAdminInitial("admin", "12345678");
 
     this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "admin",
         "12345678",
         this.serverFixture.server().adminAPI(),
@@ -398,7 +398,7 @@ public final class IdAClientIT
 
     assertThrows(IllegalStateException.class, () -> {
       this.client.loginOrElseThrow(
-        new IdAClientCredentials(
+        new IdAClientConnectionParameters(
           "admin",
           "12345678",
           this.serverFixture.server().adminAPI(),
@@ -425,7 +425,7 @@ public final class IdAClientIT
     final var ex =
       assertThrows(IdAClientException.class, () -> {
         this.client.loginOrElseThrow(
-          new IdAClientCredentials(
+          new IdAClientConnectionParameters(
             "admin",
             "1234",
             this.serverFixture.server().adminAPI(),
@@ -484,7 +484,7 @@ public final class IdAClientIT
         .toList();
 
     this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "admin",
         "12345678",
         this.serverFixture.server().adminAPI(),
@@ -519,7 +519,7 @@ public final class IdAClientIT
       this.serverFixture.createAdminInitial("admin", "12345678");
 
     this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "admin",
         "12345678",
         this.serverFixture.server().adminAPI(),

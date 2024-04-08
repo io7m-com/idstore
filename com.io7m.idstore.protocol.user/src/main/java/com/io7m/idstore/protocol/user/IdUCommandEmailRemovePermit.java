@@ -19,14 +19,17 @@ package com.io7m.idstore.protocol.user;
 import com.io7m.idstore.model.IdToken;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A request to complete an email address challenge.
  *
- * @param token The email address
+ * @param messageId The message ID
+ * @param token     The email address
  */
 
 public record IdUCommandEmailRemovePermit(
+  UUID messageId,
   IdToken token)
   implements IdUCommandType<IdUResponseEmailRemovePermit>
 {
@@ -38,6 +41,7 @@ public record IdUCommandEmailRemovePermit(
 
   public IdUCommandEmailRemovePermit
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(token, "email");
   }
 

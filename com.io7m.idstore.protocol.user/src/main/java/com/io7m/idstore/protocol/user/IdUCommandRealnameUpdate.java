@@ -19,14 +19,17 @@ package com.io7m.idstore.protocol.user;
 import com.io7m.idstore.model.IdRealName;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A request to change the user's realname.
  *
- * @param realName The real name
+ * @param messageId The message ID
+ * @param realName  The real name
  */
 
 public record IdUCommandRealnameUpdate(
+  UUID messageId,
   IdRealName realName)
   implements IdUCommandType<IdUResponseUserUpdate>
 {
@@ -38,6 +41,7 @@ public record IdUCommandRealnameUpdate(
 
   public IdUCommandRealnameUpdate
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(realName, "realName");
   }
 

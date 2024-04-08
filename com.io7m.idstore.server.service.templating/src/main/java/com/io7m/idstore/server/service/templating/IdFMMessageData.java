@@ -26,7 +26,7 @@ import java.util.UUID;
  *
  * @param htmlTitle       The page title
  * @param pageHeaderTitle The page header title
- * @param requestId       The request ID
+ * @param messageId       The request ID
  * @param isError         {@code true} if the message is an error
  * @param isServerError   {@code true} if the error is a server-side error and
  *                        not the fault of the user
@@ -38,7 +38,7 @@ import java.util.UUID;
 public record IdFMMessageData(
   String htmlTitle,
   String pageHeaderTitle,
-  UUID requestId,
+  UUID messageId,
   boolean isError,
   boolean isServerError,
   String messageTitle,
@@ -51,7 +51,7 @@ public record IdFMMessageData(
    *
    * @param htmlTitle       The page title
    * @param pageHeaderTitle The page header title
-   * @param requestId       The request ID
+   * @param messageId       The request ID
    * @param isError         {@code true} if the message is an error
    * @param isServerError   {@code true} if the error is a server-side error and
    *                        not the fault of the user
@@ -64,7 +64,7 @@ public record IdFMMessageData(
   {
     Objects.requireNonNull(htmlTitle, "htmlTitle");
     Objects.requireNonNull(pageHeaderTitle, "pageHeaderTitle");
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(messageTitle, "messageTitle");
     Objects.requireNonNull(message, "message");
     Objects.requireNonNull(returnTo, "returnTo");
@@ -76,7 +76,7 @@ public record IdFMMessageData(
     final var m = new HashMap<String, Object>();
     m.put("htmlTitle", this.htmlTitle);
     m.put("pageHeaderTitle", this.pageHeaderTitle);
-    m.put("requestId", this.requestId);
+    m.put("requestId", this.messageId);
     m.put("messageIsError", this.isError);
     m.put("messageIsServerError", this.isServerError);
     m.put("messageTitle", this.messageTitle);

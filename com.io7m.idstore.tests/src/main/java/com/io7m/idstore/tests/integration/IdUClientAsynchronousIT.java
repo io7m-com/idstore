@@ -37,14 +37,14 @@ import com.io7m.idstore.protocol.user.IdUResponseEmailRemoveDeny;
 import com.io7m.idstore.protocol.user.IdUResponseError;
 import com.io7m.idstore.protocol.user.IdUResponseLogin;
 import com.io7m.idstore.protocol.user.IdUResponseUserSelf;
-import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
+import com.io7m.idstore.protocol.user.cb.IdUCB2Messages;
 import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.idstore.tests.extensions.IdTestServers;
 import com.io7m.idstore.user_client.IdUClients;
 import com.io7m.idstore.user_client.api.IdUClientAsynchronousType;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
-import com.io7m.idstore.user_client.api.IdUClientCredentials;
+import com.io7m.idstore.user_client.api.IdUClientConnectionParameters;
 import com.io7m.idstore.user_client.api.IdUClientException;
 import com.io7m.quixote.core.QWebServerType;
 import com.io7m.quixote.core.QWebServers;
@@ -108,13 +108,13 @@ public final class IdUClientAsynchronousIT
       USER_NONEXISTENT
     );
 
-  private static final IdUCB1Messages MESSAGES = new IdUCB1Messages();
+  private static final IdUCB2Messages MESSAGES = new IdUCB2Messages();
   private static final IdUser USER;
   private static final IdUClients CLIENTS = new IdUClients();
 
   private static final VProtocolSupported V1 =
     new VProtocolSupported(
-      IdUCB1Messages.protocolId(),
+      IdUCB2Messages.protocolId(),
       1L,
       0L,
       "/v1/"
@@ -214,7 +214,7 @@ public final class IdUClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdUCB1Messages.contentType())
+      .withContentType(IdUCB2Messages.contentType())
       .withFixedData(
         MESSAGES.serialize(
           new IdUResponseLogin(UUID.randomUUID(), USER))
@@ -223,7 +223,7 @@ public final class IdUClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(401)
-      .withContentType(IdUCB1Messages.contentType())
+      .withContentType(IdUCB2Messages.contentType())
       .withFixedData(
         MESSAGES.serialize(
           new IdUResponseError(
@@ -239,7 +239,7 @@ public final class IdUClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdUCB1Messages.contentType())
+      .withContentType(IdUCB2Messages.contentType())
       .withFixedData(
         MESSAGES.serialize(
           new IdUResponseLogin(UUID.randomUUID(), USER))
@@ -248,14 +248,14 @@ public final class IdUClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(200)
-      .withContentType(IdUCB1Messages.contentType())
+      .withContentType(IdUCB2Messages.contentType())
       .withFixedData(
         MESSAGES.serialize(
           new IdUResponseUserSelf(UUID.randomUUID(), USER))
       );
 
     this.client.loginAsync(
-      new IdUClientCredentials(
+      new IdUClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
@@ -291,7 +291,7 @@ public final class IdUClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdUCB1Messages.contentType())
+      .withContentType(IdUCB2Messages.contentType())
       .withFixedData(
         MESSAGES.serialize(
           new IdUResponseLogin(UUID.randomUUID(), USER))
@@ -300,11 +300,11 @@ public final class IdUClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(200)
-      .withContentType(IdUCB1Messages.contentType())
+      .withContentType(IdUCB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(new IdUCommandUserSelf()));
 
     this.client.loginAsync(
-      new IdUClientCredentials(
+      new IdUClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
@@ -351,7 +351,7 @@ public final class IdUClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdUCB1Messages.contentType())
+      .withContentType(IdUCB2Messages.contentType())
       .withFixedData(
         MESSAGES.serialize(
           new IdUResponseLogin(UUID.randomUUID(), USER))
@@ -360,13 +360,13 @@ public final class IdUClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(200)
-      .withContentType(IdUCB1Messages.contentType())
+      .withContentType(IdUCB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdUResponseEmailRemoveDeny(UUID.randomUUID()))
       );
 
     this.client.loginAsync(
-      new IdUClientCredentials(
+      new IdUClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
@@ -452,7 +452,7 @@ public final class IdUClientAsynchronousIT
         .toList();
 
     this.client.loginAsyncOrElseThrow(
-      new IdUClientCredentials(
+      new IdUClientConnectionParameters(
         "someone",
         "12345678",
         this.serverFixture.server().userAPI(),

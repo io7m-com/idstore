@@ -20,15 +20,18 @@ import com.io7m.idstore.model.IdEmail;
 import com.io7m.idstore.model.IdShortHumanToken;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A request to send a test email to an address.
  *
- * @param address The target address
- * @param token The token to be placed in the email
+ * @param messageId The message ID
+ * @param address   The target address
+ * @param token     The token to be placed in the email
  */
 
 public record IdACommandMailTest(
+  UUID messageId,
   IdEmail address,
   IdShortHumanToken token)
   implements IdACommandType<IdAResponseMailTest>
@@ -37,11 +40,12 @@ public record IdACommandMailTest(
    * A request to send a test email to an address.
    *
    * @param address The target address
-   * @param token The token to be placed in the email
+   * @param token   The token to be placed in the email
    */
 
   public IdACommandMailTest
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(address, "address");
     Objects.requireNonNull(token, "token");
   }

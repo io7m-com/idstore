@@ -75,6 +75,8 @@
 
 [documentation IdU1CommandLogin "A request to log in."]
 [record IdU1CommandLogin
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation userName "The username."]
   [field userName cb:String]
   [documentation password "The password."]
@@ -84,52 +86,71 @@
 ]
 
 [documentation IdU1CommandUserSelf "A request to fetch the user's own profile."]
-[record IdU1CommandUserSelf]
+[record IdU1CommandUserSelf
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+]
 
 [documentation IdU1CommandEmailAddBegin "A request to add an email address."]
 [record IdU1CommandEmailAddBegin
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation email "The email address."]
   [field email cb:String]
 ]
 
 [documentation IdU1CommandEmailRemoveBegin "A request to remove an email address."]
 [record IdU1CommandEmailRemoveBegin
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation email "The email address."]
   [field email cb:String]
 ]
 
 [documentation IdU1CommandEmailAddPermit "A request to complete an email address challenge."]
 [record IdU1CommandEmailAddPermit
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation token "The challenge token."]
   [field token cb:String]
 ]
 
 [documentation IdU1CommandEmailRemovePermit "A request to complete an email address challenge."]
 [record IdU1CommandEmailRemovePermit
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation token "The challenge token."]
   [field token cb:String]
 ]
 
 [documentation IdU1CommandEmailAddDeny "A request to complete an email address challenge."]
 [record IdU1CommandEmailAddDeny
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation token "The challenge token."]
   [field token cb:String]
 ]
 
 [documentation IdU1CommandEmailRemoveDeny "A request to complete an email address challenge."]
 [record IdU1CommandEmailRemoveDeny
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation token "The challenge token."]
   [field token cb:String]
 ]
 
 [documentation IdU1CommandRealnameUpdate "A request to update the user's real name."]
 [record IdU1CommandRealnameUpdate
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation name "The new name."]
   [field name cb:String]
 ]
 
 [documentation IdU1CommandPasswordUpdate "A request to update the user's password."]
 [record IdU1CommandPasswordUpdate
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
   [documentation password "The new password."]
   [field password cb:String]
   [documentation passwordConfirm "The password confirmation."]
@@ -150,8 +171,10 @@
 
 [documentation IdU1ResponseError "An error response."]
 [record IdU1ResponseError
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation errorCode "The error code."]
   [field errorCode cb:String]
   [documentation message "The error message."]
@@ -166,62 +189,80 @@
 
 [documentation IdU1ResponseLogin "A response to IdU1CommandLogin."]
 [record IdU1ResponseLogin
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation user "The user."]
   [field user IdU1User]
 ]
 
 [documentation IdU1ResponseUserSelf "A response to IdU1CommandUserSelf."]
 [record IdU1ResponseUserSelf
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation user "The user."]
   [field user IdU1User]
 ]
 
 [documentation IdU1ResponseUserUpdate "A response to various update commands."]
 [record IdU1ResponseUserUpdate
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
   [documentation user "The user."]
   [field user IdU1User]
 ]
 
 [documentation IdU1ResponseEmailAddBegin "A response to IdU1CommandEmailAddBegin."]
 [record IdU1ResponseEmailAddBegin
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
 ]
 
 [documentation IdU1ResponseEmailRemoveBegin "A response to IdU1CommandEmailRemoveBegin."]
 [record IdU1ResponseEmailRemoveBegin
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
 ]
 
 [documentation IdU1ResponseEmailAddPermit "A response to IdU1CommandEmailAddPermit."]
 [record IdU1ResponseEmailAddPermit
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
 ]
 
 [documentation IdU1ResponseEmailRemovePermit "A response to IdU1CommandEmailRemovePermit."]
 [record IdU1ResponseEmailRemovePermit
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
 ]
 
 [documentation IdU1ResponseEmailAddDeny "A response to IdU1CommandEmailAddDeny."]
 [record IdU1ResponseEmailAddDeny
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
 ]
 
 [documentation IdU1ResponseEmailRemoveDeny "A response to IdU1CommandEmailRemoveDeny."]
 [record IdU1ResponseEmailRemoveDeny
-  [documentation requestId "The ID of the request that yielded this response."]
-  [field requestId cb:UUID]
+  [documentation messageId "The message ID."]
+  [field messageId cb:UUID]
+  [documentation correlationId "The message to which this message is a response."]
+  [field correlationId cb:UUID]
 ]
 
 ;
@@ -230,7 +271,7 @@
 
 [documentation IdU "The User protocol."]
 [protocol IdU
-  [version 1
+  [version 2
     [types-added
       IdU1CommandEmailAddBegin
       IdU1CommandEmailAddDeny

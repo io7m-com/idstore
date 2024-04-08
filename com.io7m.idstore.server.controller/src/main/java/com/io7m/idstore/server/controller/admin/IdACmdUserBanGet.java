@@ -24,6 +24,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanGet;
 import com.io7m.idstore.server.security.IdSecAdminActionUserBanGet;
 
+import java.util.UUID;
+
 /**
  * IdACmdUserBanGet
  */
@@ -60,7 +62,8 @@ public final class IdACmdUserBanGet
       transaction.queries(IdDatabaseUsersQueriesType.class);
 
     return new IdAResponseUserBanGet(
-      context.requestId(),
+      UUID.randomUUID(),
+      command.messageId(),
       users.userBanGet(command.user())
     );
   }

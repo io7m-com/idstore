@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  * A message that will be displayed on the message screen.
  *
- * @param requestId     The request ID
+ * @param messageId     The request ID
  * @param isError       {@code true} if the message is an error
  * @param isServerError {@code true} if the error is a server-side error and not
  *                      the fault of the user
@@ -32,7 +32,7 @@ import java.util.UUID;
  */
 
 public record IdSessionMessage(
-  UUID requestId,
+  UUID messageId,
   boolean isError,
   boolean isServerError,
   String messageTitle,
@@ -42,7 +42,7 @@ public record IdSessionMessage(
   /**
    * A message that will be displayed on the message screen.
    *
-   * @param requestId     The request ID
+   * @param messageId     The request ID
    * @param isError       {@code true} if the message is an error
    * @param isServerError {@code true} if the error is a server-side error and
    *                      not the fault of the user
@@ -53,7 +53,7 @@ public record IdSessionMessage(
 
   public IdSessionMessage
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(messageTitle, "messageTitle");
     Objects.requireNonNull(message, "message");
     Objects.requireNonNull(returnTo, "returnTo");

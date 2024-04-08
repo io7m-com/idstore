@@ -23,6 +23,8 @@ import com.io7m.idstore.protocol.admin.IdACommandAdminSelf;
 import com.io7m.idstore.protocol.admin.IdAResponseAdminSelf;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 
+import java.util.UUID;
+
 /**
  * IdACmdAdminSelf
  */
@@ -53,6 +55,11 @@ public final class IdACmdAdminSelf
 
     final var adminId = context.admin().id();
     final var user = admins.adminGetRequire(adminId);
-    return new IdAResponseAdminSelf(context.requestId(), user);
+
+    return new IdAResponseAdminSelf(
+      UUID.randomUUID(),
+      command.messageId(),
+      user
+    );
   }
 }

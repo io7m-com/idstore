@@ -59,7 +59,6 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SECURITY_POLICY_
 public abstract class IdCommandContext<E extends IdProtocolMessageType, S extends IdSessionType>
 {
   private final RPServiceDirectoryType services;
-  private final UUID requestId;
   private final IdDatabaseTransactionType transaction;
   private final IdServerClock clock;
   private final IdStrings strings;
@@ -73,7 +72,6 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    * transaction).
    *
    * @param inServices        The service directory
-   * @param inRequestId       The request ID
    * @param inTransaction     The transaction
    * @param inSession         The user session
    * @param inRemoteHost      The remote remoteHost
@@ -82,7 +80,6 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
 
   protected IdCommandContext(
     final RPServiceDirectoryType inServices,
-    final UUID inRequestId,
     final IdDatabaseTransactionType inTransaction,
     final S inSession,
     final String inRemoteHost,
@@ -90,8 +87,6 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
   {
     this.services =
       Objects.requireNonNull(inServices, "services");
-    this.requestId =
-      Objects.requireNonNull(inRequestId, "requestId");
     this.transaction =
       Objects.requireNonNull(inTransaction, "transaction");
     this.session =
@@ -147,15 +142,6 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
   }
 
   /**
-   * @return The ID of the incoming request
-   */
-
-  public final UUID requestId()
-  {
-    return this.requestId;
-  }
-
-  /**
    * @return The database transaction
    */
 
@@ -191,6 +177,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    */
 
   public final IdCommandExecutionFailure failDatabase(
+    final IdProtocolMessageType message,
     final IdDatabaseException e)
   {
     return new IdCommandExecutionFailure(
@@ -199,7 +186,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
       e.errorCode(),
       e.attributes(),
       e.remediatingAction(),
-      this.requestId,
+      message.messageId(),
       500
     );
   }
@@ -213,6 +200,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    */
 
   public final IdCommandExecutionFailure failSecurity(
+    final IdProtocolMessageType message,
     final IdSecurityException e)
   {
     return new IdCommandExecutionFailure(
@@ -221,7 +209,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
       e.errorCode(),
       e.attributes(),
       e.remediatingAction(),
-      this.requestId,
+      message.messageId(),
       500
     );
   }
@@ -236,6 +224,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    */
 
   public final IdCommandExecutionFailure failMail(
+    final IdProtocolMessageType message,
     final IdEmail email,
     final Exception e)
   {
@@ -249,7 +238,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
       MAIL_SYSTEM_FAILURE,
       Map.of(),
       Optional.empty(),
-      this.requestId,
+      message.messageId(),
       500
     );
   }
@@ -263,6 +252,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    */
 
   public final IdCommandExecutionFailure failValidity(
+    final IdProtocolMessageType message,
     final IdValidityException e)
   {
     return new IdCommandExecutionFailure(
@@ -271,7 +261,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
       HTTP_PARAMETER_INVALID,
       Map.of(),
       Optional.empty(),
-      this.requestId,
+      message.messageId(),
       400
     );
   }
@@ -285,6 +275,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    */
 
   public final IdCommandExecutionFailure failPassword(
+    final IdProtocolMessageType message,
     final IdPasswordException e)
   {
     return new IdCommandExecutionFailure(
@@ -293,7 +284,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
       e.errorCode(),
       e.attributes(),
       e.remediatingAction(),
-      this.requestId,
+      message.messageId(),
       400
     );
   }
@@ -307,6 +298,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    */
 
   public final IdCommandExecutionFailure failProtocol(
+    final IdProtocolMessageType message,
     final IdProtocolException e)
   {
     return new IdCommandExecutionFailure(
@@ -315,7 +307,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
       e.errorCode(),
       e.attributes(),
       e.remediatingAction(),
-      this.requestId,
+      message.messageId(),
       400
     );
   }
@@ -353,6 +345,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    */
 
   public final IdCommandExecutionFailure fail(
+    final IdProtocolMessageType message,
     final int statusCode,
     final IdErrorCode errorCode,
     final String text)
@@ -362,7 +355,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
       errorCode,
       Map.of(),
       Optional.empty(),
-      this.requestId,
+      message.messageId(),
       statusCode
     );
   }
@@ -379,6 +372,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    */
 
   public final IdCommandExecutionFailure failExceptional(
+    final IdProtocolMessageType message,
     final Exception e,
     final int statusCode,
     final IdErrorCode errorCode,
@@ -390,7 +384,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
       errorCode,
       Map.of(),
       Optional.empty(),
-      this.requestId,
+      message.messageId(),
       statusCode
     );
   }
@@ -407,6 +401,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
    */
 
   public final IdCommandExecutionFailure failFormatted(
+    final IdProtocolMessageType message,
     final int statusCode,
     final IdErrorCode errorCode,
     final IdStringConstantType text,
@@ -417,7 +412,7 @@ public abstract class IdCommandContext<E extends IdProtocolMessageType, S extend
       errorCode,
       Map.of(),
       Optional.empty(),
-      this.requestId,
+      message.messageId(),
       statusCode
     );
   }

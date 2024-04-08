@@ -31,6 +31,7 @@ import com.io7m.jaffirm.core.Invariants;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
 import static com.io7m.idstore.strings.IdStringConstants.ADMIN_ID_NAME_DUPLICATE;
@@ -124,6 +125,10 @@ public final class IdACmdAdminUpdateCredentials
       admins.adminGetRequire(newAdmin)
         .withRedactedPassword();
 
-    return new IdAResponseAdminUpdate(context.requestId(), afterAdmin);
+    return new IdAResponseAdminUpdate(
+      UUID.randomUUID(),
+      command.messageId(),
+      afterAdmin
+    );
   }
 }

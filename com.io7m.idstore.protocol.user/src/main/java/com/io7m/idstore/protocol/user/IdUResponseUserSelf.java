@@ -24,25 +24,29 @@ import java.util.UUID;
 /**
  * A response to {@link IdUCommandUserSelf}.
  *
- * @param requestId The request ID
- * @param user      The user
+ * @param messageId     The message ID
+ * @param correlationId The message correlation ID
+ * @param user          The user
  */
 
 public record IdUResponseUserSelf(
-  UUID requestId,
+  UUID messageId,
+  UUID correlationId,
   IdUser user)
   implements IdUResponseType
 {
   /**
    * A response to {@link IdUCommandUserSelf}.
    *
-   * @param requestId The request ID
-   * @param user      The user
+   * @param messageId     The message ID
+   * @param correlationId The message correlation ID
+   * @param user          The user
    */
 
   public IdUResponseUserSelf
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
+    Objects.requireNonNull(correlationId, "correlationId");
     Objects.requireNonNull(user, "user");
   }
 }

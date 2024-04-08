@@ -19,31 +19,39 @@ package com.io7m.idstore.user_client.api;
 import com.io7m.hibiscus.api.HBConfigurationType;
 import io.opentelemetry.api.OpenTelemetry;
 
+import java.time.Clock;
 import java.util.Locale;
 import java.util.Objects;
 
 /**
  * The user client configuration.
  *
- * @param openTelemetry The OpenTelemetry API
- * @param locale        The locale
+ * @param openTelemetry      The OpenTelemetry API
+ * @param clock              The clock used for timeouts
+ * @param locale             The locale
+ * @param receiveQueueBounds The receive queue maximum size
  */
 
 public record IdUClientConfiguration(
   OpenTelemetry openTelemetry,
-  Locale locale)
+  Clock clock,
+  Locale locale,
+  int receiveQueueBounds)
   implements HBConfigurationType
 {
   /**
    * The user client configuration.
    *
-   * @param openTelemetry The OpenTelemetry API
-   * @param locale        The locale
+   * @param openTelemetry      The OpenTelemetry API
+   * @param clock              The clock used for timeouts
+   * @param locale             The locale
+   * @param receiveQueueBounds The receive queue maximum size
    */
 
   public IdUClientConfiguration
   {
     Objects.requireNonNull(openTelemetry, "openTelemetry");
+    Objects.requireNonNull(clock, "clock");
     Objects.requireNonNull(locale, "locale");
   }
 }

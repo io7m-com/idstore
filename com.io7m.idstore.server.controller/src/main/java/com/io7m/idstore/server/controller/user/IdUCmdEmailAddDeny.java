@@ -26,6 +26,7 @@ import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.server.security.IdSecUserActionEmailAddDeny;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_FAILED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_NONEXISTENT;
@@ -70,6 +71,7 @@ public final class IdUCmdEmailAddDeny
 
     if (verificationOpt.isEmpty()) {
       throw context.failFormatted(
+        command,
         404,
         EMAIL_VERIFICATION_NONEXISTENT,
         NOT_FOUND
@@ -79,6 +81,7 @@ public final class IdUCmdEmailAddDeny
     final var verification = verificationOpt.get();
     if (!checkVerification(context, verification, user)) {
       throw context.failFormatted(
+        command,
         400,
         EMAIL_VERIFICATION_FAILED,
         OPERATION_NOT_PERMITTED
@@ -87,7 +90,10 @@ public final class IdUCmdEmailAddDeny
 
     transaction.userIdSet(user.id());
     emails.emailVerificationDelete(token, DENIED);
-    return new IdUResponseEmailAddDeny(context.requestId());
+    return new IdUResponseEmailAddDeny(
+      UUID.randomUUID(),
+      command.messageId()
+    );
   }
 
   private static boolean checkVerification(

@@ -24,6 +24,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchByEmailBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminRead;
 
+import java.util.UUID;
+
 /**
  * IdACmdAdminSearchByEmailBegin
  */
@@ -63,7 +65,8 @@ public final class IdACmdAdminSearchByEmailBegin
     session.setAdminSearchByEmail(search);
 
     return new IdAResponseAdminSearchByEmailBegin(
-      context.requestId(),
+      UUID.randomUUID(),
+      command.messageId(),
       search.pageCurrent(admins)
     );
   }

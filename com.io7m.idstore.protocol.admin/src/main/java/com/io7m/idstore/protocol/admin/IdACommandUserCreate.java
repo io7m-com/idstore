@@ -28,14 +28,16 @@ import java.util.UUID;
 /**
  * Create a user.
  *
- * @param id          The user ID
- * @param idName      The id name
- * @param email       The primary email
- * @param realName    The real name
- * @param password    The password
+ * @param messageId The message ID
+ * @param id        The user ID
+ * @param idName    The id name
+ * @param email     The primary email
+ * @param realName  The real name
+ * @param password  The password
  */
 
 public record IdACommandUserCreate(
+  UUID messageId,
   Optional<UUID> id,
   IdName idName,
   IdRealName realName,
@@ -49,6 +51,7 @@ public record IdACommandUserCreate(
 
   public IdACommandUserCreate
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(id, "id");
     Objects.requireNonNull(idName, "idName");
     Objects.requireNonNull(realName, "realName");

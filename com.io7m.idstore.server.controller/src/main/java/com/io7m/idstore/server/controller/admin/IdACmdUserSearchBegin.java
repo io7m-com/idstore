@@ -25,6 +25,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserSearchBegin;
 import com.io7m.idstore.server.security.IdSecAdminActionUserRead;
 
+import java.util.UUID;
+
 /**
  * IdACmdUserSearchBegin
  */
@@ -66,7 +68,8 @@ public final class IdACmdUserSearchBegin
     session.setUserSearch(search);
 
     return new IdAResponseUserSearchBegin(
-      context.requestId(),
+      UUID.randomUUID(),
+      command.messageId(),
       search.pageCurrent(users)
     );
   }

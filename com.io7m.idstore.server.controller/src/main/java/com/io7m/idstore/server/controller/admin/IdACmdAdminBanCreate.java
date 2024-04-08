@@ -24,6 +24,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminBanCreate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminBanCreate;
 
+import java.util.UUID;
+
 /**
  * IdACmdAdminBanCreate
  */
@@ -61,6 +63,10 @@ public final class IdACmdAdminBanCreate
       transaction.queries(IdDatabaseAdminsQueriesType.class);
 
     admins.adminBanCreate(ban);
-    return new IdAResponseAdminBanCreate(context.requestId(), ban);
+    return new IdAResponseAdminBanCreate(
+      UUID.randomUUID(),
+      command.messageId(),
+      ban
+    );
   }
 }

@@ -146,7 +146,6 @@ public final class IdUVEmailAddRun extends IdHTTPHandlerFunctional
         final var context =
           new IdUCommandContext(
             services,
-            information.requestId(),
             transaction,
             session,
             user,
@@ -157,7 +156,7 @@ public final class IdUVEmailAddRun extends IdHTTPHandlerFunctional
         final var email =
           emailParameter.get();
         final var command =
-          new IdUCommandEmailAddBegin(email);
+          new IdUCommandEmailAddBegin(information.requestId(), email);
         new IdUCmdEmailAddBegin()
           .execute(context, command);
 

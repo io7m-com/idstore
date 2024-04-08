@@ -22,10 +22,12 @@ import java.util.UUID;
 /**
  * Delete an admin.
  *
- * @param adminId The admin ID
+ * @param messageId The message ID
+ * @param adminId   The admin ID
  */
 
 public record IdACommandAdminDelete(
+  UUID messageId,
   UUID adminId)
   implements IdACommandType<IdAResponseAdminDelete>
 {
@@ -35,6 +37,7 @@ public record IdACommandAdminDelete(
 
   public IdACommandAdminDelete
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(adminId, "adminId");
   }
 

@@ -33,7 +33,6 @@ module com.io7m.idstore.admin_client
   requires com.io7m.genevan.core;
   requires com.io7m.hibiscus.api;
   requires com.io7m.hibiscus.basic;
-  requires com.io7m.junreachable.core;
   requires com.io7m.jxtrand.vanilla;
   requires com.io7m.verdant.core.cb;
   requires com.io7m.verdant.core;

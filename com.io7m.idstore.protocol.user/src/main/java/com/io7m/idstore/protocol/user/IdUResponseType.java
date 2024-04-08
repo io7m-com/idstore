@@ -16,8 +16,10 @@
 
 package com.io7m.idstore.protocol.user;
 
-import com.io7m.hibiscus.api.HBResponseType;
+import com.io7m.hibiscus.api.HBMessageType;
+import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -25,7 +27,7 @@ import java.util.UUID;
  */
 
 public sealed interface IdUResponseType
-  extends IdUMessageType, HBResponseType
+  extends IdUMessageType
   permits IdUResponseEmailAddBegin,
   IdUResponseEmailAddDeny,
   IdUResponseEmailAddPermit,
@@ -38,8 +40,18 @@ public sealed interface IdUResponseType
   IdUResponseUserUpdate
 {
   /**
-   * @return The ID of the request that yielded this response
+   * @return The ID of the message to which this message is a response
    */
 
-  UUID requestId();
+  UUID correlationId();
+
+  @Override
+  default boolean isResponseFor(
+    final HBMessageType message)
+  {
+    if (message instanceof IdProtocolMessageType m) {
+      return Objects.equals(m.messageId(), this.correlationId());
+    }
+    return false;
+  }
 }

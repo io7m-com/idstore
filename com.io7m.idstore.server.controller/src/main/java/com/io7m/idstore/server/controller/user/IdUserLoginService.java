@@ -102,7 +102,7 @@ public final class IdUserLoginService implements RPServiceType
    * banned user, etc).
    *
    * @param transaction A database transaction
-   * @param requestId   The ID of the request
+   * @param messageId   The ID of the request
    * @param remoteHost  The remote remoteHost
    * @param username    The username
    * @param password    The password
@@ -115,7 +115,7 @@ public final class IdUserLoginService implements RPServiceType
 
   public IdUserLoggedIn userLogin(
     final IdDatabaseTransactionType transaction,
-    final UUID requestId,
+    final UUID messageId,
     final String remoteHost,
     final String username,
     final String password,
@@ -123,21 +123,21 @@ public final class IdUserLoginService implements RPServiceType
     throws IdCommandExecutionFailure
   {
     Objects.requireNonNull(transaction, "transaction");
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(username, "username");
     Objects.requireNonNull(password, "password");
     Objects.requireNonNull(metadata, "metadata");
 
     try {
-      this.checkRateLimit(requestId, remoteHost, username);
+      this.checkRateLimit(messageId, remoteHost, username);
 
       final var users =
         transaction.queries(IdDatabaseUsersQueriesType.class);
       final var user =
         users.userGetForNameRequire(new IdName(username));
 
-      this.checkBan(requestId, users, user);
-      this.checkPassword(requestId, remoteHost, password, user);
+      this.checkBan(messageId, users, user);
+      this.checkPassword(messageId, remoteHost, password, user);
 
       users.userLogin(
         user.id(),
@@ -153,7 +153,7 @@ public final class IdUserLoginService implements RPServiceType
       return new IdUserLoggedIn(session, user.withRedactedPassword());
     } catch (final IdDatabaseException e) {
       if (Objects.equals(e.errorCode(), USER_NONEXISTENT)) {
-        throw this.authenticationFailed(requestId, e);
+        throw this.authenticationFailed(messageId, e);
       }
       throw new IdCommandExecutionFailure(
         e.getMessage(),
@@ -161,7 +161,7 @@ public final class IdUserLoginService implements RPServiceType
         e.errorCode(),
         e.attributes(),
         e.remediatingAction(),
-        requestId,
+        messageId,
         500
       );
     } catch (final IdPasswordException e) {
@@ -171,7 +171,7 @@ public final class IdUserLoginService implements RPServiceType
         e.errorCode(),
         e.attributes(),
         e.remediatingAction(),
-        requestId,
+        messageId,
         500
       );
     }

@@ -22,11 +22,14 @@ import java.util.UUID;
 /**
  * Get the given admin.
  *
- * @param admin The admin ID
+ * @param messageId The message ID
+ * @param admin     The admin ID
  */
 
 public record IdACommandAdminGet(
-  UUID admin) implements IdACommandType<IdAResponseAdminGet>
+  UUID messageId,
+  UUID admin)
+  implements IdACommandType<IdAResponseAdminGet>
 {
   /**
    * Get the given admin.
@@ -34,6 +37,7 @@ public record IdACommandAdminGet(
 
   public IdACommandAdminGet
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(admin, "id");
   }
 

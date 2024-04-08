@@ -18,27 +18,35 @@ package com.io7m.idstore.admin_client.api;
 
 import com.io7m.hibiscus.api.HBConfigurationType;
 
+import java.time.Clock;
 import java.util.Locale;
 import java.util.Objects;
 
 /**
  * The admin client configuration.
  *
- * @param locale The locale
+ * @param clock              The clock used for timeouts
+ * @param locale             The locale
+ * @param receiveQueueBounds The receive queue maximum size
  */
 
 public record IdAClientConfiguration(
-  Locale locale)
+  Clock clock,
+  Locale locale,
+  int receiveQueueBounds)
   implements HBConfigurationType
 {
   /**
-   * The user client configuration.
+   * The admin client configuration.
    *
-   * @param locale The locale
+   * @param clock              The clock used for timeouts
+   * @param locale             The locale
+   * @param receiveQueueBounds The receive queue maximum size
    */
 
   public IdAClientConfiguration
   {
+    Objects.requireNonNull(clock, "clock");
     Objects.requireNonNull(locale, "locale");
   }
 }

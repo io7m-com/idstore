@@ -30,6 +30,7 @@ import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jaffirm.core.Invariants;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
 import static com.io7m.idstore.strings.IdStringConstants.USER_ID_NAME_DUPLICATE;
@@ -115,6 +116,10 @@ public final class IdACmdUserUpdateCredentials
     }
 
     final var afterUser = users.userGetRequire(command.user());
-    return new IdAResponseUserUpdate(context.requestId(), afterUser);
+    return new IdAResponseUserUpdate(
+      UUID.randomUUID(),
+      command.messageId(),
+      afterUser
+    );
   }
 }

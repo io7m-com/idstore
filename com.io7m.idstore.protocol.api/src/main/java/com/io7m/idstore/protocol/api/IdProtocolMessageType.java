@@ -16,11 +16,17 @@
 
 package com.io7m.idstore.protocol.api;
 
+import java.util.UUID;
+
 /**
  * The base type of protocol messages.
  */
 
 public interface IdProtocolMessageType
 {
+  /**
+   * @return The message ID
+   */
 
+  UUID messageId();
 }

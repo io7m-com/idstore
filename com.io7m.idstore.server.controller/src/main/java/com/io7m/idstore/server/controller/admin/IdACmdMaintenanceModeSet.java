@@ -24,6 +24,8 @@ import com.io7m.idstore.server.security.IdSecAdminActionMaintenanceMode;
 import com.io7m.idstore.server.service.maintenance.IdClosedForMaintenanceService;
 import com.io7m.idstore.strings.IdStrings;
 
+import java.util.UUID;
+
 import static com.io7m.idstore.strings.IdStringConstants.MAINTENANCE_MODE_SET_OFF;
 import static com.io7m.idstore.strings.IdStringConstants.MAINTENANCE_MODE_SET_ON;
 
@@ -70,6 +72,10 @@ public final class IdACmdMaintenanceModeSet
       response = strings.format(MAINTENANCE_MODE_SET_OFF);
     }
 
-    return new IdAResponseMaintenanceModeSet(context.requestId(), response);
+    return new IdAResponseMaintenanceModeSet(
+      UUID.randomUUID(),
+      command.messageId(),
+      response
+    );
   }
 }

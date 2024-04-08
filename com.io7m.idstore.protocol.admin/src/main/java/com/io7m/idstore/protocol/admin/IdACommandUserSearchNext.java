@@ -16,13 +16,30 @@
 
 package com.io7m.idstore.protocol.admin;
 
+import java.util.Objects;
+import java.util.UUID;
+
 /**
  * Get the next page of the user listing.
+ *
+ * @param messageId The message ID
  */
 
-public record IdACommandUserSearchNext()
+public record IdACommandUserSearchNext(
+  UUID messageId)
   implements IdACommandType<IdAResponseUserSearchNext>
 {
+  /**
+   * Get the next page of the user listing.
+   *
+   * @param messageId The message ID
+   */
+
+  public IdACommandUserSearchNext
+  {
+    Objects.requireNonNull(messageId, "messageId");
+  }
+
   @Override
   public Class<IdAResponseUserSearchNext> responseClass()
   {

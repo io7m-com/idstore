@@ -21,9 +21,8 @@ import com.io7m.ervilla.test_extension.ErvillaCloseAfterSuite;
 import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.admin_client.IdAClients;
-import com.io7m.idstore.admin_client.api.IdAClientAsynchronousType;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
-import com.io7m.idstore.admin_client.api.IdAClientCredentials;
+import com.io7m.idstore.admin_client.api.IdAClientConnectionParameters;
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdAdmin;
@@ -47,7 +46,7 @@ import com.io7m.idstore.protocol.admin.IdAResponseBlame;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseLogin;
 import com.io7m.idstore.protocol.admin.IdAResponseUserBanDelete;
-import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
+import com.io7m.idstore.protocol.admin.cb.IdACB2Messages;
 import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.idstore.tests.extensions.IdTestServers;
@@ -106,13 +105,13 @@ public final class IdAClientAsynchronousIT
       API_MISUSE_ERROR
     );
 
-  private static final IdACB1Messages MESSAGES = new IdACB1Messages();
+  private static final IdACB2Messages MESSAGES = new IdACB2Messages();
   private static final IdAdmin ADMIN;
   private static final IdAClients CLIENTS = new IdAClients();
 
   private static final VProtocolSupported V1 =
     new VProtocolSupported(
-      IdACB1Messages.protocolId(),
+      IdACB2Messages.protocolId(),
       1L,
       0L,
       "/v1/"
@@ -210,14 +209,14 @@ public final class IdAClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdAResponseLogin(UUID.randomUUID(), ADMIN)));
 
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(401)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(
         MESSAGES.serialize(
           new IdAResponseError(
@@ -233,7 +232,7 @@ public final class IdAClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdAResponseLogin(UUID.randomUUID(), ADMIN))
       );
@@ -241,13 +240,13 @@ public final class IdAClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(
         MESSAGES.serialize(new IdAResponseAdminSelf(UUID.randomUUID(), ADMIN))
       );
 
     this.client.loginAsyncOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
@@ -283,7 +282,7 @@ public final class IdAClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdAResponseLogin(UUID.randomUUID(), ADMIN))
       );
@@ -291,11 +290,11 @@ public final class IdAClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(new IdACommandAdminSelf()));
 
     this.client.loginAsyncOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
@@ -341,20 +340,20 @@ public final class IdAClientAsynchronousIT
     this.webServer.addResponse()
       .forPath("/v1/login")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdAResponseLogin(UUID.randomUUID(), ADMIN)));
 
     this.webServer.addResponse()
       .forPath("/v1/command")
       .withStatus(200)
-      .withContentType(IdACB1Messages.contentType())
+      .withContentType(IdACB2Messages.contentType())
       .withFixedData(MESSAGES.serialize(
         new IdAResponseUserBanDelete(UUID.randomUUID()))
       );
 
     this.client.loginAsyncOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
@@ -395,7 +394,7 @@ public final class IdAClientAsynchronousIT
       this.serverFixture.createAdminInitial("admin", "12345678");
 
     this.client.loginAsyncOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "admin",
         "12345678",
         this.serverFixture.server().adminAPI(),
@@ -416,7 +415,7 @@ public final class IdAClientAsynchronousIT
 
     assertThrows(IllegalStateException.class, () -> {
       this.client.loginAsyncOrElseThrow(
-        new IdAClientCredentials(
+        new IdAClientConnectionParameters(
           "admin",
           "12345678",
           this.serverFixture.server().adminAPI(),
@@ -444,7 +443,7 @@ public final class IdAClientAsynchronousIT
       assertThrows(IdAClientException.class, () -> {
         try {
           this.client.loginAsyncOrElseThrow(
-            new IdAClientCredentials(
+            new IdAClientConnectionParameters(
               "admin",
               "1234",
               this.serverFixture.server().adminAPI(),
@@ -513,7 +512,7 @@ public final class IdAClientAsynchronousIT
         .toList();
 
     this.client.loginAsyncOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "admin",
         "12345678",
         this.serverFixture.server().adminAPI(),
@@ -550,7 +549,7 @@ public final class IdAClientAsynchronousIT
       this.serverFixture.createAdminInitial("admin", "12345678");
 
     this.client.loginAsyncOrElseThrow(
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         "admin",
         "12345678",
         this.serverFixture.server().adminAPI(),

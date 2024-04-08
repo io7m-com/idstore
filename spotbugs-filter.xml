@@ -322,7 +322,7 @@
 
   <!-- The IOException causing this can't actually happen. -->
   <Match>
-    <Class name="com.io7m.idstore.protocol.admin.cb.IdACB1Messages"/>
+    <Class name="com.io7m.idstore.protocol.admin.cb.IdACB2Messages"/>
     <Method name="serialize"/>
     <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
   </Match>
@@ -369,18 +369,18 @@
 
   <!-- The IOException causing this can't actually happen. -->
   <Match>
-    <Class name="com.io7m.idstore.protocol.user.cb.IdUCB1Messages"/>
+    <Class name="com.io7m.idstore.protocol.user.cb.IdUCB2Messages"/>
     <Method name="serialize"/>
     <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
   </Match>
 
   <!--                                  -->
-  <!-- com.io7m.idstore.server.admin_v1 -->
+  <!-- com.io7m.idstore.server.admin_v2 -->
   <!--                                  -->
 
   <!-- Irrelevant for servlets. -->
   <Match>
-    <Package name="com.io7m.idstore.server.admin_v1"/>
+    <Package name="com.io7m.idstore.server.admin_v2"/>
     <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
   </Match>
 
@@ -814,32 +814,32 @@
   <!--                                         -->
 
   <!--                                 -->
-  <!-- com.io7m.idstore.server.user_v1 -->
+  <!-- com.io7m.idstore.server.user_v2 -->
   <!--                                 -->
 
   <!-- Irrelevant for servlets. -->
   <Match>
-    <Package name="com.io7m.idstore.server.user_v1"/>
+    <Package name="com.io7m.idstore.server.user_v2"/>
     <Bug pattern="IMC_IMMATURE_CLASS_NO_TOSTRING"/>
   </Match>
 
   <!-- This string specifically needs to write \r\n\r\n -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_v1.IdU1HandlerVersion"/>
+    <Class name="com.io7m.idstore.server.user_v2.IdU1HandlerVersion"/>
     <Method name="execute"/>
     <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
   </Match>
 
   <!-- IOException -> UncheckedIOException -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_v1.IdU1HandlerCommand"/>
+    <Class name="com.io7m.idstore.server.user_v2.IdU1HandlerCommand"/>
     <Method name="execute"/>
     <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
   </Match>
 
   <!-- IOException -> UncheckedIOException -->
   <Match>
-    <Class name="com.io7m.idstore.server.user_v1.IdU1HandlerLogin"/>
+    <Class name="com.io7m.idstore.server.user_v2.IdU1HandlerLogin"/>
     <Method name="execute"/>
     <Bug pattern="EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"/>
   </Match>

@@ -24,6 +24,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminUpdate;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminEmailRemove;
 
+import java.util.UUID;
+
 /**
  * IdACmdAdminEmailRemove
  */
@@ -68,6 +70,10 @@ public final class IdACmdAdminEmailRemove
       admins.adminGetRequire(newAdmin)
         .withRedactedPassword();
 
-    return new IdAResponseAdminUpdate(context.requestId(), afterAdmin);
+    return new IdAResponseAdminUpdate(
+      UUID.randomUUID(),
+      command.messageId(),
+      afterAdmin
+    );
   }
 }

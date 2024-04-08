@@ -18,7 +18,9 @@ package com.io7m.idstore.admin_client.api;
 
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.error_codes.IdException;
+import com.io7m.idstore.error_codes.IdStandardErrorCodes;
 import com.io7m.idstore.protocol.admin.IdAResponseError;
+import com.io7m.seltzer.api.SStructuredErrorExceptionType;
 
 import java.util.Map;
 import java.util.Objects;
@@ -78,6 +80,59 @@ public final class IdAClientException extends IdException
   }
 
   /**
+   * Construct an exception from an existing exception.
+   *
+   * @param ex The cause
+   *
+   * @return The new exception
+   */
+
+  public static IdAClientException ofException(
+    final Throwable ex)
+  {
+    return switch (ex) {
+      case final IdAClientException e -> {
+        yield e;
+      }
+
+      case final IdException e -> {
+        yield new IdAClientException(
+          e.getMessage(),
+          e,
+          e.errorCode(),
+          e.attributes(),
+          e.remediatingAction(),
+          Optional.empty()
+        );
+      }
+
+      case final SStructuredErrorExceptionType<?> e -> {
+        yield new IdAClientException(
+          e.getMessage(),
+          ex,
+          new IdErrorCode(e.errorCode().toString()),
+          e.attributes(),
+          e.remediatingAction(),
+          Optional.empty()
+        );
+      }
+
+      default -> {
+        yield new IdAClientException(
+          Objects.requireNonNullElse(
+            ex.getMessage(),
+            ex.getClass().getSimpleName()),
+          ex,
+          IdStandardErrorCodes.IO_ERROR,
+          Map.of(),
+          Optional.empty(),
+          Optional.empty()
+        );
+      }
+    };
+  }
+
+  /**
    * @return The ID associated with the request, if the server returned one
    */
 
@@ -102,7 +157,7 @@ public final class IdAClientException extends IdException
       error.errorCode(),
       error.attributes(),
       error.remediatingAction(),
-      Optional.of(error.requestId())
+      Optional.of(error.correlationId())
     );
   }
 }

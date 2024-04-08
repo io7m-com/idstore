@@ -28,6 +28,7 @@ import com.io7m.idstore.server.controller.command_exec.IdCommandExecutionFailure
 import com.io7m.idstore.server.controller.command_exec.IdCommandExecutorType;
 import com.io7m.idstore.server.security.IdSecurityException;
 import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
+import io.opentelemetry.api.trace.Span;
 
 import java.util.Objects;
 
@@ -59,18 +60,20 @@ public abstract class IdACmdAbstract<
     Objects.requireNonNull(context, "context");
     Objects.requireNonNull(command, "command");
 
+    Span.current().setAttribute("MessageID", command.messageId().toString());
+
     try {
       return this.executeActual(context, command);
     } catch (final IdValidityException e) {
-      throw context.failValidity(e);
+      throw context.failValidity(command, e);
     } catch (final IdSecurityException e) {
-      throw context.failSecurity(e);
+      throw context.failSecurity(command, e);
     } catch (final IdDatabaseException e) {
-      throw context.failDatabase(e);
+      throw context.failDatabase(command, e);
     } catch (final IdPasswordException e) {
-      throw context.failPassword(e);
+      throw context.failPassword(command, e);
     } catch (final IdProtocolException e) {
-      throw context.failProtocol(e);
+      throw context.failProtocol(command, e);
     } catch (final IdException e) {
       throw new IdCommandExecutionFailure(
         e.getMessage(),
@@ -78,7 +81,7 @@ public abstract class IdACmdAbstract<
         e.errorCode(),
         e.attributes(),
         e.remediatingAction(),
-        context.requestId(),
+        command.messageId(),
         500
       );
     }

@@ -30,6 +30,7 @@ import java.util.UUID;
 /**
  * Create an admin.
  *
+ * @param messageId   The message ID
  * @param id          The admin ID
  * @param idName      The id name
  * @param email       The primary email
@@ -39,6 +40,7 @@ import java.util.UUID;
  */
 
 public record IdACommandAdminCreate(
+  UUID messageId,
   Optional<UUID> id,
   IdName idName,
   IdRealName realName,
@@ -53,6 +55,7 @@ public record IdACommandAdminCreate(
 
   public IdACommandAdminCreate
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(id, "id");
     Objects.requireNonNull(idName, "idName");
     Objects.requireNonNull(realName, "realName");

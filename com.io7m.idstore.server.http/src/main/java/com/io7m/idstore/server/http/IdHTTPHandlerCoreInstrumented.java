@@ -106,8 +106,7 @@ public final class IdHTTPHandlerCoreInstrumented
         .setAttribute("http.request_id", information.requestId().toString())
         .startSpan();
 
-    this.metrics.onHttpRequested(
-      this.domain);
+    this.metrics.onHttpRequested(this.domain);
     this.metrics.onHttpRequestSize(
       this.domain,
       IdHTTPServerRequests.contentLength(request)

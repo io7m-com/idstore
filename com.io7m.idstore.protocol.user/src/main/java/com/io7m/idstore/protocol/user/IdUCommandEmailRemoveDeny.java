@@ -19,14 +19,17 @@ package com.io7m.idstore.protocol.user;
 import com.io7m.idstore.model.IdToken;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A request to deny the removal of an email address.
  *
- * @param token The token
+ * @param messageId The message ID
+ * @param token     The token
  */
 
 public record IdUCommandEmailRemoveDeny(
+  UUID messageId,
   IdToken token)
   implements IdUCommandType<IdUResponseEmailRemoveDeny>
 {
@@ -38,6 +41,7 @@ public record IdUCommandEmailRemoveDeny(
 
   public IdUCommandEmailRemoveDeny
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(token, "email");
   }
 

@@ -25,22 +25,29 @@ import java.util.UUID;
 /**
  * A response to {@link IdACommandAuditSearchPrevious}.
  *
- * @param requestId The request ID
- * @param page      The previous page of results
+ * @param messageId     The message ID
+ * @param correlationId The message correlation ID
+ * @param page          The previous page of results
  */
 
 public record IdAResponseAuditSearchPrevious(
-  UUID requestId,
+  UUID messageId,
+  UUID correlationId,
   IdPage<IdAuditEvent> page)
   implements IdAResponseType
 {
   /**
    * A response to {@link IdACommandAuditSearchPrevious}.
+   *
+   * @param messageId     The message ID
+   * @param correlationId The message correlation ID
+   * @param page          The previous page of results
    */
 
   public IdAResponseAuditSearchPrevious
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
+    Objects.requireNonNull(correlationId, "correlationId");
     Objects.requireNonNull(page, "page");
   }
 }

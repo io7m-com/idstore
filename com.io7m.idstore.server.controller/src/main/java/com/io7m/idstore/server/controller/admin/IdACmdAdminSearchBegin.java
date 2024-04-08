@@ -25,6 +25,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminSearchBegin;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminRead;
 
+import java.util.UUID;
+
 /**
  * IdACmdAdminSearchBegin
  */
@@ -64,7 +66,8 @@ public final class IdACmdAdminSearchBegin
     session.setAdminSearch(search);
 
     return new IdAResponseAdminSearchBegin(
-      context.requestId(),
+      UUID.randomUUID(),
+      command.messageId(),
       search.pageCurrent(admins)
     );
   }

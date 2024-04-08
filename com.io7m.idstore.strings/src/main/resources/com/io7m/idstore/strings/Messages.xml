@@ -26,7 +26,9 @@
   <entry key="email_verification_success_title">Verified</entry>
   <entry key="email_verification_title">Verification</entry>
   <entry key="error">Error</entry>
+  <entry key="error_closed_channel">Channel is closed.</entry>
   <entry key="error_delete_self">You cannot delete your own account.</entry>
+  <entry key="error_expected_command_type">Expected a command type.</entry>
   <entry key="error_invalid_username_password">Invalid username or password.</entry>
   <entry key="error_io">I/O error</entry>
   <entry key="error_login_not_here">The login command cannot be used with this method.</entry>
@@ -51,6 +53,7 @@
   <entry key="maintenance_mode_set_off">Server is now actively serving requests.</entry>
   <entry key="maintenance_mode_set_on">Server is in maintenance mode with message "{0}"</entry>
   <entry key="maintenance_mode_title">Maintenance mode.</entry>
+  <entry key="message_type">Message Type</entry>
   <entry key="method_not_allowed">HTTP method not allowed.</entry>
   <entry key="missing_parameter">Missing a required parameter.</entry>
   <entry key="no_supported_versions">This client does not support any protocols the server presented.</entry>

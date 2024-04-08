@@ -16,13 +16,30 @@
 
 package com.io7m.idstore.protocol.admin;
 
+import java.util.Objects;
+import java.util.UUID;
+
 /**
  * Get the previous page of the admin listing.
+ *
+ * @param messageId The message ID
  */
 
-public record IdACommandAdminSearchPrevious()
+public record IdACommandAdminSearchPrevious(
+  UUID messageId)
   implements IdACommandType<IdAResponseAdminSearchPrevious>
 {
+  /**
+   * Get the previous page of the admin listing.
+   *
+   * @param messageId The message ID
+   */
+
+  public IdACommandAdminSearchPrevious
+  {
+    Objects.requireNonNull(messageId, "messageId");
+  }
+
   @Override
   public Class<IdAResponseAdminSearchPrevious> responseClass()
   {

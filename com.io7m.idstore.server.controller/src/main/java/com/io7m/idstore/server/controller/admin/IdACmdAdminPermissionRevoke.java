@@ -27,6 +27,7 @@ import com.io7m.jaffirm.core.Invariants;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * IdACmdAdminPermissionRevoke
@@ -95,6 +96,10 @@ public final class IdACmdAdminPermissionRevoke
       admins.adminGetRequire(newAdmin)
         .withRedactedPassword();
 
-    return new IdAResponseAdminUpdate(context.requestId(), afterAdmin);
+    return new IdAResponseAdminUpdate(
+      UUID.randomUUID(),
+      command.messageId(),
+      afterAdmin
+    );
   }
 }

@@ -95,7 +95,7 @@ public final class IdAdminLoginService implements RPServiceType
    * banned user, etc).
    *
    * @param transaction A database transaction
-   * @param requestId   The ID of the request
+   * @param messageId   The ID of the request
    * @param remoteHost  The remote remoteHost attempting to log in
    * @param username    The username
    * @param password    The password
@@ -108,7 +108,7 @@ public final class IdAdminLoginService implements RPServiceType
 
   public IdAdminLoggedIn adminLogin(
     final IdDatabaseTransactionType transaction,
-    final UUID requestId,
+    final UUID messageId,
     final String remoteHost,
     final String username,
     final String password,
@@ -116,21 +116,21 @@ public final class IdAdminLoginService implements RPServiceType
     throws IdCommandExecutionFailure
   {
     Objects.requireNonNull(transaction, "transaction");
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(username, "username");
     Objects.requireNonNull(password, "password");
     Objects.requireNonNull(metadata, "metadata");
 
     try {
-      this.checkRateLimit(requestId, remoteHost, username);
+      this.checkRateLimit(messageId, remoteHost, username);
 
       final var admins =
         transaction.queries(IdDatabaseAdminsQueriesType.class);
       final var user =
         admins.adminGetForNameRequire(new IdName(username));
 
-      this.checkBan(requestId, admins, user);
-      this.checkPassword(requestId, remoteHost, password, user);
+      this.checkBan(messageId, admins, user);
+      this.checkPassword(messageId, remoteHost, password, user);
 
       admins.adminLogin(user.id(), metadata);
       this.events.emit(new IdEventAdminLoggedIn(user.id()));
@@ -139,7 +139,7 @@ public final class IdAdminLoginService implements RPServiceType
       return new IdAdminLoggedIn(session, user.withRedactedPassword());
     } catch (final IdDatabaseException e) {
       if (Objects.equals(e.errorCode(), ADMIN_NONEXISTENT)) {
-        throw this.authenticationFailed(requestId, e);
+        throw this.authenticationFailed(messageId, e);
       }
       throw new IdCommandExecutionFailure(
         e.getMessage(),
@@ -147,7 +147,7 @@ public final class IdAdminLoginService implements RPServiceType
         e.errorCode(),
         e.attributes(),
         e.remediatingAction(),
-        requestId,
+        messageId,
         500
       );
     } catch (final IdPasswordException e) {
@@ -157,7 +157,7 @@ public final class IdAdminLoginService implements RPServiceType
         e.errorCode(),
         e.attributes(),
         e.remediatingAction(),
-        requestId,
+        messageId,
         500
       );
     }

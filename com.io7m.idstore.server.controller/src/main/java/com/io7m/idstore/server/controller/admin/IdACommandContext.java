@@ -24,7 +24,6 @@ import com.io7m.idstore.server.service.sessions.IdSessionAdmin;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * The command context for admin API commands.
@@ -40,7 +39,6 @@ public final class IdACommandContext
    * transaction).
    *
    * @param inServices        The service directory
-   * @param inRequestId       The request ID
    * @param inTransaction     The transaction
    * @param inSession         The user session
    * @param inRemoteHost      The remote remoteHost
@@ -50,7 +48,6 @@ public final class IdACommandContext
 
   public IdACommandContext(
     final RPServiceDirectoryType inServices,
-    final UUID inRequestId,
     final IdDatabaseTransactionType inTransaction,
     final IdSessionAdmin inSession,
     final String inRemoteHost,
@@ -59,7 +56,6 @@ public final class IdACommandContext
   {
     super(
       inServices,
-      inRequestId,
       inTransaction,
       inSession,
       inRemoteHost,

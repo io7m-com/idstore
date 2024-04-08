@@ -18,12 +18,9 @@
 package com.io7m.idstore.admin_client.internal;
 
 import com.io7m.hibiscus.basic.HBClientHandlerType;
-import com.io7m.idstore.admin_client.api.IdAClientCredentials;
-import com.io7m.idstore.admin_client.api.IdAClientEventType;
+import com.io7m.idstore.admin_client.api.IdAClientConnectionParameters;
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.protocol.admin.IdACommandType;
-import com.io7m.idstore.protocol.admin.IdAResponseError;
-import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.protocol.admin.IdAMessageType;
 
 /**
  * The client handler type.
@@ -31,13 +28,9 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 
 public interface IdAHandlerType
   extends HBClientHandlerType<
-  IdAClientException,
-  IdACommandType<?>,
-  IdAResponseType,
-  IdAResponseType,
-  IdAResponseError,
-  IdAClientEventType,
-  IdAClientCredentials>
+  IdAMessageType,
+  IdAClientConnectionParameters,
+  IdAClientException>
 {
 
 }

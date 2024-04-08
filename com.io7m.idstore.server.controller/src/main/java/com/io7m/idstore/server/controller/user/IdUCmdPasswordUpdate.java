@@ -33,6 +33,7 @@ import com.io7m.idstore.strings.IdStringConstants;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_MISMATCH;
 
@@ -77,6 +78,7 @@ public final class IdUCmdPasswordUpdate
 
     if (!Objects.equals(command.password(), command.passwordConfirm())) {
       throw context.failFormatted(
+        command,
         400,
         PASSWORD_RESET_MISMATCH,
         IdStringConstants.PASSWORD_RESET_MISMATCH
@@ -99,7 +101,8 @@ public final class IdUCmdPasswordUpdate
     );
 
     return new IdUResponseUserUpdate(
-      context.requestId(),
+      UUID.randomUUID(),
+      command.messageId(),
       users.userGetRequire(user.id())
     );
   }

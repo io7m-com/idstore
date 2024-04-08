@@ -24,6 +24,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.protocol.admin.IdAResponseUserUpdate;
 import com.io7m.idstore.server.security.IdSecAdminActionUserUpdateEmail;
 
+import java.util.UUID;
+
 /**
  * IdACmdUserEmailRemove
  */
@@ -62,6 +64,10 @@ public final class IdACmdUserEmailRemove
     users.userEmailRemove(command.user(), command.email());
 
     final var afterUser = users.userGetRequire(command.user());
-    return new IdAResponseUserUpdate(context.requestId(), afterUser);
+    return new IdAResponseUserUpdate(
+      UUID.randomUUID(),
+      command.messageId(),
+      afterUser
+    );
   }
 }

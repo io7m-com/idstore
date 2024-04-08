@@ -27,6 +27,7 @@ import com.io7m.idstore.server.security.IdSecAdminActionUserUpdateEmail;
 import com.io7m.idstore.strings.IdStrings;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR_UNIQUE;
 import static com.io7m.idstore.strings.IdStringConstants.EMAIL_DUPLICATE;
@@ -85,6 +86,10 @@ public final class IdACmdUserEmailAdd
     }
 
     final var afterUser = users.userGetRequire(command.user());
-    return new IdAResponseUserUpdate(context.requestId(), afterUser);
+    return new IdAResponseUserUpdate(
+      UUID.randomUUID(),
+      command.messageId(),
+      afterUser
+    );
   }
 }

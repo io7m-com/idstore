@@ -55,6 +55,7 @@ public final class IdACmdAdminLogin
     Objects.requireNonNull(command, "command");
 
     throw context.failFormatted(
+      command,
       400,
       API_MISUSE_ERROR,
       COMMAND_NOT_HERE

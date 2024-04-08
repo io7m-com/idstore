@@ -16,13 +16,30 @@
 
 package com.io7m.idstore.protocol.admin;
 
+import java.util.Objects;
+import java.util.UUID;
+
 /**
  * Get the next page of audit records.
+ *
+ * @param messageId The message ID
  */
 
-public record IdACommandAuditSearchNext()
+public record IdACommandAuditSearchNext(
+  UUID messageId)
   implements IdACommandType<IdAResponseAuditSearchNext>
 {
+  /**
+   * Get the next page of audit records.
+   *
+   * @param messageId The message ID
+   */
+
+  public IdACommandAuditSearchNext
+  {
+    Objects.requireNonNull(messageId, "messageId");
+  }
+
   @Override
   public Class<IdAResponseAuditSearchNext> responseClass()
   {

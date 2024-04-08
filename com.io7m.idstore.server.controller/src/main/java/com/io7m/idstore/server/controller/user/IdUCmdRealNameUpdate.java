@@ -24,6 +24,7 @@ import com.io7m.idstore.protocol.user.IdUResponseUserUpdate;
 import com.io7m.idstore.server.security.IdSecUserActionRealnameUpdate;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * IdUCmdRealNameUpdate
@@ -65,7 +66,8 @@ public final class IdUCmdRealNameUpdate
     );
 
     return new IdUResponseUserUpdate(
-      context.requestId(),
+      UUID.randomUUID(),
+      command.messageId(),
       users.userGetRequire(user.id())
     );
   }

@@ -16,13 +16,29 @@
 
 package com.io7m.idstore.protocol.user;
 
+import java.util.Objects;
+import java.util.UUID;
+
 /**
  * A request to fetch the user's own profile.
+ *
+ * @param messageId The message ID
  */
 
-public record IdUCommandUserSelf()
+public record IdUCommandUserSelf(UUID messageId)
   implements IdUCommandType<IdUResponseUserSelf>
 {
+  /**
+   * A request to fetch the user's own profile.
+   *
+   * @param messageId The message ID
+   */
+
+  public IdUCommandUserSelf
+  {
+    Objects.requireNonNull(messageId, "messageId");
+  }
+
   @Override
   public Class<IdUResponseUserSelf> responseClass()
   {

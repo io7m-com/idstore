@@ -19,15 +19,18 @@ package com.io7m.idstore.protocol.user;
 import com.io7m.idstore.model.IdToken;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A request to deny the addition of an email address.
  *
- * @param token The token
+ * @param messageId The message ID
+ * @param token     The token
  */
 
 
 public record IdUCommandEmailAddDeny(
+  UUID messageId,
   IdToken token)
   implements IdUCommandType<IdUResponseEmailAddDeny>
 {
@@ -39,6 +42,7 @@ public record IdUCommandEmailAddDeny(
 
   public IdUCommandEmailAddDeny
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(token, "email");
   }
 

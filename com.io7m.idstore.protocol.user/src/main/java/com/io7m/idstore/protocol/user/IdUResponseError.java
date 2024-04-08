@@ -27,7 +27,8 @@ import java.util.UUID;
 /**
  * An error response.
  *
- * @param requestId         The request ID
+ * @param messageId         The message ID
+ * @param correlationId     The message correlation ID
  * @param errorCode         The error code
  * @param message           The humanly-readable error message
  * @param attributes        The error attributes
@@ -36,7 +37,8 @@ import java.util.UUID;
  */
 
 public record IdUResponseError(
-  UUID requestId,
+  UUID messageId,
+  UUID correlationId,
   String message,
   IdErrorCode errorCode,
   Map<String, String> attributes,
@@ -47,7 +49,8 @@ public record IdUResponseError(
   /**
    * An error response.
    *
-   * @param requestId         The request ID
+   * @param messageId         The message ID
+   * @param correlationId     The message correlation ID
    * @param errorCode         The error code
    * @param message           The humanly-readable error message
    * @param attributes        The error attributes
@@ -57,7 +60,8 @@ public record IdUResponseError(
 
   public IdUResponseError
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
+    Objects.requireNonNull(correlationId, "correlationId");
     Objects.requireNonNull(message, "message");
     Objects.requireNonNull(errorCode, "errorCode");
     Objects.requireNonNull(attributes, "attributes");

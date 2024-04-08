@@ -16,38 +16,31 @@
 
 package com.io7m.idstore.admin_client.internal;
 
-import com.io7m.hibiscus.api.HBResultFailure;
-import com.io7m.hibiscus.api.HBResultType;
-import com.io7m.hibiscus.basic.HBClientNewHandler;
+import com.io7m.hibiscus.api.HBConnection;
+import com.io7m.hibiscus.api.HBConnectionClosed;
+import com.io7m.hibiscus.api.HBConnectionType;
+import com.io7m.hibiscus.basic.HBConnectionError;
+import com.io7m.hibiscus.basic.HBConnectionResultType;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
-import com.io7m.idstore.admin_client.api.IdAClientCredentials;
-import com.io7m.idstore.admin_client.api.IdAClientEventType;
+import com.io7m.idstore.admin_client.api.IdAClientConnectionParameters;
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.error_codes.IdStandardErrorCodes;
-import com.io7m.idstore.protocol.admin.IdACommandType;
-import com.io7m.idstore.protocol.admin.IdAResponseError;
-import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.strings.IdStrings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.http.HttpClient;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
-import static com.io7m.idstore.protocol.admin.IdAResponseBlame.BLAME_CLIENT;
-import static com.io7m.idstore.strings.IdStringConstants.NOT_LOGGED_IN;
 
 /**
  * The initial "disconnected" protocol handler.
  */
 
-public final class IdAHandlerDisconnected extends IdAHandlerAbstract
+final class IdAHandlerDisconnected extends IdAHandlerAbstract
 {
   private static final Logger LOG =
     LoggerFactory.getLogger(IdAHandlerDisconnected.class);
+
+  private final HBConnectionClosed<IdAMessageType, IdAClientException> connection;
 
   /**
    * Construct a handler.
@@ -57,91 +50,66 @@ public final class IdAHandlerDisconnected extends IdAHandlerAbstract
    * @param inHttpClient    The client
    */
 
-  public IdAHandlerDisconnected(
+  IdAHandlerDisconnected(
     final IdAClientConfiguration inConfiguration,
     final IdStrings inStrings,
     final HttpClient inHttpClient)
   {
     super(inConfiguration, inStrings, inHttpClient);
-  }
 
-  private <A> HBResultFailure<A, IdAResponseError> notLoggedIn()
-  {
-    return new HBResultFailure<>(
-      new IdAResponseError(
-        UUID.randomUUID(),
-        this.local(NOT_LOGGED_IN),
-        IdStandardErrorCodes.NOT_LOGGED_IN,
-        Map.of(),
-        Optional.empty(),
-        BLAME_CLIENT
-      )
-    );
+    this.connection =
+      new HBConnectionClosed<>(IdAClientException::ofException);
   }
 
   @Override
-  public boolean onIsConnected()
-  {
-    return false;
-  }
-
-  @Override
-  public List<IdAClientEventType> onPollEvents()
-  {
-    return List.of();
-  }
-
-  @Override
-  public HBResultType<HBClientNewHandler<
-    IdAClientException,
-    IdACommandType<?>,
-    IdAResponseType,
-    IdAResponseType,
-    IdAResponseError,
-    IdAClientEventType,
-    IdAClientCredentials>,
-    IdAResponseError>
-  onExecuteLogin(
-    final IdAClientCredentials credentials)
+  public HBConnectionResultType<
+    IdAMessageType,
+    IdAClientConnectionParameters,
+    IdAClientException>
+  doConnect(
+    final IdAClientConnectionParameters parameters)
     throws InterruptedException
   {
     try {
-      final var handler =
-        IdAProtocolNegotiation.negotiateProtocolHandler(
+      final var transport =
+        IdAProtocolNegotiation.negotiateTransport(
           this.configuration(),
           this.httpClient(),
           this.strings(),
-          credentials.baseURI()
+          parameters.baseURI()
         );
 
-      LOG.debug("login: negotiated {}", handler);
-      return handler.onExecuteLogin(credentials);
+      final var newConnection =
+        new HBConnection<>(
+          this.configuration().clock(),
+          transport,
+          this.configuration().receiveQueueBounds()
+        );
+
+      final var newHandler =
+        new IdAHandlerConnected(
+          this.configuration(),
+          this.strings(),
+          this.httpClient(),
+          newConnection
+        );
+
+      return newHandler.doConnect(parameters);
     } catch (final IdAClientException e) {
-      LOG.debug("login: ", e);
-      return new HBResultFailure<>(
-        new IdAResponseError(
-          UUID.randomUUID(),
-          e.message(),
-          e.errorCode(),
-          e.attributes(),
-          Optional.empty(),
-          BLAME_CLIENT
-        )
-      );
+      return new HBConnectionError<>(e);
     }
   }
 
   @Override
-  public HBResultType<IdAResponseType, IdAResponseError>
-  onExecuteCommand(
-    final IdACommandType<?> command)
+  public HBConnectionType<IdAMessageType, IdAClientException> connection()
   {
-    return this.notLoggedIn();
+    return this.connection;
   }
 
   @Override
-  public void onDisconnect()
+  public void close()
+    throws IdAClientException
   {
-
+    this.connection.close();
   }
 }

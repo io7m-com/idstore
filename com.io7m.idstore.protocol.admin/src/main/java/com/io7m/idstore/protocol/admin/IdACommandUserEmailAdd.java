@@ -24,11 +24,13 @@ import java.util.UUID;
 /**
  * Add an email address to the given user.
  *
- * @param user The user ID
- * @param email The email
+ * @param messageId The message ID
+ * @param user      The user ID
+ * @param email     The email
  */
 
 public record IdACommandUserEmailAdd(
+  UUID messageId,
   UUID user,
   IdEmail email)
   implements IdACommandType<IdAResponseUserUpdate>
@@ -39,6 +41,7 @@ public record IdACommandUserEmailAdd(
 
   public IdACommandUserEmailAdd
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(user, "id");
     Objects.requireNonNull(email, "email");
   }

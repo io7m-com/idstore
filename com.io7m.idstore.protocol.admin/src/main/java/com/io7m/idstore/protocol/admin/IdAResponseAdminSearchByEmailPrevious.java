@@ -25,12 +25,14 @@ import java.util.UUID;
 /**
  * A response to {@link IdACommandAdminSearchByEmailPrevious}.
  *
- * @param requestId The request ID
- * @param page      The previous page of results
+ * @param messageId     The message ID
+ * @param correlationId The message correlation ID
+ * @param page          The previous page of results
  */
 
 public record IdAResponseAdminSearchByEmailPrevious(
-  UUID requestId,
+  UUID messageId,
+  UUID correlationId,
   IdPage<IdAdminSummary> page)
   implements IdAResponseType
 {
@@ -40,7 +42,8 @@ public record IdAResponseAdminSearchByEmailPrevious(
 
   public IdAResponseAdminSearchByEmailPrevious
   {
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
+    Objects.requireNonNull(correlationId, "correlationId");
     Objects.requireNonNull(page, "page");
   }
 }

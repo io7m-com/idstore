@@ -16,13 +16,30 @@
 
 package com.io7m.idstore.protocol.admin;
 
+import java.util.Objects;
+import java.util.UUID;
+
 /**
  * A request to fetch the admin's own profile.
+ *
+ * @param messageId The message ID
  */
 
-public record IdACommandAdminSelf()
+public record IdACommandAdminSelf(
+  UUID messageId)
   implements IdACommandType<IdAResponseAdminSelf>
 {
+  /**
+   * A request to fetch the admin's own profile.
+   *
+   * @param messageId The message ID
+   */
+
+  public IdACommandAdminSelf
+  {
+    Objects.requireNonNull(messageId, "messageId");
+  }
+
   @Override
   public Class<IdAResponseAdminSelf> responseClass()
   {

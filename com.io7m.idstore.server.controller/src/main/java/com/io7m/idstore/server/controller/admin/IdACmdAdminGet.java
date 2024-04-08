@@ -25,6 +25,8 @@ import com.io7m.idstore.protocol.admin.IdAResponseAdminGet;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.idstore.server.security.IdSecAdminActionAdminRead;
 
+import java.util.UUID;
+
 /**
  * IdACmdAdminGet
  */
@@ -62,6 +64,10 @@ public final class IdACmdAdminGet
       admins.adminGet(command.admin())
         .map(IdAdmin::withRedactedPassword);
 
-    return new IdAResponseAdminGet(context.requestId(), result);
+    return new IdAResponseAdminGet(
+      UUID.randomUUID(),
+      command.messageId(),
+      result
+    );
   }
 }

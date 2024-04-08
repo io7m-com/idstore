@@ -20,16 +20,19 @@ import com.io7m.idstore.model.IdName;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A request to log in.
  *
- * @param userName The username
- * @param password The password
- * @param metadata Extra metadata included with the request
+ * @param messageId The message ID
+ * @param userName  The username
+ * @param password  The password
+ * @param metadata  Extra metadata included with the request
  */
 
 public record IdUCommandLogin(
+  UUID messageId,
   IdName userName,
   String password,
   Map<String, String> metadata)
@@ -45,6 +48,7 @@ public record IdUCommandLogin(
 
   public IdUCommandLogin
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(userName, "userName");
     Objects.requireNonNull(password, "password");
     Objects.requireNonNull(metadata, "metadata");

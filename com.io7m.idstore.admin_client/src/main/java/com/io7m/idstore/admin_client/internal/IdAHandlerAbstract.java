@@ -17,17 +17,18 @@
 package com.io7m.idstore.admin_client.internal;
 
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
-import com.io7m.idstore.strings.IdStringConstantType;
+import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.strings.IdStrings;
 
 import java.net.http.HttpClient;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * The abstract base class for handlers.
  */
 
-public abstract class IdAHandlerAbstract
+abstract class IdAHandlerAbstract
   implements IdAHandlerType
 {
   private final IdStrings strings;
@@ -47,11 +48,10 @@ public abstract class IdAHandlerAbstract
       Objects.requireNonNull(inHttpClient, "httpClient");
   }
 
-  protected final String local(
-    final IdStringConstantType s,
-    final Object... arguments)
+  @Override
+  public final Function<Throwable, IdAClientException> exceptionTransformer()
   {
-    return this.strings().format(s, arguments);
+    return IdAClientException::ofException;
   }
 
   protected final IdStrings strings()

@@ -162,14 +162,14 @@ public final class IdServerMailService implements IdServerMailServiceType
   @Override
   public CompletableFuture<Void> sendMail(
     final Span parentSpan,
-    final UUID requestId,
+    final UUID messageId,
     final IdEmail to,
     final Map<String, String> headers,
     final String subject,
     final String text)
   {
     Objects.requireNonNull(parentSpan, "span");
-    Objects.requireNonNull(requestId, "requestId");
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(to, "to");
     Objects.requireNonNull(subject, "subject");
     Objects.requireNonNull(headers, "headers");
@@ -184,7 +184,7 @@ public final class IdServerMailService implements IdServerMailServiceType
       final var span =
         this.telemetry.tracer()
           .spanBuilder("IdServerMailService.sendMail")
-          .setAttribute("smtp.source_request", requestId.toString())
+          .setAttribute("smtp.source_request", messageId.toString())
           .setAttribute("smtp.to", to.value())
           .setAttribute("smtp.subject", subject)
           .setAttribute("smtp.from", this.configuration.senderAddress())

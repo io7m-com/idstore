@@ -19,14 +19,17 @@ package com.io7m.idstore.protocol.admin;
 import com.io7m.idstore.model.IdUserSearchParameters;
 
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Start searching/listing users.
  *
+ * @param messageId  The message ID
  * @param parameters The user list parameters
  */
 
 public record IdACommandUserSearchBegin(
+  UUID messageId,
   IdUserSearchParameters parameters)
   implements IdACommandType<IdAResponseUserSearchBegin>
 {
@@ -36,6 +39,7 @@ public record IdACommandUserSearchBegin(
 
   public IdACommandUserSearchBegin
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(parameters, "parameters");
   }
 

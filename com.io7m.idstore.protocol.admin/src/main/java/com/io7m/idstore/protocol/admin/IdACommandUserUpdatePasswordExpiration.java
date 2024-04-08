@@ -22,11 +22,13 @@ import java.util.UUID;
 /**
  * Update the given user's password expiration.
  *
- * @param user The user to be updated
- * @param set  The set behaviour
+ * @param messageId The message ID
+ * @param user      The user to be updated
+ * @param set       The set behaviour
  */
 
 public record IdACommandUserUpdatePasswordExpiration(
+  UUID messageId,
   UUID user,
   IdAPasswordExpirationSetType set)
   implements IdACommandType<IdAResponseUserUpdate>
@@ -40,6 +42,7 @@ public record IdACommandUserUpdatePasswordExpiration(
 
   public IdACommandUserUpdatePasswordExpiration
   {
+    Objects.requireNonNull(messageId, "messageId");
     Objects.requireNonNull(user, "user");
     Objects.requireNonNull(set, "set");
   }

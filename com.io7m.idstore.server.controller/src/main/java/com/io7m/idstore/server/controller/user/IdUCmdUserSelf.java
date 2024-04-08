@@ -23,6 +23,8 @@ import com.io7m.idstore.protocol.user.IdUCommandUserSelf;
 import com.io7m.idstore.protocol.user.IdUResponseType;
 import com.io7m.idstore.protocol.user.IdUResponseUserSelf;
 
+import java.util.UUID;
+
 /**
  * IdUCmdUserSelf
  */
@@ -53,6 +55,11 @@ public final class IdUCmdUserSelf
     final var userId = context.user().id();
     transaction.userIdSet(userId);
     final var user = users.userGetRequire(userId);
-    return new IdUResponseUserSelf(context.requestId(), user);
+
+    return new IdUResponseUserSelf(
+      UUID.randomUUID(),
+      command.messageId(),
+      user
+    );
   }
 }
