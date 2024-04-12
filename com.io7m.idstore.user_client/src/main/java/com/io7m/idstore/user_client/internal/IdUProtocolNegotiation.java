@@ -73,7 +73,7 @@ public final class IdUProtocolNegotiation
     final IdStrings strings)
     throws InterruptedException, IdUClientException
   {
-    LOG.debug("retrieving supported server protocols");
+    LOG.debug("Retrieving supported server protocols");
 
     final var request =
       HttpRequest.newBuilder(base)
@@ -94,7 +94,7 @@ public final class IdUProtocolNegotiation
       );
     }
 
-    LOG.debug("server: status {}", response.statusCode());
+    LOG.debug("Server: Status {}", response.statusCode());
 
     if (response.statusCode() >= 400) {
       final var msg =
@@ -170,20 +170,20 @@ public final class IdUProtocolNegotiation
   }
 
   /**
-   * Negotiate a protocol handler.
+   * Negotiate a protocol transport.
    *
-   * @param configuration     The configuration
-   * @param httpClient The HTTP client
-   * @param strings    The string resources
-   * @param base       The base URI
+   * @param configuration The configuration
+   * @param httpClient    The HTTP client
+   * @param strings       The string resources
+   * @param base          The base URI
    *
-   * @return The protocol handler
+   * @return The protocol transport
    *
    * @throws IdUClientException   On errors
    * @throws InterruptedException On interruption
    */
 
-  public static IdUHandlerType negotiateProtocolHandler(
+  public static IdUTransportType negotiateTransport(
     final IdUClientConfiguration configuration,
     final HttpClient httpClient,
     final IdStrings strings,
@@ -197,19 +197,19 @@ public final class IdUProtocolNegotiation
 
     final var clientSupports =
       List.of(
-        new IdUHandlers1()
+        new IdUTransports1()
       );
 
     final var serverProtocols =
       fetchSupportedVersions(base, httpClient, strings);
 
-    LOG.debug("server supports {} protocols", serverProtocols.size());
+    LOG.debug("Server supports {} protocols", serverProtocols.size());
 
     final var solver =
-      GenProtocolSolver.<IdUHandlerFactoryType, IdUServerEndpoint>
+      GenProtocolSolver.<IdUTransportFactoryType, IdUServerEndpoint>
         create(configuration.locale());
 
-    final GenProtocolSolved<IdUHandlerFactoryType, IdUServerEndpoint> solved;
+    final GenProtocolSolved<IdUTransportFactoryType, IdUServerEndpoint> solved;
     try {
       solved = solver.solve(
         serverProtocols,
@@ -235,14 +235,14 @@ public final class IdUProtocolNegotiation
 
     final var protocol = serverEndpoint.supported();
     LOG.debug(
-      "using protocol {} {}.{} at endpoint {}",
+      "Using protocol {} {}.{} at endpoint {}",
       protocol.identifier(),
       protocol.version().versionMajor(),
       protocol.version().versionMinor(),
       target
     );
 
-    return solved.clientHandler().createHandler(
+    return solved.clientHandler().createTransport(
       configuration,
       httpClient,
       strings,

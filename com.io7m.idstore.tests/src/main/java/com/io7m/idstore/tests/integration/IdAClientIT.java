@@ -22,9 +22,9 @@ import com.io7m.ervilla.test_extension.ErvillaConfiguration;
 import com.io7m.ervilla.test_extension.ErvillaExtension;
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
-import com.io7m.idstore.admin_client.api.IdAClientCredentials;
+import com.io7m.idstore.admin_client.api.IdAClientConnectionParameters;
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
+import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.error_codes.IdErrorCode;
 import com.io7m.idstore.model.IdAdmin;
 import com.io7m.idstore.model.IdAdminColumn;
@@ -66,8 +66,11 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.time.Clock;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -75,6 +78,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_DUPLICATE_ID_NAME;
@@ -82,6 +86,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTEN
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_SIZE_LIMIT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID_NAME;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
@@ -99,10 +104,12 @@ public final class IdAClientIT
     Set.of(
       ADMIN_DUPLICATE_ID_NAME,
       ADMIN_NONEXISTENT,
-      USER_NONEXISTENT,
-      USER_DUPLICATE_ID_NAME,
+      API_MISUSE_ERROR,
+      AUTHENTICATION_ERROR,
       EMAIL_DUPLICATE,
-      API_MISUSE_ERROR
+      HTTP_SIZE_LIMIT,
+      USER_DUPLICATE_ID_NAME,
+      USER_NONEXISTENT
     );
 
   private static final IdACB1Messages MESSAGES = new IdACB1Messages();
@@ -147,7 +154,7 @@ public final class IdAClientIT
   }
 
   private static IdTestDatabases.IdDatabaseFixture DATABASE_FIXTURE;
-  private IdAClientSynchronousType client;
+  private IdAClientType client;
   private QWebServerType webServer;
   private IdTestServers.IdTestServerFixture serverFixture;
 
@@ -182,7 +189,12 @@ public final class IdAClientIT
         ));
 
     this.client =
-      CLIENTS.openSynchronousClient(new IdAClientConfiguration(Locale.ROOT));
+      CLIENTS.create(
+        new IdAClientConfiguration(
+          Clock.systemUTC(),
+          Locale.ROOT
+        )
+      );
 
     this.webServer =
       closeables.addPerTestResource(QWebServers.createServer(60002));
@@ -195,6 +207,7 @@ public final class IdAClientIT
    */
 
   @Test
+  @Timeout(value = 5L, unit = TimeUnit.HOURS)
   public void testCommandRetry()
     throws Exception
   {
@@ -243,19 +256,22 @@ public final class IdAClientIT
           new IdAResponseAdminSelf(UUID.randomUUID(), ADMIN))
       );
 
-    this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+    this.client.connectOrThrow(
+      new IdAClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
-        Map.of()
-      ),
-      IdAClientException::ofError
+        Map.of(),
+        Duration.ofSeconds(30L),
+        Duration.ofSeconds(30L)
+      )
     );
 
-    final var result = (IdAResponseAdminSelf) this.client.executeOrElseThrow(
-      new IdACommandAdminSelf(),
-      IdAClientException::ofError);
+    final var result =
+      (IdAResponseAdminSelf) this.client.sendAndWaitOrThrow(
+        new IdACommandAdminSelf(),
+        Duration.ofSeconds(30L)
+      );
     assertEquals(ADMIN.id(), result.admin().id());
   }
 
@@ -288,23 +304,24 @@ public final class IdAClientIT
       .withContentType(IdACB1Messages.contentType())
       .withFixedData(MESSAGES.serialize(new IdACommandAdminSelf()));
 
-    this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+    this.client.connectOrThrow(
+      new IdAClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
-        Map.of()
-      ),
-      IdAClientException::ofError
+        Map.of(),
+        Duration.ofSeconds(30L),
+        Duration.ofSeconds(30L)
+      )
     );
 
     final var ex =
       assertThrows(
         IdAClientException.class,
         () -> {
-          this.client.executeOrElseThrow(
+          this.client.sendAndWaitOrThrow(
             new IdACommandAdminSelf(),
-            IdAClientException::ofError
+            Duration.ofSeconds(30L)
           );
         }
       );
@@ -342,22 +359,26 @@ public final class IdAClientIT
       .withFixedData(MESSAGES.serialize(
         new IdAResponseUserBanDelete(UUID.randomUUID())));
 
-    this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+    this.client.connectOrThrow(
+      new IdAClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
-        Map.of()
-      ),
-      IdAClientException::ofError
+        Map.of(),
+        Duration.ofSeconds(30L),
+        Duration.ofSeconds(30L)
+      )
     );
 
     final var ex =
       assertThrows(
         IdAClientException.class,
-        () -> this.client.executeOrElseThrow(
-          new IdACommandAdminSelf(),
-          IdAClientException::ofError)
+        () -> {
+          this.client.sendAndWaitOrThrow(
+            new IdACommandAdminSelf(),
+            Duration.ofSeconds(30L)
+          );
+        }
       );
 
     assertEquals(PROTOCOL_ERROR, ex.errorCode());
@@ -376,35 +397,37 @@ public final class IdAClientIT
     final var admin =
       this.serverFixture.createAdminInitial("admin", "12345678");
 
-    this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+    this.client.connectOrThrow(
+      new IdAClientConnectionParameters(
         "admin",
         "12345678",
         this.serverFixture.server().adminAPI(),
-        Map.of()
-      ),
-      IdAClientException::ofError
+        Map.of(),
+        Duration.ofSeconds(30L),
+        Duration.ofSeconds(30L)
+      )
     );
 
     final var self =
       (IdAResponseAdminSelf)
-        this.client.executeOrElseThrow(
+        this.client.sendAndWaitOrThrow(
           new IdACommandAdminSelf(),
-          IdAClientException::ofError
+          Duration.ofSeconds(30L)
         );
     assertEquals(admin, self.admin().id());
 
     this.client.close();
 
     assertThrows(IllegalStateException.class, () -> {
-      this.client.loginOrElseThrow(
-        new IdAClientCredentials(
+      this.client.connectOrThrow(
+        new IdAClientConnectionParameters(
           "admin",
           "12345678",
           this.serverFixture.server().adminAPI(),
-          Map.of()
-        ),
-        IdAClientException::ofError
+          Map.of(),
+          Duration.ofSeconds(30L),
+          Duration.ofSeconds(30L)
+        )
       );
     });
   }
@@ -424,14 +447,15 @@ public final class IdAClientIT
 
     final var ex =
       assertThrows(IdAClientException.class, () -> {
-        this.client.loginOrElseThrow(
-          new IdAClientCredentials(
+        this.client.connectOrThrow(
+          new IdAClientConnectionParameters(
             "admin",
             "1234",
             this.serverFixture.server().adminAPI(),
-            Map.of()
-          ),
-          IdAClientException::ofError
+            Map.of(),
+            Duration.ofSeconds(30L),
+            Duration.ofSeconds(30L)
+          )
         );
       });
 
@@ -457,7 +481,7 @@ public final class IdAClientIT
           "testDisconnected_%s".formatted(c),
           () -> {
             assertThrows(IdAClientException.class, () -> {
-              this.client.executeOrElseThrow(c, IdAClientException::ofError);
+              this.client.sendAndWaitOrThrow(c, Duration.ofSeconds(30L));
             });
           }
         );
@@ -483,19 +507,20 @@ public final class IdAClientIT
         .limit(2000L)
         .toList();
 
-    this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+    this.client.connectOrThrow(
+      new IdAClientConnectionParameters(
         "admin",
         "12345678",
         this.serverFixture.server().adminAPI(),
-        Map.of()
-      ),
-      IdAClientException::ofError
+        Map.of(),
+        Duration.ofSeconds(30L),
+        Duration.ofSeconds(30L)
+      )
     );
 
     for (final var c : messages) {
       try {
-        this.client.executeOrElseThrow(c, IdAClientException::ofError);
+        this.client.sendAndWaitOrThrow(c, Duration.ofSeconds(30L));
       } catch (final IdAClientException ex) {
         if (ALLOWED_SMOKE_CODES.contains(ex.errorCode())) {
           continue;
@@ -518,19 +543,20 @@ public final class IdAClientIT
     final var admin =
       this.serverFixture.createAdminInitial("admin", "12345678");
 
-    this.client.loginOrElseThrow(
-      new IdAClientCredentials(
+    this.client.connectOrThrow(
+      new IdAClientConnectionParameters(
         "admin",
         "12345678",
         this.serverFixture.server().adminAPI(),
-        Map.of()
-      ),
-      IdAClientException::ofError
+        Map.of(),
+        Duration.ofSeconds(30L),
+        Duration.ofSeconds(30L)
+      )
     );
 
     final var ex =
       assertThrows(IdAClientException.class, () -> {
-        this.client.executeOrElseThrow(
+        this.client.sendAndWaitOrThrow(
           new IdACommandAdminSearchByEmailBegin(
             new IdAdminSearchByEmailParameters(
               IdTimeRange.largest(),
@@ -540,7 +566,7 @@ public final class IdAClientIT
               100
             )
           ),
-          IdAClientException::ofError
+          Duration.ofSeconds(30L)
         );
       });
 

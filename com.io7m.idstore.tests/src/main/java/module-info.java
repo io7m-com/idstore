@@ -54,6 +54,7 @@ open module com.io7m.idstore.tests
   requires com.io7m.ervilla.api;
   requires com.io7m.ervilla.test_extension;
   requires com.io7m.junreachable.core;
+  requires com.io7m.jdeferthrow.core;
   requires com.io7m.quarrel.ext.xstructural;
   requires com.io7m.quixote.core;
   requires com.io7m.repetoir.core;

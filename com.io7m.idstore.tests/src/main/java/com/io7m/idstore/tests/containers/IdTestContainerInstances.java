@@ -20,8 +20,6 @@ package com.io7m.idstore.tests.containers;
 import com.io7m.ervilla.api.EContainerSupervisorType;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
 
-import java.nio.file.Files;
-
 public final class IdTestContainerInstances
 {
   private static IdTestDatabases.IdDatabaseFixture DATABASE_FIXTURE;

@@ -70,6 +70,7 @@ import com.io7m.idstore.server.service.tls.IdTLSContextServiceType;
 import com.io7m.idstore.server.service.verdant.IdVerdantMessages;
 import com.io7m.idstore.server.user_v1.IdU1Server;
 import com.io7m.idstore.server.user_view.IdUVServer;
+import com.io7m.idstore.strings.IdStringConstants;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.jmulticlose.core.CloseableCollection;
 import com.io7m.jmulticlose.core.CloseableCollectionType;
@@ -406,7 +407,7 @@ public final class IdServer implements IdServerType
     services.register(IdMaintenanceService.class, maintenance);
 
     services.register(IdRequestLimits.class, new IdRequestLimits(size -> {
-      return strings.format("requestTooLarge", size);
+      return strings.format(IdStringConstants.REQUEST_TOO_LARGE, size);
     }));
 
     for (final var service : services.services()) {

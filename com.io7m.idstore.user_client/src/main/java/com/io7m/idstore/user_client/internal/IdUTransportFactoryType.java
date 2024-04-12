@@ -16,28 +16,35 @@
 
 package com.io7m.idstore.user_client.internal;
 
-import java.util.UUID;
+import com.io7m.genevan.core.GenProtocolClientHandlerType;
+import com.io7m.idstore.strings.IdStrings;
+import com.io7m.idstore.user_client.api.IdUClientConfiguration;
+
+import java.net.URI;
+import java.net.http.HttpClient;
 
 /**
- * UUID functions.
+ * The type of protocol transport factories.
  */
 
-public final class IdUUUIDs
+public interface IdUTransportFactoryType
+  extends GenProtocolClientHandlerType
 {
-  private static final UUID NULL_UUID =
-    UUID.fromString("00000000-0000-0000-0000-000000000000");
-
-  private IdUUUIDs()
-  {
-
-  }
-
   /**
-   * @return The null UUID
+   * Create a new transport.
+   *
+   * @param configuration The configuration
+   * @param inHttpClient  The underlying HTTP client
+   * @param inStrings     The string resources
+   * @param baseURI       The base URI negotiated by the server
+   *
+   * @return A new handler
    */
 
-  public static UUID nullUUID()
-  {
-    return NULL_UUID;
-  }
+  IdUTransportType createTransport(
+    IdUClientConfiguration configuration,
+    HttpClient inHttpClient,
+    IdStrings inStrings,
+    URI baseURI
+  );
 }

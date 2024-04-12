@@ -26,6 +26,7 @@ import com.io7m.quarrel.core.QParameterNamedType;
 import com.io7m.quarrel.core.QStringType.QConstant;
 import com.io7m.repetoir.core.RPServiceDirectoryType;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +64,26 @@ public final class IdAShellCmdSet extends IdAShellCmdAbstract
       Formatter.class
     );
 
+  private static final QParameterNamed01<Duration> LOGIN_TIMEOUT =
+    new QParameterNamed01<>(
+      "--login-timeout",
+      List.of(),
+      new QConstant(
+        "Set the login timeout value."),
+      Optional.empty(),
+      Duration.class
+    );
+
+  private static final QParameterNamed01<Duration> COMMAND_TIMEOUT =
+    new QParameterNamed01<>(
+      "--command-timeout",
+      List.of(),
+      new QConstant(
+        "Set the command timeout value."),
+      Optional.empty(),
+      Duration.class
+    );
+
   /**
    * Construct a command.
    *
@@ -85,7 +106,12 @@ public final class IdAShellCmdSet extends IdAShellCmdAbstract
   @Override
   public List<QParameterNamedType<?>> onListNamedParameters()
   {
-    return List.of(TERMINATE_ON_ERRORS, FORMATTER);
+    return List.of(
+      TERMINATE_ON_ERRORS,
+      FORMATTER,
+      LOGIN_TIMEOUT,
+      COMMAND_TIMEOUT
+    );
   }
 
   @Override
@@ -105,6 +131,12 @@ public final class IdAShellCmdSet extends IdAShellCmdAbstract
           }
         }
       });
+
+    context.parameterValue(LOGIN_TIMEOUT)
+        .ifPresent(x -> this.options().setLoginTimeout(x));
+
+    context.parameterValue(COMMAND_TIMEOUT)
+      .ifPresent(x -> this.options().setCommandTimeout(x));
 
     context.parameterValue(TERMINATE_ON_ERRORS)
       .ifPresent(x -> {

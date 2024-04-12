@@ -18,7 +18,7 @@
  * Identity server (Client implementation [internals])
  */
 
-@Version("1.0.0")
+@Version("2.0.0")
 package com.io7m.idstore.user_client.internal;
 
 import org.osgi.annotation.versioning.Version;

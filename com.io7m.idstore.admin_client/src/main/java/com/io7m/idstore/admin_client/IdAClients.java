@@ -16,16 +16,17 @@
 
 package com.io7m.idstore.admin_client;
 
-import com.io7m.idstore.admin_client.api.IdAClientAsynchronousType;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
 import com.io7m.idstore.admin_client.api.IdAClientFactoryType;
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
-import com.io7m.idstore.admin_client.internal.IdAClientAsynchronous;
-import com.io7m.idstore.admin_client.internal.IdAClientSynchronous;
+import com.io7m.idstore.admin_client.api.IdAClientType;
+import com.io7m.idstore.admin_client.internal.IdAClient;
 import com.io7m.idstore.strings.IdStrings;
 
 import java.net.CookieManager;
 import java.net.http.HttpClient;
+import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 /**
  * The default client factory.
@@ -43,40 +44,23 @@ public final class IdAClients implements IdAClientFactoryType
   }
 
   @Override
-  public IdAClientAsynchronousType openAsynchronousClient(
+  public IdAClientType create(
     final IdAClientConfiguration configuration)
   {
-    final var cookieJar =
-      new CookieManager();
+    Objects.requireNonNull(configuration, "configuration");
+
     final var locale =
       configuration.locale();
     final var strings =
       IdStrings.create(locale);
 
-    final var httpClient =
-      HttpClient.newBuilder()
-        .cookieHandler(cookieJar)
+    final Supplier<HttpClient> clients = () -> {
+      return HttpClient.newBuilder()
+        .cookieHandler(new CookieManager())
+        .executor(Executors.newVirtualThreadPerTaskExecutor())
         .build();
+    };
 
-    return new IdAClientAsynchronous(configuration, strings, httpClient);
-  }
-
-  @Override
-  public IdAClientSynchronousType openSynchronousClient(
-    final IdAClientConfiguration configuration)
-  {
-    final var cookieJar =
-      new CookieManager();
-    final var locale =
-      configuration.locale();
-    final var strings =
-      IdStrings.create(locale);
-
-    final var httpClient =
-      HttpClient.newBuilder()
-        .cookieHandler(cookieJar)
-        .build();
-
-    return new IdAClientSynchronous(configuration, strings, httpClient);
+    return new IdAClient(configuration, strings, clients);
   }
 }

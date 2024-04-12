@@ -17,50 +17,52 @@
 
 package com.io7m.idstore.admin_client.internal;
 
-import com.io7m.hibiscus.basic.HBClientAsynchronousAbstract;
-import com.io7m.idstore.admin_client.api.IdAClientAsynchronousType;
+import com.io7m.hibiscus.api.HBClientAbstract;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
-import com.io7m.idstore.admin_client.api.IdAClientCredentials;
-import com.io7m.idstore.admin_client.api.IdAClientEventType;
+import com.io7m.idstore.admin_client.api.IdAClientConnectionParameters;
 import com.io7m.idstore.admin_client.api.IdAClientException;
-import com.io7m.idstore.protocol.admin.IdACommandType;
-import com.io7m.idstore.protocol.admin.IdAResponseError;
-import com.io7m.idstore.protocol.admin.IdAResponseType;
+import com.io7m.idstore.admin_client.api.IdAClientType;
+import com.io7m.idstore.protocol.admin.IdAMessageType;
 import com.io7m.idstore.strings.IdStrings;
 
 import java.net.http.HttpClient;
+import java.util.function.Supplier;
 
 /**
- * The asynchronous client.
+ * The client.
  */
 
-public final class IdAClientAsynchronous
-  extends HBClientAsynchronousAbstract<
-  IdAClientException,
-  IdACommandType<?>,
-  IdAResponseType,
-  IdAResponseType,
-  IdAResponseError,
-  IdAClientEventType,
-  IdAClientCredentials>
-  implements IdAClientAsynchronousType
+public final class IdAClient
+  extends HBClientAbstract<
+  IdAMessageType,
+  IdAClientConnectionParameters,
+  IdAClientException>
+  implements IdAClientType
 {
   /**
-   * The asynchronous client.
+   * The client.
    *
    * @param inConfiguration The configuration
-   * @param inHttpClient    The HTTP client
+   * @param inHttpClients   The HTTP clients
    * @param inStrings       The string resources
    */
 
-  public IdAClientAsynchronous(
+  public IdAClient(
     final IdAClientConfiguration inConfiguration,
     final IdStrings inStrings,
-    final HttpClient inHttpClient)
+    final Supplier<HttpClient> inHttpClients)
   {
     super(
-      new IdAClientSynchronous(inConfiguration, inStrings, inHttpClient),
-      "com.io7m.idstore.admin_client"
+      new IdAHandlerDisconnected(inConfiguration, inStrings, inHttpClients)
+    );
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[%s 0x%s]".formatted(
+      this.getClass().getSimpleName(),
+      Integer.toUnsignedString(this.hashCode(), 16)
     );
   }
 }

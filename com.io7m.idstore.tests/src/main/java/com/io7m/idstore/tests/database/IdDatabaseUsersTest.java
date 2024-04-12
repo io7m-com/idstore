@@ -37,7 +37,6 @@ import com.io7m.idstore.model.IdUserSummary;
 import com.io7m.idstore.tests.IdTestUserSet;
 import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
-import com.io7m.idstore.tests.extensions.IdTestDatabases.ExpectedEvent;
 import com.io7m.zelador.test_extension.CloseableResourcesType;
 import com.io7m.zelador.test_extension.ZeladorExtension;
 import org.junit.jupiter.api.BeforeAll;

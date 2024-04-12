@@ -9,7 +9,7 @@
   <parent>
     <groupId>com.io7m.idstore</groupId>
     <artifactId>com.io7m.idstore</artifactId>
-    <version>1.2.1</version>
+    <version>2.0.0-beta0001</version>
   </parent>
   <artifactId>com.io7m.idstore.tests</artifactId>
 
@@ -255,6 +255,10 @@
     <dependency>
       <groupId>com.io7m.jmulticlose</groupId>
       <artifactId>com.io7m.jmulticlose.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.jdeferthrow</groupId>
+      <artifactId>com.io7m.jdeferthrow.core</artifactId>
     </dependency>
     <dependency>
       <groupId>net.jqwik</groupId>

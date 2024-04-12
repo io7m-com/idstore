@@ -17,7 +17,7 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
+import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.shell.admin.internal.formatting.IdAFormatterType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QParameterType;
@@ -54,9 +54,9 @@ public abstract class IdAShellCmdAbstract
     return this.metadata;
   }
 
-  protected final IdAClientSynchronousType client()
+  protected final IdAClientType client()
   {
-    return this.services().requireService(IdAClientSynchronousType.class);
+    return this.services().requireService(IdAClientType.class);
   }
 
   protected final Terminal terminal()

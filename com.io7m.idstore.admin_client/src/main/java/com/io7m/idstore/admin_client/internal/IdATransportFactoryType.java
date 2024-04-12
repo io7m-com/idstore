@@ -16,50 +16,35 @@
 
 package com.io7m.idstore.admin_client.internal;
 
-import com.io7m.genevan.core.GenProtocolIdentifier;
-import com.io7m.genevan.core.GenProtocolVersion;
+import com.io7m.genevan.core.GenProtocolClientHandlerType;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
-import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.strings.IdStrings;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
-
 /**
- * The factory of version 1 protocol handlers.
+ * The type of protocol transport factories.
  */
 
-public final class IdAHandlers1
-  implements IdAHandlerFactoryType
+public interface IdATransportFactoryType
+  extends GenProtocolClientHandlerType
 {
   /**
-   * The factory of version 1 protocol handlers.
+   * Create a new transport.
+   *
+   * @param configuration The configuration
+   * @param inHttpClient  The underlying HTTP client
+   * @param inStrings     The string resources
+   * @param baseURI       The base URI negotiated by the server
+   *
+   * @return A new handler
    */
 
-  public IdAHandlers1()
-  {
-
-  }
-
-  @Override
-  public GenProtocolIdentifier supported()
-  {
-    return new GenProtocolIdentifier(
-      IdACB1Messages.protocolId().toString(),
-      new GenProtocolVersion(ONE, ZERO)
-    );
-  }
-
-  @Override
-  public IdAHandlerType createHandler(
-    final IdAClientConfiguration configuration,
-    final HttpClient inHttpClient,
-    final IdStrings inStrings,
-    final URI inBaseURI)
-  {
-    return new IdAHandler1(configuration, inStrings, inHttpClient, inBaseURI);
-  }
+  IdATransportType createTransport(
+    IdAClientConfiguration configuration,
+    HttpClient inHttpClient,
+    IdStrings inStrings,
+    URI baseURI
+  );
 }

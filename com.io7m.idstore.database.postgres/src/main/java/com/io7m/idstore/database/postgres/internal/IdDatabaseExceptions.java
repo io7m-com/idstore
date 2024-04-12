@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.ADMIN_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_DUPLICATE;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_ONE_REQUIRED;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.OPERATION_NOT_PERMITTED;
@@ -34,6 +35,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.SQL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_DUPLICATE_ID_NAME;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.USER_NONEXISTENT;
 
 /**
  * Functions to handle database exceptions.
@@ -95,10 +97,19 @@ public final class IdDatabaseExceptions
             Objects.requireNonNullElse(serverError.getConstraint(), "");
 
           yield switch (constraint) {
-            case "emails_user_id_fkey", "emails_admin_id_fkey" -> {
+            case "emails_user_id_fkey" -> {
               yield new IdDatabaseException(
-                "Email already exists",
-                EMAIL_DUPLICATE,
+                "User does not exist.",
+                USER_NONEXISTENT,
+                attributes,
+                Optional.empty()
+              );
+            }
+
+            case "emails_admin_id_fkey" -> {
+              yield new IdDatabaseException(
+                "Admin does not exist.",
+                ADMIN_NONEXISTENT,
                 attributes,
                 Optional.empty()
               );

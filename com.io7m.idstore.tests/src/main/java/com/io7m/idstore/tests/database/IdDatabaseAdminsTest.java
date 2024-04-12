@@ -39,7 +39,6 @@ import com.io7m.idstore.model.IdRealName;
 import com.io7m.idstore.model.IdTimeRange;
 import com.io7m.idstore.tests.containers.IdTestContainerInstances;
 import com.io7m.idstore.tests.extensions.IdTestDatabases;
-import com.io7m.idstore.tests.extensions.IdTestDatabases.ExpectedEvent;
 import com.io7m.zelador.test_extension.CloseableResourcesType;
 import com.io7m.zelador.test_extension.ZeladorExtension;
 import org.junit.jupiter.api.BeforeAll;
@@ -959,5 +958,33 @@ public final class IdDatabaseAdminsTest
         );
       }
     }
+  }
+
+  /**
+   * Adding addresses to nonexistent admins fails.
+   *
+   * @throws Exception On errors
+   */
+
+  @Test
+  public void testAdminEmailIntegrity()
+    throws Exception
+  {
+    final var adminId =
+      IdTestDatabases.createAdminInitial(this.transaction, "admin", "12345678");
+
+    this.transaction.adminIdSet(adminId);
+
+    final var admins =
+      this.transaction.queries(IdDatabaseAdminsQueriesType.class);
+
+    final var reqId =
+      randomUUID();
+
+    final var ex =
+      assertThrows(IdDatabaseException.class, () -> {
+        admins.adminEmailAdd(reqId, new IdEmail("someone2@example.com"));
+      });
+    assertEquals(ADMIN_NONEXISTENT, ex.errorCode());
   }
 }
