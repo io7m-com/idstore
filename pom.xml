@@ -111,6 +111,7 @@
     <net.jqwik.version>1.8.4</net.jqwik.version>
     <org.apache.commons.io.version>2.16.0</org.apache.commons.io.version>
     <org.apache.commons.text.version>1.11.0</org.apache.commons.text.version>
+    <org.eclipse.angus.angus-mail.version>2.0.3</org.eclipse.angus.angus-mail.version>
     <org.jetbrains.version>1.9.23</org.jetbrains.version>
     <org.jline.version>3.25.1</org.jline.version>
     <org.jooq.version>3.19.7</org.jooq.version>
@@ -118,7 +119,6 @@
     <org.mockito.version>5.11.0</org.mockito.version>
     <org.postgresql.version>42.7.3</org.postgresql.version>
     <org.slf4j.version>2.0.12</org.slf4j.version>
-    <org.eclipse.angus.angus-mail.version>2.0.3</org.eclipse.angus.angus-mail.version>
   </properties>
 
   <licenses>
