@@ -19,6 +19,7 @@ package com.io7m.idstore.shell.admin.internal;
 
 import com.io7m.idstore.admin_client.api.IdAClientException;
 import com.io7m.idstore.protocol.admin.IdACommandType;
+import com.io7m.idstore.protocol.admin.IdAResponseError;
 import com.io7m.idstore.protocol.admin.IdAResponseType;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
@@ -79,11 +80,17 @@ public abstract class IdAShellCmdAbstractCR<
     final QCommandContextType context)
     throws Exception
   {
+    final var client = this.client();
+
     final var r =
-      this.client().executeOrElseThrow(
+      client.sendAndWaitOrThrow(
         this.onCreateCommand(context),
-        IdAClientException::ofError
+        this.options().commandTimeout()
       );
+
+    if (r instanceof final IdAResponseError error) {
+      throw IdAClientException.ofError(error);
+    }
 
     this.onFormatResponse(context, this.responseClass.cast(r));
     return SUCCESS;

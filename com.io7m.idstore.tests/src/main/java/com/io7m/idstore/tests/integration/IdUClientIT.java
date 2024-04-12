@@ -44,9 +44,9 @@ import com.io7m.idstore.tests.extensions.IdTestDatabases;
 import com.io7m.idstore.tests.extensions.IdTestServers;
 import com.io7m.idstore.user_client.IdUClients;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
-import com.io7m.idstore.user_client.api.IdUClientCredentials;
+import com.io7m.idstore.user_client.api.IdUClientConnectionParameters;
 import com.io7m.idstore.user_client.api.IdUClientException;
-import com.io7m.idstore.user_client.api.IdUClientSynchronousType;
+import com.io7m.idstore.user_client.api.IdUClientType;
 import com.io7m.quixote.core.QWebServerType;
 import com.io7m.quixote.core.QWebServers;
 import com.io7m.verdant.core.VProtocolException;
@@ -68,6 +68,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Clock;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -81,6 +83,7 @@ import static com.io7m.idstore.error_codes.IdStandardErrorCodes.API_MISUSE_ERROR
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.AUTHENTICATION_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_NONEXISTENT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.EMAIL_VERIFICATION_NONEXISTENT;
+import static com.io7m.idstore.error_codes.IdStandardErrorCodes.HTTP_SIZE_LIMIT;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PASSWORD_RESET_MISMATCH;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.PROTOCOL_ERROR;
 import static com.io7m.idstore.error_codes.IdStandardErrorCodes.RATE_LIMIT_EXCEEDED;
@@ -99,8 +102,10 @@ public final class IdUClientIT
   private static final Set<IdErrorCode> ALLOWED_SMOKE_CODES =
     Set.of(
       API_MISUSE_ERROR,
+      AUTHENTICATION_ERROR,
       EMAIL_NONEXISTENT,
       EMAIL_VERIFICATION_NONEXISTENT,
+      HTTP_SIZE_LIMIT,
       PASSWORD_RESET_MISMATCH,
       RATE_LIMIT_EXCEEDED,
       SECURITY_POLICY_DENIED,
@@ -148,7 +153,7 @@ public final class IdUClientIT
   }
 
   private static IdTestDatabases.IdDatabaseFixture DATABASE_FIXTURE;
-  private IdUClientSynchronousType client;
+  private IdUClientType client;
   private QWebServerType webServer;
   private IdTestServers.IdTestServerFixture serverFixture;
 
@@ -184,10 +189,12 @@ public final class IdUClientIT
 
     this.client =
       closeables.addPerTestResource(
-        CLIENTS.openSynchronousClient(
+        CLIENTS.create(
           new IdUClientConfiguration(
             OpenTelemetry.noop(),
-            Locale.ROOT)
+            Clock.systemUTC(),
+            Locale.ROOT
+          )
         ));
 
     this.webServer =
@@ -253,19 +260,19 @@ public final class IdUClientIT
           new IdUResponseUserSelf(UUID.randomUUID(), USER))
       );
 
-    this.client.login(
-      new IdUClientCredentials(
+    this.client.connectOrThrow(
+      new IdUClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
-        Map.of()
+        Map.of(),
+        Duration.ofSeconds(30L),
+        Duration.ofSeconds(30L)
       )
     );
 
     final var result =
-      this.client.execute(new IdUCommandUserSelf())
-        .map(IdUResponseUserSelf.class::cast)
-        .orElseThrow(e -> new IllegalStateException());
+      this.client.sendAndWaitOrThrow(new IdUCommandUserSelf(), Duration.ofSeconds(30L));
 
     assertEquals(USER.id(), result.user().id());
   }
@@ -301,25 +308,20 @@ public final class IdUClientIT
       .withContentType(IdUCB1Messages.contentType())
       .withFixedData(MESSAGES.serialize(new IdUCommandUserSelf()));
 
-    this.client.login(
-      new IdUClientCredentials(
+    this.client.connectOrThrow(
+      new IdUClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
-        Map.of()
+        Map.of(),
+        Duration.ofSeconds(30L),
+        Duration.ofSeconds(30L)
       )
     );
 
     final var ex =
       assertThrows(IdUClientException.class, () -> {
-        this.client.execute(new IdUCommandUserSelf())
-          .orElseThrow(e -> new IdUClientException(
-            e.message(),
-            e.errorCode(),
-            e.attributes(),
-            e.remediatingAction(),
-            Optional.of(e.requestId())
-          ));
+        this.client.sendAndWaitOrThrow(new IdUCommandUserSelf(), Duration.ofSeconds(30L));
       });
 
     assertEquals(PROTOCOL_ERROR, ex.errorCode());
@@ -358,25 +360,20 @@ public final class IdUClientIT
         new IdUResponseEmailRemoveDeny(UUID.randomUUID()))
       );
 
-    this.client.login(
-      new IdUClientCredentials(
+    this.client.connectOrThrow(
+      new IdUClientConnectionParameters(
         "someone",
         "whatever",
         this.webServer.uri(),
-        Map.of()
+        Map.of(),
+        Duration.ofSeconds(30L),
+        Duration.ofSeconds(30L)
       )
     );
 
     final var ex =
       assertThrows(IdUClientException.class, () -> {
-        this.client.execute(new IdUCommandUserSelf())
-          .orElseThrow(e -> new IdUClientException(
-            e.message(),
-            e.errorCode(),
-            e.attributes(),
-            e.remediatingAction(),
-            Optional.of(e.requestId())
-          ));
+        this.client.sendAndWaitOrThrow(new IdUCommandUserSelf(), Duration.ofSeconds(30L));
       });
 
     assertEquals(PROTOCOL_ERROR, ex.errorCode());
@@ -401,7 +398,7 @@ public final class IdUClientIT
           "testDisconnected_%s".formatted(c),
           () -> {
             assertThrows(IdUClientException.class, () -> {
-              this.client.executeOrElseThrow(c, IdUClientException::ofError);
+              this.client.sendAndWaitOrThrow(c, Duration.ofSeconds(30L));
             });
           }
         );
@@ -430,19 +427,20 @@ public final class IdUClientIT
         .limit(2000L)
         .toList();
 
-    this.client.loginOrElseThrow(
-      new IdUClientCredentials(
+    this.client.connectOrThrow(
+      new IdUClientConnectionParameters(
         "someone",
         "12345678",
         this.serverFixture.server().userAPI(),
-        Map.of()
-      ),
-      IdUClientException::ofError
+        Map.of(),
+        Duration.ofSeconds(30L),
+        Duration.ofSeconds(30L)
+      )
     );
 
     for (final var c : messages) {
       try {
-        this.client.executeOrElseThrow(c, IdUClientException::ofError);
+        this.client.sendAndWaitOrThrow(c, Duration.ofSeconds(30L));
       } catch (final IdUClientException ex) {
         if (ALLOWED_SMOKE_CODES.contains(ex.errorCode())) {
           continue;

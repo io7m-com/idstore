@@ -25,6 +25,7 @@ module com.io7m.idstore.shell.admin
 
   requires com.io7m.idstore.admin_client.api;
   requires com.io7m.idstore.admin_client;
+  requires com.io7m.idstore.strings;
 
   requires com.io7m.jmulticlose.core;
   requires com.io7m.quarrel.core;
@@ -32,6 +33,7 @@ module com.io7m.idstore.shell.admin
   requires com.io7m.tabla.core;
   requires org.jline;
   requires org.slf4j;
+  requires com.io7m.idstore.protocol.admin;
 
   exports com.io7m.idstore.shell.admin;
 }

@@ -16,8 +16,7 @@
 
 package com.io7m.idstore.shell.admin.internal;
 
-import com.io7m.idstore.admin_client.api.IdAClientCredentials;
-import com.io7m.idstore.admin_client.api.IdAClientException;
+import com.io7m.idstore.admin_client.api.IdAClientConnectionParameters;
 import com.io7m.quarrel.core.QCommandContextType;
 import com.io7m.quarrel.core.QCommandMetadata;
 import com.io7m.quarrel.core.QCommandStatus;
@@ -110,14 +109,19 @@ public final class IdAShellCmdLogin extends IdAShellCmdAbstract
       context.parameterValue(PASSWORD);
 
     final var credentials =
-      new IdAClientCredentials(
+      new IdAClientConnectionParameters(
         userName,
         password,
         new URI(server),
-        Map.of()
+        Map.of(),
+        this.options().loginTimeout(),
+        this.options().commandTimeout()
       );
 
-    this.client().loginOrElseThrow(credentials, IdAClientException::ofError);
+    final var client =
+      this.client();
+
+    client.connectOrThrow(credentials);
     return SUCCESS;
   }
 }

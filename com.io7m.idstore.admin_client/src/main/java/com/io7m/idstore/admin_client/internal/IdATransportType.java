@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 Mark Raynsford <code@io7m.com> https://www.io7m.com
+ * Copyright © 2024 Mark Raynsford <code@io7m.com> https://www.io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,30 +14,19 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.admin_client.internal;
 
-import java.util.UUID;
+import com.io7m.hibiscus.api.HBTransportType;
+import com.io7m.idstore.admin_client.api.IdAClientException;
+import com.io7m.idstore.protocol.admin.IdAMessageType;
 
 /**
- * UUID functions.
+ * The type of message transports.
  */
 
-public final class IdAUUIDs
+public interface IdATransportType
+  extends HBTransportType<IdAMessageType, IdAClientException>
 {
-  private static final UUID NULL_UUID =
-    UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-  private IdAUUIDs()
-  {
-
-  }
-
-  /**
-   * @return The null UUID
-   */
-
-  public static UUID nullUUID()
-  {
-    return NULL_UUID;
-  }
 }

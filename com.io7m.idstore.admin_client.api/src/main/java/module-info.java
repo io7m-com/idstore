@@ -23,10 +23,11 @@ module com.io7m.idstore.admin_client.api
   requires static org.osgi.annotation.bundle;
   requires static org.osgi.annotation.versioning;
 
-  requires transitive com.io7m.repetoir.core;
-  requires transitive com.io7m.hibiscus.api;
-  requires transitive com.io7m.idstore.error_codes;
-  requires transitive com.io7m.idstore.protocol.admin;
+  requires com.io7m.idstore.error_codes;
+  requires com.io7m.idstore.protocol.admin;
+
+  requires com.io7m.repetoir.core;
+  requires com.io7m.hibiscus.api;
 
   exports com.io7m.idstore.admin_client.api;
 }

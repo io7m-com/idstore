@@ -16,46 +16,54 @@
 
 package com.io7m.idstore.user_client.internal;
 
+import com.io7m.genevan.core.GenProtocolIdentifier;
+import com.io7m.genevan.core.GenProtocolVersion;
+import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
-import com.io7m.idstore.user_client.api.IdUClientException;
 
-import java.util.Objects;
-import java.util.function.Function;
+import java.net.URI;
+import java.net.http.HttpClient;
+
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
 
 /**
- * The abstract base class for handlers.
+ * The factory of version 1 protocol transports.
  */
 
-abstract class IdUHandlerAbstract
-  implements IdUHandlerType
+public final class IdUTransports1
+  implements IdUTransportFactoryType
 {
-  private final IdStrings strings;
-  private final IdUClientConfiguration configuration;
+  /**
+   * The factory of version 1 protocol transports.
+   */
 
-  protected IdUHandlerAbstract(
-    final IdUClientConfiguration inConfiguration,
-    final IdStrings inStrings)
+  public IdUTransports1()
   {
-    this.configuration =
-      Objects.requireNonNull(inConfiguration, "configuration");
-    this.strings =
-      Objects.requireNonNull(inStrings, "strings");
+
   }
 
   @Override
-  public final Function<Throwable, IdUClientException> exceptionTransformer()
+  public GenProtocolIdentifier supported()
   {
-    return IdUClientException::ofException;
+    return new GenProtocolIdentifier(
+      IdUCB1Messages.protocolId().toString(),
+      new GenProtocolVersion(ONE, ZERO)
+    );
   }
 
-  protected final IdStrings strings()
+  @Override
+  public IdUTransportType createTransport(
+    final IdUClientConfiguration configuration,
+    final HttpClient inHttpClient,
+    final IdStrings inStrings,
+    final URI inBaseURI)
   {
-    return this.strings;
-  }
-
-  protected final IdUClientConfiguration configuration()
-  {
-    return this.configuration;
+    return new IdUTransport1(
+      inStrings,
+      inHttpClient,
+      inBaseURI
+    );
   }
 }

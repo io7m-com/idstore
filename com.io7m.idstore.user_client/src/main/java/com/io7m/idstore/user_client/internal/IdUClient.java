@@ -14,36 +14,46 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 package com.io7m.idstore.user_client.internal;
 
-import com.io7m.genevan.core.GenProtocolClientHandlerType;
+import com.io7m.hibiscus.api.HBClientAbstract;
+import com.io7m.idstore.protocol.user.IdUMessageType;
 import com.io7m.idstore.strings.IdStrings;
 import com.io7m.idstore.user_client.api.IdUClientConfiguration;
+import com.io7m.idstore.user_client.api.IdUClientConnectionParameters;
+import com.io7m.idstore.user_client.api.IdUClientException;
+import com.io7m.idstore.user_client.api.IdUClientType;
 
-import java.net.URI;
 import java.net.http.HttpClient;
+import java.util.function.Supplier;
 
 /**
- * The type of protocol handler factories.
+ * The client.
  */
 
-public interface IdUHandlerFactoryType
-  extends GenProtocolClientHandlerType
+public final class IdUClient
+  extends HBClientAbstract<
+  IdUMessageType,
+  IdUClientConnectionParameters,
+  IdUClientException>
+  implements IdUClientType
 {
   /**
-   * Create a new handler.
+   * The client.
    *
-   * @param configuration The configuration
-   * @param inHttpClient  The underlying HTTP client
-   * @param inStrings     The string resources
-   * @param baseURI       The base URI negotiated by the server
-   *
-   * @return A new handler
+   * @param inConfiguration The configuration
+   * @param inHttpClients   The HTTP client
+   * @param inStrings       The string resources
    */
 
-  IdUHandlerType createHandler(
-    IdUClientConfiguration configuration,
-    HttpClient inHttpClient,
-    IdStrings inStrings,
-    URI baseURI);
+  public IdUClient(
+    final IdUClientConfiguration inConfiguration,
+    final IdStrings inStrings,
+    final Supplier<HttpClient> inHttpClients)
+  {
+    super(
+      new IdUHandlerDisconnected(inConfiguration, inStrings, inHttpClients)
+    );
+  }
 }

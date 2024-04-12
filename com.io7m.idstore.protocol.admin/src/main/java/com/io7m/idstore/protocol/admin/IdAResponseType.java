@@ -16,8 +16,6 @@
 
 package com.io7m.idstore.protocol.admin;
 
-import com.io7m.hibiscus.api.HBResponseType;
-
 import java.util.UUID;
 
 /**
@@ -25,7 +23,7 @@ import java.util.UUID;
  */
 
 public sealed interface IdAResponseType
-  extends IdAMessageType, HBResponseType
+  extends IdAMessageType
   permits IdAResponseAdminBanCreate,
   IdAResponseAdminBanDelete,
   IdAResponseAdminBanGet,

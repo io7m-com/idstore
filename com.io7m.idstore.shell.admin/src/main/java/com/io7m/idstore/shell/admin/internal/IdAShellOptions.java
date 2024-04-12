@@ -22,6 +22,7 @@ import com.io7m.idstore.shell.admin.internal.formatting.IdAFormatterType;
 import com.io7m.repetoir.core.RPServiceType;
 import org.jline.terminal.Terminal;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,6 +34,8 @@ public final class IdAShellOptions
   implements RPServiceType
 {
   private final AtomicBoolean terminateOnErrors;
+  private Duration loginTimeout;
+  private Duration commandTimeout;
   private IdAFormatterType formatter;
 
   /**
@@ -48,6 +51,28 @@ public final class IdAShellOptions
       new AtomicBoolean(false);
     this.formatter =
       new IdAFormatterPretty(inTerminal);
+    this.loginTimeout =
+      Duration.ofSeconds(30L);
+    this.commandTimeout =
+      Duration.ofSeconds(30L);
+  }
+
+  /**
+   * @return The login timeout
+   */
+
+  public Duration loginTimeout()
+  {
+    return this.loginTimeout;
+  }
+
+  /**
+   * @return The command timeout
+   */
+
+  public Duration commandTimeout()
+  {
+    return this.commandTimeout;
   }
 
   /**
@@ -91,5 +116,29 @@ public final class IdAShellOptions
   public String description()
   {
     return "Shell options service.";
+  }
+
+  /**
+   * Set the login timeout.
+   *
+   * @param t The timeout
+   */
+
+  public void setLoginTimeout(
+    final Duration t)
+  {
+    this.loginTimeout = Objects.requireNonNull(t, "timeout");
+  }
+
+  /**
+   * Set the command timeout.
+   *
+   * @param t The timeout
+   */
+
+  public void setCommandTimeout(
+    final Duration t)
+  {
+    this.commandTimeout = Objects.requireNonNull(t, "timeout");
   }
 }

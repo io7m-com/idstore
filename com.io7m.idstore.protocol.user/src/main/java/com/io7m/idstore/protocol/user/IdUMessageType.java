@@ -17,6 +17,7 @@
 
 package com.io7m.idstore.protocol.user;
 
+import com.io7m.hibiscus.api.HBMessageType;
 import com.io7m.idstore.protocol.api.IdProtocolMessageType;
 
 /**
@@ -24,7 +25,7 @@ import com.io7m.idstore.protocol.api.IdProtocolMessageType;
  */
 
 public sealed interface IdUMessageType
-  extends IdProtocolMessageType
+  extends IdProtocolMessageType, HBMessageType
   permits IdUCommandType,
   IdUResponseType
 {

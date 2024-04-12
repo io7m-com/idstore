@@ -9,7 +9,7 @@
   <parent>
     <artifactId>com.io7m.idstore</artifactId>
     <groupId>com.io7m.idstore</groupId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>com.io7m.idstore.user_client</artifactId>
@@ -56,29 +56,12 @@
     </dependency>
 
     <dependency>
-      <groupId>io.opentelemetry</groupId>
-      <artifactId>opentelemetry-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.opentelemetry</groupId>
-      <artifactId>opentelemetry-context</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>com.io7m.jxtrand</groupId>
       <artifactId>com.io7m.jxtrand.api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.io7m.hibiscus</groupId>
       <artifactId>com.io7m.hibiscus.api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.io7m.hibiscus</groupId>
-      <artifactId>com.io7m.hibiscus.basic</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.io7m.junreachable</groupId>
-      <artifactId>com.io7m.junreachable.core</artifactId>
     </dependency>
     <dependency>
       <groupId>com.io7m.verdant</groupId>

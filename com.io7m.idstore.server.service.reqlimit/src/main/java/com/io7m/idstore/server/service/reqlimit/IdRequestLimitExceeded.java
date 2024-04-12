@@ -48,7 +48,7 @@ public final class IdRequestLimitExceeded extends IdException
   {
     super(
       Objects.requireNonNull(message, "message"),
-      IdStandardErrorCodes.HTTP_ERROR,
+      IdStandardErrorCodes.HTTP_SIZE_LIMIT,
       Map.ofEntries(
         Map.entry("Size Limit", Long.toUnsignedString(inSizeLimit)),
         Map.entry("Size", Long.toUnsignedString(inSizeProvided))

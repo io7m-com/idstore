@@ -18,7 +18,7 @@ package com.io7m.idstore.shell.admin;
 
 import com.io7m.idstore.admin_client.IdAClients;
 import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
-import com.io7m.idstore.admin_client.api.IdAClientSynchronousType;
+import com.io7m.idstore.admin_client.api.IdAClientType;
 import com.io7m.idstore.error_codes.IdException;
 import com.io7m.idstore.shell.admin.internal.IdAShell;
 import com.io7m.idstore.shell.admin.internal.IdAShellCmdAdminBanCreate;
@@ -77,6 +77,7 @@ import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.Clock;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -103,9 +104,10 @@ public final class IdAShells implements IdAShellFactoryType
   {
     final var client =
       new IdAClients()
-        .openSynchronousClient(
-          new IdAClientConfiguration(configuration.locale())
-        );
+        .create(new IdAClientConfiguration(
+          Clock.systemUTC(),
+          configuration.locale()
+        ));
     final var terminal =
       configuration.terminal()
         .orElseGet(() -> {
@@ -122,7 +124,7 @@ public final class IdAShells implements IdAShellFactoryType
       new IdAShellOptions(terminal);
 
     final var services = new RPServiceDirectory();
-    services.register(IdAClientSynchronousType.class, client);
+    services.register(IdAClientType.class, client);
     services.register(IdAShellOptions.class, options);
     services.register(
       IdAShellTerminalHolder.class,

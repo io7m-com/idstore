@@ -17,9 +17,7 @@
 package com.io7m.idstore.user_client.api;
 
 import com.io7m.hibiscus.api.HBClientFactoryType;
-import com.io7m.idstore.protocol.user.IdUCommandType;
-import com.io7m.idstore.protocol.user.IdUResponseError;
-import com.io7m.idstore.protocol.user.IdUResponseType;
+import com.io7m.idstore.protocol.user.IdUMessageType;
 
 /**
  * A factory of clients.
@@ -27,16 +25,11 @@ import com.io7m.idstore.protocol.user.IdUResponseType;
 
 public interface IdUClientFactoryType
   extends HBClientFactoryType<
-  IdUClientException,
-  IdUClientConfiguration,
-  IdUCommandType<?>,
-  IdUResponseType,
-  IdUResponseType,
-  IdUResponseError,
-  IdUClientEventType,
-  IdUClientCredentials,
-  IdUClientAsynchronousType,
-  IdUClientSynchronousType>
+    IdUClientConfiguration,
+    IdUMessageType,
+    IdUClientConnectionParameters,
+    IdUClientType,
+    IdUClientException>
 {
 
 }

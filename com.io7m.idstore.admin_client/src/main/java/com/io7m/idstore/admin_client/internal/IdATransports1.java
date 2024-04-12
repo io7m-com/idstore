@@ -14,13 +14,13 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.user_client.internal;
+package com.io7m.idstore.admin_client.internal;
 
 import com.io7m.genevan.core.GenProtocolIdentifier;
 import com.io7m.genevan.core.GenProtocolVersion;
-import com.io7m.idstore.protocol.user.cb.IdUCB1Messages;
+import com.io7m.idstore.admin_client.api.IdAClientConfiguration;
+import com.io7m.idstore.protocol.admin.cb.IdACB1Messages;
 import com.io7m.idstore.strings.IdStrings;
-import com.io7m.idstore.user_client.api.IdUClientConfiguration;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -29,17 +29,17 @@ import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 
 /**
- * The factory of version 1 protocol handlers.
+ * The factory of version 1 protocol transports.
  */
 
-public final class IdUHandlers1
-  implements IdUHandlerFactoryType
+public final class IdATransports1
+  implements IdATransportFactoryType
 {
   /**
-   * The factory of version 1 protocol handlers.
+   * The factory of version 1 protocol transports.
    */
 
-  public IdUHandlers1()
+  public IdATransports1()
   {
 
   }
@@ -48,18 +48,31 @@ public final class IdUHandlers1
   public GenProtocolIdentifier supported()
   {
     return new GenProtocolIdentifier(
-      IdUCB1Messages.protocolId().toString(),
+      IdACB1Messages.protocolId().toString(),
       new GenProtocolVersion(ONE, ZERO)
     );
   }
 
   @Override
-  public IdUHandlerType createHandler(
-    final IdUClientConfiguration configuration,
+  public IdATransportType createTransport(
+    final IdAClientConfiguration configuration,
     final HttpClient inHttpClient,
     final IdStrings inStrings,
     final URI inBaseURI)
   {
-    return new IdUHandler1(configuration, inStrings, inHttpClient, inBaseURI);
+    return new IdATransport1(
+      inStrings,
+      inHttpClient,
+      inBaseURI
+    );
+  }
+
+  @Override
+  public String toString()
+  {
+    return "[%s 0x%s]".formatted(
+      this.getClass().getSimpleName(),
+      Integer.toUnsignedString(this.hashCode(), 16)
+    );
   }
 }

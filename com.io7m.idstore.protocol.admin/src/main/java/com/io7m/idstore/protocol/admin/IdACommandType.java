@@ -17,8 +17,6 @@
 
 package com.io7m.idstore.protocol.admin;
 
-import com.io7m.hibiscus.api.HBCommandType;
-
 /**
  * The type of commands in the Admin protocol.
  *
@@ -26,7 +24,7 @@ import com.io7m.hibiscus.api.HBCommandType;
  */
 
 public sealed interface IdACommandType<R extends IdAResponseType>
-  extends IdAMessageType, HBCommandType
+  extends IdAMessageType
   permits IdACommandAdminBanCreate,
   IdACommandAdminBanDelete,
   IdACommandAdminBanGet,

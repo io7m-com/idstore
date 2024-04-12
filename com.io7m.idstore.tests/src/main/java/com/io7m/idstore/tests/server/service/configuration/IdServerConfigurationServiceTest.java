@@ -41,7 +41,6 @@ import java.util.Locale;
 
 import static com.io7m.blackthorne.core.BTPreserveLexical.DISCARD_LEXICAL_INFORMATION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class IdServerConfigurationServiceTest

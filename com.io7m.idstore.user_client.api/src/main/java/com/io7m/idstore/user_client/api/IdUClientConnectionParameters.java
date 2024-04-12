@@ -14,44 +14,54 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.idstore.admin_client.api;
+package com.io7m.idstore.user_client.api;
 
-import com.io7m.hibiscus.api.HBCredentialsType;
+import com.io7m.hibiscus.api.HBConnectionParametersType;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 
 /**
  * The client credentials.
  *
- * @param userName   The username
- * @param password   The password
- * @param baseURI    The base URI
- * @param attributes The attributes
+ * @param userName       The username
+ * @param password       The password
+ * @param baseURI        The base URI
+ * @param attributes     The attributes
+ * @param commandTimeout The command timeout
+ * @param loginTimeout   The login timeout
  */
 
-public record IdAClientCredentials(
+public record IdUClientConnectionParameters(
   String userName,
   String password,
   URI baseURI,
-  Map<String, String> attributes)
-  implements HBCredentialsType
+  Map<String, String> attributes,
+  Duration loginTimeout,
+  Duration commandTimeout)
+  implements HBConnectionParametersType
 {
   /**
    * The client credentials.
    *
-   * @param userName   The username
-   * @param password   The password
-   * @param baseURI    The base URI
-   * @param attributes The attributes
+   * @param userName       The username
+   * @param password       The password
+   * @param baseURI        The base URI
+   * @param attributes     The attributes
+   * @param commandTimeout The command timeout
+   * @param loginTimeout   The login timeout
    */
 
-  public IdAClientCredentials
+  public IdUClientConnectionParameters
   {
     Objects.requireNonNull(userName, "userName");
     Objects.requireNonNull(password, "password");
     Objects.requireNonNull(baseURI, "baseURI");
-    Objects.requireNonNull(attributes, "attributes");
+    Objects.requireNonNull(commandTimeout, "commandTimeout");
+    Objects.requireNonNull(loginTimeout, "loginTimeout");
+
+    attributes = Map.copyOf(attributes);
   }
 }
