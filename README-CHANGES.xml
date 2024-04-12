@@ -48,13 +48,14 @@
         <c:change date="2024-04-07T00:00:00+00:00" summary="Re-add missing mail service implementation."/>
       </c:changes>
     </c:release>
-    <c:release date="2024-04-12T10:03:59+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="2.0.0">
+    <c:release date="2024-04-12T10:55:17+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="2.0.0">
       <c:changes>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update io.opentelemetry:opentelemetry-sdk-logs:1.36.0 → 1.37.0"/>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update io.opentelemetry:opentelemetry-bom:1.36.0 → 1.37.0"/>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update ch.qos.logback:logback-classic:1.5.3 → 1.5.4"/>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update ch.qos.logback:logback-core:1.5.3 → 1.5.4"/>
-        <c:change date="2024-04-12T10:03:59+00:00" summary="Update commons-io:commons-io:2.16.0 → 2.16.1"/>
+        <c:change date="2024-04-12T00:00:00+00:00" summary="Update commons-io:commons-io:2.16.0 → 2.16.1"/>
+        <c:change compatible="false" date="2024-04-12T10:55:17+00:00" summary="Upgrade to hibiscus 1.0.0-beta0001."/>
       </c:changes>
     </c:release>
   </c:releases>
