@@ -235,7 +235,7 @@
       using the included
       <Link target="894a0f26-590b-4d08-b445-1b687c87b583">schema</Link>. It is the service used by the
       included <Link target="80d0af5f-505b-4dee-b733-296a6f3970a4">admin shell</Link>, and by projects such
-      as <LinkExternal target="https://github.com/io7m/idstore_gui">idstore_gui</LinkExternal>.
+      as <LinkExternal target="https://www.github.com/io7m-com/idstore_gui">idstore_gui</LinkExternal>.
     </Paragraph>
   </Subsection>
 

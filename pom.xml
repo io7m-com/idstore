@@ -129,9 +129,9 @@
   </licenses>
 
   <scm>
-    <url>https://www.github.com/io7m/idstore</url>
-    <connection>scm:git:https://github.com/io7m/idstore</connection>
-    <developerConnection>scm:git:https://github.com/io7m/idstore</developerConnection>
+    <url>https://www.github.com/io7m-com/idstore</url>
+    <connection>scm:git:https://www.github.com/io7m-com/idstore</connection>
+    <developerConnection>scm:git:https://www.github.com/io7m-com/idstore</developerConnection>
   </scm>
 
   <developers>
@@ -144,7 +144,7 @@
   </developers>
 
   <issueManagement>
-    <url>https://www.github.com/io7m/idstore/issues</url>
+    <url>https://www.github.com/io7m-com/idstore/issues</url>
     <system>GitHub Issues</system>
   </issueManagement>
 
@@ -166,7 +166,7 @@
 
   <ciManagement>
     <system>GitHub Actions</system>
-    <url>https://github.com/idstore/actions</url>
+    <url>https://www.github.com/io7m-com/idstore/actions</url>
   </ciManagement>
 
   <prerequisites>

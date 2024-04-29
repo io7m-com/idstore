@@ -60,6 +60,6 @@
     </c:release>
   </c:releases>
   <c:ticket-systems>
-    <c:ticket-system default="true" id="com.github.io7m.idstore" url="https://www.github.com/io7m/idstore/issues/"/>
+    <c:ticket-system default="true" id="com.github.io7m.idstore" url="https://www.github.com/io7m-com/idstore/issues/"/>
   </c:ticket-systems>
 </c:changelog>

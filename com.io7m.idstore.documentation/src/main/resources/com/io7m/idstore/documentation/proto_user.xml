@@ -9,7 +9,7 @@
     <Paragraph>
       The <Link target="01d8e9c6-54c0-4501-8f45-e6988e0cb673">User API</Link> service exposes one or more
       versions of the <Term type="term">User</Term> protocol. The service uses the
-      <LinkExternal target="https://github.com/io7m/verdant">verdant</LinkExternal> protocol to advertise
+      <LinkExternal target="https://www.github.com/io7m-com/verdant">verdant</LinkExternal> protocol to advertise
       which versions of the <Term type="term">User</Term> protocol are available. Executing a
       <Term type="function">GET</Term> request to the root endpoint will yield a <Term type="package">verdant</Term>
       message showing which versions of the <Term type="term">User</Term> protocol are available.
