@@ -48,14 +48,21 @@
         <c:change date="2024-04-07T00:00:00+00:00" summary="Re-add missing mail service implementation."/>
       </c:changes>
     </c:release>
-    <c:release date="2024-04-12T10:55:17+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="2.0.0">
+    <c:release date="2024-05-10T09:41:42+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="2.0.0">
       <c:changes>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update io.opentelemetry:opentelemetry-sdk-logs:1.36.0 → 1.37.0"/>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update io.opentelemetry:opentelemetry-bom:1.36.0 → 1.37.0"/>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update ch.qos.logback:logback-classic:1.5.3 → 1.5.4"/>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update ch.qos.logback:logback-core:1.5.3 → 1.5.4"/>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update commons-io:commons-io:2.16.0 → 2.16.1"/>
-        <c:change compatible="false" date="2024-04-12T10:55:17+00:00" summary="Upgrade to hibiscus 1.0.0-beta0001."/>
+        <c:change compatible="false" date="2024-05-10T00:00:00+00:00" summary="Upgrade to hibiscus 1.0.0-beta0001."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update ch.qos.logback.version:1.5.4 → 1.5.5."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update org.slf4j.version:2.0.12 → 2.0.13."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update org.codehaus.mojo:jaxb2-maven-plugin:3.1.0 → 3.2.0."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update org.apache.commons:commons-text:1.11.0 → 1.12.0."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update ch.qos.logback.version:1.5.5 → 1.5.6."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update io.helidon:helidon-bom:4.0.7 → 4.0.8."/>
+        <c:change date="2024-05-10T09:41:42+00:00" summary="Update net.bytebuddy.version:1.14.13 → 1.14.14."/>
       </c:changes>
     </c:release>
   </c:releases>
