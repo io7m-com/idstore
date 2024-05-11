@@ -19,7 +19,7 @@
       Strong separation between administrators and users.
     </li>
     <li>
-      Fine-grained capability based security model for administrative operations; Safely write external services that
+      Fine-grained capability-based security model for administrative operations; Safely write external services that
       can perform administrative operations while maintaining the principle of least privilege.
     </li>
     <li>
@@ -40,6 +40,10 @@
     <li>
       Platform independence. No platform-dependent code is included in any form, and installations can largely be
       carried between platforms without changes.
+    </li>
+    <li>
+      Extensive documentation including information on installation, a setup tutorial, a theory of operation,
+      maintenance and monitoring information, information on security properties, and full API documentation.
     </li>
     <li>
       <a href="https://opencontainers.org/">OCI</a>-ready: Ready to run as an immutable, stateless, read-only,

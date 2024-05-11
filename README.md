@@ -30,7 +30,7 @@ authentication.
   using an efficient binary protocol over HTTP.
 * Full Java API for performing user and administrative operations.
 * Strong separation between administrators and users.
-* Fine-grained capability based security model for administrative operations;
+* Fine-grained capability-based security model for administrative operations;
   Safely write external services that can perform administrative operations
   while maintaining the principle of least privilege.
 * Command-line administrative shell.
@@ -42,6 +42,9 @@ authentication.
 * An extensive automated test suite with high coverage.
 * Platform independence. No platform-dependent code is included in any form,
   and installations can largely be carried between platforms without changes.
+* Extensive documentation including information on installation, a setup
+  tutorial, a theory of operation, maintenance and monitoring information,
+  information on security properties, and full API documentation.
 * [OCI](https://opencontainers.org/)-ready: Ready to run as an immutable,
   stateless, read-only, unprivileged container for maximum security and
   reliability.
