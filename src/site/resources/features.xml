@@ -2,8 +2,57 @@
 
 <div xmlns="http://www.w3.org/1999/xhtml">
   <ul>
-    <li><a href="https://www.osgi.org/">OSGi</a>-ready</li>
-    <li><a href="https://en.wikipedia.org/wiki/Java_Platform_Module_System">JPMS</a>-ready</li>
-    <li>ISC license</li>
+    <li>
+      Simple, centralized identity storage and password checking. Passwords are securely stored using PBKDF2.
+    </li>
+    <li>
+      Email-based password reset functionality with a minimalist web interface.
+    </li>
+    <li>
+      Full API access for all operations: Separate user-facing and administrator-facing APIs are exposed on different
+      ports and are accessed using an efficient binary protocol over HTTP.
+    </li>
+    <li>
+      Full Java API for performing user and administrative operations.
+    </li>
+    <li>
+      Strong separation between administrators and users.
+    </li>
+    <li>
+      Fine-grained capability based security model for administrative operations; Safely write external services that
+      can perform administrative operations while maintaining the principle of least privilege.
+    </li>
+    <li>
+      Command-line administrative shell.
+    </li>
+    <li>
+      Complete audit log; every operation that changes the state of the system is logged in an append-only log.
+    </li>
+    <li>
+      Fully instrumented with <a href="https://opentelemetry.io/">OpenTelemetry</a>.
+    </li>
+    <li>
+      A small, easily auditable codebase with a heavy use of modularity for correctness.
+    </li>
+    <li>
+      An extensive automated test suite with high coverage.
+    </li>
+    <li>
+      Platform independence. No platform-dependent code is included in any form, and installations can largely be
+      carried between platforms without changes.
+    </li>
+    <li>
+      <a href="https://opencontainers.org/">OCI</a>-ready: Ready to run as an immutable, stateless, read-only,
+      unprivileged container for maximum security and reliability.
+    </li>
+    <li>
+      <a href="https://www.osgi.org/">OSGi</a>-ready.
+    </li>
+    <li>
+      <a href="https://en.wikipedia.org/wiki/Java_Platform_Module_System">JPMS</a>-ready.
+    </li>
+    <li>
+      ISC license.
+    </li>
   </ul>
 </div>
