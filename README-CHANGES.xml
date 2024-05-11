@@ -48,17 +48,48 @@
         <c:change date="2024-04-07T00:00:00+00:00" summary="Re-add missing mail service implementation."/>
       </c:changes>
     </c:release>
-    <c:release date="2024-04-12T10:03:59+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="2.0.0">
+    <c:release date="2024-05-11T19:25:09+00:00" is-open="false" ticket-system="com.github.io7m.idstore" version="2.0.0">
       <c:changes>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update io.opentelemetry:opentelemetry-sdk-logs:1.36.0 → 1.37.0"/>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update io.opentelemetry:opentelemetry-bom:1.36.0 → 1.37.0"/>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update ch.qos.logback:logback-classic:1.5.3 → 1.5.4"/>
         <c:change date="2024-04-12T00:00:00+00:00" summary="Update ch.qos.logback:logback-core:1.5.3 → 1.5.4"/>
-        <c:change date="2024-04-12T10:03:59+00:00" summary="Update commons-io:commons-io:2.16.0 → 2.16.1"/>
+        <c:change date="2024-04-12T00:00:00+00:00" summary="Update commons-io:commons-io:2.16.0 → 2.16.1"/>
+        <c:change date="2024-05-05T00:00:00+00:00" summary="Update com.io7m.jdeferthrow:com.io7m.jdeferthrow.core:1.2.0 → 1.3.0."/>
+        <c:change date="2024-05-05T00:00:00+00:00" summary="Update com.io7m.jaffirm:com.io7m.jaffirm.core:4.0.0 → 4.0.1."/>
+        <c:change date="2024-05-05T00:00:00+00:00" summary="Update org.jooq.version:3.19.7 → 3.19.8."/>
+        <c:change date="2024-05-07T00:00:00+00:00" summary="Update org.jetbrains.kotlin:kotlin-stdlib:1.9.23 → 1.9.24."/>
+        <c:change date="2024-05-07T00:00:00+00:00" summary="Update com.io7m.jxe:com.io7m.jxe.core:1.0.2 → 1.0.3."/>
+        <c:change date="2024-05-08T00:00:00+00:00" summary="Update com.io7m.jlexing:com.io7m.jlexing.core:3.1.0 → 3.2.0."/>
+        <c:change date="2024-05-08T00:00:00+00:00" summary="Update com.io7m.seltzer:com.io7m.seltzer.api:1.0.0 → 1.0.1."/>
+        <c:change date="2024-05-08T00:00:00+00:00" summary="Update net.bytebuddy.version:1.14.14 → 1.14.15."/>
+        <c:change compatible="false" date="2024-05-10T00:00:00+00:00" summary="Upgrade to hibiscus 1.0.0-beta0001."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update ch.qos.logback.version:1.5.4 → 1.5.5."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update org.slf4j.version:2.0.12 → 2.0.13."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update org.codehaus.mojo:jaxb2-maven-plugin:3.1.0 → 3.2.0."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update org.apache.commons:commons-text:1.11.0 → 1.12.0."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update ch.qos.logback.version:1.5.5 → 1.5.6."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update io.helidon:helidon-bom:4.0.7 → 4.0.8."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update net.bytebuddy.version:1.14.13 → 1.14.14."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update com.io7m.ervilla.version:1.0.0-beta0002 → 1.0.0."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update com.io7m.quarrel.version:1.6.0 → 1.6.1."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update com.io7m.jade.version:1.0.2 → 1.0.3."/>
+        <c:change date="2024-05-10T00:00:00+00:00" summary="Update com.io7m.anethum.version:1.1.0 → 1.1.1."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update com.io7m.quixote:com.io7m.quixote.core:1.2.0 → 1.3.0."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update com.io7m.verdant.version:1.0.0 → 1.0.1."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update com.io7m.canonmill:com.io7m.canonmill.core:2.0.1 → 2.1.0."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update com.io7m.jxtrand.version:2.0.0 → 2.1.0."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update io.opentelemetry:opentelemetry-bom:1.37.0 → 1.38.0."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update com.io7m.blackthorne.version:2.0.0 → 2.0.1."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update io.opentelemetry:opentelemetry-sdk-logs:1.37.0 → 1.38.0."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update org.mockito:mockito-core:5.11.0 → 5.12.0."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update com.io7m.jmulticlose:com.io7m.jmulticlose.core:1.1.2 → 1.1.3."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update com.io7m.repetoir:com.io7m.repetoir.core:1.0.0 → 1.0.1."/>
+        <c:change date="2024-05-11T00:00:00+00:00" summary="Update com.io7m.jbssio.version:2.0.0 → 2.1.0."/>
       </c:changes>
     </c:release>
   </c:releases>
   <c:ticket-systems>
-    <c:ticket-system default="true" id="com.github.io7m.idstore" url="https://www.github.com/io7m/idstore/issues/"/>
+    <c:ticket-system default="true" id="com.github.io7m.idstore" url="https://www.github.com/io7m-com/idstore/issues/"/>
   </c:ticket-systems>
 </c:changelog>
