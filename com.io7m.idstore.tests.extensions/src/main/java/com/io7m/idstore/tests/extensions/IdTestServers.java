@@ -224,10 +224,10 @@ public final class IdTestServers
       new IdServerRateLimitConfiguration(
         Duration.ofMinutes(5L),
         Duration.ofMinutes(5L),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L),
-        Duration.ofSeconds(1L)
+        Duration.ofMillis(1L),
+        Duration.ofMillis(3L),
+        Duration.ofMillis(1L),
+        Duration.ofMillis(3L)
       );
 
     return createWithRateLimitConfiguration(
