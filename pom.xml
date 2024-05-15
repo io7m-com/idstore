@@ -97,7 +97,7 @@
 
     <!-- Third-party dependencies. -->
     <ch.qos.logback.version>1.5.6</ch.qos.logback.version>
-    <com.github.davidmoten.subethasmtp.version>7.0.2</com.github.davidmoten.subethasmtp.version>
+    <com.github.davidmoten.subethasmtp.version>7.1.1</com.github.davidmoten.subethasmtp.version>
     <com.helger.ph-css.version>7.0.2</com.helger.ph-css.version>
     <com.squareup.okio.version>3.9.0</com.squareup.okio.version>
     <io.helidon.version>4.0.8</io.helidon.version>
