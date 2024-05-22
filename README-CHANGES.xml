@@ -88,9 +88,10 @@
         <c:change date="2024-05-11T00:00:00+00:00" summary="Update com.io7m.jbssio.version:2.0.0 → 2.1.0."/>
       </c:changes>
     </c:release>
-    <c:release date="2024-05-22T19:50:03+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="2.0.1">
+    <c:release date="2024-05-22T20:11:52+00:00" is-open="false" ticket-system="com.github.io7m.idstore" version="2.0.1">
       <c:changes>
-        <c:change date="2024-05-22T19:50:03+00:00" summary="The idstore worker role was not being used to connect to the database.">
+        <c:change date="2024-05-14T00:00:00+00:00" summary="Update com.github.davidmoten:subethasmtp:7.0.2 → 7.1.1."/>
+        <c:change date="2024-05-22T00:00:00+00:00" summary="The idstore worker role was not being used to connect to the database.">
           <c:tickets>
             <c:ticket id="154"/>
           </c:tickets>
