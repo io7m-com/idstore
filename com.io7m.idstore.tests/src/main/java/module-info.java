@@ -75,12 +75,13 @@ open module com.io7m.idstore.tests
   requires org.postgresql.jdbc;
   requires org.slf4j;
   requires subethasmtp;
+  requires com.io7m.blackthorne.core;
 
   requires org.junit.jupiter.api;
   requires org.junit.jupiter.engine;
   requires org.junit.platform.commons;
   requires org.junit.platform.engine;
-  requires com.io7m.blackthorne.core;
+  requires org.junit.platform.launcher;
 
   exports com.io7m.idstore.tests.database;
   exports com.io7m.idstore.tests.integration;

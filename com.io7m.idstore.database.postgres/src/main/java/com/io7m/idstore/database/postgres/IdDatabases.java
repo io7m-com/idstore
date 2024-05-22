@@ -207,8 +207,8 @@ public final class IdDatabases implements IdDatabaseFactoryType
 
     final var config = new HikariConfig();
     config.setJdbcUrl(url.toString());
-    config.setUsername(configuration.ownerRoleName());
-    config.setPassword(configuration.ownerRolePassword());
+    config.setUsername("idstore");
+    config.setPassword(configuration.workerRolePassword());
     config.setAutoCommit(false);
 
     final var dataSource =
