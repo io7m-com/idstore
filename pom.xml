@@ -99,7 +99,7 @@
     <ch.qos.logback.version>1.5.8</ch.qos.logback.version>
     <com.github.davidmoten.subethasmtp.version>7.1.1</com.github.davidmoten.subethasmtp.version>
     <com.helger.ph-css.version>7.0.2</com.helger.ph-css.version>
-    <com.squareup.okio.version>3.9.0</com.squareup.okio.version>
+    <com.squareup.okio.version>3.9.1</com.squareup.okio.version>
     <io.helidon.version>4.1.1</io.helidon.version>
     <io.opentelemetry.api.logs.version>1.26.0-alpha</io.opentelemetry.api.logs.version>
     <io.opentelemetry.sdk.logs.version>1.42.1</io.opentelemetry.sdk.logs.version>
