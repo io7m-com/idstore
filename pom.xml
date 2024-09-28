@@ -113,7 +113,7 @@
     <org.apache.commons.text.version>1.12.0</org.apache.commons.text.version>
     <org.eclipse.angus.angus-mail.version>2.0.3</org.eclipse.angus.angus-mail.version>
     <org.jetbrains.version>1.9.25</org.jetbrains.version>
-    <org.jline.version>3.25.1</org.jline.version>
+    <org.jline.version>3.27.0</org.jline.version>
     <org.jooq.version>3.19.13</org.jooq.version>
     <org.junit.version>5.11.0</org.junit.version>
     <org.mockito.version>5.13.0</org.mockito.version>
