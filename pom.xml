@@ -96,7 +96,7 @@
     <com.io7m.zelador.version>0.0.1</com.io7m.zelador.version>
 
     <!-- Third-party dependencies. -->
-    <ch.qos.logback.version>1.5.8</ch.qos.logback.version>
+    <ch.qos.logback.version>1.5.9</ch.qos.logback.version>
     <com.github.davidmoten.subethasmtp.version>7.1.1</com.github.davidmoten.subethasmtp.version>
     <com.helger.ph-css.version>7.0.3</com.helger.ph-css.version>
     <com.squareup.okio.version>3.9.1</com.squareup.okio.version>
