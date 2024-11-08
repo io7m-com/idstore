@@ -193,7 +193,9 @@ public final class IdTestDatabases
         IdDatabaseCreate.CREATE_DATABASE,
         IdDatabaseUpgrade.UPGRADE_DATABASE,
         IdStrings.create(Locale.ROOT),
-        Clock.systemUTC()
+        Clock.systemUTC(),
+        0,
+        10
       );
 
 
@@ -244,7 +246,9 @@ public final class IdTestDatabases
         IdDatabaseCreate.CREATE_DATABASE,
         IdDatabaseUpgrade.UPGRADE_DATABASE,
         IdStrings.create(Locale.ROOT),
-        Clock.systemUTC()
+        Clock.systemUTC(),
+        0,
+        10
       );
 
 

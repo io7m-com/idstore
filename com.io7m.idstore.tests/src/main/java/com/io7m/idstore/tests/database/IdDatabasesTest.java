@@ -90,7 +90,9 @@ public final class IdDatabasesTest
         IdDatabaseCreate.CREATE_DATABASE,
         IdDatabaseUpgrade.DO_NOT_UPGRADE_DATABASE,
         IdStrings.create(Locale.ROOT),
-        Clock.systemUTC()
+        Clock.systemUTC(),
+        0,
+        10
       );
 
     final var url = new StringBuilder(128);

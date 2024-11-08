@@ -704,6 +704,30 @@
           </documentation>
         </annotation>
       </attribute>
+
+      <attribute name="MinimumPoolConnections"
+                 use="optional"
+                 default="1"
+                 type="unsignedInt">
+        <annotation>
+          <documentation>
+            The minimum number of connections to keep idle in the database connection pool.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="MaximumPoolConnections"
+                 use="optional"
+                 default="10"
+                 type="unsignedInt">
+        <annotation>
+          <documentation>
+            The maximum number of connections to allow in the database connection pool. When this number of
+            connections is active in the pool, the application will be forced to wait until a connection
+            becomes idle upon requesting another connection.
+          </documentation>
+        </annotation>
+      </attribute>
     </complexType>
   </element>
 

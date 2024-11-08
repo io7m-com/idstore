@@ -36,6 +36,8 @@ import java.util.Optional;
  * @param databaseName       The database name
  * @param strings            The string resources
  * @param clock              A clock for time retrievals
+ * @param minimumConnections The minimum number of database connections in the pool
+ * @param maximumConnections The maximum number of database connections in the pool
  */
 
 public record IdDatabaseConfiguration(
@@ -49,7 +51,9 @@ public record IdDatabaseConfiguration(
   IdDatabaseCreate create,
   IdDatabaseUpgrade upgrade,
   IdStrings strings,
-  Clock clock)
+  Clock clock,
+  int minimumConnections,
+  int maximumConnections)
 {
   /**
    * The server database configuration.
@@ -65,6 +69,8 @@ public record IdDatabaseConfiguration(
    * @param databaseName       The database name
    * @param strings            The string resources
    * @param clock              A clock for time retrievals
+   * @param minimumConnections The minimum number of database connections in the pool
+   * @param maximumConnections The maximum number of database connections in the pool
    */
 
   public IdDatabaseConfiguration
@@ -79,6 +85,9 @@ public record IdDatabaseConfiguration(
     Objects.requireNonNull(upgrade, "upgrade");
     Objects.requireNonNull(strings, "strings");
     Objects.requireNonNull(clock, "clock");
+
+    minimumConnections = Math.max(0, minimumConnections);
+    maximumConnections = Math.max(minimumConnections, maximumConnections);
   }
 
   /**
@@ -98,7 +107,9 @@ public record IdDatabaseConfiguration(
       IdDatabaseCreate.DO_NOT_CREATE_DATABASE,
       IdDatabaseUpgrade.DO_NOT_UPGRADE_DATABASE,
       this.strings(),
-      this.clock()
+      this.clock(),
+      this.minimumConnections,
+      this.maximumConnections
     );
   }
 }

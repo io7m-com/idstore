@@ -82,7 +82,9 @@ public final class IdServerConfigurations
         fileDbConfig.create() ? CREATE_DATABASE : DO_NOT_CREATE_DATABASE,
         fileDbConfig.upgrade() ? UPGRADE_DATABASE : DO_NOT_UPGRADE_DATABASE,
         strings,
-        clock
+        clock,
+        fileDbConfig.minimumConnections(),
+        fileDbConfig.maximumConnections()
       );
 
     final var databaseFactories =

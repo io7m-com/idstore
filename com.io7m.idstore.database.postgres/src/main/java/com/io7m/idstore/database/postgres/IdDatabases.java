@@ -210,6 +210,8 @@ public final class IdDatabases implements IdDatabaseFactoryType
     config.setUsername("idstore");
     config.setPassword(configuration.workerRolePassword());
     config.setAutoCommit(false);
+    config.setMinimumIdle(configuration.minimumConnections());
+    config.setMaximumPoolSize(configuration.maximumConnections());
 
     final var dataSource =
       resources.add(new HikariDataSource(config));

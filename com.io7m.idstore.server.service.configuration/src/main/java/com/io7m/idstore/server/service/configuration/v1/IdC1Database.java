@@ -41,6 +41,18 @@ final class IdC1Database
     final BTElementParsingContextType context,
     final Attributes attributes)
   {
+    final var minimumPoolConnections =
+      Optional.ofNullable(attributes.getValue(
+          "MinimumPoolConnections"))
+        .map(x -> Integer.valueOf(Integer.parseUnsignedInt(x)))
+        .orElse(Integer.valueOf(0));
+
+    final var maximumPoolConnections =
+      Optional.ofNullable(attributes.getValue(
+          "MaximumPoolConnections"))
+        .map(x -> Integer.valueOf(Integer.parseUnsignedInt(x)))
+        .orElse(Integer.valueOf(10));
+
     this.result =
       new IdServerDatabaseConfiguration(
         IdServerDatabaseKind.valueOf(attributes.getValue("Kind")),
@@ -52,7 +64,9 @@ final class IdC1Database
         Integer.valueOf(attributes.getValue("Port")).intValue(),
         attributes.getValue("Name"),
         Boolean.parseBoolean(attributes.getValue("Create")),
-        Boolean.parseBoolean(attributes.getValue("Upgrade"))
+        Boolean.parseBoolean(attributes.getValue("Upgrade")),
+        minimumPoolConnections.intValue(),
+        maximumPoolConnections.intValue()
       );
   }
 
