@@ -98,9 +98,14 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2024-11-03T20:16:12+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="2.0.2">
+    <c:release date="2024-11-08T12:14:00+00:00" is-open="true" ticket-system="com.github.io7m.idstore" version="2.0.2">
       <c:changes>
-        <c:change date="2024-11-03T20:16:12+00:00" summary="Upgrade Temurin and Alpine in OCI containers."/>
+        <c:change date="2024-11-03T00:00:00+00:00" summary="Upgrade Temurin and Alpine in OCI containers."/>
+        <c:change date="2024-11-08T12:14:00+00:00" summary="Fix an issue that was preventing maintenance from running.">
+          <c:tickets>
+            <c:ticket id="243"/>
+          </c:tickets>
+        </c:change>
       </c:changes>
     </c:release>
   </c:releases>

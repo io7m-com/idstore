@@ -33,6 +33,7 @@ module com.io7m.idstore.server.service.maintenance
   requires com.io7m.repetoir.core;
   requires io.opentelemetry.api;
   requires org.slf4j;
+  requires com.io7m.jmulticlose.core;
 
   exports com.io7m.idstore.server.service.maintenance;
 }
