@@ -40,7 +40,13 @@ public final class IdAShellCmdSet extends IdAShellCmdAbstract
 {
   enum Formatter
   {
+    /**
+     * Raw format.
+     */
     RAW,
+    /**
+     * Pretty format.
+     */
     PRETTY
   }
 
@@ -133,7 +139,7 @@ public final class IdAShellCmdSet extends IdAShellCmdAbstract
       });
 
     context.parameterValue(LOGIN_TIMEOUT)
-        .ifPresent(x -> this.options().setLoginTimeout(x));
+      .ifPresent(x -> this.options().setLoginTimeout(x));
 
     context.parameterValue(COMMAND_TIMEOUT)
       .ifPresent(x -> this.options().setCommandTimeout(x));
