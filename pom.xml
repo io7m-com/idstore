@@ -118,7 +118,7 @@
     <org.junit.version>5.13.0</org.junit.version>
     <org.mockito.version>5.15.2</org.mockito.version>
     <org.postgresql.version>42.7.7</org.postgresql.version>
-    <org.slf4j.version>2.0.16</org.slf4j.version>
+    <org.slf4j.version>2.0.17</org.slf4j.version>
 
     <!-- Container dependencies. -->
     <com.io7m.oci.versionAlpine>3.20.3</com.io7m.oci.versionAlpine>
