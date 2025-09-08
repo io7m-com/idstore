@@ -477,16 +477,6 @@
         <version>${io.opentelemetry.semconv.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.opentelemetry</groupId>
-        <artifactId>opentelemetry-api-logs</artifactId>
-        <version>${io.opentelemetry.api.logs.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.opentelemetry</groupId>
-        <artifactId>opentelemetry-sdk-logs</artifactId>
-        <version>${io.opentelemetry.sdk.logs.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-stdlib</artifactId>
         <version>${org.jetbrains.version}</version>
