@@ -173,7 +173,7 @@ public final class IdTestDatabases
       supervisor.start(
         EPgSpecs.builderFromDockerIO(
           POSTGRESQL_VERSION,
-          new EPortAddressType.All(),
+          new EPortAddressType.AllIPv4(),
           port,
           "idstore",
           "idstore_install",
@@ -226,7 +226,7 @@ public final class IdTestDatabases
       supervisor.start(
         EPgSpecs.builderFromDockerIO(
           POSTGRESQL_VERSION,
-          new EPortAddressType.All(),
+          new EPortAddressType.AllIPv4(),
           port,
           "idstore",
           "idstore_install",

@@ -121,8 +121,7 @@
     <org.slf4j.version>2.0.17</org.slf4j.version>
 
     <!-- Container dependencies. -->
-    <com.io7m.oci.versionAlpine>3.20.3</com.io7m.oci.versionAlpine>
-    <com.io7m.oci.versionTemurin>23.0.1_11-jre-alpine</com.io7m.oci.versionTemurin>
+    <com.io7m.oci.versionTemurin>24.0.2_12-jre-ubi10-minimal@sha256:0b2a233757822c62d947ab47fab5db0df975d02e1e77853c9aff136ee4049820</com.io7m.oci.versionTemurin>
   </properties>
 
   <licenses>
