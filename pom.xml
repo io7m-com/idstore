@@ -93,7 +93,7 @@
     <com.io7m.trasco.version>2.0.1</com.io7m.trasco.version>
     <com.io7m.verdant.version>1.0.1</com.io7m.verdant.version>
     <com.io7m.xstructural.version>2.0.1</com.io7m.xstructural.version>
-    <com.io7m.zelador.version>0.0.1</com.io7m.zelador.version>
+    <com.io7m.zelador.version>1.0.0</com.io7m.zelador.version>
 
     <!-- Third-party dependencies. -->
     <ch.qos.logback.version>1.5.32</ch.qos.logback.version>
