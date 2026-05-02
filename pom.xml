@@ -104,7 +104,7 @@
     <io.opentelemetry.api.logs.version>1.26.0-alpha</io.opentelemetry.api.logs.version>
     <io.opentelemetry.sdk.logs.version>1.46.0</io.opentelemetry.sdk.logs.version>
     <io.opentelemetry.semconv.version>1.30.1-alpha</io.opentelemetry.semconv.version>
-    <io.opentelemetry.version>1.60.1</io.opentelemetry.version>
+    <io.opentelemetry.version>1.61.0</io.opentelemetry.version>
     <jakarta.activation-api.version>2.1.4</jakarta.activation-api.version>
     <jakarta.mail.version>2.1.5</jakarta.mail.version>
     <net.bytebuddy.version>1.18.7</net.bytebuddy.version>
