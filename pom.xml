@@ -115,7 +115,7 @@
     <org.jetbrains.version>1.9.25</org.jetbrains.version>
     <org.jline.version>3.29.0</org.jline.version>
     <org.jooq.version>3.21.1</org.jooq.version>
-    <org.junit.version>5.14.3</org.junit.version>
+    <org.junit.version>5.14.4</org.junit.version>
     <org.mockito.version>5.15.2</org.mockito.version>
     <org.postgresql.version>42.7.11</org.postgresql.version>
     <org.slf4j.version>2.0.17</org.slf4j.version>
